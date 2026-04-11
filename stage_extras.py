@@ -1200,3 +1200,387 @@ def stage11_extras(modules) -> List[str]:
         shutil.rmtree(tmpdir, ignore_errors=True)
 
     return results
+
+
+def stage6_extras(modules) -> List[str]:
+    """1000-hand Stage 6 test: the full 8-archetype table including the
+    three adaptive players (Predator, Mirror, Judge).
+
+    Asserts the three adaptive-specific behavioral invariants plus the
+    usual reproducibility + per-agent sanity:
+
+    1. Predator exploits classified opponents. After 1000 hands, when the
+       Predator's posterior for the Firestorm is saturated (> 0.90) and
+       we probe ``get_params`` with only Firestorm active, the returned
+       bluff rate must drop well below the baseline (< 0.15 on preflop;
+       baseline is 0.25). Falls back to asserting br < 0.25 if the
+       posterior hasn't fully saturated — the shape of the adaptation
+       matters more than the specific number.
+    2. Mirror's VPIP trends loose. Against a Firestorm/Wall-heavy table,
+       Mirror's observed VPIP should exceed the Stage 4 ``mirror_default``
+       empirical value (~22 %) by a comfortable margin — the test bound
+       is > 30 %.
+    3. Judge's grievance ledger accumulates against the Firestorm. In
+       1000 hands the Firestorm will bluff against the Judge at
+       showdown at least once, so ``judge.grievance[2] >= 1``. If the
+       ledger reaches τ the trigger hand is printed (informational; not
+       required in 1000 hands but usually happens much earlier).
+    4. Reproducibility of every adaptive agent: same seed twice → same
+       Predator posterior, same Mirror observed_stats, same Judge
+       grievance ledger.
+    5. Every agent at the table has ``hands_dealt == 1000`` and
+       ``PFR <= VPIP``, the usual invariants.
+    """
+    import numpy as np
+
+    Oracle = modules["Oracle"]
+    Sentinel = modules["Sentinel"]
+    Firestorm = modules["Firestorm"]
+    Wall = modules["Wall"]
+    Phantom = modules["Phantom"]
+    Predator = modules["Predator"]
+    Mirror = modules["Mirror"]
+    Judge = modules["Judge"]
+    Table = modules["Table"]
+    GameState = modules["GameState"]
+
+    results: List[str] = []
+
+    def check(name: str, cond: bool, detail: str = "") -> None:
+        prefix = "PASS" if cond else "FAIL"
+        results.append(f"{prefix} {name}{': ' + detail if detail else ''}")
+
+    def build():
+        return [
+            Oracle(seat=0),
+            Sentinel(seat=1),
+            Firestorm(seat=2),
+            Wall(seat=3),
+            Phantom(seat=4),
+            Predator(seat=5),
+            Mirror(seat=6),
+            Judge(seat=7),
+        ]
+
+    num_hands = 1000
+    agents = build()
+    table = Table(agents, seed=42)
+    for _ in range(num_hands):
+        table.play_hand()
+
+    oracle, sentinel, firestorm, wall, phantom, predator, mirror, judge = agents
+
+    # ------------------------------------------------------------------
+    # Per-agent stat line so the researcher can eyeball the run.
+    # ------------------------------------------------------------------
+    for a in agents:
+        s = a.stats
+        results.append(
+            f"INFO 6.x: seat{a.seat} {a.archetype:10} "
+            f"VPIP={a.vpip()*100:5.1f}% PFR={a.pfr()*100:5.1f}% "
+            f"AF={a.af():5.2f} showdowns={s['showdowns']:3d} "
+            f"stack={a.stack:4d} rebuys={a.rebuys}"
+        )
+
+    # ------------------------------------------------------------------
+    # Invariants for every agent
+    # ------------------------------------------------------------------
+    for a in agents:
+        check(
+            f"6.inv/seat{a.seat} {a.archetype}: hands_dealt == 1000",
+            a.stats["hands_dealt"] == num_hands,
+            f"got {a.stats['hands_dealt']}",
+        )
+        v = a.vpip() * 100
+        p = a.pfr() * 100
+        check(
+            f"6.inv/seat{a.seat} {a.archetype}: PFR <= VPIP",
+            p <= v + 0.01,
+            f"PFR={p:.1f}% VPIP={v:.1f}%",
+        )
+        check(
+            f"6.inv/seat{a.seat} {a.archetype}: showdowns <= saw_flop <= hands_dealt",
+            a.stats["showdowns"] <= a.stats["saw_flop"] <= a.stats["hands_dealt"],
+            f"sd={a.stats['showdowns']} flop={a.stats['saw_flop']} "
+            f"hd={a.stats['hands_dealt']}",
+        )
+
+    # ------------------------------------------------------------------
+    # Predator: classification + exploit blend.
+    # After 1000 hands Firestorm (seat 2) should be well-classified and
+    # Predator.get_params with only seat 2 active should return a heavily
+    # exploit-leaning br (< 0.15, vs baseline 0.25).
+    # ------------------------------------------------------------------
+    fs_post = predator.posteriors.get(2)
+    if fs_post is None:
+        check("6.1a: Predator has posterior for Firestorm", False,
+              "posterior not found")
+        max_fs_prob = 0.0
+    else:
+        max_fs_prob = float(np.max(fs_post))
+        check(
+            "6.1a: Predator posterior for Firestorm > 0.60 (classification threshold)",
+            max_fs_prob > 0.60,
+            f"max_post={max_fs_prob:.3f}",
+        )
+
+    # Probe get_params with only Firestorm active, on preflop.
+    probe_state = GameState(
+        hand_id=num_hands + 1,
+        betting_round="preflop",
+        community_cards=[],
+        pot_size=3,
+        current_bet=2,
+        cost_to_call=2,
+        bet_count=1,
+        bet_cap=4,
+        bet_size=2,
+        num_active_players=2,
+        active_opponent_seats=[2],
+        player_seat=predator.seat,
+        player_stack=predator.stack,
+        player_position=5,
+        dealer_seat=0,
+    )
+    probe_params = predator.get_params("preflop", probe_state)
+    baseline_br = predator.BASELINE_PARAMS["preflop"]["br"]
+    check(
+        "6.1b: Predator br drops to exploit regime vs classified Firestorm",
+        probe_params["br"] < 0.15,
+        f"br={probe_params['br']:.3f} (baseline={baseline_br:.3f}, "
+        f"exploit target=0.10)",
+    )
+
+    # And on the turn — stronger exploit (target br=0.08).
+    probe_turn = GameState(
+        hand_id=num_hands + 1,
+        betting_round="turn",
+        community_cards=[0, 1, 2, 3],
+        pot_size=20,
+        current_bet=4,
+        cost_to_call=4,
+        bet_count=1,
+        bet_cap=4,
+        bet_size=4,
+        num_active_players=2,
+        active_opponent_seats=[2],
+        player_seat=predator.seat,
+        player_stack=predator.stack,
+        player_position=5,
+        dealer_seat=0,
+    )
+    probe_turn_params = predator.get_params("turn", probe_turn)
+    check(
+        "6.1c: Predator turn br <= 0.10 vs classified Firestorm",
+        probe_turn_params["br"] <= 0.10 + 1e-9,
+        f"turn br={probe_turn_params['br']:.3f} (target=0.08)",
+    )
+
+    # When NO opponents are classified → baseline.
+    fallback_state = GameState(
+        hand_id=num_hands + 1,
+        betting_round="preflop",
+        community_cards=[],
+        pot_size=3,
+        current_bet=2,
+        cost_to_call=2,
+        bet_count=1,
+        bet_cap=4,
+        bet_size=2,
+        num_active_players=1,
+        active_opponent_seats=[],
+        player_seat=predator.seat,
+        player_stack=predator.stack,
+        player_position=5,
+        dealer_seat=0,
+    )
+    fallback_params = predator.get_params("preflop", fallback_state)
+    check(
+        "6.1d: Predator falls back to baseline when no classified opponents",
+        abs(fallback_params["br"] - baseline_br) < 1e-9,
+        f"got br={fallback_params['br']:.3f}, baseline={baseline_br:.3f}",
+    )
+
+    # ------------------------------------------------------------------
+    # Mirror: VPIP trends toward the most-active opponent.
+    # ------------------------------------------------------------------
+    mirror_vpip_pct = mirror.vpip() * 100
+    check(
+        "6.2a: Mirror VPIP > 30% (Mirror_default ~22%)",
+        mirror_vpip_pct > 30.0,
+        f"Mirror.vpip()={mirror_vpip_pct:.1f}%",
+    )
+    # Mirror should have opponent_stats populated for Firestorm and Wall.
+    fs_stats = mirror.opponent_stats.get(2)
+    wall_stats = mirror.opponent_stats.get(3)
+    check(
+        "6.2b: Mirror tracks observed_vpip for Firestorm",
+        fs_stats is not None and fs_stats["observed_vpip"] > 0.30,
+        f"Firestorm observed_vpip="
+        f"{(fs_stats['observed_vpip'] if fs_stats else 'None')!r}",
+    )
+    check(
+        "6.2c: Mirror tracks observed_cr for Firestorm > 0.30",
+        fs_stats is not None and fs_stats["observed_cr"] > 0.30,
+        f"Firestorm observed_cr="
+        f"{(fs_stats['observed_cr'] if fs_stats else 'None')!r}",
+    )
+    check(
+        "6.2d: Mirror observed_vpip(Firestorm) > Mirror observed_vpip(Sentinel)",
+        (mirror.observed_vpip(2) > mirror.observed_vpip(1)),
+        f"F={mirror.observed_vpip(2):.3f} S={mirror.observed_vpip(1):.3f}",
+    )
+
+    # ------------------------------------------------------------------
+    # Judge: grievance ledger against Firestorm.
+    # ------------------------------------------------------------------
+    fs_griev = judge.grievance.get(2, 0)
+    check(
+        "6.3a: Judge.grievance[Firestorm] >= 1",
+        fs_griev >= 1,
+        f"grievance[2]={fs_griev}",
+    )
+    if judge.triggered.get(2, False):
+        results.append(
+            f"INFO 6.3: Judge triggered vs Firestorm at hand "
+            f"{judge.trigger_hand.get(2)}"
+        )
+    else:
+        results.append(
+            f"INFO 6.3: Judge NOT triggered vs Firestorm after {num_hands} "
+            f"hands (grievance={fs_griev}, τ={judge.tau})"
+        )
+    results.append(
+        f"INFO 6.3: Judge grievance ledger = {dict(judge.grievance)}"
+    )
+
+    # Judge never forgives — once triggered, always triggered. Simulate
+    # a probe in both cooperative and retaliatory modes.
+    if 2 in judge.triggered and judge.triggered[2]:
+        # When Firestorm is active, should return retaliatory params.
+        probe_ret = GameState(
+            hand_id=num_hands + 1,
+            betting_round="river",
+            community_cards=[0, 1, 2, 3, 4],
+            pot_size=20,
+            current_bet=0,
+            cost_to_call=0,
+            bet_count=0,
+            bet_cap=4,
+            bet_size=4,
+            num_active_players=2,
+            active_opponent_seats=[2],
+            player_seat=judge.seat,
+            player_stack=judge.stack,
+            player_position=7,
+            dealer_seat=0,
+        )
+        ret_params = judge.get_params("river", probe_ret)
+        check(
+            "6.3b: Judge returns retaliatory params when triggered opponent active",
+            abs(ret_params["br"]
+                - judge.RETALIATORY_PARAMS["river"]["br"]) < 1e-9,
+            f"br={ret_params['br']:.3f} (retaliatory={judge.RETALIATORY_PARAMS['river']['br']:.3f})",
+        )
+        # Only untriggered opponent active → cooperative params.
+        probe_coop = GameState(
+            hand_id=num_hands + 1,
+            betting_round="river",
+            community_cards=[0, 1, 2, 3, 4],
+            pot_size=20,
+            current_bet=0,
+            cost_to_call=0,
+            bet_count=0,
+            bet_cap=4,
+            bet_size=4,
+            num_active_players=2,
+            active_opponent_seats=[1],  # Sentinel only (not triggered)
+            player_seat=judge.seat,
+            player_stack=judge.stack,
+            player_position=7,
+            dealer_seat=0,
+        )
+        coop_params = judge.get_params("river", probe_coop)
+        check(
+            "6.3c: Judge returns cooperative params when no triggered opponent active",
+            abs(coop_params["br"]
+                - judge.COOPERATIVE_PARAMS["river"]["br"]) < 1e-9,
+            f"br={coop_params['br']:.3f} (cooperative={judge.COOPERATIVE_PARAMS['river']['br']:.3f})",
+        )
+
+    # ------------------------------------------------------------------
+    # Reproducibility: rebuild with same seed, verify stats match.
+    # ------------------------------------------------------------------
+    agents2 = build()
+    table2 = Table(agents2, seed=42)
+    for _ in range(num_hands):
+        table2.play_hand()
+    p2, m2, j2 = agents2[5], agents2[6], agents2[7]
+
+    # Predator: posteriors match
+    pred_repro = True
+    max_diff = 0.0
+    for s in range(8):
+        if s == predator.seat:
+            continue
+        a = predator.posteriors.get(s)
+        b = p2.posteriors.get(s)
+        if a is None or b is None:
+            if a is not b:
+                pred_repro = False
+            continue
+        d = float(np.abs(a - b).max())
+        if d > max_diff:
+            max_diff = d
+        if d > 1e-12:
+            pred_repro = False
+    check(
+        "6.R.predator: same seed → identical Predator posteriors",
+        pred_repro,
+        f"max|diff|={max_diff:.2e}",
+    )
+
+    # Mirror: opponent_stats match for every seat.
+    mir_repro = True
+    for s in range(8):
+        if s == mirror.seat:
+            continue
+        a = mirror.opponent_stats.get(s)
+        b = m2.opponent_stats.get(s)
+        if a is None or b is None:
+            if a is not b:
+                mir_repro = False
+            continue
+        for k in ("observed_vpip", "observed_br", "observed_cr",
+                  "observed_mbr", "observed_vbr", "hands_seen"):
+            if abs(a[k] - b[k]) > 1e-12:
+                mir_repro = False
+                break
+    check(
+        "6.R.mirror: same seed → identical Mirror opponent_stats",
+        mir_repro,
+    )
+
+    # Judge: grievance + triggered match.
+    judge_repro = (
+        dict(judge.grievance) == dict(j2.grievance)
+        and dict(judge.triggered) == dict(j2.triggered)
+        and dict(judge.trigger_hand) == dict(j2.trigger_hand)
+    )
+    check(
+        "6.R.judge: same seed → identical Judge grievance + trigger state",
+        judge_repro,
+        f"g1={dict(judge.grievance)} g2={dict(j2.grievance)}",
+    )
+
+    # Stat-level reproducibility for every agent.
+    all_stats_match = all(
+        agents[i].stats == agents2[i].stats and agents[i].stack == agents2[i].stack
+        for i in range(8)
+    )
+    check(
+        "6.R.all: same seed → identical stats + stacks for all 8 agents",
+        all_stats_match,
+    )
+
+    return results

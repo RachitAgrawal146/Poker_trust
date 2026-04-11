@@ -93,12 +93,39 @@ def _stage5_agents():
     return _stage4_agents()
 
 
-# stage -> (agents builder, label)
+def _stage6_agents():
+    # Stage 6: the full 8-archetype canonical roster. Seats 5-7 are now
+    # the three adaptive agents — Predator (exploiter), Mirror
+    # (tit-for-tat), Judge (grudger). Adaptive state lives on the
+    # agents themselves, so nothing else in the demo wiring changes.
+    from agents.oracle import Oracle
+    from agents.sentinel import Sentinel
+    from agents.firestorm import Firestorm
+    from agents.wall import Wall
+    from agents.phantom import Phantom
+    from agents.predator import Predator
+    from agents.mirror import Mirror
+    from agents.judge import Judge
+
+    return [
+        Oracle(seat=0),
+        Sentinel(seat=1),
+        Firestorm(seat=2),
+        Wall(seat=3),
+        Phantom(seat=4),
+        Predator(seat=5),
+        Mirror(seat=6),
+        Judge(seat=7),
+    ]
+
+
+# stage -> (agents builder, label, default_hands)
 STAGE_DEMOS: dict = {
-    2: (_stage2_agents, "Stage 2 demo · scripted engine test"),
-    3: (_stage3_agents, "Stage 3 demo · Oracle vs scripted mix"),
-    4: (_stage4_agents, "Stage 4 demo · 5 static archetypes + Oracle fillers"),
-    5: (_stage5_agents, "Stage 5 demo · Bayesian trust model in action"),
+    2: (_stage2_agents, "Stage 2 demo · scripted engine test", 20),
+    3: (_stage3_agents, "Stage 3 demo · Oracle vs scripted mix", 20),
+    4: (_stage4_agents, "Stage 4 demo · 5 static archetypes + Oracle fillers", 20),
+    5: (_stage5_agents, "Stage 5 demo · Bayesian trust model in action", 20),
+    6: (_stage6_agents, "Stage 6 demo · full 8-archetype adaptive table", 50),
 }
 
 HIGHEST_STAGE = max(STAGE_DEMOS)
@@ -108,8 +135,8 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--stage", type=int, default=HIGHEST_STAGE,
                         help=f"Stage to demo (default: {HIGHEST_STAGE})")
-    parser.add_argument("--hands", type=int, default=20,
-                        help="Number of hands to play (default: 20)")
+    parser.add_argument("--hands", type=int, default=None,
+                        help="Number of hands to play (default: stage-specific)")
     parser.add_argument("--seed", type=int, default=42,
                         help="Seed for reproducibility (default: 42)")
     parser.add_argument("--output", default="visualizer/data.js",
@@ -122,18 +149,19 @@ def main() -> int:
             f"Available: {sorted(STAGE_DEMOS)}"
         )
 
-    builder, label = STAGE_DEMOS[args.stage]
+    builder, label, default_hands = STAGE_DEMOS[args.stage]
+    num_hands = args.hands if args.hands is not None else default_hands
     agents = builder()
 
     run_and_export(
         agents=agents,
-        num_hands=args.hands,
+        num_hands=num_hands,
         seed=args.seed,
         output_path=args.output,
         stage=args.stage,
         label=label,
     )
-    print(f"Wrote {args.hands} hands → {args.output}")
+    print(f"Wrote {num_hands} hands → {args.output}")
     print("Open visualizer/poker_table.html in your browser.")
     return 0
 
