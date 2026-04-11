@@ -414,6 +414,46 @@ body::before {
   color: var(--gold);
 }
 
+/* --- Stage 9: posterior entropy bar under each trust ring ---
+ * 0–3 bits (log2(8)). Longer bar = more uncertain. The fill is the
+ * DesignCues reserved teal when the observer is confident and decays
+ * to a neutral grey as entropy climbs — matching the spec vocabulary
+ * of "teal = confident, neutral = uncertain". */
+.entropy-wrap {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  margin-top: 3px;
+}
+.entropy-bar-track {
+  flex: 1;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 0.5px solid rgba(255, 255, 255, 0.04);
+  border-radius: 1px;
+  overflow: hidden;
+}
+.entropy-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: #7ab0a8;
+  transition: width 0.35s ease, background 0.35s ease;
+}
+.entropy-bar-fill.ent-conf   { background: #7ab0a8; }
+.entropy-bar-fill.ent-mid    { background: #8aa39b; }
+.entropy-bar-fill.ent-uncert { background: #6a6a62; }
+
+.entropy-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px;
+  color: var(--text-dim);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.08em;
+  min-width: 30px;
+  text-align: right;
+}
+
 /* Card face/back */
 .card {
   display: inline-block;
@@ -1229,6 +1269,10 @@ footer .em {
         <div class="trust-overlay hidden" id="trust-${agent.seat}">
           <div class="trust-ring"></div>
           <div class="trust-label">&mdash;</div>
+          <div class="entropy-wrap">
+            <div class="entropy-bar-track"><div class="entropy-bar-fill"></div></div>
+            <span class="entropy-label">H &mdash;</span>
+          </div>
         </div>
       `;
       table.appendChild(el);
@@ -1336,12 +1380,14 @@ footer .em {
     document.getElementById("action-label").textContent =
       `Action ${actionIdx} / ${numActions}${state.isFinal ? " \u00b7 final" : ""}`;
 
-    // Trust / top-archetype snapshot for the currently selected observer.
-    // Fall back to null if the data predates Stage 5 (older demos).
+    // Trust / entropy / top-archetype snapshot for the currently selected
+    // observer. Fall back to null if the data predates Stage 5.
     const trustRow =
       hand.trust_snapshot && hand.trust_snapshot[String(observerSeat)] || null;
     const topArchRow =
       hand.top_archetype_snapshot && hand.top_archetype_snapshot[String(observerSeat)] || null;
+    const entropyRow =
+      hand.entropy_snapshot && hand.entropy_snapshot[String(observerSeat)] || null;
 
     DATA.meta.agents.forEach((agent) => {
       const s = agent.seat;
@@ -1389,6 +1435,7 @@ footer .em {
       el.classList.toggle("winner", isWinner);
 
       // Stage 5: trust ring + top-archetype label.
+      // Stage 9: posterior entropy bar underneath.
       const trustEl = document.getElementById(`trust-${s}`);
       if (s === observerSeat || !trustRow) {
         trustEl.classList.add("hidden");
@@ -1406,6 +1453,25 @@ footer .em {
             `T ${score.toFixed(2)} \u00b7 <span class="trust-arch">${archName}</span> ${prob}%`;
         } else {
           labelEl.innerHTML = `T ${score.toFixed(2)}`;
+        }
+
+        // Entropy bar — 0..3 bits. Width is entropy/3, color band
+        // shifts from teal (confident) to neutral grey (uncertain).
+        const entFill = trustEl.querySelector(".entropy-bar-fill");
+        const entLabel = trustEl.querySelector(".entropy-label");
+        const ent = entropyRow ? entropyRow[String(s)] : null;
+        if (ent !== null && ent !== undefined) {
+          const clamped = Math.max(0, Math.min(3, ent));
+          const pct = (clamped / 3) * 100;
+          entFill.style.width = `${pct}%`;
+          entFill.className =
+            "entropy-bar-fill " +
+            (ent < 1.0 ? "ent-conf" : ent < 2.0 ? "ent-mid" : "ent-uncert");
+          entLabel.textContent = `H ${ent.toFixed(2)}`;
+        } else {
+          entFill.style.width = "0%";
+          entFill.className = "entropy-bar-fill ent-conf";
+          entLabel.innerHTML = "H &mdash;";
         }
       }
     });
