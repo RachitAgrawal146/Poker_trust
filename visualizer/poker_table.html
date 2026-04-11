@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Poker Trust Simulation</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #0a0a0a;
+    color: #e0e0e0;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+  }
+  .wrapper {
+    max-width: 1500px;
+    margin: 0 auto;
+    padding: 20px 28px 28px;
+  }
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid #2a2a2a;
+    margin-bottom: 22px;
+    flex-wrap: wrap;
+  }
+  .header h1 {
+    font-size: 18px;
+    margin: 0;
+    color: #f0f0f0;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+  }
+  .header .subtitle {
+    color: #8a8a8a;
+    font-size: 12px;
+  }
+  .header .stage-badge {
+    background: #1f3a1f;
+    color: #9ee09e;
+    border: 1px solid #3a5a3a;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .main {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 340px;
+    gap: 20px;
+  }
+
+  .table-area {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .table-container {
+    position: relative;
+    background:
+      radial-gradient(ellipse at center, #1e5b38 0%, #0b2a1a 85%);
+    border: 10px solid #2c1a0f;
+    border-radius: 50% / 42%;
+    aspect-ratio: 16 / 10;
+    box-shadow:
+      0 20px 60px rgba(0,0,0,0.6),
+      inset 0 0 60px rgba(0,0,0,0.35);
+    min-height: 420px;
+  }
+  .center {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    pointer-events: none;
+  }
+  .community {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+    min-height: 48px;
+  }
+  .community .card {
+    font-size: 18px;
+    padding: 6px 8px;
+    min-width: 30px;
+    line-height: 1;
+  }
+  .pot {
+    margin-top: 14px;
+    font-size: 15px;
+    color: #f5d66c;
+    font-weight: 600;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+  }
+
+  .seat {
+    position: absolute;
+    width: 140px;
+    padding: 9px 10px 10px;
+    background: rgba(10,10,10,0.78);
+    border: 2px solid #444;
+    border-radius: 10px;
+    text-align: center;
+    transform: translate(-50%, -50%);
+    transition: border-color 0.2s, opacity 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+  }
+  .seat:hover { border-color: #777; }
+  .seat.folded { opacity: 0.35; filter: grayscale(0.7); }
+  .seat.winner {
+    border-color: #f5d66c;
+    box-shadow: 0 0 22px rgba(245, 214, 108, 0.55);
+  }
+  .seat.sb::before,
+  .seat.bb::before,
+  .seat.dealer::before {
+    position: absolute;
+    top: -9px;
+    left: -9px;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 5px;
+    line-height: 18px;
+    border-radius: 11px;
+    font-weight: 700;
+    font-size: 10px;
+    border: 2px solid #000;
+    background: #aaa;
+    color: #000;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+  .seat.dealer::before { content: 'D'; background: #f5d66c; }
+  .seat.sb::before     { content: 'SB'; background: #6caadb; }
+  .seat.bb::before     { content: 'BB'; background: #dba56c; }
+
+  .seat-name {
+    font-weight: 600;
+    font-size: 13px;
+    color: #f0f0f0;
+  }
+  .seat-archetype {
+    font-size: 9px;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 1px;
+  }
+  .seat-stack {
+    font-size: 14px;
+    color: #f5d66c;
+    margin-top: 5px;
+    font-weight: 600;
+  }
+  .seat-stack .delta {
+    font-size: 10px;
+    margin-left: 4px;
+    font-weight: 500;
+  }
+  .seat-stack .delta.up   { color: #9ee09e; }
+  .seat-stack .delta.down { color: #e09e9e; }
+  .seat-cards {
+    display: flex;
+    justify-content: center;
+    gap: 3px;
+    margin-top: 6px;
+    min-height: 24px;
+  }
+
+  .card {
+    display: inline-block;
+    padding: 3px 5px;
+    background: #fafafa;
+    color: #111;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 700;
+    min-width: 22px;
+    text-align: center;
+    border: 1px solid #888;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.5px;
+  }
+  .card.red { color: #c00; }
+  .card.hidden {
+    background:
+      repeating-linear-gradient(45deg, #1e3a6f, #1e3a6f 4px, #193056 4px, #193056 8px);
+    color: transparent;
+    border-color: #0a1a3a;
+  }
+
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-height: 0;
+  }
+  .panel {
+    background: #141414;
+    border: 1px solid #2a2a2a;
+    border-radius: 8px;
+    padding: 14px 16px;
+  }
+  .panel h3 {
+    margin: 0 0 8px;
+    font-size: 11px;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    font-weight: 600;
+  }
+  .hand-info h2 {
+    margin: 0 0 6px;
+    font-size: 16px;
+    color: #f5d66c;
+    font-weight: 600;
+  }
+  .hand-info .meta-row {
+    font-size: 12px;
+    color: #aaa;
+    margin: 2px 0;
+  }
+
+  .action-feed {
+    max-height: 300px;
+    overflow-y: auto;
+  }
+  .action-row {
+    display: grid;
+    grid-template-columns: 54px 34px 1fr 52px;
+    gap: 6px;
+    padding: 3px 0;
+    font-size: 12px;
+    border-bottom: 1px dashed #222;
+    align-items: baseline;
+  }
+  .action-row:last-child { border-bottom: none; }
+  .action-row .round { color: #666; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .action-row .seatnum { color: #a8d8e8; font-weight: 600; }
+  .action-row .type { color: #f0f0f0; }
+  .action-row .type.fold  { color: #c76060; }
+  .action-row .type.bet   { color: #8cd88c; }
+  .action-row .type.raise { color: #6cc76c; font-weight: 700; }
+  .action-row .type.call  { color: #c7c76c; }
+  .action-row .type.check { color: #888; }
+  .action-row .potcell {
+    color: #f5d66c;
+    text-align: right;
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .showdown-row {
+    font-size: 12px;
+    padding: 3px 0;
+    color: #bbb;
+  }
+  .showdown-row.won { color: #f5d66c; font-weight: 600; }
+
+  .controls {
+    grid-column: 1 / -1;
+    background: #141414;
+    border: 1px solid #2a2a2a;
+    border-radius: 8px;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .btn {
+    background: #2a2a2a;
+    border: 1px solid #444;
+    color: #e0e0e0;
+    padding: 7px 14px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .btn:hover { background: #333; border-color: #666; }
+  .btn:disabled { opacity: 0.35; cursor: not-allowed; }
+  .btn.play { min-width: 90px; }
+
+  input[type="range"] {
+    flex: 1;
+    accent-color: #f5d66c;
+    min-width: 200px;
+  }
+  .hand-label {
+    color: #f5d66c;
+    font-weight: 600;
+    min-width: 110px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    font-size: 13px;
+  }
+
+  .fallback {
+    padding: 60px 40px;
+    text-align: center;
+    color: #aaa;
+  }
+  .fallback code {
+    background: #1a1a1a;
+    padding: 2px 6px;
+    border-radius: 3px;
+    color: #f5d66c;
+    border: 1px solid #333;
+  }
+
+  @media (max-width: 980px) {
+    .main { grid-template-columns: 1fr; }
+    .sidebar { max-height: none; }
+  }
+</style>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="header">
+      <div>
+        <h1>Poker Trust Simulation</h1>
+        <div class="subtitle" id="subtitle">Loading…</div>
+      </div>
+      <div class="stage-badge" id="stage-badge">stage —</div>
+    </div>
+
+    <div id="content">
+      <div class="fallback" id="fallback" style="display:none">
+        <p>No simulation data loaded.</p>
+        <p>Run <code>python3 run_demo.py</code> from the repo root, then refresh this page.</p>
+      </div>
+
+      <div class="main" id="main">
+        <div class="table-area">
+          <div class="table-container" id="table">
+            <div class="center">
+              <div class="community" id="community"></div>
+              <div class="pot" id="pot"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sidebar">
+          <div class="panel hand-info" id="hand-info">
+            <h2>Hand —</h2>
+          </div>
+          <div class="panel">
+            <h3>Action feed</h3>
+            <div class="action-feed" id="action-feed"></div>
+          </div>
+          <div class="panel">
+            <h3>Showdown</h3>
+            <div id="showdown"></div>
+          </div>
+        </div>
+
+        <div class="controls">
+          <button class="btn" id="prev">← Prev</button>
+          <button class="btn play" id="play">▶ Play</button>
+          <button class="btn" id="next">Next →</button>
+          <input type="range" id="slider" min="0" max="0" value="0">
+          <span class="hand-label" id="hand-label">Hand 0 / 0</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script src="data.js"></script>
+<script>
+(function () {
+  const DATA = window.POKER_DATA;
+  if (!DATA) {
+    document.getElementById("main").style.display = "none";
+    document.getElementById("fallback").style.display = "block";
+    document.getElementById("subtitle").textContent = "waiting for data.js";
+    return;
+  }
+
+  const NUM_SEATS = DATA.meta.num_seats || 8;
+  let currentHand = 0;
+  let playing = false;
+  let playTimer = null;
+
+  function renderCard(str) {
+    if (!str) return '';
+    if (str === "??") {
+      return '<div class="card hidden">??</div>';
+    }
+    const rank = str[0];
+    const suit = str[1];
+    const pretty = { h: "♥", d: "♦", s: "♠", c: "♣" }[suit] || suit;
+    const red = (suit === "h" || suit === "d") ? " red" : "";
+    return `<div class="card${red}">${rank}${pretty}</div>`;
+  }
+
+  function positionSeats() {
+    const table = document.getElementById("table");
+    const rect = table.getBoundingClientRect();
+    if (rect.width === 0) return;
+    const cx = rect.width / 2;
+    const cy = rect.height / 2;
+    // Inset so seats sit on the felt rim, not outside it.
+    const rx = rect.width * 0.44;
+    const ry = rect.height * 0.44;
+    for (let i = 0; i < NUM_SEATS; i++) {
+      // Seat 0 at the bottom, going clockwise (matches dealer rotation).
+      const angle = Math.PI / 2 + (i / NUM_SEATS) * 2 * Math.PI;
+      const x = cx + Math.cos(angle) * rx;
+      const y = cy + Math.sin(angle) * ry;
+      const el = document.getElementById(`seat-${i}`);
+      if (el) {
+        el.style.left = `${x}px`;
+        el.style.top  = `${y}px`;
+      }
+    }
+  }
+
+  function createSeats() {
+    const table = document.getElementById("table");
+    DATA.meta.agents.forEach((agent) => {
+      const el = document.createElement("div");
+      el.className = "seat";
+      el.id = `seat-${agent.seat}`;
+      el.innerHTML = `
+        <div class="seat-name">${agent.name}</div>
+        <div class="seat-archetype">${agent.archetype}</div>
+        <div class="seat-stack" id="stack-${agent.seat}">—</div>
+        <div class="seat-cards" id="cards-${agent.seat}"></div>
+      `;
+      table.appendChild(el);
+    });
+    positionSeats();
+  }
+
+  function renderHand(idx) {
+    if (idx < 0 || idx >= DATA.hands.length) return;
+    currentHand = idx;
+    const hand = DATA.hands[idx];
+
+    // Header and slider state
+    document.getElementById("subtitle").textContent =
+      `${DATA.meta.label} · seed ${DATA.meta.seed} · ${DATA.meta.num_hands} hands`;
+    document.getElementById("stage-badge").textContent = `stage ${DATA.meta.stage}`;
+    document.getElementById("slider").value = idx;
+    document.getElementById("hand-label").textContent =
+      `Hand ${idx + 1} / ${DATA.hands.length}`;
+
+    // Per-seat updates
+    DATA.meta.agents.forEach((agent) => {
+      const s = agent.seat;
+      const el = document.getElementById(`seat-${s}`);
+      el.classList.toggle("folded", !!hand.folded[s]);
+      el.classList.toggle("dealer", s === hand.dealer);
+      el.classList.toggle("sb", s === hand.sb_seat);
+      el.classList.toggle("bb", s === hand.bb_seat);
+
+      const stackAfter = hand.stacks_after[s];
+      const delta = stackAfter - hand.stacks_before[s];
+      const deltaLabel = delta > 0 ? `<span class="delta up">+${delta}</span>`
+                       : delta < 0 ? `<span class="delta down">${delta}</span>`
+                                   : '';
+      document.getElementById(`stack-${s}`).innerHTML = `${stackAfter}${deltaLabel}`;
+
+      const cardsEl = document.getElementById(`cards-${s}`);
+      const hole = hand.hole_cards[String(s)];
+      // Reveal cards if the player reached showdown (their entry is in the
+      // showdown list) OR if they were the walkover winner (optional). For
+      // folders/mid-hand exits the cards stay hidden.
+      let revealed = false;
+      if (hand.showdown) {
+        revealed = hand.showdown.some(e => e.seat === s);
+      }
+      if (hole && revealed) {
+        cardsEl.innerHTML = hole.map(renderCard).join("");
+      } else if (hand.folded[s]) {
+        cardsEl.innerHTML = "";
+      } else {
+        cardsEl.innerHTML = '<div class="card hidden">??</div><div class="card hidden">??</div>';
+      }
+
+      // Winner glow
+      let isWinner = false;
+      if (hand.showdown) {
+        isWinner = hand.showdown.some(e => e.seat === s && e.won);
+      } else if (hand.walkover_winner === s) {
+        isWinner = true;
+      }
+      el.classList.toggle("winner", isWinner);
+    });
+
+    // Community cards
+    const comm = [
+      ...(hand.community.flop  || []),
+      ...(hand.community.turn  || []),
+      ...(hand.community.river || []),
+    ];
+    document.getElementById("community").innerHTML =
+      comm.length ? comm.map(renderCard).join("")
+                  : '<span style="color:#5a5a5a;font-size:13px">no community cards</span>';
+
+    document.getElementById("pot").textContent = `Pot: ${hand.final_pot}`;
+
+    // Hand info panel
+    document.getElementById("hand-info").innerHTML = `
+      <h2>Hand #${hand.hand_id}</h2>
+      <div class="meta-row">Dealer: Seat ${hand.dealer}</div>
+      <div class="meta-row">SB: Seat ${hand.sb_seat} &nbsp;·&nbsp; BB: Seat ${hand.bb_seat}</div>
+      <div class="meta-row">Final pot: <strong style="color:#f5d66c">${hand.final_pot}</strong></div>
+      <div class="meta-row">Actions: ${hand.actions.length}</div>
+    `;
+
+    // Action feed
+    const feedEl = document.getElementById("action-feed");
+    feedEl.innerHTML = hand.actions.map(a => `
+      <div class="action-row">
+        <span class="round">${a.round}</span>
+        <span class="seatnum">S${a.seat}</span>
+        <span class="type ${a.type}">${a.type}${a.amount ? ' ' + a.amount : ''}</span>
+        <span class="potcell">${a.pot_after}</span>
+      </div>
+    `).join("");
+
+    // Showdown / walkover
+    const showEl = document.getElementById("showdown");
+    if (hand.showdown) {
+      showEl.innerHTML = hand.showdown.map(e => `
+        <div class="showdown-row ${e.won ? 'won' : ''}">
+          S${e.seat} · ${e.hole_cards.join(' ')} → rank ${e.hand_rank}
+          ${e.won ? `· WINS ${e.pot_won}` : ''}
+        </div>
+      `).join("");
+    } else if (hand.walkover_winner !== null && hand.walkover_winner !== undefined) {
+      showEl.innerHTML =
+        `<div class="showdown-row won">Walkover · Seat ${hand.walkover_winner} takes ${hand.final_pot}</div>`;
+    } else {
+      showEl.innerHTML = '<div style="color:#666;font-size:12px">—</div>';
+    }
+  }
+
+  function setupControls() {
+    const slider = document.getElementById("slider");
+    slider.max = DATA.hands.length - 1;
+    slider.value = 0;
+    slider.addEventListener("input", e => renderHand(parseInt(e.target.value, 10)));
+
+    document.getElementById("prev").addEventListener("click", () => {
+      if (currentHand > 0) renderHand(currentHand - 1);
+    });
+    document.getElementById("next").addEventListener("click", () => {
+      if (currentHand < DATA.hands.length - 1) renderHand(currentHand + 1);
+    });
+
+    const playBtn = document.getElementById("play");
+    playBtn.addEventListener("click", () => {
+      playing = !playing;
+      playBtn.textContent = playing ? "⏸ Pause" : "▶ Play";
+      if (playing) {
+        playTimer = setInterval(() => {
+          if (currentHand < DATA.hands.length - 1) {
+            renderHand(currentHand + 1);
+          } else {
+            clearInterval(playTimer);
+            playing = false;
+            playBtn.textContent = "▶ Play";
+          }
+        }, 900);
+      } else {
+        clearInterval(playTimer);
+      }
+    });
+
+    window.addEventListener("resize", positionSeats);
+    // Re-position once fonts/layout settle.
+    setTimeout(positionSeats, 50);
+  }
+
+  createSeats();
+  setupControls();
+  renderHand(0);
+})();
+</script>
+</body>
+</html>
