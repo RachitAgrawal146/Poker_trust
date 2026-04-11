@@ -106,6 +106,43 @@ def _build_stage_5() -> dict:
     return modules
 
 
+def _build_stage_7() -> dict:
+    # Stage 7 adds the persistent SQLite logger. The roster is the same
+    # Stage 5 static table (Oracle / Sentinel / Firestorm / Wall / Phantom
+    # + 3 Oracle fillers) because the trust-snapshot assertions in
+    # ``stage7_extras`` need agents that expose the Stage 5 trust API.
+    from agents.oracle import Oracle
+    from agents.sentinel import Sentinel
+    from agents.firestorm import Firestorm
+    from agents.wall import Wall
+    from agents.phantom import Phantom
+    from data.sqlite_logger import SQLiteLogger
+    from engine.table import Table
+
+    def create_agents():
+        return [
+            Oracle(seat=0),
+            Sentinel(seat=1),
+            Firestorm(seat=2),
+            Wall(seat=3),
+            Phantom(seat=4),
+            Oracle(seat=5, name="Oracle-5"),
+            Oracle(seat=6, name="Oracle-6"),
+            Oracle(seat=7, name="Oracle-7"),
+        ]
+
+    return {
+        "Table": Table,
+        "SQLiteLogger": SQLiteLogger,
+        "Oracle": Oracle,
+        "Sentinel": Sentinel,
+        "Firestorm": Firestorm,
+        "Wall": Wall,
+        "Phantom": Phantom,
+        "create_agents": create_agents,
+    }
+
+
 #: Maps a stage number to a zero-arg builder that returns the modules dict.
 #: Later stages register themselves here as they come online.
 STAGE_BUILDERS = {
@@ -114,6 +151,7 @@ STAGE_BUILDERS = {
     3: _build_stage_3,
     4: _build_stage_4,
     5: _build_stage_5,
+    7: _build_stage_7,
 }
 
 #: Maps a stage number to an extra-assertions function from ``stage_extras``.
@@ -123,6 +161,7 @@ STAGE_EXTRAS = {
     3: stage_extras.stage3_extras,
     4: stage_extras.stage4_extras,
     5: stage_extras.stage5_extras,
+    7: stage_extras.stage7_extras,
 }
 
 
