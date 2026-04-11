@@ -106,6 +106,48 @@ def _build_stage_5() -> dict:
     return modules
 
 
+def _build_stage_6() -> dict:
+    # Stage 6 wires up the three adaptive archetypes (Predator, Mirror,
+    # Judge) in their canonical seats 5-7. The extras test rebuilds the
+    # full 8-archetype table from this module dict.
+    from agents.oracle import Oracle
+    from agents.sentinel import Sentinel
+    from agents.firestorm import Firestorm
+    from agents.wall import Wall
+    from agents.phantom import Phantom
+    from agents.predator import Predator
+    from agents.mirror import Mirror
+    from agents.judge import Judge
+    from engine.game import GameState
+    from engine.table import Table
+
+    def create_agents():
+        return [
+            Oracle(seat=0),
+            Sentinel(seat=1),
+            Firestorm(seat=2),
+            Wall(seat=3),
+            Phantom(seat=4),
+            Predator(seat=5),
+            Mirror(seat=6),
+            Judge(seat=7),
+        ]
+
+    return {
+        "Oracle": Oracle,
+        "Sentinel": Sentinel,
+        "Firestorm": Firestorm,
+        "Wall": Wall,
+        "Phantom": Phantom,
+        "Predator": Predator,
+        "Mirror": Mirror,
+        "Judge": Judge,
+        "Table": Table,
+        "GameState": GameState,
+        "create_agents": create_agents,
+    }
+
+
 #: Maps a stage number to a zero-arg builder that returns the modules dict.
 #: Later stages register themselves here as they come online.
 STAGE_BUILDERS = {
@@ -114,6 +156,7 @@ STAGE_BUILDERS = {
     3: _build_stage_3,
     4: _build_stage_4,
     5: _build_stage_5,
+    6: _build_stage_6,
 }
 
 #: Maps a stage number to an extra-assertions function from ``stage_extras``.
@@ -123,6 +166,7 @@ STAGE_EXTRAS = {
     3: stage_extras.stage3_extras,
     4: stage_extras.stage4_extras,
     5: stage_extras.stage5_extras,
+    6: stage_extras.stage6_extras,
 }
 
 
