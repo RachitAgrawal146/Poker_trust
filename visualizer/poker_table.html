@@ -152,12 +152,38 @@
     color: #f0f0f0;
   }
   .seat-archetype {
+    display: inline-block;
     font-size: 9px;
-    color: #888;
+    color: #ddd;
     text-transform: uppercase;
     letter-spacing: 1px;
-    margin-top: 1px;
+    margin-top: 3px;
+    padding: 1px 6px;
+    border-radius: 8px;
+    background: #2a2a2a;
+    border: 1px solid #444;
   }
+  /* Archetype accent colors — ring around the seat card + background of
+   * the archetype chip. Keys match BaseAgent.archetype strings. */
+  .seat.arch-oracle    { border-color: #9a9a9a; }
+  .seat.arch-sentinel  { border-color: #6c9ec7; }
+  .seat.arch-firestorm { border-color: #c76c6c; }
+  .seat.arch-wall      { border-color: #c7b86c; }
+  .seat.arch-phantom   { border-color: #9e6cc7; }
+  .seat.arch-predator  { border-color: #e0a06c; }
+  .seat.arch-mirror    { border-color: #6cc7ad; }
+  .seat.arch-judge     { border-color: #e0d46c; }
+  .seat.arch-dummy,
+  .seat.arch-folder,
+  .seat.arch-raiser    { border-color: #555; }
+  .seat-archetype.arch-oracle    { background: #333; color: #ccc; border-color: #555; }
+  .seat-archetype.arch-sentinel  { background: #1f3a55; color: #9ecadd; border-color: #2f4a65; }
+  .seat-archetype.arch-firestorm { background: #55201f; color: #dd9e9e; border-color: #653030; }
+  .seat-archetype.arch-wall      { background: #4d4520; color: #ddd09e; border-color: #5d5530; }
+  .seat-archetype.arch-phantom   { background: #3f1f55; color: #c9a0dd; border-color: #4f2f65; }
+  .seat-archetype.arch-predator  { background: #553a1f; color: #ddb99e; border-color: #654a30; }
+  .seat-archetype.arch-mirror    { background: #1f553f; color: #9edbc2; border-color: #2f6550; }
+  .seat-archetype.arch-judge     { background: #504b14; color: #ddd679; border-color: #605a24; }
   .seat-stack {
     font-size: 14px;
     color: #f5d66c;
@@ -473,11 +499,11 @@
     const table = document.getElementById("table");
     DATA.meta.agents.forEach((agent) => {
       const el = document.createElement("div");
-      el.className = "seat";
+      el.className = `seat arch-${agent.archetype}`;
       el.id = `seat-${agent.seat}`;
       el.innerHTML = `
         <div class="seat-name">${agent.name}</div>
-        <div class="seat-archetype">${agent.archetype}</div>
+        <div class="seat-archetype arch-${agent.archetype}">${agent.archetype}</div>
         <div class="seat-stack" id="stack-${agent.seat}">—</div>
         <div class="seat-cards" id="cards-${agent.seat}"></div>
       `;
