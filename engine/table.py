@@ -34,6 +34,8 @@ class Table:
         agents: list,
         seed: Optional[int] = None,
         rng: Optional[np.random.Generator] = None,
+        logger: Optional[object] = None,
+        run_id: Optional[int] = None,
     ) -> None:
         if len(agents) != NUM_PLAYERS:
             raise ValueError(
@@ -68,6 +70,14 @@ class Table:
         #: full per-hand state without requiring Table to know about logging.
         self.last_hand: Optional[Hand] = None
 
+        #: Stage 7 persistent logger hook. When set, ``play_hand`` forwards
+        #: the just-played ``Hand`` to ``logger.log_hand(run_id, hand)`` after
+        #: the dealer rotates. Both attributes are plain fields so callers
+        #: can attach a logger lazily (e.g. after calling
+        #: ``logger.start_run(...)`` to obtain the run_id).
+        self.logger = logger
+        self.run_id: Optional[int] = run_id
+
     # ------------------------------------------------------------------
     def play_hand(self) -> Tuple[List[ActionRecord], Optional[List[dict]]]:
         self.hand_number += 1
@@ -92,6 +102,11 @@ class Table:
                 fn(self.hand_number)
 
         self._rotate_dealer()
+
+        # Stage 7: forward the just-played hand to the persistent logger.
+        if self.logger is not None and self.run_id is not None:
+            self.logger.log_hand(self.run_id, hand)
+
         return action_log, showdown_data
 
     # ------------------------------------------------------------------
