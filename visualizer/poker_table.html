@@ -701,6 +701,207 @@ footer .em {
   text-transform: none;
 }
 
+/* =====================================================================
+ * Stage 9 — View Mode picker + Trust Heatmap panel
+ * =====================================================================
+ * A segmented control at the top of the sidebar toggles between three
+ * panels (Trust Lens / Heatmap / Stats). Only one is visible at a time.
+ * The picker itself uses DM Mono with a gold underline on the active
+ * option, hairline dividers between options — the same DesignCues
+ * vocabulary as the rest of the viewer.
+ * ===================================================================== */
+
+.view-picker-panel {
+  padding: 14px 20px 0;
+}
+.view-picker-panel .section-label { margin-bottom: 8px; }
+
+.view-picker {
+  display: flex;
+  gap: 0;
+  margin: 0 -20px;
+  border-top: 0.5px solid var(--border);
+}
+.view-btn {
+  flex: 1;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid transparent;
+  color: var(--text-muted);
+  padding: 12px 6px 11px;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  cursor: pointer;
+  transition: color 0.3s, border-color 0.3s;
+  position: relative;
+}
+.view-btn + .view-btn { border-left: 0.5px solid var(--border); }
+.view-btn:hover { color: var(--text-primary); }
+.view-btn.active {
+  color: var(--gold);
+  border-bottom-color: var(--gold);
+  box-shadow: 0 1px 12px -2px rgba(201, 169, 110, 0.35);
+}
+
+.panel.view-panel.view-hidden { display: none; }
+
+/* --- Trust Heatmap --- */
+.heatmap-wrap {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+.heatmap-grid {
+  display: grid;
+  grid-template-columns: 22px repeat(8, 28px);
+  grid-template-rows: 4px 16px repeat(8, 28px);
+  column-gap: 2px;
+  row-gap: 2px;
+  font-family: 'DM Mono', monospace;
+  align-self: center;
+}
+.heatmap-archbar {
+  height: 3px;
+  background: var(--arch-neutral);
+  opacity: 0.85;
+  align-self: stretch;
+  border-radius: 1px;
+}
+.heatmap-archbar.arch-oracle    { background: var(--arch-oracle); }
+.heatmap-archbar.arch-sentinel  { background: var(--arch-sentinel); }
+.heatmap-archbar.arch-firestorm { background: var(--arch-firestorm); }
+.heatmap-archbar.arch-wall      { background: var(--arch-wall); }
+.heatmap-archbar.arch-phantom   { background: var(--arch-phantom); }
+.heatmap-archbar.arch-predator  { background: var(--arch-predator); }
+.heatmap-archbar.arch-mirror    { background: var(--arch-mirror); }
+.heatmap-archbar.arch-judge     { background: var(--arch-judge); }
+
+.heatmap-colhead,
+.heatmap-rowhead {
+  font-size: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--text-muted);
+  align-self: center;
+}
+.heatmap-colhead { justify-self: center; padding-top: 2px; }
+.heatmap-rowhead {
+  justify-self: end;
+  padding-right: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.heatmap-rowhead .row-archbar {
+  display: inline-block;
+  width: 3px;
+  height: 14px;
+  background: var(--arch-neutral);
+  border-radius: 1px;
+}
+.heatmap-rowhead.arch-oracle    .row-archbar { background: var(--arch-oracle); }
+.heatmap-rowhead.arch-sentinel  .row-archbar { background: var(--arch-sentinel); }
+.heatmap-rowhead.arch-firestorm .row-archbar { background: var(--arch-firestorm); }
+.heatmap-rowhead.arch-wall      .row-archbar { background: var(--arch-wall); }
+.heatmap-rowhead.arch-phantom   .row-archbar { background: var(--arch-phantom); }
+.heatmap-rowhead.arch-predator  .row-archbar { background: var(--arch-predator); }
+.heatmap-rowhead.arch-mirror    .row-archbar { background: var(--arch-mirror); }
+.heatmap-rowhead.arch-judge     .row-archbar { background: var(--arch-judge); }
+
+.heatmap-cell {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  font-variant-numeric: tabular-nums;
+  color: rgba(20, 16, 12, 0.88);
+  cursor: help;
+  position: relative;
+  border: 0.5px solid rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.heatmap-cell:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 0 1px var(--gold), 0 0 12px rgba(201, 169, 110, 0.45);
+  z-index: 2;
+}
+.heatmap-cell.diag {
+  background: #000;
+  color: var(--text-dim);
+  border-color: rgba(255, 255, 255, 0.05);
+  cursor: default;
+}
+.heatmap-cell.diag:hover { transform: none; box-shadow: none; }
+.heatmap-cell.diag::after {
+  content: '—';
+  color: var(--text-dim);
+  font-size: 9px;
+  letter-spacing: 0;
+}
+
+/* Trust color scale — opaque fills of the gold-to-rust ring palette,
+ * chosen so the 2-decimal number stays legible against each band. */
+.heatmap-cell.trust-gold    { background: rgba(201, 169, 110, 0.88); color: #1a1410; }
+.heatmap-cell.trust-warm    { background: rgba(201, 169, 110, 0.58); color: #1a1410; }
+.heatmap-cell.trust-neutral { background: rgba(200, 190, 150, 0.30); color: #e8e6df; }
+.heatmap-cell.trust-cool    { background: rgba(185, 110, 70, 0.62); color: #f4ece0; }
+.heatmap-cell.trust-dim     { background: rgba(180, 60, 40, 0.82); color: #f4ece0; }
+
+.heatmap-legend {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'DM Mono', monospace;
+  font-size: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--text-dim);
+  align-self: center;
+  margin-top: 2px;
+}
+.heatmap-legend-scale {
+  height: 4px;
+  width: 120px;
+  background: linear-gradient(
+    90deg,
+    rgba(180, 60, 40, 0.82) 0%,
+    rgba(185, 110, 70, 0.62) 25%,
+    rgba(200, 190, 150, 0.30) 50%,
+    rgba(201, 169, 110, 0.58) 75%,
+    rgba(201, 169, 110, 0.88) 100%);
+  border: 0.5px solid rgba(0, 0, 0, 0.3);
+}
+.heatmap-tooltip {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  min-height: 32px;
+  padding-top: 8px;
+  margin-top: 4px;
+  border-top: 0.5px solid var(--border);
+  width: 100%;
+  line-height: 1.6;
+}
+.heatmap-tooltip .arrow { color: var(--text-dim); margin: 0 6px; font-style: normal; }
+.heatmap-tooltip .gold { color: var(--gold); }
+.heatmap-tooltip .obs,
+.heatmap-tooltip .tgt {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 12px;
+  color: var(--text-primary);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
 /* Small-screen fallback */
 @media (max-width: 1100px) {
   .main { grid-template-columns: 1fr; }
@@ -748,12 +949,39 @@ footer .em {
             <h2>Hand &mdash;</h2>
           </div>
 
-          <div class="panel observer-panel">
+          <div class="panel view-picker-panel">
+            <div class="section-label"><span class="shiny-text">View Mode</span></div>
+            <div class="view-picker" role="tablist" aria-label="View Mode">
+              <button type="button" class="view-btn active" data-view="trust-lens" role="tab">Trust Lens</button>
+              <button type="button" class="view-btn" data-view="heatmap" role="tab">Heatmap</button>
+              <button type="button" class="view-btn" data-view="stats" role="tab">Stats</button>
+            </div>
+          </div>
+
+          <div class="panel view-panel observer-panel" id="panel-trust-lens">
             <div class="section-label"><span class="shiny-text">03 &mdash; Trust Lens</span></div>
             <div class="observer-select">
               <select id="observer-select"></select>
               <div class="hint">each seat's ring shows this observer's trust</div>
             </div>
+          </div>
+
+          <div class="panel view-panel view-hidden" id="panel-heatmap">
+            <div class="section-label"><span class="shiny-text">06 &mdash; Trust Heatmap</span></div>
+            <div class="heatmap-wrap">
+              <div class="heatmap-grid" id="heatmap-grid"></div>
+              <div class="heatmap-legend">
+                <span>rust</span>
+                <div class="heatmap-legend-scale"></div>
+                <span>gold</span>
+              </div>
+              <div class="heatmap-tooltip" id="heatmap-tooltip">hover a cell to inspect</div>
+            </div>
+          </div>
+
+          <div class="panel view-panel view-hidden" id="panel-stats">
+            <div class="section-label"><span class="shiny-text">07 &mdash; Agent Stats</span></div>
+            <div class="stats-wrap" id="stats-wrap"></div>
           </div>
 
           <div class="panel">
@@ -821,6 +1049,9 @@ footer .em {
   let observerSeat = 0;
   let playing = false;
   let playTimer = null;
+  // Stage 9: which of the three sidebar panels is currently visible.
+  // One of "trust-lens" | "heatmap" | "stats". Trust Lens is the default.
+  let currentView = "trust-lens";
 
   /* ------------------------------------------------------------------
    * Rendering helpers
@@ -1105,6 +1336,11 @@ footer .em {
     const currentRow = feedEl.querySelector(".action-row.current");
     if (currentRow) currentRow.scrollIntoView({ block: "nearest" });
 
+    // Stage 9: the Trust Heatmap reads from the current hand's snapshot
+    // on every frame. We always update it so it stays in sync even if
+    // the user switches to it mid-hand.
+    renderHeatmap();
+
     // Showdown / walkover — only at final frame
     const showEl = document.getElementById("showdown");
     if (state.isFinal && hand.showdown) {
@@ -1161,6 +1397,162 @@ footer .em {
       return true;
     }
     return false;
+  }
+
+  /* ------------------------------------------------------------------
+   * Stage 9: View Mode picker + Trust Heatmap
+   * ------------------------------------------------------------------
+   * The picker toggles which of the three sidebar panels is visible.
+   * Each panel reads from the same snapshot data but presents a
+   * different slice — Trust Lens scopes to a single observer, the
+   * Heatmap shows all 8x8 observer→target cells at once, and Stats
+   * rolls up the action log through the current action index.
+   * ------------------------------------------------------------------ */
+  const VIEW_PANELS = {
+    "trust-lens": "panel-trust-lens",
+    "heatmap":    "panel-heatmap",
+    "stats":      "panel-stats",
+  };
+
+  function setupViewPicker() {
+    document.querySelectorAll(".view-btn").forEach((btn) => {
+      btn.addEventListener("click", () => switchView(btn.dataset.view));
+    });
+  }
+
+  function switchView(view) {
+    if (!VIEW_PANELS[view]) return;
+    currentView = view;
+    document.querySelectorAll(".view-btn").forEach((btn) => {
+      btn.classList.toggle("active", btn.dataset.view === view);
+      btn.setAttribute("aria-selected", btn.dataset.view === view ? "true" : "false");
+    });
+    Object.entries(VIEW_PANELS).forEach(([v, id]) => {
+      const el = document.getElementById(id);
+      if (el) el.classList.toggle("view-hidden", v !== view);
+    });
+    renderFrame();
+  }
+
+  /* --- Trust Heatmap -------------------------------------------------
+   * 8x8 grid. Rows = observer, cols = target. The diagonal is blacked
+   * out (self-trust is meaningless). Cell color reuses the same gold→
+   * rust ring palette used elsewhere, so a quick scan across the board
+   * reads the same way as the trust rings on the seat cards.
+   * ------------------------------------------------------------------ */
+  function createHeatmap() {
+    const grid = document.getElementById("heatmap-grid");
+    if (!grid) return;
+    grid.innerHTML = "";
+    const agents = DATA.meta.agents;
+    const byName = {};
+    agents.forEach((a) => { byName[a.seat] = a; });
+
+    // Top archetype color bars (row 1) + S-label headers (row 2).
+    for (let c = 0; c < NUM_SEATS; c++) {
+      const a = byName[c];
+      const bar = document.createElement("div");
+      bar.className = `heatmap-archbar arch-${a.archetype}`;
+      bar.style.gridColumn = String(c + 2);
+      bar.style.gridRow = "1";
+      bar.title = `${a.name} (${a.archetype})`;
+      grid.appendChild(bar);
+
+      const lab = document.createElement("div");
+      lab.className = "heatmap-colhead";
+      lab.style.gridColumn = String(c + 2);
+      lab.style.gridRow = "2";
+      lab.textContent = `S${c}`;
+      grid.appendChild(lab);
+    }
+
+    // Row headers + 64 cells.
+    for (let r = 0; r < NUM_SEATS; r++) {
+      const rowA = byName[r];
+      const rowLab = document.createElement("div");
+      rowLab.className = `heatmap-rowhead arch-${rowA.archetype}`;
+      rowLab.style.gridColumn = "1";
+      rowLab.style.gridRow = String(r + 3);
+      rowLab.innerHTML = `<span class="row-archbar"></span>S${r}`;
+      grid.appendChild(rowLab);
+
+      for (let c = 0; c < NUM_SEATS; c++) {
+        const cell = document.createElement("div");
+        cell.className = "heatmap-cell";
+        cell.style.gridColumn = String(c + 2);
+        cell.style.gridRow = String(r + 3);
+        cell.id = `heatmap-${r}-${c}`;
+        if (r === c) {
+          cell.classList.add("diag");
+        } else {
+          cell.addEventListener("mouseenter", () => showHeatmapTooltip(r, c));
+          cell.addEventListener("mouseleave", resetHeatmapTooltip);
+        }
+        grid.appendChild(cell);
+      }
+    }
+  }
+
+  function resetHeatmapTooltip() {
+    const el = document.getElementById("heatmap-tooltip");
+    if (el) el.innerHTML = "hover a cell to inspect";
+  }
+
+  function showHeatmapTooltip(obsSeat, tgtSeat) {
+    const hand = DATA.hands[currentHand];
+    const trustRow = hand.trust_snapshot && hand.trust_snapshot[String(obsSeat)];
+    if (!trustRow) return;
+    const t = trustRow[String(tgtSeat)];
+    const entRow = hand.entropy_snapshot && hand.entropy_snapshot[String(obsSeat)];
+    const topRow = hand.top_archetype_snapshot && hand.top_archetype_snapshot[String(obsSeat)];
+    const ent = entRow ? entRow[String(tgtSeat)] : null;
+    const top = topRow ? topRow[String(tgtSeat)] : null;
+    const obsName = DATA.meta.agents[obsSeat].name;
+    const tgtName = DATA.meta.agents[tgtSeat].name;
+    const topStr = top
+      ? `${formatArchName(top[0])} ${Math.round(top[1] * 100)}%`
+      : "—";
+    const entStr = ent !== null && ent !== undefined ? ent.toFixed(2) : "—";
+    const el = document.getElementById("heatmap-tooltip");
+    el.innerHTML =
+      `<span class="obs">${obsName}</span>` +
+      `<span class="arrow">→</span>` +
+      `<span class="tgt">${tgtName}</span><br>` +
+      `trust <span class="gold">${t.toFixed(3)}</span> · top ${topStr} · entropy H ${entStr}`;
+  }
+
+  function renderHeatmap() {
+    const hand = DATA.hands[currentHand];
+    const snap = hand.trust_snapshot;
+    if (!snap) return;
+    for (let r = 0; r < NUM_SEATS; r++) {
+      const row = snap[String(r)] || {};
+      for (let c = 0; c < NUM_SEATS; c++) {
+        if (r === c) continue;
+        const cell = document.getElementById(`heatmap-${r}-${c}`);
+        if (!cell) continue;
+        const score = row[String(c)];
+        if (score === undefined || score === null) {
+          cell.className = "heatmap-cell trust-neutral";
+          cell.textContent = "—";
+          continue;
+        }
+        cell.className = `heatmap-cell ${trustClass(score)}`;
+        cell.textContent = score.toFixed(2);
+        // Also populate the native browser tooltip as a fallback so the
+        // info is accessible even without the in-panel hover handler.
+        const obsName = DATA.meta.agents[r].name;
+        const tgtName = DATA.meta.agents[c].name;
+        const entRow = hand.entropy_snapshot && hand.entropy_snapshot[String(r)];
+        const topRow = hand.top_archetype_snapshot && hand.top_archetype_snapshot[String(r)];
+        const ent = entRow ? entRow[String(c)] : null;
+        const top = topRow ? topRow[String(c)] : null;
+        cell.title =
+          `${obsName} → ${tgtName}: trust ${score.toFixed(3)}` +
+          (top ? `, top ${formatArchName(top[0])} ${Math.round(top[1] * 100)}%` : "") +
+          (ent !== null && ent !== undefined ? `, entropy ${ent.toFixed(2)}` : "");
+      }
+    }
   }
 
   function setupObserverSelector() {
@@ -1236,6 +1628,8 @@ footer .em {
 
   createSeats();
   setupObserverSelector();
+  setupViewPicker();
+  createHeatmap();
   setupControls();
   gotoHand(0, { startAtEnd: false });
 })();
