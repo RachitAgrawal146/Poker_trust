@@ -902,6 +902,104 @@ footer .em {
   text-transform: none;
 }
 
+/* --- Agent Stats panel ---
+ * Live per-agent stats, walked from hand 0 through the current action
+ * index. Each row gets a left-edge colored border keyed to the seat's
+ * archetype — the same color bar used on the seat cards and heatmap
+ * headers, here rotated to mark the row's origin at a glance.
+ */
+.stats-wrap { margin-top: 10px; }
+.stats-header {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr) 38px 38px 32px 48px;
+  column-gap: 10px;
+  padding: 0 0 6px 8px;
+  border-bottom: 0.5px solid var(--border);
+  font-family: 'DM Mono', monospace;
+  font-size: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--text-dim);
+  align-items: end;
+}
+.stats-header .num     { text-align: left; }
+.stats-header .name    { text-align: left; }
+.stats-header .vpip,
+.stats-header .pfr,
+.stats-header .af,
+.stats-header .stack   { text-align: right; }
+
+.stats-row {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr) 38px 38px 32px 48px;
+  column-gap: 10px;
+  padding: 8px 0 8px 8px;
+  border-bottom: 0.5px solid rgba(255, 255, 255, 0.03);
+  border-left: 2px solid var(--arch-neutral);
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+  align-items: center;
+  transition: background 0.2s, color 0.3s, border-color 0.3s;
+}
+.stats-row:hover { background: rgba(255, 255, 255, 0.015); }
+.stats-row:last-child { border-bottom: 0; }
+.stats-row.folded { opacity: 0.45; }
+.stats-row.acting {
+  background: rgba(201, 169, 110, 0.08);
+  border-left-color: var(--gold);
+}
+.stats-row.arch-oracle    { border-left-color: var(--arch-oracle); }
+.stats-row.arch-sentinel  { border-left-color: var(--arch-sentinel); }
+.stats-row.arch-firestorm { border-left-color: var(--arch-firestorm); }
+.stats-row.arch-wall      { border-left-color: var(--arch-wall); }
+.stats-row.arch-phantom   { border-left-color: var(--arch-phantom); }
+.stats-row.arch-predator  { border-left-color: var(--arch-predator); }
+.stats-row.arch-mirror    { border-left-color: var(--arch-mirror); }
+.stats-row.arch-judge     { border-left-color: var(--arch-judge); }
+
+.stats-row .num {
+  color: var(--text-dim);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+}
+.stats-row .name {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 14px;
+  color: var(--text-primary);
+  letter-spacing: -0.005em;
+  text-transform: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.stats-row .vpip,
+.stats-row .pfr,
+.stats-row .af,
+.stats-row .stack {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.stats-row .vpip  { color: var(--gold); }
+.stats-row .pfr   { color: var(--gold-bright); }
+.stats-row .af    { color: var(--text-primary); }
+.stats-row .stack { color: var(--gold); font-weight: 500; }
+
+.stats-footnote {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--text-dim);
+  padding-top: 10px;
+  margin-top: 6px;
+  border-top: 0.5px solid var(--border);
+  line-height: 1.6;
+}
+
 /* Small-screen fallback */
 @media (max-width: 1100px) {
   .main { grid-template-columns: 1fr; }
@@ -981,7 +1079,18 @@ footer .em {
 
           <div class="panel view-panel view-hidden" id="panel-stats">
             <div class="section-label"><span class="shiny-text">07 &mdash; Agent Stats</span></div>
-            <div class="stats-wrap" id="stats-wrap"></div>
+            <div class="stats-wrap">
+              <div class="stats-header">
+                <span class="num">Seat</span>
+                <span class="name">Name</span>
+                <span class="vpip">VPIP</span>
+                <span class="pfr">PFR</span>
+                <span class="af">AF</span>
+                <span class="stack">Stack</span>
+              </div>
+              <div id="stats-rows"></div>
+              <div class="stats-footnote" id="stats-footnote">&mdash;</div>
+            </div>
           </div>
 
           <div class="panel">
@@ -1336,10 +1445,12 @@ footer .em {
     const currentRow = feedEl.querySelector(".action-row.current");
     if (currentRow) currentRow.scrollIntoView({ block: "nearest" });
 
-    // Stage 9: the Trust Heatmap reads from the current hand's snapshot
-    // on every frame. We always update it so it stays in sync even if
-    // the user switches to it mid-hand.
+    // Stage 9: the Trust Heatmap and Agent Stats panels read from the
+    // current hand's snapshot / walked action log on every frame. We
+    // always update both so they stay in sync even if the user switches
+    // to them mid-hand.
     renderHeatmap();
+    renderStats();
 
     // Showdown / walkover — only at final frame
     const showEl = document.getElementById("showdown");
@@ -1555,6 +1666,117 @@ footer .em {
     }
   }
 
+  /* --- Agent Stats -------------------------------------------------
+   * VPIP, PFR, and AF are computed live by walking every action from
+   * hand 0 up to the current hand × current action index. Definitions
+   * match ``agents/base_agent.py``:
+   *   VPIP = hands with any preflop CALL/BET/RAISE / hands_dealt
+   *   PFR  = hands with any preflop BET/RAISE / hands_dealt
+   *   AF   = (bets + raises) / max(calls, 1)
+   * Every seat is dealt in every hand (8-handed cash), so hands_dealt
+   * equals (currentHand + 1) at every step.
+   * ------------------------------------------------------------------ */
+  function computeLiveStats() {
+    const rows = [];
+    for (let i = 0; i < NUM_SEATS; i++) {
+      rows.push({
+        hands_dealt: 0,
+        vpip_hands: new Set(),
+        pfr_hands: new Set(),
+        bets: 0,
+        raises: 0,
+        calls: 0,
+        stack: 0,
+      });
+    }
+
+    // Walk every fully-completed hand before the current one.
+    for (let h = 0; h < currentHand; h++) {
+      walkHandIntoStats(DATA.hands[h], DATA.hands[h].actions.length, rows);
+    }
+    // Walk the current hand up to the current action index. Blinds are
+    // posted at idx=0 so hands_dealt is still bumped for the current hand.
+    walkHandIntoStats(DATA.hands[currentHand], actionIdx, rows);
+
+    // Live stacks come from computeState so they match the table view.
+    const state = computeState(DATA.hands[currentHand], actionIdx);
+    for (let s = 0; s < NUM_SEATS; s++) rows[s].stack = state.stacks[s];
+    return rows;
+  }
+
+  function walkHandIntoStats(hand, upToIdx, rows) {
+    // Each hand counts as dealt for every seat, matching BaseAgent's
+    // on_hand_start bookkeeping (hands_dealt bumps regardless of folding).
+    for (let s = 0; s < NUM_SEATS; s++) rows[s].hands_dealt += 1;
+    const lim = Math.min(upToIdx, hand.actions.length);
+    for (let i = 0; i < lim; i++) {
+      const a = hand.actions[i];
+      const s = rows[a.seat];
+      if (a.type === "bet")       s.bets   += 1;
+      else if (a.type === "raise") s.raises += 1;
+      else if (a.type === "call")  s.calls  += 1;
+      if (a.round === "preflop") {
+        if (a.type === "call" || a.type === "bet" || a.type === "raise") {
+          s.vpip_hands.add(hand.hand_id);
+        }
+        if (a.type === "bet" || a.type === "raise") {
+          s.pfr_hands.add(hand.hand_id);
+        }
+      }
+    }
+  }
+
+  function createStats() {
+    const container = document.getElementById("stats-rows");
+    if (!container) return;
+    container.innerHTML = "";
+    DATA.meta.agents.forEach((agent) => {
+      const row = document.createElement("div");
+      row.className = `stats-row arch-${agent.archetype}`;
+      row.id = `stats-row-${agent.seat}`;
+      row.innerHTML = `
+        <span class="num">S${agent.seat}</span>
+        <span class="name">${agent.name}</span>
+        <span class="vpip" id="stats-vpip-${agent.seat}">&mdash;</span>
+        <span class="pfr"  id="stats-pfr-${agent.seat}">&mdash;</span>
+        <span class="af"   id="stats-af-${agent.seat}">&mdash;</span>
+        <span class="stack" id="stats-stack-${agent.seat}">&mdash;</span>
+      `;
+      container.appendChild(row);
+    });
+  }
+
+  function renderStats() {
+    const rows = computeLiveStats();
+    const hand = DATA.hands[currentHand];
+    const state = computeState(hand, actionIdx);
+    DATA.meta.agents.forEach((agent) => {
+      const s = agent.seat;
+      const r = rows[s];
+      const vpip = r.hands_dealt ? (r.vpip_hands.size / r.hands_dealt) * 100 : 0;
+      const pfr  = r.hands_dealt ? (r.pfr_hands.size  / r.hands_dealt) * 100 : 0;
+      const af   = r.calls > 0 ? (r.bets + r.raises) / r.calls : (r.bets + r.raises);
+      document.getElementById(`stats-vpip-${s}`).textContent = `${vpip.toFixed(0)}%`;
+      document.getElementById(`stats-pfr-${s}`).textContent  = `${pfr.toFixed(0)}%`;
+      document.getElementById(`stats-af-${s}`).textContent   =
+        r.calls === 0 && (r.bets + r.raises) === 0 ? "—" : af.toFixed(2);
+      document.getElementById(`stats-stack-${s}`).textContent = r.stack;
+      const rowEl = document.getElementById(`stats-row-${s}`);
+      rowEl.classList.toggle("folded", !!state.folded[s]);
+      rowEl.classList.toggle("acting", !state.isFinal && s === state.actingSeat);
+    });
+    const totalHands = currentHand + 1;
+    const totalActions =
+      DATA.hands.slice(0, currentHand).reduce((sum, h) => sum + h.actions.length, 0) +
+      Math.min(actionIdx, hand.actions.length);
+    const note = document.getElementById("stats-footnote");
+    if (note) {
+      note.innerHTML =
+        `rolling through <span style="color:var(--gold)">${totalHands}</span> hand${totalHands === 1 ? "" : "s"} ` +
+        `&middot; ${totalActions} action${totalActions === 1 ? "" : "s"} applied`;
+    }
+  }
+
   function setupObserverSelector() {
     const sel = document.getElementById("observer-select");
     sel.innerHTML = DATA.meta.agents
@@ -1630,6 +1852,7 @@ footer .em {
   setupObserverSelector();
   setupViewPicker();
   createHeatmap();
+  createStats();
   setupControls();
   gotoHand(0, { startAtEnd: false });
 })();
