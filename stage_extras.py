@@ -756,3 +756,141 @@ def stage2_extras(modules) -> List[str]:
     )
 
     return results
+
+
+def stage7_extras(modules) -> List[str]:
+    """SQLite logger integration check (Stage 7).
+
+    Plays 50 hands with the Stage 5-style 8-archetype table, logging every
+    hand into an in-memory SQLite database via ``SQLiteLogger``. Verifies
+    each piece of the persistence schema:
+
+    a. runs table has exactly 1 row.
+    b. hands table has 50 rows.
+    c. actions row count > 0 and equals the sum of per-hand action-log
+       lengths tracked as the loop runs (since ``table.last_hand`` only
+       points at the most recent Hand, we accumulate the count on the fly).
+    d. trust_snapshots row count equals 50 * 8 * 7 = 2800 (one per
+       observer-target pair per hand) for Stage 5+ agents.
+    e. Chip conservation: SUM(final_stack) = num_seats * starting_stack
+       + SUM(rebuys) * starting_stack (i.e. each rebuy injects exactly one
+       starting-stack into the economy — the net profit across seats is
+       zero).
+    f. Foreign-key integrity: every ``actions.hand_id`` is present in the
+       ``hands`` table for the same run_id.
+    """
+    Table = modules["Table"]
+    SQLiteLogger = modules["SQLiteLogger"]
+    create_agents = modules["create_agents"]
+
+    results: List[str] = []
+
+    def check(name: str, cond: bool, detail: str = "") -> None:
+        prefix = "PASS" if cond else "FAIL"
+        results.append(f"{prefix} {name}{': ' + detail if detail else ''}")
+
+    num_hands = 50
+    num_seats = 8
+
+    logger = SQLiteLogger(":memory:")
+    agents = create_agents()
+    run_id = logger.start_run(
+        seed=42,
+        num_hands=num_hands,
+        label="stage7-extras",
+        agents=agents,
+    )
+    table = Table(agents, seed=42, logger=logger, run_id=run_id)
+
+    total_actions_in_memory = 0
+    for _ in range(num_hands):
+        table.play_hand()
+        last = table.last_hand
+        if last is not None:
+            total_actions_in_memory += len(last.action_log)
+
+    logger.log_agent_stats(run_id, table)
+
+    cur = logger.conn.cursor()
+
+    # ---- (a) runs row count -------------------------------------------
+    runs_count = cur.execute("SELECT COUNT(*) FROM runs").fetchone()[0]
+    check(
+        "7.a: runs table has 1 row",
+        runs_count == 1,
+        f"got {runs_count}",
+    )
+
+    # ---- (b) hands row count ------------------------------------------
+    hands_count = cur.execute(
+        "SELECT COUNT(*) FROM hands WHERE run_id = ?", (run_id,)
+    ).fetchone()[0]
+    check(
+        "7.b: hands table has 50 rows",
+        hands_count == num_hands,
+        f"got {hands_count}",
+    )
+
+    # ---- (c) actions row count matches accumulated lengths ------------
+    actions_count = cur.execute(
+        "SELECT COUNT(*) FROM actions WHERE run_id = ?", (run_id,)
+    ).fetchone()[0]
+    check(
+        "7.c1: actions table has >0 rows",
+        actions_count > 0,
+        f"got {actions_count}",
+    )
+    check(
+        "7.c2: actions rows == summed action_log lengths",
+        actions_count == total_actions_in_memory,
+        f"db={actions_count} memory={total_actions_in_memory}",
+    )
+
+    # ---- (d) trust_snapshot row count = hands * observers * targets --
+    expected_trust = num_hands * num_seats * (num_seats - 1)
+    trust_count = cur.execute(
+        "SELECT COUNT(*) FROM trust_snapshots WHERE run_id = ?", (run_id,)
+    ).fetchone()[0]
+    check(
+        "7.d: trust_snapshots rows == 50 * 8 * 7",
+        trust_count == expected_trust,
+        f"got {trust_count}, expected {expected_trust}",
+    )
+
+    # ---- (e) chip conservation ----------------------------------------
+    from config import SIMULATION as _SIM
+    starting_stack = _SIM["starting_stack"]
+    final_stack_sum, rebuys_sum = cur.execute(
+        "SELECT COALESCE(SUM(final_stack), 0), COALESCE(SUM(rebuys), 0) "
+        "FROM agent_stats WHERE run_id = ?",
+        (run_id,),
+    ).fetchone()
+    expected_total = (num_seats + int(rebuys_sum)) * starting_stack
+    check(
+        "7.e: chip conservation across rebuys",
+        int(final_stack_sum) == expected_total,
+        (
+            f"sum(final_stack)={int(final_stack_sum)} "
+            f"expected={expected_total} "
+            f"(num_seats*{starting_stack} + rebuys*{starting_stack})"
+        ),
+    )
+
+    # ---- (f) foreign-key integrity ------------------------------------
+    orphans = cur.execute(
+        """
+        SELECT COUNT(*) FROM actions a
+         LEFT JOIN hands h
+                ON a.run_id = h.run_id AND a.hand_id = h.hand_id
+         WHERE a.run_id = ? AND h.hand_id IS NULL
+        """,
+        (run_id,),
+    ).fetchone()[0]
+    check(
+        "7.f: every actions.hand_id exists in hands",
+        orphans == 0,
+        f"orphan action rows = {orphans}",
+    )
+
+    logger.close()
+    return results
