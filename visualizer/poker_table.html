@@ -2,435 +2,793 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Poker Trust Simulation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Mono:wght@300;400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-  * { box-sizing: border-box; }
-  html, body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background: #0a0a0a;
-    color: #e0e0e0;
-    margin: 0;
-    padding: 0;
-    min-height: 100vh;
-  }
-  .wrapper {
-    max-width: 1500px;
-    margin: 0 auto;
-    padding: 20px 28px 28px;
-  }
-  .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    gap: 16px;
-    padding-bottom: 14px;
-    border-bottom: 1px solid #2a2a2a;
-    margin-bottom: 22px;
-    flex-wrap: wrap;
-  }
-  .header h1 {
-    font-size: 18px;
-    margin: 0;
-    color: #f0f0f0;
-    font-weight: 600;
-    letter-spacing: 0.2px;
-  }
-  .header .subtitle {
-    color: #8a8a8a;
-    font-size: 12px;
-  }
-  .header .stage-badge {
-    background: #1f3a1f;
-    color: #9ee09e;
-    border: 1px solid #3a5a3a;
-    padding: 3px 10px;
-    border-radius: 12px;
-    font-size: 11px;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-  }
+/* =====================================================================
+ * DesignCues — dark editorial aesthetic
+ * #0c0c0b background, #c9a96e gold accent, Cormorant Garamond italic
+ * display + Inter body + DM Mono labels. Noise overlay, hairline dividers.
+ * ===================================================================== */
 
-  .main {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 340px;
-    gap: 20px;
-  }
+:root {
+  --bg: #0c0c0b;
+  --surface: #141413;
+  --surface2: #1c1c1a;
+  --border: rgba(255, 255, 255, 0.07);
+  --border-active: rgba(255, 255, 255, 0.12);
+  --text-primary: #e8e6df;
+  --text-muted: #8a887f;
+  --text-dim: #4a4844;
+  --gold: #c9a96e;
+  --gold-bright: #e8d5b0;
+  --gold-soft: rgba(201, 169, 110, 0.45);
+  --gold-wash: rgba(201, 169, 110, 0.04);
 
-  .table-area {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
-  .table-container {
-    position: relative;
-    background:
-      radial-gradient(ellipse at center, #1e5b38 0%, #0b2a1a 85%);
-    border: 10px solid #2c1a0f;
-    border-radius: 50% / 42%;
-    aspect-ratio: 16 / 10;
-    box-shadow:
-      0 20px 60px rgba(0,0,0,0.6),
-      inset 0 0 60px rgba(0,0,0,0.35);
-    min-height: 420px;
-  }
-  .center {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
-    pointer-events: none;
-  }
-  .community {
-    display: flex;
-    gap: 5px;
-    justify-content: center;
-    min-height: 48px;
-  }
-  .community .card {
-    font-size: 18px;
-    padding: 6px 8px;
-    min-width: 30px;
-    line-height: 1;
-  }
-  .pot {
-    margin-top: 14px;
-    font-size: 15px;
-    color: #f5d66c;
-    font-weight: 600;
-    text-shadow: 0 1px 3px rgba(0,0,0,0.8);
-  }
+  /* Archetype accents — muted, used for faint border tints only so they
+   * never fight the gold accent. */
+  --arch-oracle: #9a9a9a;
+  --arch-sentinel: #6c9ec7;
+  --arch-firestorm: #c76c6c;
+  --arch-wall: #c7b86c;
+  --arch-phantom: #9e6cc7;
+  --arch-predator: #e0a06c;
+  --arch-mirror: #6cc7ad;
+  --arch-judge: #e0d46c;
+  --arch-neutral: #555;
 
-  .seat {
-    position: absolute;
-    width: 140px;
-    padding: 9px 10px 10px;
-    background: rgba(10,10,10,0.78);
-    border: 2px solid #444;
-    border-radius: 10px;
-    text-align: center;
-    transform: translate(-50%, -50%);
-    transition: border-color 0.2s, opacity 0.2s, box-shadow 0.2s;
-    cursor: pointer;
-  }
-  .seat:hover { border-color: #777; }
-  .seat.folded { opacity: 0.35; filter: grayscale(0.7); }
-  .seat.acting {
-    border-color: #6caadb;
-    box-shadow: 0 0 24px rgba(108, 170, 219, 0.55);
-  }
-  .seat.winner {
-    border-color: #f5d66c;
-    box-shadow: 0 0 22px rgba(245, 214, 108, 0.55);
-  }
-  .seat.sb::before,
-  .seat.bb::before,
-  .seat.dealer::before {
-    position: absolute;
-    top: -9px;
-    left: -9px;
-    min-width: 22px;
-    height: 22px;
-    padding: 0 5px;
-    line-height: 18px;
-    border-radius: 11px;
-    font-weight: 700;
-    font-size: 10px;
-    border: 2px solid #000;
-    background: #aaa;
-    color: #000;
-    text-transform: uppercase;
-    letter-spacing: 0.4px;
-  }
-  .seat.dealer::before { content: 'D'; background: #f5d66c; }
-  .seat.sb::before     { content: 'SB'; background: #6caadb; }
-  .seat.bb::before     { content: 'BB'; background: #dba56c; }
+  /* Trust ring palette — gold → rust gradient. Matches the editorial
+   * aesthetic: gold = trustworthy, rust = blatantly bluffing. */
+  --trust-gold: rgba(201, 169, 110, 0.9);
+  --trust-warm: rgba(201, 169, 110, 0.6);
+  --trust-neutral: rgba(200, 190, 150, 0.45);
+  --trust-cool: rgba(185, 110, 70, 0.7);
+  --trust-dim: rgba(180, 60, 40, 0.85);
 
-  .seat-name {
-    font-weight: 600;
-    font-size: 13px;
-    color: #f0f0f0;
-  }
-  .seat-archetype {
-    display: inline-block;
-    font-size: 9px;
-    color: #ddd;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-top: 3px;
-    padding: 1px 6px;
-    border-radius: 8px;
-    background: #2a2a2a;
-    border: 1px solid #444;
-  }
-  /* Archetype accent colors — ring around the seat card + background of
-   * the archetype chip. Keys match BaseAgent.archetype strings. */
-  .seat.arch-oracle    { border-color: #9a9a9a; }
-  .seat.arch-sentinel  { border-color: #6c9ec7; }
-  .seat.arch-firestorm { border-color: #c76c6c; }
-  .seat.arch-wall      { border-color: #c7b86c; }
-  .seat.arch-phantom   { border-color: #9e6cc7; }
-  .seat.arch-predator  { border-color: #e0a06c; }
-  .seat.arch-mirror    { border-color: #6cc7ad; }
-  .seat.arch-judge     { border-color: #e0d46c; }
-  .seat.arch-dummy,
-  .seat.arch-folder,
-  .seat.arch-raiser    { border-color: #555; }
-  .seat-archetype.arch-oracle    { background: #333; color: #ccc; border-color: #555; }
-  .seat-archetype.arch-sentinel  { background: #1f3a55; color: #9ecadd; border-color: #2f4a65; }
-  .seat-archetype.arch-firestorm { background: #55201f; color: #dd9e9e; border-color: #653030; }
-  .seat-archetype.arch-wall      { background: #4d4520; color: #ddd09e; border-color: #5d5530; }
-  .seat-archetype.arch-phantom   { background: #3f1f55; color: #c9a0dd; border-color: #4f2f65; }
-  .seat-archetype.arch-predator  { background: #553a1f; color: #ddb99e; border-color: #654a30; }
-  .seat-archetype.arch-mirror    { background: #1f553f; color: #9edbc2; border-color: #2f6550; }
-  .seat-archetype.arch-judge     { background: #504b14; color: #ddd679; border-color: #605a24; }
-  .seat-stack {
-    font-size: 14px;
-    color: #f5d66c;
-    margin-top: 5px;
-    font-weight: 600;
-  }
-  .seat-stack .delta {
-    font-size: 10px;
-    margin-left: 4px;
-    font-weight: 500;
-  }
-  .seat-stack .delta.up   { color: #9ee09e; }
-  .seat-stack .delta.down { color: #e09e9e; }
-  .seat-cards {
-    display: flex;
-    justify-content: center;
-    gap: 3px;
-    margin-top: 6px;
-    min-height: 24px;
-  }
+  /* Felt — deeper, more muted than the original green so it sits in the
+   * dark editorial palette without screaming "casino". A card-room green
+   * under paper-dark light. */
+  --felt-light: #1f3a26;
+  --felt-dark: #0f1c12;
+  --felt-rim: #3a2a14;
+}
 
-  .card {
-    display: inline-block;
-    padding: 3px 5px;
-    background: #fafafa;
-    color: #111;
-    border-radius: 3px;
-    font-size: 11px;
-    font-weight: 700;
-    min-width: 22px;
-    text-align: center;
-    border: 1px solid #888;
-    font-variant-numeric: tabular-nums;
-    letter-spacing: -0.5px;
-  }
-  .card.red { color: #c00; }
-  .card.hidden {
-    background:
-      repeating-linear-gradient(45deg, #1e3a6f, #1e3a6f 4px, #193056 4px, #193056 8px);
-    color: transparent;
-    border-color: #0a1a3a;
-  }
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
-  .sidebar {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    min-height: 0;
-  }
-  .panel {
-    background: #141414;
-    border: 1px solid #2a2a2a;
-    border-radius: 8px;
-    padding: 14px 16px;
-  }
-  .panel h3 {
-    margin: 0 0 8px;
-    font-size: 11px;
-    color: #888;
-    text-transform: uppercase;
-    letter-spacing: 1.2px;
-    font-weight: 600;
-  }
-  .hand-info h2 {
-    margin: 0 0 6px;
-    font-size: 16px;
-    color: #f5d66c;
-    font-weight: 600;
-  }
-  .hand-info .meta-row {
-    font-size: 12px;
-    color: #aaa;
-    margin: 2px 0;
-  }
+html, body {
+  width: 100%;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 300;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
 
-  .action-feed {
-    max-height: 300px;
-    overflow-y: auto;
-  }
-  .action-row {
-    display: grid;
-    grid-template-columns: 54px 34px 1fr 52px;
-    gap: 6px;
-    padding: 3px 0;
-    font-size: 12px;
-    border-bottom: 1px dashed #222;
-    align-items: baseline;
-  }
-  .action-row:last-child { border-bottom: none; }
-  .action-row.current {
-    background: rgba(108, 170, 219, 0.18);
-    border-radius: 3px;
-    outline: 1px solid rgba(108, 170, 219, 0.5);
-  }
-  .action-row.future { opacity: 0.35; }
-  .action-row .round { color: #666; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
-  .action-row .seatnum { color: #a8d8e8; font-weight: 600; }
-  .action-row .type { color: #f0f0f0; }
-  .action-row .type.fold  { color: #c76060; }
-  .action-row .type.bet   { color: #8cd88c; }
-  .action-row .type.raise { color: #6cc76c; font-weight: 700; }
-  .action-row .type.call  { color: #c7c76c; }
-  .action-row .type.check { color: #888; }
-  .action-row .potcell {
-    color: #f5d66c;
-    text-align: right;
-    font-size: 11px;
-    font-variant-numeric: tabular-nums;
-  }
+/* Noise overlay — the single most atmospheric detail. Turns OLED black
+ * into something that feels like paper. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px 256px;
+}
 
-  .round-badge {
-    display: inline-block;
-    background: #1f2a3a;
-    color: #a8d8e8;
-    border: 1px solid #3a4a5a;
-    padding: 2px 10px;
-    border-radius: 10px;
-    font-size: 10px;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    margin-left: 6px;
-  }
+::selection { background: rgba(201, 169, 110, 0.3); color: var(--text-primary); }
 
-  .showdown-row {
-    font-size: 12px;
-    padding: 3px 0;
-    color: #bbb;
-  }
-  .showdown-row.won { color: #f5d66c; font-weight: 600; }
+/* =====================================================================
+ * Layout
+ * ===================================================================== */
 
-  .controls {
-    grid-column: 1 / -1;
-    background: #141414;
-    border: 1px solid #2a2a2a;
-    border-radius: 8px;
-    padding: 12px 18px;
-    display: flex;
-    align-items: center;
-    gap: 14px;
-  }
-  .controls-top    { border-radius: 8px 8px 0 0; border-bottom: 0; }
-  .controls-bottom { border-radius: 0 0 8px 8px; padding-top: 10px; }
-  .controls-bottom input[type="range"] { accent-color: #6caadb; }
-  .btn {
-    background: #2a2a2a;
-    border: 1px solid #444;
-    color: #e0e0e0;
-    padding: 7px 14px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 13px;
-    font-weight: 500;
-    transition: background 0.15s, border-color 0.15s;
-  }
-  .btn:hover { background: #333; border-color: #666; }
-  .btn:disabled { opacity: 0.35; cursor: not-allowed; }
-  .btn.play { min-width: 90px; }
+.wrapper {
+  max-width: 1480px;
+  margin: 0 auto;
+  padding: 28px 36px 28px;
+  position: relative;
+}
 
-  input[type="range"] {
-    flex: 1;
-    accent-color: #f5d66c;
-    min-width: 200px;
-  }
-  .hand-label {
-    color: #f5d66c;
-    font-weight: 600;
-    min-width: 110px;
-    text-align: right;
-    font-variant-numeric: tabular-nums;
-    font-size: 13px;
-  }
+/* --- Top bar --- */
+.top-bar {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 32px;
+  padding-bottom: 18px;
+  border-bottom: 0.5px solid var(--border);
+  margin-bottom: 28px;
+}
 
-  .fallback {
-    padding: 60px 40px;
-    text-align: center;
-    color: #aaa;
-  }
-  .fallback code {
-    background: #1a1a1a;
-    padding: 2px 6px;
-    border-radius: 3px;
-    color: #f5d66c;
-    border: 1px solid #333;
-  }
+.top-bar .title-block {
+  display: flex;
+  align-items: baseline;
+  gap: 18px;
+  flex-wrap: wrap;
+}
 
-  @media (max-width: 980px) {
-    .main { grid-template-columns: 1fr; }
-    .sidebar { max-height: none; }
-  }
+.top-bar h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 28px;
+  letter-spacing: -0.005em;
+  color: var(--text-primary);
+}
+
+.top-bar h1 .em {
+  color: var(--gold);
+  font-weight: 500;
+}
+
+.top-bar .subtitle {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  color: var(--text-muted);
+}
+
+.top-bar .stage-badge {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  color: var(--gold);
+  padding: 3px 10px;
+  border: 0.5px solid rgba(201, 169, 110, 0.3);
+  background: rgba(201, 169, 110, 0.06);
+  white-space: nowrap;
+}
+
+/* Shiny text sweep — applied to the stage badge so it reads as a living
+ * label, not a static chip. Matches the portfolio's section-number pattern. */
+.shiny-text {
+  background: linear-gradient(
+    110deg,
+    rgba(201, 169, 110, 0.5) 0%,
+    rgba(201, 169, 110, 0.5) 35%,
+    rgba(255, 240, 200, 1) 50%,
+    rgba(201, 169, 110, 0.5) 65%,
+    rgba(201, 169, 110, 0.5) 100%
+  );
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: shinySweep 4s linear infinite;
+}
+@keyframes shinySweep {
+  0%   { background-position: 200% center; }
+  100% { background-position: -200% center; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .shiny-text { animation: none; color: var(--gold); -webkit-text-fill-color: var(--gold); }
+}
+
+/* --- Section labels (the numbered NN — Title pattern) --- */
+.section-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  color: var(--gold);
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  margin-bottom: 12px;
+}
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 0.5px;
+  background: var(--border);
+}
+
+/* --- Main grid --- */
+.main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 28px;
+}
+
+.table-area {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* --- Oval felt --- */
+.table-container {
+  position: relative;
+  background: radial-gradient(ellipse at center, var(--felt-light) 0%, var(--felt-dark) 82%);
+  border: 1px solid rgba(201, 169, 110, 0.22);
+  border-radius: 50% / 42%;
+  aspect-ratio: 16 / 10;
+  box-shadow:
+    0 0 0 6px rgba(58, 42, 20, 0.5),
+    0 0 0 7px rgba(201, 169, 110, 0.15),
+    0 24px 80px rgba(0, 0, 0, 0.7),
+    inset 0 0 80px rgba(0, 0, 0, 0.45);
+  min-height: 440px;
+}
+
+.center {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.community {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  min-height: 52px;
+}
+
+.pot {
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--gold);
+  padding: 5px 14px;
+  background: rgba(0, 0, 0, 0.55);
+  border: 0.5px solid rgba(201, 169, 110, 0.35);
+  border-radius: 20px;
+}
+.pot .pot-value {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 18px;
+  letter-spacing: 0;
+  color: var(--gold-bright);
+  margin-left: 8px;
+  text-transform: none;
+}
+
+/* --- Seats --- */
+.seat {
+  position: absolute;
+  width: 148px;
+  padding: 10px 12px 12px;
+  background: rgba(10, 10, 9, 0.86);
+  border: 0.5px solid var(--border);
+  border-radius: 4px;
+  text-align: center;
+  transform: translate(-50%, -50%);
+  transition: opacity 0.3s, box-shadow 0.3s, border-color 0.3s;
+}
+.seat.folded { opacity: 0.38; filter: grayscale(0.65); }
+.seat.acting {
+  border-color: var(--gold);
+  box-shadow:
+    0 0 0 1px rgba(201, 169, 110, 0.4),
+    0 0 24px rgba(201, 169, 110, 0.35),
+    inset 0 0 20px rgba(201, 169, 110, 0.08);
+}
+.seat.winner {
+  border-color: var(--gold-bright);
+  box-shadow:
+    0 0 0 1px rgba(232, 213, 176, 0.55),
+    0 0 28px rgba(232, 213, 176, 0.4),
+    inset 0 0 20px rgba(232, 213, 176, 0.1);
+}
+
+/* Position badges (D / SB / BB) */
+.seat.sb::before,
+.seat.bb::before,
+.seat.dealer::before {
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  width: 22px;
+  height: 22px;
+  line-height: 20px;
+  border-radius: 50%;
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  border: 1px solid var(--bg);
+  text-align: center;
+}
+.seat.dealer::before { content: 'D';  background: var(--gold);        color: #1a1410; }
+.seat.sb::before     { content: 'SB'; background: #6c9ec7;            color: #0a1420; font-size: 8px; }
+.seat.bb::before     { content: 'BB'; background: #dba56c;            color: #201610; font-size: 8px; }
+
+.seat-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 16px;
+  color: var(--text-primary);
+  letter-spacing: -0.005em;
+}
+
+.seat-archetype {
+  display: inline-block;
+  margin-top: 3px;
+  padding: 1px 7px;
+  font-family: 'DM Mono', monospace;
+  font-size: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--text-muted);
+  border: 0.5px solid var(--border);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* Archetype color tints — a thin colored bar at the top of the seat card. */
+.seat::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--arch-neutral);
+  opacity: 0.7;
+}
+.seat.arch-oracle::after    { background: var(--arch-oracle); }
+.seat.arch-sentinel::after  { background: var(--arch-sentinel); }
+.seat.arch-firestorm::after { background: var(--arch-firestorm); }
+.seat.arch-wall::after      { background: var(--arch-wall); }
+.seat.arch-phantom::after   { background: var(--arch-phantom); }
+.seat.arch-predator::after  { background: var(--arch-predator); }
+.seat.arch-mirror::after    { background: var(--arch-mirror); }
+.seat.arch-judge::after     { background: var(--arch-judge); }
+
+.seat-stack {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--gold);
+  margin-top: 6px;
+  font-variant-numeric: tabular-nums;
+}
+.seat-stack .delta {
+  font-size: 9px;
+  margin-left: 5px;
+  letter-spacing: 0.05em;
+}
+.seat-stack .delta.up   { color: #8dba86; }
+.seat-stack .delta.down { color: #c78080; }
+
+.seat-cards {
+  display: flex;
+  justify-content: center;
+  gap: 3px;
+  margin-top: 6px;
+  min-height: 26px;
+}
+
+/* --- Trust overlay per seat --- */
+.trust-overlay {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 0.5px dashed var(--border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.trust-overlay.hidden { display: none; }
+.trust-ring {
+  width: 100%;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--trust-neutral);
+  position: relative;
+}
+.trust-ring.trust-gold    { background: var(--trust-gold); }
+.trust-ring.trust-warm    { background: var(--trust-warm); }
+.trust-ring.trust-neutral { background: var(--trust-neutral); }
+.trust-ring.trust-cool    { background: var(--trust-cool); }
+.trust-ring.trust-dim     { background: var(--trust-dim); }
+.trust-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+.trust-label .trust-arch {
+  color: var(--gold);
+}
+
+/* Card face/back */
+.card {
+  display: inline-block;
+  padding: 3px 4px;
+  background: #fafaf7;
+  color: #1a1a1a;
+  border-radius: 2px;
+  font-family: 'Georgia', serif;
+  font-size: 12px;
+  font-weight: 700;
+  min-width: 22px;
+  text-align: center;
+  border: 1px solid #645644;
+  letter-spacing: -0.5px;
+  font-variant-numeric: tabular-nums;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+.card.red { color: #a31a12; }
+.card.hidden {
+  background:
+    repeating-linear-gradient(45deg, #2a1f14, #2a1f14 3px, #1c130a 3px, #1c130a 6px);
+  color: transparent;
+  border-color: #3a2a14;
+  box-shadow: inset 0 0 4px rgba(201, 169, 110, 0.15);
+}
+/* Community cards use a larger size */
+.community .card { padding: 6px 8px; font-size: 16px; min-width: 28px; }
+
+/* =====================================================================
+ * Sidebar
+ * ===================================================================== */
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  min-height: 0;
+}
+
+.panel {
+  padding: 18px 20px 20px;
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  border-radius: 2px;
+}
+.panel.featured {
+  background: var(--gold-wash);
+  border-color: rgba(201, 169, 110, 0.22);
+}
+
+.hand-info h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 28px;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+  margin-bottom: 4px;
+}
+.hand-info h2 .em {
+  color: var(--gold);
+  font-weight: 500;
+}
+.hand-info .round-badge {
+  display: inline-block;
+  margin-left: 10px;
+  padding: 2px 9px;
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  color: var(--gold);
+  border: 0.5px solid rgba(201, 169, 110, 0.3);
+  background: rgba(201, 169, 110, 0.05);
+  vertical-align: middle;
+}
+.hand-info .meta-row {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--text-muted);
+  margin-top: 6px;
+}
+.hand-info .meta-row strong {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+.hand-info .meta-row .gold { color: var(--gold); font-weight: 500; }
+
+/* Observer selector */
+.observer-select {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.observer-select select {
+  background: var(--surface2);
+  color: var(--text-primary);
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  padding: 8px 10px;
+  border: 0.5px solid var(--border);
+  border-radius: 2px;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.3s;
+}
+.observer-select select:hover,
+.observer-select select:focus { border-color: rgba(201, 169, 110, 0.4); }
+.observer-select .hint {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--text-dim);
+}
+
+/* Action feed */
+.action-feed {
+  max-height: 340px;
+  overflow-y: auto;
+  margin-top: 8px;
+}
+.action-feed::-webkit-scrollbar { width: 4px; }
+.action-feed::-webkit-scrollbar-thumb { background: var(--border-active); border-radius: 2px; }
+
+.action-row {
+  display: grid;
+  grid-template-columns: 54px 34px 1fr 60px;
+  gap: 6px;
+  padding: 5px 0;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  border-bottom: 0.5px solid rgba(255, 255, 255, 0.03);
+  align-items: baseline;
+  transition: background 0.2s;
+}
+.action-row.current {
+  background: rgba(201, 169, 110, 0.08);
+  border-left: 2px solid var(--gold);
+  padding-left: 8px;
+  margin-left: -8px;
+  padding-right: 4px;
+}
+.action-row.future { opacity: 0.3; }
+
+.action-row .round { color: var(--text-dim); font-size: 8px; letter-spacing: 0.2em; }
+.action-row .seatnum { color: var(--text-muted); font-weight: 500; }
+.action-row .type   { color: var(--text-primary); }
+.action-row .type.fold  { color: #c78080; }
+.action-row .type.bet   { color: var(--gold); }
+.action-row .type.raise { color: var(--gold-bright); font-weight: 500; }
+.action-row .type.call  { color: #8dba86; }
+.action-row .type.check { color: var(--text-muted); }
+.action-row .potcell {
+  color: var(--gold);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.08em;
+}
+
+/* Showdown entries */
+.showdown-row {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  padding: 4px 0;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  border-bottom: 0.5px solid rgba(255, 255, 255, 0.03);
+}
+.showdown-row.won { color: var(--gold); font-weight: 500; }
+.showdown-row .cards { font-family: 'Georgia', serif; font-size: 11px; letter-spacing: 0; }
+
+.empty-hint {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--text-dim);
+  padding: 4px 0;
+}
+
+/* =====================================================================
+ * Controls
+ * ===================================================================== */
+.controls {
+  grid-column: 1 / -1;
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  border-radius: 2px;
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 8px;
+}
+.controls.controls-top    { border-radius: 2px 2px 0 0; border-bottom: 0; margin-top: 24px; }
+.controls.controls-bottom { border-radius: 0 0 2px 2px; margin-top: 0; padding-top: 10px; }
+
+.btn {
+  background: transparent;
+  border: 0.5px solid var(--border-active);
+  color: var(--text-primary);
+  padding: 7px 14px;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  cursor: pointer;
+  transition: border-color 0.3s, color 0.3s, background 0.3s;
+  border-radius: 2px;
+}
+.btn:hover { border-color: var(--gold); color: var(--gold); }
+.btn:disabled { opacity: 0.3; cursor: not-allowed; }
+.btn:disabled:hover { border-color: var(--border-active); color: var(--text-primary); }
+.btn.play { min-width: 96px; letter-spacing: 0.22em; }
+
+input[type="range"] {
+  flex: 1;
+  min-width: 200px;
+  accent-color: var(--gold);
+}
+.hand-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--gold);
+  min-width: 150px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Fallback when data.js hasn't been generated yet */
+.fallback {
+  padding: 80px 40px;
+  text-align: center;
+  color: var(--text-muted);
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 20px;
+}
+.fallback .mono {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  font-style: normal;
+  background: var(--surface);
+  padding: 3px 8px;
+  border: 0.5px solid var(--border);
+  color: var(--gold);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+}
+.fallback .sub {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  font-style: normal;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  color: var(--text-dim);
+  margin-top: 18px;
+}
+
+/* Footer */
+footer {
+  margin-top: 40px;
+  padding-top: 22px;
+  border-top: 0.5px solid var(--border);
+  text-align: center;
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  color: var(--text-dim);
+}
+footer .em {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 13px;
+  letter-spacing: 0;
+  color: var(--text-muted);
+  text-transform: none;
+}
+
+/* Small-screen fallback */
+@media (max-width: 1100px) {
+  .main { grid-template-columns: 1fr; }
+  .sidebar { max-height: none; }
+  .wrapper { padding: 22px 20px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
 </style>
 </head>
 <body>
   <div class="wrapper">
-    <div class="header">
-      <div>
-        <h1>Poker Trust Simulation</h1>
-        <div class="subtitle" id="subtitle">Loading…</div>
+
+    <header class="top-bar">
+      <div class="title-block">
+        <h1>Poker <em class="em">Trust</em> Simulation</h1>
+        <div class="subtitle" id="subtitle">loading…</div>
       </div>
-      <div class="stage-badge" id="stage-badge">stage —</div>
-    </div>
+      <div class="stage-badge"><span class="shiny-text" id="stage-badge">stage —</span></div>
+    </header>
 
     <div id="content">
       <div class="fallback" id="fallback" style="display:none">
-        <p>No simulation data loaded.</p>
-        <p>Run <code>python3 run_demo.py</code> from the repo root, then refresh this page.</p>
+        No simulation data loaded.<br>
+        Run <span class="mono">python3 run_demo.py</span> from the repo root, then refresh this page.
+        <div class="sub">data.js will be regenerated in the visualizer/ directory</div>
       </div>
 
       <div class="main" id="main">
         <div class="table-area">
+          <div class="section-label"><span class="shiny-text">01 &mdash; Table</span></div>
           <div class="table-container" id="table">
             <div class="center">
               <div class="community" id="community"></div>
-              <div class="pot" id="pot"></div>
+              <div class="pot"><span>Pot</span><span class="pot-value" id="pot-value">0</span></div>
             </div>
           </div>
         </div>
 
-        <div class="sidebar">
+        <aside class="sidebar">
           <div class="panel hand-info" id="hand-info">
-            <h2>Hand —</h2>
+            <div class="section-label"><span class="shiny-text">02 &mdash; Hand</span></div>
+            <h2>Hand &mdash;</h2>
           </div>
+
+          <div class="panel observer-panel">
+            <div class="section-label"><span class="shiny-text">03 &mdash; Trust Lens</span></div>
+            <div class="observer-select">
+              <select id="observer-select"></select>
+              <div class="hint">each seat's ring shows this observer's trust</div>
+            </div>
+          </div>
+
           <div class="panel">
-            <h3>Action feed</h3>
+            <div class="section-label"><span class="shiny-text">04 &mdash; Action Feed</span></div>
             <div class="action-feed" id="action-feed"></div>
           </div>
+
           <div class="panel">
-            <h3>Showdown</h3>
-            <div id="showdown"></div>
+            <div class="section-label"><span class="shiny-text">05 &mdash; Showdown</span></div>
+            <div id="showdown"><div class="empty-hint">&mdash;</div></div>
           </div>
-        </div>
+        </aside>
 
         <div class="controls controls-top">
-          <button class="btn" id="hand-prev">◀◀ Hand</button>
-          <button class="btn play" id="play">▶ Play</button>
-          <button class="btn" id="hand-next">Hand ▶▶</button>
+          <button class="btn" id="hand-prev">&lt;&lt; Hand</button>
+          <button class="btn play" id="play">&#9658; Play</button>
+          <button class="btn" id="hand-next">Hand &gt;&gt;</button>
           <input type="range" id="hand-slider" min="0" max="0" value="0">
           <span class="hand-label" id="hand-label">Hand 0 / 0</span>
         </div>
 
         <div class="controls controls-bottom">
-          <button class="btn" id="action-prev">◀ Step</button>
-          <button class="btn" id="action-next">Step ▶</button>
+          <button class="btn" id="action-prev">&lt; Step</button>
+          <button class="btn" id="action-next">Step &gt;</button>
           <input type="range" id="action-slider" min="0" max="0" value="0">
           <span class="hand-label" id="action-label">Action 0 / 0</span>
         </div>
       </div>
     </div>
+
+    <footer>
+      <div class="em">Poker Trust Simulation</div>
+      <div>Phase 1 &middot; Bayesian trust dynamics in 8-player Limit Hold'em</div>
+    </footer>
+
   </div>
 
 <script src="data.js"></script>
@@ -448,42 +806,64 @@
   const SB_SIZE = 1;
   const BB_SIZE = 2;
 
-  // ------------------------------------------------------------------
-  // State
-  // ------------------------------------------------------------------
-  // currentHand ∈ [0, hands.length - 1]
-  // actionIdx ∈ [0, currentHand.actions.length]
-  //   0                          = "just posted blinds, no actions yet"
-  //   1..actions.length          = state AFTER applying that many actions
-  //   actions.length             = same as above + showdown/walkover resolved
-  // ------------------------------------------------------------------
+  /* ------------------------------------------------------------------
+   * State
+   * ------------------------------------------------------------------
+   * currentHand ∈ [0, hands.length - 1]
+   * actionIdx ∈ [0, currentHand.actions.length]
+   *   0                          = "just posted blinds, no actions yet"
+   *   1..actions.length          = state AFTER applying that many actions
+   *   actions.length             = same as above + showdown/walkover resolved
+   * observerSeat                 = Stage 5: whose trust lens we're using
+   * ------------------------------------------------------------------ */
   let currentHand = 0;
   let actionIdx = 0;
+  let observerSeat = 0;
   let playing = false;
   let playTimer = null;
 
-  // ------------------------------------------------------------------
-  // Rendering helpers
-  // ------------------------------------------------------------------
+  /* ------------------------------------------------------------------
+   * Rendering helpers
+   * ------------------------------------------------------------------ */
+
   function renderCard(str) {
     if (!str) return "";
     if (str === "??") return '<div class="card hidden">??</div>';
     const rank = str[0];
     const suit = str[1];
-    const pretty = { h: "♥", d: "♦", s: "♠", c: "♣" }[suit] || suit;
+    const pretty = { h: "\u2665", d: "\u2666", s: "\u2660", c: "\u2663" }[suit] || suit;
     const red = (suit === "h" || suit === "d") ? " red" : "";
     return `<div class="card${red}">${rank}${pretty}</div>`;
   }
 
+  function trustClass(score) {
+    if (score >= 0.85) return "trust-gold";
+    if (score >= 0.70) return "trust-warm";
+    if (score >= 0.55) return "trust-neutral";
+    if (score >= 0.40) return "trust-cool";
+    return "trust-dim";
+  }
+
+  function formatArchName(arch) {
+    if (!arch) return "—";
+    // Strip suffixes like "_baseline", "_default", "_cooperative".
+    return arch.replace(/_baseline$|_default$|_cooperative$/, "");
+  }
+
+  /* ------------------------------------------------------------------
+   * Seat positioning — 8 seats around an oval
+   * ------------------------------------------------------------------ */
   function positionSeats() {
     const table = document.getElementById("table");
     const rect = table.getBoundingClientRect();
     if (rect.width === 0) return;
     const cx = rect.width / 2;
     const cy = rect.height / 2;
-    const rx = rect.width * 0.44;
+    const rx = rect.width * 0.43;
     const ry = rect.height * 0.44;
     for (let i = 0; i < NUM_SEATS; i++) {
+      // Start at bottom center (angle = π/2) and go clockwise so seat 0
+      // sits at 6 o'clock — the usual "hero" convention.
       const angle = Math.PI / 2 + (i / NUM_SEATS) * 2 * Math.PI;
       const x = cx + Math.cos(angle) * rx;
       const y = cy + Math.sin(angle) * ry;
@@ -503,19 +883,23 @@
       el.id = `seat-${agent.seat}`;
       el.innerHTML = `
         <div class="seat-name">${agent.name}</div>
-        <div class="seat-archetype arch-${agent.archetype}">${agent.archetype}</div>
-        <div class="seat-stack" id="stack-${agent.seat}">—</div>
+        <div class="seat-archetype">${agent.archetype}</div>
+        <div class="seat-stack" id="stack-${agent.seat}">&mdash;</div>
         <div class="seat-cards" id="cards-${agent.seat}"></div>
+        <div class="trust-overlay hidden" id="trust-${agent.seat}">
+          <div class="trust-ring"></div>
+          <div class="trust-label">&mdash;</div>
+        </div>
       `;
       table.appendChild(el);
     });
     positionSeats();
   }
 
-  // ------------------------------------------------------------------
-  // State reconstruction: compute what the table looks like at
-  // action-index `idx` within the given `hand`.
-  // ------------------------------------------------------------------
+  /* ------------------------------------------------------------------
+   * State reconstruction: compute what the table looks like at
+   * action-index `idx` within the given `hand`.
+   * ------------------------------------------------------------------ */
   function computeState(hand, idx) {
     const stacks = [...hand.stacks_before];
     const folded = new Array(NUM_SEATS).fill(false);
@@ -557,8 +941,6 @@
 
     const isFinal = idx >= hand.actions.length;
     if (isFinal) {
-      // End-of-hand state: pot has been awarded. Use the official
-      // stacks_after and reveal the full board + showdown cards.
       return {
         stacks: hand.stacks_after,
         folded: hand.folded,
@@ -587,9 +969,9 @@
     };
   }
 
-  // ------------------------------------------------------------------
-  // Main render
-  // ------------------------------------------------------------------
+  /* ------------------------------------------------------------------
+   * Main render
+   * ------------------------------------------------------------------ */
   function renderFrame() {
     const hand = DATA.hands[currentHand];
     const numActions = hand.actions.length;
@@ -600,8 +982,8 @@
 
     // Top badges and labels
     document.getElementById("subtitle").textContent =
-      `${DATA.meta.label} · seed ${DATA.meta.seed} · ${DATA.meta.num_hands} hands`;
-    document.getElementById("stage-badge").textContent = `stage ${DATA.meta.stage}`;
+      `${DATA.meta.label} \u00b7 seed ${DATA.meta.seed} \u00b7 ${DATA.meta.num_hands} hands`;
+    document.getElementById("stage-badge").textContent = `Stage ${DATA.meta.stage} \u00b7 Trust Lens`;
 
     const handSlider = document.getElementById("hand-slider");
     handSlider.value = currentHand;
@@ -612,9 +994,15 @@
     actionSlider.max = numActions;
     actionSlider.value = actionIdx;
     document.getElementById("action-label").textContent =
-      `Action ${actionIdx} / ${numActions}${state.isFinal ? " · final" : ""}`;
+      `Action ${actionIdx} / ${numActions}${state.isFinal ? " \u00b7 final" : ""}`;
 
-    // Per-seat updates
+    // Trust / top-archetype snapshot for the currently selected observer.
+    // Fall back to null if the data predates Stage 5 (older demos).
+    const trustRow =
+      hand.trust_snapshot && hand.trust_snapshot[String(observerSeat)] || null;
+    const topArchRow =
+      hand.top_archetype_snapshot && hand.top_archetype_snapshot[String(observerSeat)] || null;
+
     DATA.meta.agents.forEach((agent) => {
       const s = agent.seat;
       const el = document.getElementById(`seat-${s}`);
@@ -632,10 +1020,8 @@
       : "";
       document.getElementById(`stack-${s}`).innerHTML = `${stack}${deltaLabel}`;
 
-      // Hole-card visibility rules:
-      //   - During play (not isFinal): all cards hidden unless folded (empty).
-      //   - At isFinal with showdown: reveal cards for showdown participants.
-      //   - Walkover: hide (winner's cards never revealed).
+      // Hole-card visibility: hidden during play, revealed at the final
+      // frame for showdown participants. Walkover winners stay hidden.
       const cardsEl = document.getElementById(`cards-${s}`);
       const hole = hand.hole_cards[String(s)];
       let reveal = false;
@@ -661,26 +1047,48 @@
         }
       }
       el.classList.toggle("winner", isWinner);
+
+      // Stage 5: trust ring + top-archetype label.
+      const trustEl = document.getElementById(`trust-${s}`);
+      if (s === observerSeat || !trustRow) {
+        trustEl.classList.add("hidden");
+      } else {
+        trustEl.classList.remove("hidden");
+        const score = trustRow[String(s)];
+        const ringEl = trustEl.querySelector(".trust-ring");
+        ringEl.className = `trust-ring ${trustClass(score)}`;
+        const topEntry = topArchRow && topArchRow[String(s)];
+        const labelEl = trustEl.querySelector(".trust-label");
+        if (topEntry) {
+          const archName = formatArchName(topEntry[0]);
+          const prob = Math.round(topEntry[1] * 100);
+          labelEl.innerHTML =
+            `T ${score.toFixed(2)} \u00b7 <span class="trust-arch">${archName}</span> ${prob}%`;
+        } else {
+          labelEl.innerHTML = `T ${score.toFixed(2)}`;
+        }
+      }
     });
 
     // Community cards
     document.getElementById("community").innerHTML =
       state.community.length
         ? state.community.map(renderCard).join("")
-        : '<span style="color:#5a5a5a;font-size:13px">no community cards</span>';
+        : '<span style="font-family:DM Mono,monospace;font-size:9px;color:var(--text-dim);letter-spacing:0.2em;text-transform:uppercase;">no community cards</span>';
 
-    document.getElementById("pot").textContent = `Pot: ${state.displayPot}`;
+    document.getElementById("pot-value").textContent = state.displayPot;
 
     // Hand-info panel
+    const handInfo = document.getElementById("hand-info");
     const actionCount = actionIdx > numActions ? numActions : actionIdx;
-    document.getElementById("hand-info").innerHTML = `
-      <h2>Hand #${hand.hand_id}<span class="round-badge">${state.currentRound}</span></h2>
-      <div class="meta-row">Dealer: Seat ${hand.dealer}</div>
-      <div class="meta-row">SB: Seat ${hand.sb_seat} &nbsp;·&nbsp; BB: Seat ${hand.bb_seat}</div>
-      <div class="meta-row">Pot: <strong style="color:#f5d66c">${state.displayPot}</strong> &nbsp;·&nbsp; Actions: ${actionCount} / ${numActions}</div>
+    handInfo.innerHTML = `
+      <div class="section-label"><span class="shiny-text">02 &mdash; Hand</span></div>
+      <h2>Hand <span class="em">#${hand.hand_id}</span><span class="round-badge">${state.currentRound}</span></h2>
+      <div class="meta-row">Dealer <strong>S${hand.dealer}</strong> &middot; SB <strong>S${hand.sb_seat}</strong> &middot; BB <strong>S${hand.bb_seat}</strong></div>
+      <div class="meta-row">Pot <span class="gold">${state.displayPot}</span> &middot; Actions ${actionCount} / ${numActions}</div>
     `;
 
-    // Action feed — highlight current action, dim future actions.
+    // Action feed — street-grouped with highlight + dimming.
     const feedEl = document.getElementById("action-feed");
     feedEl.innerHTML = hand.actions.map((a, i) => {
       const cls = i === actionIdx - 1 ? "current"
@@ -694,7 +1102,6 @@
           <span class="potcell">${a.pot_after}</span>
         </div>`;
     }).join("");
-    // Scroll the current action into view
     const currentRow = feedEl.querySelector(".action-row.current");
     if (currentRow) currentRow.scrollIntoView({ block: "nearest" });
 
@@ -703,20 +1110,20 @@
     if (state.isFinal && hand.showdown) {
       showEl.innerHTML = hand.showdown.map((e) => `
         <div class="showdown-row ${e.won ? "won" : ""}">
-          S${e.seat} · ${e.hole_cards.join(" ")} → rank ${e.hand_rank}
-          ${e.won ? `· WINS ${e.pot_won}` : ""}
+          S${e.seat} &middot; <span class="cards">${e.hole_cards.join(" ")}</span> &middot; rank ${e.hand_rank}
+          ${e.won ? `&middot; wins ${e.pot_won}` : ""}
         </div>`).join("");
     } else if (state.isFinal && hand.walkover_winner !== null && hand.walkover_winner !== undefined) {
       showEl.innerHTML =
-        `<div class="showdown-row won">Walkover · Seat ${hand.walkover_winner} takes ${hand.final_pot}</div>`;
+        `<div class="showdown-row won">Walkover &middot; S${hand.walkover_winner} takes ${hand.final_pot}</div>`;
     } else {
-      showEl.innerHTML = '<div style="color:#666;font-size:12px">—</div>';
+      showEl.innerHTML = '<div class="empty-hint">&mdash;</div>';
     }
   }
 
-  // ------------------------------------------------------------------
-  // Navigation
-  // ------------------------------------------------------------------
+  /* ------------------------------------------------------------------
+   * Navigation
+   * ------------------------------------------------------------------ */
   function gotoHand(idx, { startAtEnd = true } = {}) {
     if (idx < 0 || idx >= DATA.hands.length) return;
     currentHand = idx;
@@ -732,7 +1139,6 @@
       renderFrame();
       return true;
     }
-    // At final frame — advance to next hand (start at frame 0 = just blinds)
     if (currentHand < DATA.hands.length - 1) {
       currentHand += 1;
       actionIdx = 0;
@@ -755,6 +1161,18 @@
       return true;
     }
     return false;
+  }
+
+  function setupObserverSelector() {
+    const sel = document.getElementById("observer-select");
+    sel.innerHTML = DATA.meta.agents
+      .map((a) => `<option value="${a.seat}">S${a.seat} \u00b7 ${a.name} (${a.archetype})</option>`)
+      .join("");
+    sel.value = String(observerSeat);
+    sel.addEventListener("change", (e) => {
+      observerSeat = parseInt(e.target.value, 10);
+      renderFrame();
+    });
   }
 
   function setupControls() {
@@ -785,14 +1203,14 @@
     const playBtn = document.getElementById("play");
     playBtn.addEventListener("click", () => {
       playing = !playing;
-      playBtn.textContent = playing ? "⏸ Pause" : "▶ Play";
+      playBtn.textContent = playing ? "\u25a0 Pause" : "\u25b6 Play";
       if (playing) {
         playTimer = setInterval(() => {
           const advanced = stepForward();
           if (!advanced) {
             clearInterval(playTimer);
             playing = false;
-            playBtn.textContent = "▶ Play";
+            playBtn.textContent = "\u25b6 Play";
           }
         }, 350);
       } else {
@@ -800,7 +1218,7 @@
       }
     });
 
-    // Keyboard shortcuts: ←/→ step actions, Shift+←/→ jump hands, space = play.
+    // Keyboard shortcuts: \u2190/\u2192 step actions, Shift+\u2190/\u2192 jump hands, space = play.
     window.addEventListener("keydown", (e) => {
       if (e.key === "ArrowRight") {
         e.shiftKey ? gotoHand(currentHand + 1) : stepForward();
@@ -817,8 +1235,9 @@
   }
 
   createSeats();
+  setupObserverSelector();
   setupControls();
-  gotoHand(0, { startAtEnd: false });  // Start at "just blinds posted"
+  gotoHand(0, { startAtEnd: false });
 })();
 </script>
 </body>

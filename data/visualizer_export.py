@@ -42,6 +42,71 @@ def _cards(cs) -> List[str]:
     return [_card_str(c) for c in cs]
 
 
+def _capture_trust_snapshot(table) -> Optional[dict]:
+    """Return ``{observer_seat: {target_seat: trust_score}}`` at hand-end.
+
+    Uses each agent's public ``trust_score(seat)`` accessor so the snapshot
+    works for any agent that implements the Stage 5 interface (BaseAgent
+    subclasses) and silently degrades for dummy agents that don't.
+    """
+    snapshot: dict = {}
+    for obs in table.seats:
+        if not hasattr(obs, "trust_score"):
+            return None  # Pre-Stage-5 agent roster — skip the whole snapshot
+        row: dict = {}
+        for target in range(len(table.seats)):
+            if target == obs.seat:
+                continue
+            row[str(target)] = float(obs.trust_score(target))
+        snapshot[str(obs.seat)] = row
+    return snapshot
+
+
+def _capture_entropy_snapshot(table) -> Optional[dict]:
+    """Same shape as the trust snapshot but with posterior entropy in bits."""
+    snapshot: dict = {}
+    for obs in table.seats:
+        if not hasattr(obs, "entropy"):
+            return None
+        row: dict = {}
+        for target in range(len(table.seats)):
+            if target == obs.seat:
+                continue
+            row[str(target)] = float(obs.entropy(target))
+        snapshot[str(obs.seat)] = row
+    return snapshot
+
+
+def _capture_top_archetype_snapshot(table) -> Optional[dict]:
+    """``{observer_seat: {target_seat: [top_archetype, top_prob]}}``.
+
+    Lets the viewer show the observer's best guess for each seat without
+    shipping the full 8-element posterior. Returns ``None`` if any agent in
+    the roster lacks the Stage 5 interface.
+    """
+    snapshot: dict = {}
+    for obs in table.seats:
+        posteriors = getattr(obs, "posteriors", None)
+        if posteriors is None:
+            return None
+        row: dict = {}
+        for target in range(len(table.seats)):
+            if target == obs.seat:
+                continue
+            post = posteriors.get(target)
+            if post is None:
+                row[str(target)] = ["unknown", 0.125]
+                continue
+            try:
+                from trust import TRUST_TYPE_LIST
+                idx = int(post.argmax())
+                row[str(target)] = [TRUST_TYPE_LIST[idx], float(post[idx])]
+            except Exception:
+                row[str(target)] = ["unknown", 0.125]
+        snapshot[str(obs.seat)] = row
+    return snapshot
+
+
 def hand_to_dict(hand: Hand) -> dict:
     """Serialize one played ``Hand`` to a viewer-ready dict."""
     actions = []
@@ -82,6 +147,11 @@ def hand_to_dict(hand: Hand) -> dict:
         walkover_winner = getattr(hand, "_walkover_winner", None)
 
     num_seats = len(hand.table.seats)
+    # Stage 5: snapshot each agent's view of every other agent at hand-end.
+    trust_snapshot = _capture_trust_snapshot(hand.table)
+    entropy_snapshot = _capture_entropy_snapshot(hand.table)
+    top_archetype_snapshot = _capture_top_archetype_snapshot(hand.table)
+
     return {
         "hand_id": hand.hand_id,
         "dealer": hand.dealer_seat,
@@ -100,9 +170,10 @@ def hand_to_dict(hand: Hand) -> dict:
         "final_pot": hand.final_pot,
         "showdown": showdown,
         "walkover_winner": walkover_winner,
-        # Forward-compatible hooks. Populated by later stages:
-        "trust_snapshot": None,     # Stage 5: {observer: {target: score}}
-        "entropy_snapshot": None,   # Stage 5: {observer: {target: bits}}
+        # Stage 5: trust / entropy / top-archetype snapshots per observer pair.
+        "trust_snapshot": trust_snapshot,
+        "entropy_snapshot": entropy_snapshot,
+        "top_archetype_snapshot": top_archetype_snapshot,
         "grievances": None,         # Stage 6: Judge grievance counts
     }
 
