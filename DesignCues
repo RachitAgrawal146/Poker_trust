@@ -1,0 +1,784 @@
+Rachit Agrawal — Portfolio Design System
+A standalone reference covering every design decision used across rachitagrawal146.github.io (the portfolio) and rachitagrawal146.github.io/game-algorithms-java (the games repo). Use this document alone to build any new page that stays consistent with the existing system.
+
+1. Brand & Aesthetic
+Mood: Dark editorial. Quiet, deliberate, confident. Think: a letterpress-era literary magazine translated into a terminal.
+
+Principles:
+
+Restraint over ornament — one accent colour (gold), two type families, lots of negative space.
+Labels in mono, prose in serif or sans — the monospace labels act like small-caps in a print magazine.
+Never square, never center-aligned by default — the page breathes from the left margin, like a book.
+Every section is numbered (01 — About, 02 — The Journey …). Numbering is part of the identity.
+Gold as light, not fill — the accent is used for glow, thin borders, sweep animations, and single characters in text. Never as a solid button background.
+Slow motion — reveals are 0.7s, hero loads are 1s, halo breath is 6s. Nothing fast or bouncy.
+2. Color System
+All colours are exact, dark-theme-only. No light mode.
+
+Token	Hex / RGBA	Usage
+bg	#0c0c0b	Page background
+surface	#141413	Card / boxed background
+surface2	#1c1c1a	Secondary raised surface
+border	rgba(255,255,255,0.07)	Default hairlines, dividers
+border-active	rgba(255,255,255,0.12)	Hover/focus borders
+text-primary	#e8e6df	Headings, primary body
+text-muted	#8a887f	Body prose, descriptions
+text-dim	#4a4844	Tiny labels, captions, placeholder text
+gold	#c9a96e	Accent — labels, links, borders, glow
+gold-bright	#e8d5b0	Only used in the scroll-progress gradient and shiny-text sweep peak
+gold-highlight	rgba(255,240,200,1)	The bright centre of the shiny sweep animation
+teal	#7ab0a8	Reserved accent, used sparingly if ever
+Derived gold tints (used throughout):
+
+rgba(201,169,110,0.04) — ghost gold wash on featured hover
+rgba(201,169,110,0.1) — badge background
+rgba(201,169,110,0.15) — featured card border
+rgba(201,169,110,0.25) — photo slot border
+rgba(201,169,110,0.45–0.55) — portrait ring, currently-box border
+rgba(255,220,150,0.06–0.15) — inner highlight glow
+Selection color: background: rgba(201,169,110,0.3); color: #e8e6df
+
+3. Typography
+Three families — the display italic is the signature.
+
+Fonts (Google Fonts)
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500;1,600&family=DM+Mono:wght@300;400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+Family	Role	Weights used
+Cormorant Garamond	Display headings, quotes, italic emphasis, navbar logotype	300, 400 (italic for signature)
+Inter	Body prose, paragraphs	300 (default body), 400, 500
+DM Mono	Labels, tags, captions, nav links, section numbers, code-ish details	300, 400, 500
+Body default: font-family: 'Inter', sans-serif; font-weight: 300; line-height: 1.7;
+
+Type Scale
+Use	CSS
+Hero headline	font-family: Cormorant Garamond; font-style: italic; font-weight: 300; font-size: clamp(3rem, 6.5vw, 5.4rem); line-height: 1.04; letter-spacing: -0.015em;
+Section H2 (display)	font-family: Cormorant Garamond; font-style: italic; font-size: clamp(2.5rem, 5vw, 3.5rem); font-weight: 300; line-height: 1.1;
+Project title H3	font-family: Cormorant Garamond; font-size: 1.25rem (text-xl) or 1.5rem (text-2xl); font-weight: 400; font-style: italic often;
+Lead body	text-lg (1.125rem); text-text-primary; font-weight: 300;
+Body	text-sm (0.875rem); text-text-muted; font-weight: 300; line-height 1.7;
+Quote	Cormorant Garamond italic; clamp(1.15rem, 1.6vw, 1.4rem); color: #f0ede4; letter-spacing: -0.005em;
+Section label / number	DM Mono; 10px; uppercase; letter-spacing: 0.25em; color: #c9a96e;
+Small label	DM Mono; 9px; uppercase; letter-spacing: 0.2em; color: #4a4844 or #8a887f;
+Tag pill	DM Mono; 9px; uppercase; letter-spacing: 0.15em;
+Featured badge	DM Mono; 8px; uppercase; letter-spacing: 0.2em; color: #c9a96e;
+Typographic rules
+Em dashes are &mdash; with spaces either side. Never hyphens for emphasis.
+Quotes are curly: &ldquo;&rdquo; and &lsquo;&rsquo;.
+Gold italic is the single most important device: use <em class="hero-headline-em"> or <span style="color: #c9a96e;"> to italicise a handful of words in gold inside a serif heading. This is the signature.
+Labels use DM Mono at 9–10px, uppercase, with wide letter-spacing (0.2–0.3em). Never use mono for long prose.
+Middle dots &middot; are the preferred separator in labels (16,000 ft &middot; May 2024).
+Never underline links by default — use the animated underline on hover (see .link-anim).
+4. Layout & Spacing
+Containers
+/* Tailwind config */
+maxWidth: { content: "760px" }   /* The core column */
+
+Main content column: max-w-content (760px) centered with mx-auto px-6.
+Detail page column (projects.html): 780px.
+Hero breakout: up to 1180px wide, using negative margins:
+margin-left: calc((760px - min(1180px, 100vw - 3rem)) / 2);
+margin-right: calc((760px - min(1180px, 100vw - 3rem)) / 2);
+
+This lets the hero break out of the narrow column on desktop while collapsing cleanly at max-width: 880px.
+Vertical rhythm
+Major section: py-24 md:py-32 (6rem mobile, 8rem desktop).
+Interstitial / aside (e.g. the Krishnamurti quote): py-16 md:py-20.
+Card padding: p-8 md:p-10 (2rem → 2.5rem).
+Section label bottom margin: margin-bottom: 3rem; (hard-coded in .section-label).
+Gap between list items inside a section: space-y-10 for major, space-y-6 for dense lists.
+Horizontal rules
+.section-divider {
+  border: none;
+  border-top: 0.5px solid rgba(255,255,255,0.07);
+}
+
+Used as <hr class="section-divider" /> between every major section. Never <hr> alone, never solid lines.
+
+Breakpoints
+max-width: 720px — stack photo grids to single column
+max-width: 768px — mobile nav appears (bottom), desktop nav hides; hero stacks vertically
+max-width: 880px — hero breakout ends, aligns to content column
+5. Background Treatment
+Noise overlay — the single most atmospheric detail. Apply to body::before:
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px 256px;
+}
+
+This is what makes the black feel like paper instead of OLED.
+
+6. Components
+6.1 Section label
+<div class="section-label"><span class="shiny-text">01 &mdash; About</span></div>
+
+.section-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  color: #c9a96e;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 0.5px;
+  background: rgba(255,255,255,0.07);
+}
+
+Every section starts with one of these. The label sits inline with a hairline that extends to the right edge.
+
+6.2 Shiny text sweep
+A gold gradient sweep animation applied to labels and important heading elements.
+
+.shiny-text {
+  background: linear-gradient(
+    110deg,
+    rgba(201,169,110,0.5) 0%,
+    rgba(201,169,110,0.5) 35%,
+    rgba(255,240,200,1) 50%,
+    rgba(201,169,110,0.5) 65%,
+    rgba(201,169,110,0.5) 100%
+  );
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: shinySweep 4s linear infinite;
+}
+@keyframes shinySweep {
+  0%   { background-position: 200% center; }
+  100% { background-position: -200% center; }
+}
+
+6.3 Tag pill
+.tag {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  padding: 0.35rem 0.75rem;
+  border: 0.5px solid rgba(255,255,255,0.1);
+  color: #8a887f;
+  display: inline-block;
+  transition: border-color 0.3s ease, color 0.3s ease;
+}
+.tag:hover { border-color: rgba(201,169,110,0.3); color: #c9a96e; }
+
+6.4 Animated underline link
+.link-anim {
+  position: relative;
+  display: inline;
+}
+.link-anim::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: #c9a96e;
+  transition: width 0.3s ease;
+}
+.link-anim:hover::after { width: 100%; }
+
+Use on every inline link. Never underline by default.
+
+6.5 Project card
+.project-card {
+  padding: 2.5rem 0;
+  border-bottom: 0.5px solid rgba(255,255,255,0.07);
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+.project-card:hover {
+  background: rgba(255,255,255,0.02);
+  transform: translateY(-2px);
+}
+
+Set style="border-bottom: none;" on the last card in a group.
+
+6.6 Featured project card (boxed, gold-bordered)
+.project-featured {
+  padding: 2rem 2.5rem !important;
+  border: 0.5px solid rgba(201,169,110,0.15) !important;
+  border-radius: 4px;
+  transition: background 0.3s, transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+}
+.project-featured:hover {
+  background: rgba(201,169,110,0.04);
+  border-color: rgba(201,169,110,0.3) !important;
+  box-shadow: 0 4px 30px rgba(201,169,110,0.06);
+  transform: translateY(-3px);
+}
+.featured-badge {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: #c9a96e;
+  background: rgba(201,169,110,0.1);
+  padding: 3px 8px;
+  border: 0.5px solid rgba(201,169,110,0.2);
+  display: inline-block;
+  margin-bottom: 1rem;
+}
+
+6.7 "Currently" box (pinned quote)
+.currently-box {
+  border: 1px solid rgba(201,169,110,0.45);
+  padding: 3rem 3.25rem;
+  position: relative;
+  background: linear-gradient(135deg, rgba(201,169,110,0.045) 0%, rgba(201,169,110,0.015) 100%);
+  box-shadow:
+    0 0 0 1px rgba(201,169,110,0.05),
+    0 8px 30px rgba(201,169,110,0.06),
+    inset 0 0 60px rgba(201,169,110,0.025);
+}
+.currently-box::before {
+  content: 'pinned';              /* badge label cut into the top border */
+  position: absolute;
+  top: -8px;
+  left: 1.75rem;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  color: #c9a96e;
+  background: #0c0c0b;            /* matches page bg to mask the border */
+  padding: 0 0.6rem;
+}
+.currently-box::after {
+  content: '';
+  position: absolute;
+  top: -1px; right: -1px;
+  width: 24px; height: 24px;
+  border-top: 1px solid #c9a96e;
+  border-right: 1px solid #c9a96e;
+}
+
+This is the "signature decorative container" — use it for quotes, pinned thoughts, or any highlighted block.
+
+6.8 Photo slot
+Gold-framed image container with aspect-ratio variants.
+
+.photo-slot {
+  position: relative;
+  width: 100%;
+  background: #141413;
+  border: 1px solid rgba(201,169,110,0.25);
+  overflow: hidden;
+  transition: border-color 0.3s ease, transform 0.3s ease;
+}
+.photo-slot::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  box-shadow: inset 0 0 0 1px rgba(255,220,150,0.06);
+  pointer-events: none;
+}
+.photo-slot:hover {
+  border-color: rgba(201,169,110,0.5);
+  transform: translateY(-2px);
+}
+.photo-slot img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Aspect ratio modifiers */
+.photo-slot.ratio-16-9 { aspect-ratio: 16 / 9; }
+.photo-slot.ratio-4-3  { aspect-ratio: 4 / 3;  }
+.photo-slot.ratio-3-4  { aspect-ratio: 3 / 4;  }
+.photo-slot.ratio-1-1  { aspect-ratio: 1 / 1;  }
+
+/* 3-column grid that collapses */
+.photo-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+@media (max-width: 720px) {
+  .photo-grid-3 { grid-template-columns: 1fr; }
+}
+
+Captions below photos use font-mono text-[9px] uppercase tracking-[0.2em] text-text-dim mt-2.
+
+6.9 Circular portrait frame (hero)
+.portrait-frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  overflow: hidden;
+  isolation: isolate;
+}
+.portrait-frame img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  object-position: 50% 0%;   /* anchor top of tall portraits */
+}
+.portrait-frame-ring {
+  position: absolute; inset: 0;
+  border-radius: 50%;
+  border: 1.5px solid rgba(201,169,110,0.55);
+  box-shadow:
+    inset 0 0 0 1px rgba(255,220,150,0.15),
+    0 0 30px rgba(201,169,110,0.18),
+    0 0 60px rgba(201,169,110,0.10);
+}
+.portrait-frame-glow {
+  position: absolute; inset: -22%;
+  border-radius: 50%;
+  background: radial-gradient(circle at center,
+    rgba(255,230,170,0.28) 0%,
+    rgba(201,169,110,0.16) 28%,
+    rgba(201,169,110,0.06) 50%,
+    transparent 72%);
+  filter: blur(20px);
+  animation: haloBreath 6s ease-in-out infinite alternate;
+}
+@keyframes haloBreath {
+  0%   { opacity: 0.85; transform: scale(1);    }
+  100% { opacity: 1;    transform: scale(1.06); }
+}
+
+HTML:
+
+<div class="portrait-frame">
+  <div class="portrait-frame-glow"></div>
+  <div class="portrait-frame-ring"></div>
+  <img src="portrait.jpg" alt="" />
+</div>
+
+6.10 Data table (theatre-table style)
+.theatre-table { width: 100%; border-collapse: collapse; }
+.theatre-table th {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: #4a4844;
+  text-align: left;
+  padding: 0.75rem 0;
+  border-bottom: 0.5px solid rgba(255,255,255,0.07);
+}
+.theatre-table td {
+  padding: 1rem 0;
+  border-bottom: 0.5px solid rgba(255,255,255,0.04);
+  vertical-align: top;
+  transition: color 0.3s ease;
+}
+.theatre-table tr:hover td { color: #c9a96e; }
+
+6.11 Insight box (detail page)
+.insight-box {
+  background: rgba(201,169,110,0.04);
+  border-left: 2px solid #c9a96e;
+  padding: 1.25rem 1.5rem;
+  margin-top: 1.25rem;
+}
+.insight-box .insight-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  color: #c9a96e;
+  margin-bottom: 0.5rem;
+}
+
+Gold-left-border callout — use for key insights, principles, or highlighted quotes inside long-form content.
+
+6.12 Metric table (detail page)
+table.metrics {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+}
+table.metrics td, table.metrics th {
+  padding: 8px 12px;
+  text-align: left;
+  border-bottom: 0.5px solid rgba(255,255,255,0.05);
+}
+table.metrics th {
+  color: #71717a;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-size: 9px;
+}
+table.metrics td { color: #c9c9c0; }
+
+Use for benchmark numbers, comparative data. Monospace is essential here.
+
+7. Navigation
+Desktop navbar (fixed top)
+.nav-bar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  background: rgba(12,12,11,0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 0.5px solid rgba(255,255,255,0.05);
+  transition: transform 0.4s ease;
+}
+.nav-bar.hidden { transform: translateY(-100%); }  /* hides on scroll-down */
+
+Logo on the left (Cormorant Garamond italic text-xl), mono links on the right.
+
+Mobile navbar (fixed bottom)
+.mobile-nav {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  z-index: 100;
+  background: rgba(12,12,11,0.92);
+  backdrop-filter: blur(20px);
+  border-top: 0.5px solid rgba(255,255,255,0.07);
+  padding: 0.75rem 0;
+  display: none;
+}
+@media (max-width: 768px) {
+  .mobile-nav { display: flex; justify-content: space-around; }
+  .desktop-nav { display: none; }
+}
+.mobile-nav a {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #8a887f;
+  padding: 0.5rem;
+  transition: color 0.3s;
+}
+.mobile-nav a.active, .mobile-nav a:hover { color: #c9a96e; }
+
+Detail page back-link
+.nav-back {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  color: #c9a96e;
+  transition: color 0.3s;
+}
+.nav-back:hover { color: #fff; }
+
+Use ← Back to Portfolio at the top of sub-pages.
+
+8. Motion & Animations
+Every animation respects prefers-reduced-motion: reduce. Every one.
+
+8.1 Scroll reveal
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+}
+
+Activated by an IntersectionObserver that adds .visible when 15% of the element enters viewport. One-shot (observer disconnects per element).
+
+8.2 Staggered children reveal
+.reveal-stagger > * {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.reveal-stagger.visible > * { opacity: 1; transform: translateY(0); }
+.reveal-stagger.visible > *:nth-child(1) { transition-delay: 0s;    }
+.reveal-stagger.visible > *:nth-child(2) { transition-delay: 0.08s; }
+.reveal-stagger.visible > *:nth-child(3) { transition-delay: 0.16s; }
+.reveal-stagger.visible > *:nth-child(4) { transition-delay: 0.24s; }
+.reveal-stagger.visible > *:nth-child(5) { transition-delay: 0.32s; }
+.reveal-stagger.visible > *:nth-child(6) { transition-delay: 0.4s;  }
+
+8.3 Hero load-in
+.hero-load { opacity: 0; transform: translateY(20px); animation: heroIn 1s ease 0.2s forwards; }
+.hero-load-delay  { animation-delay: 0.5s; }
+.hero-load-delay2 { animation-delay: 0.8s; }
+.hero-load-delay3 { animation-delay: 1.1s; }
+@keyframes heroIn { to { opacity: 1; transform: translateY(0); } }
+
+Sequential hero entry — tagline → headline → body → tags.
+
+8.4 Shiny text sweep
+See §6.2 above. Applied to every section label and hero tagline.
+
+8.5 Portrait halo breath
+Infinite breathing pulse on the hero portrait glow (see §6.9).
+
+8.6 Gold blob cursor (desktop only)
+A reactbits-style gooey cursor that follows the mouse with 3 trailing blobs. Merged via SVG feGaussianBlur + feColorMatrix goo filter.
+
+Disabled on @media (hover: none) and @media (prefers-reduced-motion: reduce).
+
+8.7 Scroll progress bar
+.scroll-progress {
+  position: fixed;
+  top: 0; left: 0;
+  height: 2px;
+  width: 0%;
+  background: linear-gradient(90deg, #c9a96e, #e8d5b0);
+  z-index: 200;
+}
+
+Width set in JS from window.scrollY / (documentHeight - windowHeight).
+
+8.8 Typing effect (hero)
+The hero headline types out over an invisible placeholder that reserves layout space (prevents shift):
+
+<h1 class="hero-headline font-display italic">
+  <span class="hero-headline-placeholder" aria-hidden="true">
+    I grew up learning to sit with things I didn&rsquo;t understand yet.
+    <span class="hero-headline-em">I still do.</span>
+  </span>
+  <span class="hero-headline-typer">
+    <span id="typeText"></span>
+    <span class="hero-headline-em" id="typeTextEm"></span>
+    <span class="text-type-cursor"></span>
+  </span>
+</h1>
+
+.hero-headline { position: relative; }
+.hero-headline-placeholder { visibility: hidden; display: block; pointer-events: none; }
+.hero-headline-typer { position: absolute; inset: 0; display: block; }
+.text-type-cursor {
+  display: inline-block;
+  width: 0.05em; height: 0.85em;
+  background: #c9a96e;
+  margin-left: 0.05em;
+  vertical-align: text-bottom;
+  border-radius: 1px;
+  animation: ttBlink 0.85s steps(2, start) infinite;
+}
+@keyframes ttBlink { 0%,50% { opacity: 1; } 51%,100% { opacity: 0; } }
+
+8.9 Reduced-motion master rule
+Always ship this block:
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .reveal, .reveal-stagger > *, .hero-load,
+  .project-card, .project-featured,
+  .link-anim::after, .thought-item, .portrait-wrap {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+    animation: none !important;
+  }
+  .scroll-progress, .hero-particles canvas,
+  .blob-cursor-container, .blob-svg-filter { display: none; }
+}
+
+9. Page Structure Template
+Every page follows this skeleton:
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Page Title — Rachit Agrawal</title>
+  <meta name="description" content="..." />
+
+  <!-- OG -->
+  <meta property="og:title" content="..." />
+  <meta property="og:description" content="..." />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500;1,600&family=DM+Mono:wght@300;400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CDN + config -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            bg:"#0c0c0b", surface:"#141413", surface2:"#1c1c1a",
+            border:"rgba(255,255,255,0.07)", "border-active":"rgba(255,255,255,0.12)",
+            "text-primary":"#e8e6df", "text-muted":"#8a887f", "text-dim":"#4a4844",
+            gold:"#c9a96e", teal:"#7ab0a8",
+          },
+          fontFamily: {
+            display:["Cormorant Garamond","serif"],
+            mono:["DM Mono","monospace"],
+            body:["Inter","sans-serif"],
+          },
+          maxWidth: { content: "760px" },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    /* Global reset + body + noise overlay */
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      background-color: #0c0c0b;
+      color: #e8e6df;
+      font-family: 'Inter', sans-serif;
+      font-weight: 300;
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+    body::before { /* noise overlay — see §5 */ }
+    ::selection { background: rgba(201,169,110,0.3); color: #e8e6df; }
+    a { color: inherit; text-decoration: none; }
+
+    /* Import all the component classes from §6 and animations from §8 */
+  </style>
+</head>
+
+<body>
+  <div class="scroll-progress" id="scrollProgress"></div>
+
+  <!-- Fixed nav -->
+  <nav class="nav-bar" id="navbar">
+    <div class="max-w-content mx-auto px-6 py-5 flex justify-between items-center">
+      <a href="/" class="nav-name font-display italic text-xl text-text-primary">Rachit Agrawal</a>
+      <div class="desktop-nav flex items-center gap-10">
+        <a href="#about" class="font-mono text-[10px] uppercase tracking-[0.2em] text-text-muted hover:text-gold transition-colors">About</a>
+        <!-- more links -->
+      </div>
+    </div>
+  </nav>
+
+  <main class="max-w-content mx-auto px-6">
+
+    <!-- Hero -->
+    <section class="min-h-screen flex flex-col justify-center pt-24 pb-16 hero-section-wide">
+      <div class="reveal">
+        <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-gold mb-8 shiny-text">Ranchi &rarr; Sahyadri &rarr; The World</p>
+        <h1 class="hero-headline font-display italic">
+          Your headline <span class="hero-headline-em">with gold italic accent.</span>
+        </h1>
+        <!-- ... -->
+      </div>
+    </section>
+
+    <hr class="section-divider" />
+
+    <!-- Numbered sections -->
+    <section class="py-24 md:py-32" id="about">
+      <div class="reveal">
+        <div class="section-label"><span class="shiny-text">01 &mdash; About</span></div>
+        <!-- content -->
+      </div>
+    </section>
+
+    <hr class="section-divider" />
+
+    <!-- repeat ... -->
+
+  </main>
+
+  <footer class="border-t border-border px-6 py-12 text-center">
+    <p class="font-display italic text-text-primary">Rachit Agrawal</p>
+    <p class="font-mono text-[9px] uppercase tracking-[0.2em] text-text-dim mt-2">&copy; 2025</p>
+  </footer>
+
+  <!-- Mobile nav -->
+  <nav class="mobile-nav"> ... </nav>
+
+  <script>
+    /* Scroll progress */
+    const sp = document.getElementById('scrollProgress');
+    window.addEventListener('scroll', () => {
+      const h = document.documentElement;
+      sp.style.width = (h.scrollTop / (h.scrollHeight - h.clientHeight) * 100) + '%';
+    });
+
+    /* Reveal on scroll */
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            e.target.classList.add('visible');
+            io.unobserve(e.target);
+          }
+        });
+      }, { threshold: 0.15 });
+      document.querySelectorAll('.reveal, .reveal-stagger').forEach(el => io.observe(el));
+    } else {
+      document.querySelectorAll('.reveal, .reveal-stagger').forEach(el => el.classList.add('visible'));
+    }
+
+    /* Nav auto-hide on scroll down */
+    let lastY = 0;
+    const nav = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      const y = window.scrollY;
+      if (y > lastY && y > 100) nav.classList.add('hidden');
+      else nav.classList.remove('hidden');
+      lastY = y;
+    });
+  </script>
+</body>
+</html>
+
+10. Content & Voice Conventions
+Not strictly "design" but inseparable from it:
+
+Section intros are short and confident. One or two sentences of primary prose (text-lg text-text-primary), then secondary prose (text-sm text-text-muted).
+Lead with a question or a principle. Avoid "I am…" openers.
+Italics in gold are reserved for the 2–5 most important words on a page.
+Captions describe context, not content. Sahyadri School (KFI), Pune, not Photo of school.
+Stats are given in mono font inline: depth 10 → ~530,000 nodes, 1,700× reduction.
+Never use emojis.
+Links open in new tabs for external destinations, include target="_blank" rel="noopener noreferrer".
+11. File & Asset Conventions
+Images: kebab-case filenames (pandav-patthar.jpg, portrait-bw.png). Avoid spaces and apostrophes — browsers need encoding and it breaks casually.
+Photo aspect ratios: Pick one of ratio-16-9, ratio-4-3, ratio-3-4, ratio-1-1. Never free-form.
+Loading: loading="lazy" on every image except hero portrait (loading="eager").
+Object-position: Tall portraits in square/circle frames need object-position: 50% 0%. Landscape portraits in 4:3 frames with the subject off-center need explicit object-position: left center or similar — always verify the subject isn't cropped.
+.nojekyll at repo root for GitHub Pages (prevents Jekyll from eating underscore-prefixed files).
+Favicon: a single SVG.
+12. Technology Constraints
+No build step. Tailwind CDN only. No npm, no bundler, no framework.
+Vanilla JavaScript. No jQuery, no React, no Vue. IntersectionObserver + addEventListener.
+Two HTML files per concept max: a summary (index.html) and a detail (projects.html), linked by link-anim.
+All styles inline in one <style> tag per page. No external CSS files (beyond fonts/Tailwind CDN).
+All JS inline in one <script> tag at the bottom of body.
+Accessibility: every animation gated on prefers-reduced-motion; every image has an alt; every interactive element is a real <a> or <button>.
+13. Cross-reference: Games Repo
+The games repo (rachitagrawal146.github.io/game-algorithms-java) is a sibling of the portfolio, hosted on GitHub Pages from a separate repo, and is linked from the portfolio's featured project card. It is expected to share this same design language — same colours, same fonts, same noise overlay, same section labels, same photo/card/insight-box components. The detail page layout (projects.html on the portfolio) is the closest reference for how long-form technical content should look: numbered project blocks separated by hairline borders, .subhead mono labels in gold, .insight-box callouts, .metrics tables, and a centered footer row of mono links back to GitHub and demos.
+
+If you're building a new page for either repo, start from the skeleton in §9, paste the component blocks from §6 that you need, and you will automatically be consistent.
+
+Bottom line for any new page:
+
+#0c0c0b background, noise overlay, 760px content column.
+Cormorant Garamond italic display + Inter body + DM Mono labels.
+Every section numbered NN — Title in gold mono 10px wide-tracked.
+Gold (#c9a96e) accent only — for italic heading words, labels, borders, glows.
+Hairline dividers between sections (rgba(255,255,255,0.07) at 0.5px).
+Scroll reveals + shiny-text sweep + portrait halo = the motion vocabulary.
+Respect prefers-reduced-motion on every animation.
+No build tools. Tailwind CDN + vanilla JS + one HTML file per page.
