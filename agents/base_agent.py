@@ -308,6 +308,23 @@ class BaseAgent(ABC):
         # Buffer for showdown refinement.
         self._hand_action_log.setdefault(record.seat, []).append(record)
 
+        # Stage 6 adaptive-agent hook. BaseAgent defaults to a no-op; Mirror
+        # and Judge override ``_observe_opponent_action`` to accumulate
+        # per-opponent behavioral stats / grievance candidates WITHOUT
+        # replacing the audited Stage 5 trust-update flow above.
+        self._observe_opponent_action(record)
+
+    # ------------------------------------------------------------------
+    # Stage 6 hook — adaptive agents override this instead of
+    # ``observe_action`` itself so the Stage 5 trust plumbing stays in
+    # one audited place. Called once per non-self action, after the
+    # posterior update, with the same ActionRecord the engine logged.
+    # ------------------------------------------------------------------
+    def _observe_opponent_action(self, record: ActionRecord) -> None:
+        """No-op default. Mirror tracks per-opponent rolling stats here;
+        Judge buffers candidate-bluff actions here. See those subclasses."""
+        return None
+
     def observe_showdown(self, showdown_data, community_cards=None) -> None:
         if not showdown_data:
             return
