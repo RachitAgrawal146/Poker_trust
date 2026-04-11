@@ -278,11 +278,15 @@ class Hand:
                 acted.add(seat)
                 continue
 
+            if action == ActionType.BET and current_bet != 0:
+                # Agent returned BET but there's already a bet on the street
+                # (typically the preflop BB option: cost_to_call=0 so the
+                # agent's "no bet pending" branch fires and returns BET,
+                # but current_bet is already 2 from the BB posting). Upgrade
+                # it to a RAISE and fall through to the RAISE handler.
+                action = ActionType.RAISE
+
             if action == ActionType.BET:
-                if current_bet != 0:
-                    raise ValueError(
-                        f"Seat {seat} ({agent.archetype}) bet when current_bet={current_bet}"
-                    )
                 paid = min(bet_size, agent.stack)
                 self._move_chips(seat, paid)
                 self.round_contribution[seat] += paid

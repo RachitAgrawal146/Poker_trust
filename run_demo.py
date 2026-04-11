@@ -42,9 +42,54 @@ def _stage2_agents():
     ]
 
 
+def _stage3_agents():
+    # Stage 3: Oracle (real archetype) + mixed scripted stand-ins. The mix
+    # forces Oracle to deal with aggression (Raiser), passivity (Dummy),
+    # and tight opponents (Folder), so every hand stress-tests the decision
+    # branches and hand-strength caching.
+    from agents.dummy_agent import DummyAgent, FolderAgent, RaiserAgent
+    from agents.oracle import Oracle
+
+    return [
+        Oracle(seat=0),
+        DummyAgent("D1", "dummy", 1),
+        RaiserAgent("R2", "raiser", 2),
+        FolderAgent("F3", "folder", 3),
+        DummyAgent("D4", "dummy", 4),
+        RaiserAgent("R5", "raiser", 5),
+        FolderAgent("F6", "folder", 6),
+        DummyAgent("D7", "dummy", 7),
+    ]
+
+
+def _stage4_agents():
+    # Stage 4: all 5 static archetypes in their canonical seats from
+    # SEATING (oracle, sentinel, firestorm, wall, phantom). Seats 5-7 will
+    # become Predator/Mirror/Judge in Stage 6; until then they're Oracle
+    # stand-ins so every hand exercises the full 8-seat engine.
+    from agents.oracle import Oracle
+    from agents.sentinel import Sentinel
+    from agents.firestorm import Firestorm
+    from agents.wall import Wall
+    from agents.phantom import Phantom
+
+    return [
+        Oracle(seat=0),
+        Sentinel(seat=1),
+        Firestorm(seat=2),
+        Wall(seat=3),
+        Phantom(seat=4),
+        Oracle(seat=5, name="Oracle-2"),
+        Oracle(seat=6, name="Oracle-3"),
+        Oracle(seat=7, name="Oracle-4"),
+    ]
+
+
 # stage -> (agents builder, label)
 STAGE_DEMOS: dict = {
     2: (_stage2_agents, "Stage 2 demo · scripted engine test"),
+    3: (_stage3_agents, "Stage 3 demo · Oracle vs scripted mix"),
+    4: (_stage4_agents, "Stage 4 demo · 5 static archetypes + Oracle fillers"),
 }
 
 HIGHEST_STAGE = max(STAGE_DEMOS)

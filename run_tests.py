@@ -48,17 +48,51 @@ def _build_stage_2() -> dict:
     }
 
 
+def _build_stage_3() -> dict:
+    from agents.dummy_agent import DummyAgent
+    from agents.oracle import Oracle
+    from engine.table import Table
+
+    return {
+        "Oracle": Oracle,
+        "DummyAgent": DummyAgent,
+        "Table": Table,
+    }
+
+
+def _build_stage_4() -> dict:
+    from agents.oracle import Oracle
+    from agents.sentinel import Sentinel
+    from agents.firestorm import Firestorm
+    from agents.wall import Wall
+    from agents.phantom import Phantom
+    from engine.table import Table
+
+    return {
+        "Oracle": Oracle,
+        "Sentinel": Sentinel,
+        "Firestorm": Firestorm,
+        "Wall": Wall,
+        "Phantom": Phantom,
+        "Table": Table,
+    }
+
+
 #: Maps a stage number to a zero-arg builder that returns the modules dict.
 #: Later stages register themselves here as they come online.
 STAGE_BUILDERS = {
     1: _build_stage_1,
     2: _build_stage_2,
+    3: _build_stage_3,
+    4: _build_stage_4,
 }
 
 #: Maps a stage number to an extra-assertions function from ``stage_extras``.
 #: These augment the canonical (placeholder-heavy) ``test_cases`` stages.
 STAGE_EXTRAS = {
     2: stage_extras.stage2_extras,
+    3: stage_extras.stage3_extras,
+    4: stage_extras.stage4_extras,
 }
 
 
