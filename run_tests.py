@@ -16,6 +16,7 @@ from __future__ import annotations
 import argparse
 import sys
 
+import stage_extras
 import test_cases
 
 
@@ -33,10 +34,31 @@ def _build_stage_1() -> dict:
     }
 
 
+def _build_stage_2() -> dict:
+    from agents.dummy_agent import DummyAgent, FolderAgent, RaiserAgent
+    from engine.actions import ActionType
+    from engine.table import Table
+
+    return {
+        "Table": Table,
+        "DummyAgent": DummyAgent,
+        "FolderAgent": FolderAgent,
+        "RaiserAgent": RaiserAgent,
+        "ActionType": ActionType,
+    }
+
+
 #: Maps a stage number to a zero-arg builder that returns the modules dict.
 #: Later stages register themselves here as they come online.
 STAGE_BUILDERS = {
     1: _build_stage_1,
+    2: _build_stage_2,
+}
+
+#: Maps a stage number to an extra-assertions function from ``stage_extras``.
+#: These augment the canonical (placeholder-heavy) ``test_cases`` stages.
+STAGE_EXTRAS = {
+    2: stage_extras.stage2_extras,
 }
 
 
@@ -47,22 +69,31 @@ def run_stage(stage: int) -> int:
         print(f"Stage {stage} has no builder registered yet.")
         return 0
 
-    fn = getattr(test_cases, f"test_stage_{stage}", None)
-    if fn is None:
-        print(f"test_cases.test_stage_{stage} does not exist.")
-        return 0
-
     print("=" * 60)
     print(f"STAGE {stage}")
     print("=" * 60)
 
-    modules = builder()
-    results = fn(modules)
     fails = 0
-    for r in results:
-        print(f"  {r}")
-        if r.startswith("FAIL"):
-            fails += 1
+    modules = builder()
+
+    # Canonical test_cases results (may be placeholder "TEST ..." strings).
+    fn = getattr(test_cases, f"test_stage_{stage}", None)
+    if fn is not None:
+        canonical = fn(modules)
+        for r in canonical:
+            print(f"  {r}")
+            if r.startswith("FAIL"):
+                fails += 1
+
+    # Extra assertions layered on top.
+    extra_fn = STAGE_EXTRAS.get(stage)
+    if extra_fn is not None:
+        print("  --- extras ---")
+        for r in extra_fn(modules):
+            print(f"  {r}")
+            if r.startswith("FAIL"):
+                fails += 1
+
     return fails
 
 

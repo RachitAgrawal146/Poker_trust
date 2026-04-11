@@ -25,3 +25,23 @@ HAND_STRENGTH = {
 # =============================================================================
 NUM_PLAYERS = 8
 DEFAULT_SEED = 42
+
+
+# =============================================================================
+# SIMULATION / LIMIT HOLD'EM RULES
+# =============================================================================
+# Blinds, bet sizes, and stack / rebuy economics. All numbers are in chip
+# units. Small bet applies pre-flop and on the flop; big bet on turn and
+# river. Bet cap is 1 bet + 3 raises per round (standard limit hold'em).
+# =============================================================================
+SIMULATION = {
+    "num_hands": 10_000,
+    "num_seeds": 5,
+    "seeds": [42, 137, 256, 512, 1024],
+    "starting_stack": 200,
+    "small_blind": 1,
+    "big_blind": 2,
+    "small_bet": 2,
+    "big_bet": 4,
+    "bet_cap": 4,
+}
