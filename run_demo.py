@@ -42,9 +42,30 @@ def _stage2_agents():
     ]
 
 
+def _stage3_agents():
+    # Stage 3: Oracle (real archetype) + mixed scripted stand-ins. The mix
+    # forces Oracle to deal with aggression (Raiser), passivity (Dummy),
+    # and tight opponents (Folder), so every hand stress-tests the decision
+    # branches and hand-strength caching.
+    from agents.dummy_agent import DummyAgent, FolderAgent, RaiserAgent
+    from agents.oracle import Oracle
+
+    return [
+        Oracle(seat=0),
+        DummyAgent("D1", "dummy", 1),
+        RaiserAgent("R2", "raiser", 2),
+        FolderAgent("F3", "folder", 3),
+        DummyAgent("D4", "dummy", 4),
+        RaiserAgent("R5", "raiser", 5),
+        FolderAgent("F6", "folder", 6),
+        DummyAgent("D7", "dummy", 7),
+    ]
+
+
 # stage -> (agents builder, label)
 STAGE_DEMOS: dict = {
     2: (_stage2_agents, "Stage 2 demo · scripted engine test"),
+    3: (_stage3_agents, "Stage 3 demo · Oracle vs scripted mix"),
 }
 
 HIGHEST_STAGE = max(STAGE_DEMOS)

@@ -47,12 +47,22 @@ class Table:
                 agent.stack = _STARTING_STACK
             if not hasattr(agent, "rebuys"):
                 agent.rebuys = 0
-
-        self.dealer_button: int = 0
-        self.hand_number: int = 0
+            # Every archetype agent expects a shared, seeded RNG. Injecting
+            # here means the caller doesn't have to wire it up at
+            # construction time, and it stays reproducible.
+            if getattr(agent, "rng", None) is None:
+                agent.rng = rng if rng is not None else None
+        # Assign the table's RNG second so we always have one.
         self._rng: np.random.Generator = (
             rng if rng is not None else np.random.default_rng(seed)
         )
+        # Any agent that still doesn't have an RNG picks up the table's.
+        for agent in self.seats:
+            if getattr(agent, "rng", None) is None:
+                agent.rng = self._rng
+
+        self.dealer_button: int = 0
+        self.hand_number: int = 0
         #: Reference to the most recently played ``Hand`` instance. External
         #: tooling (e.g. the visualizer exporter) reads this to recover the
         #: full per-hand state without requiring Table to know about logging.
@@ -62,10 +72,25 @@ class Table:
     def play_hand(self) -> Tuple[List[ActionRecord], Optional[List[dict]]]:
         self.hand_number += 1
         self._handle_rebuys()
+
+        # Lifecycle hook — agents reset per-hand scratch state, increment
+        # hands_dealt, etc. Optional method: old scripted agents (DummyAgent)
+        # don't care.
+        for agent in self.seats:
+            fn = getattr(agent, "on_hand_start", None)
+            if callable(fn):
+                fn(self.hand_number)
+
         deck = Deck(rng=self._rng)
         hand = Hand(self, deck, self._rng, self.hand_number)
         action_log, showdown_data = hand.play()
         self.last_hand = hand
+
+        for agent in self.seats:
+            fn = getattr(agent, "on_hand_end", None)
+            if callable(fn):
+                fn(self.hand_number)
+
         self._rotate_dealer()
         return action_log, showdown_data
 

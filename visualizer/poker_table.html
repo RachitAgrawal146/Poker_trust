@@ -115,6 +115,10 @@
   }
   .seat:hover { border-color: #777; }
   .seat.folded { opacity: 0.35; filter: grayscale(0.7); }
+  .seat.acting {
+    border-color: #6caadb;
+    box-shadow: 0 0 24px rgba(108, 170, 219, 0.55);
+  }
   .seat.winner {
     border-color: #f5d66c;
     box-shadow: 0 0 22px rgba(245, 214, 108, 0.55);
@@ -243,6 +247,12 @@
     align-items: baseline;
   }
   .action-row:last-child { border-bottom: none; }
+  .action-row.current {
+    background: rgba(108, 170, 219, 0.18);
+    border-radius: 3px;
+    outline: 1px solid rgba(108, 170, 219, 0.5);
+  }
+  .action-row.future { opacity: 0.35; }
   .action-row .round { color: #666; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
   .action-row .seatnum { color: #a8d8e8; font-weight: 600; }
   .action-row .type { color: #f0f0f0; }
@@ -258,6 +268,19 @@
     font-variant-numeric: tabular-nums;
   }
 
+  .round-badge {
+    display: inline-block;
+    background: #1f2a3a;
+    color: #a8d8e8;
+    border: 1px solid #3a4a5a;
+    padding: 2px 10px;
+    border-radius: 10px;
+    font-size: 10px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-left: 6px;
+  }
+
   .showdown-row {
     font-size: 12px;
     padding: 3px 0;
@@ -270,11 +293,14 @@
     background: #141414;
     border: 1px solid #2a2a2a;
     border-radius: 8px;
-    padding: 14px 18px;
+    padding: 12px 18px;
     display: flex;
     align-items: center;
     gap: 14px;
   }
+  .controls-top    { border-radius: 8px 8px 0 0; border-bottom: 0; }
+  .controls-bottom { border-radius: 0 0 8px 8px; padding-top: 10px; }
+  .controls-bottom input[type="range"] { accent-color: #6caadb; }
   .btn {
     background: #2a2a2a;
     border: 1px solid #444;
@@ -363,12 +389,19 @@
           </div>
         </div>
 
-        <div class="controls">
-          <button class="btn" id="prev">← Prev</button>
+        <div class="controls controls-top">
+          <button class="btn" id="hand-prev">◀◀ Hand</button>
           <button class="btn play" id="play">▶ Play</button>
-          <button class="btn" id="next">Next →</button>
-          <input type="range" id="slider" min="0" max="0" value="0">
+          <button class="btn" id="hand-next">Hand ▶▶</button>
+          <input type="range" id="hand-slider" min="0" max="0" value="0">
           <span class="hand-label" id="hand-label">Hand 0 / 0</span>
+        </div>
+
+        <div class="controls controls-bottom">
+          <button class="btn" id="action-prev">◀ Step</button>
+          <button class="btn" id="action-next">Step ▶</button>
+          <input type="range" id="action-slider" min="0" max="0" value="0">
+          <span class="hand-label" id="action-label">Action 0 / 0</span>
         </div>
       </div>
     </div>
@@ -386,15 +419,29 @@
   }
 
   const NUM_SEATS = DATA.meta.num_seats || 8;
+  const SB_SIZE = 1;
+  const BB_SIZE = 2;
+
+  // ------------------------------------------------------------------
+  // State
+  // ------------------------------------------------------------------
+  // currentHand ∈ [0, hands.length - 1]
+  // actionIdx ∈ [0, currentHand.actions.length]
+  //   0                          = "just posted blinds, no actions yet"
+  //   1..actions.length          = state AFTER applying that many actions
+  //   actions.length             = same as above + showdown/walkover resolved
+  // ------------------------------------------------------------------
   let currentHand = 0;
+  let actionIdx = 0;
   let playing = false;
   let playTimer = null;
 
+  // ------------------------------------------------------------------
+  // Rendering helpers
+  // ------------------------------------------------------------------
   function renderCard(str) {
-    if (!str) return '';
-    if (str === "??") {
-      return '<div class="card hidden">??</div>';
-    }
+    if (!str) return "";
+    if (str === "??") return '<div class="card hidden">??</div>';
     const rank = str[0];
     const suit = str[1];
     const pretty = { h: "♥", d: "♦", s: "♠", c: "♣" }[suit] || suit;
@@ -408,18 +455,16 @@
     if (rect.width === 0) return;
     const cx = rect.width / 2;
     const cy = rect.height / 2;
-    // Inset so seats sit on the felt rim, not outside it.
     const rx = rect.width * 0.44;
     const ry = rect.height * 0.44;
     for (let i = 0; i < NUM_SEATS; i++) {
-      // Seat 0 at the bottom, going clockwise (matches dealer rotation).
       const angle = Math.PI / 2 + (i / NUM_SEATS) * 2 * Math.PI;
       const x = cx + Math.cos(angle) * rx;
       const y = cy + Math.sin(angle) * ry;
       const el = document.getElementById(`seat-${i}`);
       if (el) {
         el.style.left = `${x}px`;
-        el.style.top  = `${y}px`;
+        el.style.top = `${y}px`;
       }
     }
   }
@@ -441,104 +486,201 @@
     positionSeats();
   }
 
-  function renderHand(idx) {
-    if (idx < 0 || idx >= DATA.hands.length) return;
-    currentHand = idx;
-    const hand = DATA.hands[idx];
+  // ------------------------------------------------------------------
+  // State reconstruction: compute what the table looks like at
+  // action-index `idx` within the given `hand`.
+  // ------------------------------------------------------------------
+  function computeState(hand, idx) {
+    const stacks = [...hand.stacks_before];
+    const folded = new Array(NUM_SEATS).fill(false);
 
-    // Header and slider state
+    // Apply blinds (always visible, even at idx=0).
+    stacks[hand.sb_seat] -= SB_SIZE;
+    stacks[hand.bb_seat] -= BB_SIZE;
+    let pot = SB_SIZE + BB_SIZE;
+    let currentRound = "preflop";
+    let actingSeat = null;
+    let lastAction = null;
+
+    const numApplied = Math.min(idx, hand.actions.length);
+    for (let i = 0; i < numApplied; i++) {
+      const a = hand.actions[i];
+      currentRound = a.round;
+      actingSeat = a.seat;
+      lastAction = a;
+      if (a.type === "fold") folded[a.seat] = true;
+      if (a.amount > 0) {
+        stacks[a.seat] = a.stack_after;
+        pot = a.pot_after;
+      }
+    }
+
+    // Community cards follow the highest round we've entered.
+    const rounds = new Set();
+    for (let i = 0; i < numApplied; i++) rounds.add(hand.actions[i].round);
+    const community = [];
+    if (rounds.has("flop") || rounds.has("turn") || rounds.has("river")) {
+      community.push(...hand.community.flop);
+    }
+    if (rounds.has("turn") || rounds.has("river")) {
+      community.push(...hand.community.turn);
+    }
+    if (rounds.has("river")) {
+      community.push(...hand.community.river);
+    }
+
+    const isFinal = idx >= hand.actions.length;
+    if (isFinal) {
+      // End-of-hand state: pot has been awarded. Use the official
+      // stacks_after and reveal the full board + showdown cards.
+      return {
+        stacks: hand.stacks_after,
+        folded: hand.folded,
+        community: [
+          ...hand.community.flop,
+          ...hand.community.turn,
+          ...hand.community.river,
+        ],
+        displayPot: hand.final_pot,
+        currentRound: lastAction ? lastAction.round : "preflop",
+        actingSeat: null,
+        lastAction: lastAction,
+        isFinal: true,
+      };
+    }
+
+    return {
+      stacks,
+      folded,
+      community,
+      displayPot: pot,
+      currentRound,
+      actingSeat,
+      lastAction,
+      isFinal: false,
+    };
+  }
+
+  // ------------------------------------------------------------------
+  // Main render
+  // ------------------------------------------------------------------
+  function renderFrame() {
+    const hand = DATA.hands[currentHand];
+    const numActions = hand.actions.length;
+    if (actionIdx < 0) actionIdx = 0;
+    if (actionIdx > numActions) actionIdx = numActions;
+
+    const state = computeState(hand, actionIdx);
+
+    // Top badges and labels
     document.getElementById("subtitle").textContent =
       `${DATA.meta.label} · seed ${DATA.meta.seed} · ${DATA.meta.num_hands} hands`;
     document.getElementById("stage-badge").textContent = `stage ${DATA.meta.stage}`;
-    document.getElementById("slider").value = idx;
+
+    const handSlider = document.getElementById("hand-slider");
+    handSlider.value = currentHand;
     document.getElementById("hand-label").textContent =
-      `Hand ${idx + 1} / ${DATA.hands.length}`;
+      `Hand ${currentHand + 1} / ${DATA.hands.length}`;
+
+    const actionSlider = document.getElementById("action-slider");
+    actionSlider.max = numActions;
+    actionSlider.value = actionIdx;
+    document.getElementById("action-label").textContent =
+      `Action ${actionIdx} / ${numActions}${state.isFinal ? " · final" : ""}`;
 
     // Per-seat updates
     DATA.meta.agents.forEach((agent) => {
       const s = agent.seat;
       const el = document.getElementById(`seat-${s}`);
-      el.classList.toggle("folded", !!hand.folded[s]);
+      el.classList.toggle("folded", !!state.folded[s]);
       el.classList.toggle("dealer", s === hand.dealer);
       el.classList.toggle("sb", s === hand.sb_seat);
       el.classList.toggle("bb", s === hand.bb_seat);
+      el.classList.toggle("acting", !state.isFinal && s === state.actingSeat);
 
-      const stackAfter = hand.stacks_after[s];
-      const delta = stackAfter - hand.stacks_before[s];
-      const deltaLabel = delta > 0 ? `<span class="delta up">+${delta}</span>`
-                       : delta < 0 ? `<span class="delta down">${delta}</span>`
-                                   : '';
-      document.getElementById(`stack-${s}`).innerHTML = `${stackAfter}${deltaLabel}`;
+      const stack = state.stacks[s];
+      const delta = stack - hand.stacks_before[s];
+      const deltaLabel =
+        delta > 0 ? `<span class="delta up">+${delta}</span>`
+      : delta < 0 ? `<span class="delta down">${delta}</span>`
+      : "";
+      document.getElementById(`stack-${s}`).innerHTML = `${stack}${deltaLabel}`;
 
+      // Hole-card visibility rules:
+      //   - During play (not isFinal): all cards hidden unless folded (empty).
+      //   - At isFinal with showdown: reveal cards for showdown participants.
+      //   - Walkover: hide (winner's cards never revealed).
       const cardsEl = document.getElementById(`cards-${s}`);
       const hole = hand.hole_cards[String(s)];
-      // Reveal cards if the player reached showdown (their entry is in the
-      // showdown list) OR if they were the walkover winner (optional). For
-      // folders/mid-hand exits the cards stay hidden.
-      let revealed = false;
-      if (hand.showdown) {
-        revealed = hand.showdown.some(e => e.seat === s);
+      let reveal = false;
+      if (state.isFinal && hand.showdown) {
+        reveal = hand.showdown.some((e) => e.seat === s);
       }
-      if (hole && revealed) {
-        cardsEl.innerHTML = hole.map(renderCard).join("");
-      } else if (hand.folded[s]) {
+      if (state.folded[s]) {
         cardsEl.innerHTML = "";
+      } else if (reveal && hole) {
+        cardsEl.innerHTML = hole.map(renderCard).join("");
       } else {
-        cardsEl.innerHTML = '<div class="card hidden">??</div><div class="card hidden">??</div>';
+        cardsEl.innerHTML =
+          '<div class="card hidden">??</div><div class="card hidden">??</div>';
       }
 
-      // Winner glow
+      // Winner glow only appears at the final frame.
       let isWinner = false;
-      if (hand.showdown) {
-        isWinner = hand.showdown.some(e => e.seat === s && e.won);
-      } else if (hand.walkover_winner === s) {
-        isWinner = true;
+      if (state.isFinal) {
+        if (hand.showdown) {
+          isWinner = hand.showdown.some((e) => e.seat === s && e.won);
+        } else if (hand.walkover_winner === s) {
+          isWinner = true;
+        }
       }
       el.classList.toggle("winner", isWinner);
     });
 
     // Community cards
-    const comm = [
-      ...(hand.community.flop  || []),
-      ...(hand.community.turn  || []),
-      ...(hand.community.river || []),
-    ];
     document.getElementById("community").innerHTML =
-      comm.length ? comm.map(renderCard).join("")
-                  : '<span style="color:#5a5a5a;font-size:13px">no community cards</span>';
+      state.community.length
+        ? state.community.map(renderCard).join("")
+        : '<span style="color:#5a5a5a;font-size:13px">no community cards</span>';
 
-    document.getElementById("pot").textContent = `Pot: ${hand.final_pot}`;
+    document.getElementById("pot").textContent = `Pot: ${state.displayPot}`;
 
-    // Hand info panel
+    // Hand-info panel
+    const actionCount = actionIdx > numActions ? numActions : actionIdx;
     document.getElementById("hand-info").innerHTML = `
-      <h2>Hand #${hand.hand_id}</h2>
+      <h2>Hand #${hand.hand_id}<span class="round-badge">${state.currentRound}</span></h2>
       <div class="meta-row">Dealer: Seat ${hand.dealer}</div>
       <div class="meta-row">SB: Seat ${hand.sb_seat} &nbsp;·&nbsp; BB: Seat ${hand.bb_seat}</div>
-      <div class="meta-row">Final pot: <strong style="color:#f5d66c">${hand.final_pot}</strong></div>
-      <div class="meta-row">Actions: ${hand.actions.length}</div>
+      <div class="meta-row">Pot: <strong style="color:#f5d66c">${state.displayPot}</strong> &nbsp;·&nbsp; Actions: ${actionCount} / ${numActions}</div>
     `;
 
-    // Action feed
+    // Action feed — highlight current action, dim future actions.
     const feedEl = document.getElementById("action-feed");
-    feedEl.innerHTML = hand.actions.map(a => `
-      <div class="action-row">
-        <span class="round">${a.round}</span>
-        <span class="seatnum">S${a.seat}</span>
-        <span class="type ${a.type}">${a.type}${a.amount ? ' ' + a.amount : ''}</span>
-        <span class="potcell">${a.pot_after}</span>
-      </div>
-    `).join("");
+    feedEl.innerHTML = hand.actions.map((a, i) => {
+      const cls = i === actionIdx - 1 ? "current"
+                : i >= actionIdx        ? "future"
+                                        : "";
+      return `
+        <div class="action-row ${cls}">
+          <span class="round">${a.round}</span>
+          <span class="seatnum">S${a.seat}</span>
+          <span class="type ${a.type}">${a.type}${a.amount ? " " + a.amount : ""}</span>
+          <span class="potcell">${a.pot_after}</span>
+        </div>`;
+    }).join("");
+    // Scroll the current action into view
+    const currentRow = feedEl.querySelector(".action-row.current");
+    if (currentRow) currentRow.scrollIntoView({ block: "nearest" });
 
-    // Showdown / walkover
+    // Showdown / walkover — only at final frame
     const showEl = document.getElementById("showdown");
-    if (hand.showdown) {
-      showEl.innerHTML = hand.showdown.map(e => `
-        <div class="showdown-row ${e.won ? 'won' : ''}">
-          S${e.seat} · ${e.hole_cards.join(' ')} → rank ${e.hand_rank}
-          ${e.won ? `· WINS ${e.pot_won}` : ''}
-        </div>
-      `).join("");
-    } else if (hand.walkover_winner !== null && hand.walkover_winner !== undefined) {
+    if (state.isFinal && hand.showdown) {
+      showEl.innerHTML = hand.showdown.map((e) => `
+        <div class="showdown-row ${e.won ? "won" : ""}">
+          S${e.seat} · ${e.hole_cards.join(" ")} → rank ${e.hand_rank}
+          ${e.won ? `· WINS ${e.pot_won}` : ""}
+        </div>`).join("");
+    } else if (state.isFinal && hand.walkover_winner !== null && hand.walkover_winner !== undefined) {
       showEl.innerHTML =
         `<div class="showdown-row won">Walkover · Seat ${hand.walkover_winner} takes ${hand.final_pot}</div>`;
     } else {
@@ -546,18 +688,73 @@
     }
   }
 
-  function setupControls() {
-    const slider = document.getElementById("slider");
-    slider.max = DATA.hands.length - 1;
-    slider.value = 0;
-    slider.addEventListener("input", e => renderHand(parseInt(e.target.value, 10)));
+  // ------------------------------------------------------------------
+  // Navigation
+  // ------------------------------------------------------------------
+  function gotoHand(idx, { startAtEnd = true } = {}) {
+    if (idx < 0 || idx >= DATA.hands.length) return;
+    currentHand = idx;
+    const numActions = DATA.hands[currentHand].actions.length;
+    actionIdx = startAtEnd ? numActions : 0;
+    renderFrame();
+  }
 
-    document.getElementById("prev").addEventListener("click", () => {
-      if (currentHand > 0) renderHand(currentHand - 1);
+  function stepForward() {
+    const hand = DATA.hands[currentHand];
+    if (actionIdx < hand.actions.length) {
+      actionIdx += 1;
+      renderFrame();
+      return true;
+    }
+    // At final frame — advance to next hand (start at frame 0 = just blinds)
+    if (currentHand < DATA.hands.length - 1) {
+      currentHand += 1;
+      actionIdx = 0;
+      renderFrame();
+      return true;
+    }
+    return false;
+  }
+
+  function stepBack() {
+    if (actionIdx > 0) {
+      actionIdx -= 1;
+      renderFrame();
+      return true;
+    }
+    if (currentHand > 0) {
+      currentHand -= 1;
+      actionIdx = DATA.hands[currentHand].actions.length;
+      renderFrame();
+      return true;
+    }
+    return false;
+  }
+
+  function setupControls() {
+    const handSlider = document.getElementById("hand-slider");
+    handSlider.max = DATA.hands.length - 1;
+    handSlider.value = 0;
+    handSlider.addEventListener("input", (e) =>
+      gotoHand(parseInt(e.target.value, 10), { startAtEnd: true })
+    );
+
+    const actionSlider = document.getElementById("action-slider");
+    actionSlider.addEventListener("input", (e) => {
+      actionIdx = parseInt(e.target.value, 10);
+      renderFrame();
     });
-    document.getElementById("next").addEventListener("click", () => {
-      if (currentHand < DATA.hands.length - 1) renderHand(currentHand + 1);
+
+    document.getElementById("hand-prev").addEventListener("click", () => {
+      if (currentHand > 0) gotoHand(currentHand - 1, { startAtEnd: true });
     });
+    document.getElementById("hand-next").addEventListener("click", () => {
+      if (currentHand < DATA.hands.length - 1)
+        gotoHand(currentHand + 1, { startAtEnd: true });
+    });
+
+    document.getElementById("action-prev").addEventListener("click", stepBack);
+    document.getElementById("action-next").addEventListener("click", stepForward);
 
     const playBtn = document.getElementById("play");
     playBtn.addEventListener("click", () => {
@@ -565,27 +762,37 @@
       playBtn.textContent = playing ? "⏸ Pause" : "▶ Play";
       if (playing) {
         playTimer = setInterval(() => {
-          if (currentHand < DATA.hands.length - 1) {
-            renderHand(currentHand + 1);
-          } else {
+          const advanced = stepForward();
+          if (!advanced) {
             clearInterval(playTimer);
             playing = false;
             playBtn.textContent = "▶ Play";
           }
-        }, 900);
+        }, 350);
       } else {
         clearInterval(playTimer);
       }
     });
 
+    // Keyboard shortcuts: ←/→ step actions, Shift+←/→ jump hands, space = play.
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowRight") {
+        e.shiftKey ? gotoHand(currentHand + 1) : stepForward();
+      } else if (e.key === "ArrowLeft") {
+        e.shiftKey ? gotoHand(currentHand - 1) : stepBack();
+      } else if (e.key === " ") {
+        e.preventDefault();
+        playBtn.click();
+      }
+    });
+
     window.addEventListener("resize", positionSeats);
-    // Re-position once fonts/layout settle.
     setTimeout(positionSeats, 50);
   }
 
   createSeats();
   setupControls();
-  renderHand(0);
+  gotoHand(0, { startAtEnd: false });  // Start at "just blinds posted"
 })();
 </script>
 </body>
