@@ -47,64 +47,103 @@ _PARAM_MAP = {
     "tpw":     ("third_party_weight", "_TPW"),
 }
 
-# Fixed true archetypes for seats 1-4 in the canonical Stage 5 roster.
-# Seats 0/5/6/7 are Oracle fillers and share the 'oracle' identity, so we
-# don't report a separate id rate for them — they'd triple-dip.
-_TRACKED_SEATS = [
-    (1, "sentinel"),
-    (2, "firestorm"),
-    (3, "wall"),
-    (4, "phantom"),
-]
+# Fixed true archetypes per seat. Keyed by stage because Stage 5 fills
+# seats 5-7 with Oracle stand-ins (which would triple-dip if we tracked
+# them) while Stage 6 uses the full 8-archetype roster.
+_TRACKED_SEATS_BY_STAGE: Dict[int, List[Tuple[int, str]]] = {
+    5: [
+        (1, "sentinel"),
+        (2, "firestorm"),
+        (3, "wall"),
+        (4, "phantom"),
+    ],
+    6: [
+        (1, "sentinel"),
+        (2, "firestorm"),
+        (3, "wall"),
+        (4, "phantom"),
+        (5, "predator_baseline"),
+        (6, "mirror_default"),
+        (7, "judge_cooperative"),
+    ],
+}
 
 # Output columns (long-format: one row per (param, value, seed)).
+# Stage 5 rosters leave the adaptive columns at 0; Stage 6 populates them.
 _SWEEP_HEADER = [
     "param",
     "value",
     "seed",
+    "stage",
     "mean_trust",
     "mean_entropy",
     "sentinel_id_rate",
     "firestorm_id_rate",
     "wall_id_rate",
     "phantom_id_rate",
+    "predator_id_rate",
+    "mirror_id_rate",
+    "judge_id_rate",
 ]
 
 
 # =============================================================================
-# Agent roster: canonical Stage 5 — matches run_multiseed.build_agents.
+# Agent roster: stage-aware builder (matches run_multiseed.build_agents).
 # =============================================================================
-def build_agents():
-    """Return a fresh 8-seat Stage 5 roster."""
+def build_agents(stage: int = 6):
+    """Return a fresh 8-seat roster for the requested stage.
+
+    Stage 5 is retained for reproducing older sweeps; Stage 6 is the
+    canonical default and measures adaptive-agent identification rates
+    alongside the 4 static archetypes.
+    """
     from agents.oracle import Oracle
     from agents.sentinel import Sentinel
     from agents.firestorm import Firestorm
     from agents.wall import Wall
     from agents.phantom import Phantom
 
-    return [
+    base = [
         Oracle(seat=0),
         Sentinel(seat=1),
         Firestorm(seat=2),
         Wall(seat=3),
         Phantom(seat=4),
-        Oracle(seat=5, name="Oracle-5"),
-        Oracle(seat=6, name="Oracle-6"),
-        Oracle(seat=7, name="Oracle-7"),
     ]
+
+    if stage == 5:
+        return base + [
+            Oracle(seat=5, name="Oracle-5"),
+            Oracle(seat=6, name="Oracle-6"),
+            Oracle(seat=7, name="Oracle-7"),
+        ]
+    if stage == 6:
+        from agents.predator import Predator
+        from agents.mirror import Mirror
+        from agents.judge import Judge
+
+        return base + [
+            Predator(seat=5),
+            Mirror(seat=6),
+            Judge(seat=7),
+        ]
+    raise ValueError(
+        f"run_sensitivity supports stage 5 and 6, got {stage}"
+    )
 
 
 # =============================================================================
 # Measurement: run one (value, seed) cell and compute aggregate metrics.
 # =============================================================================
-def _run_cell(seed: int, num_hands: int) -> Dict[str, float]:
-    """Play ``num_hands`` hands with a fresh roster and return the four
-    aggregate metrics for the sweep: mean_trust, mean_entropy, and the four
-    per-archetype id rates."""
+def _run_cell(seed: int, num_hands: int, stage: int = 6) -> Dict[str, float]:
+    """Play ``num_hands`` hands with a fresh roster and return aggregate
+    metrics for the sweep: mean_trust, mean_entropy, and per-archetype
+    identification rates. Adaptive-agent columns are populated only when
+    ``stage >= 6`` (they stay at 0.0 for Stage 5 for schema stability)."""
     from engine.table import Table
     from trust import TRUST_TYPE_LIST
 
-    agents = build_agents()
+    agents = build_agents(stage=stage)
     table = Table(agents, seed=seed)
     for _ in range(num_hands):
         table.play_hand()
@@ -127,7 +166,8 @@ def _run_cell(seed: int, num_hands: int) -> Dict[str, float]:
     # the target's TRUE archetype, across all observers for that target.
     id_rates: Dict[str, float] = {}
     arch_idx = {a: i for i, a in enumerate(TRUST_TYPE_LIST)}
-    for target_seat, true_arch in _TRACKED_SEATS:
+    tracked = _TRACKED_SEATS_BY_STAGE[stage]
+    for target_seat, true_arch in tracked:
         idx = arch_idx[true_arch]
         vals: List[float] = []
         for obs in agents:
@@ -146,6 +186,9 @@ def _run_cell(seed: int, num_hands: int) -> Dict[str, float]:
         "firestorm_id_rate": id_rates.get("firestorm", 0.0),
         "wall_id_rate":      id_rates.get("wall", 0.0),
         "phantom_id_rate":   id_rates.get("phantom", 0.0),
+        "predator_id_rate":  id_rates.get("predator_baseline", 0.0),
+        "mirror_id_rate":    id_rates.get("mirror_default", 0.0),
+        "judge_id_rate":     id_rates.get("judge_cooperative", 0.0),
     }
 
 
@@ -193,6 +236,7 @@ def run(
     seeds: List[int],
     num_hands: int,
     outdir: str,
+    stage: int = 6,
 ) -> str:
     """Execute the sweep and write ``<param>_sweep.csv``. Returns the path.
 
@@ -202,6 +246,10 @@ def run(
     if param not in _PARAM_MAP:
         raise ValueError(
             f"Unknown --param {param!r}. Valid: {sorted(_PARAM_MAP)}"
+        )
+    if stage not in _TRACKED_SEATS_BY_STAGE:
+        raise ValueError(
+            f"Unknown --stage {stage}. Valid: {sorted(_TRACKED_SEATS_BY_STAGE)}"
         )
 
     os.makedirs(outdir, exist_ok=True)
@@ -216,17 +264,21 @@ def run(
             for value in values:
                 _apply_override(param, value)
                 for seed in seeds:
-                    metrics = _run_cell(seed, num_hands)
+                    metrics = _run_cell(seed, num_hands, stage=stage)
                     row = [
                         param,
                         f"{value:.6f}",
                         seed,
+                        stage,
                         f"{metrics['mean_trust']:.6f}",
                         f"{metrics['mean_entropy']:.6f}",
                         f"{metrics['sentinel_id_rate']:.6f}",
                         f"{metrics['firestorm_id_rate']:.6f}",
                         f"{metrics['wall_id_rate']:.6f}",
                         f"{metrics['phantom_id_rate']:.6f}",
+                        f"{metrics['predator_id_rate']:.6f}",
+                        f"{metrics['mirror_id_rate']:.6f}",
+                        f"{metrics['judge_id_rate']:.6f}",
                     ]
                     writer.writerow(row)
                     summary_rows.append({
@@ -289,6 +341,11 @@ def main(argv: List[str] = None) -> int:
         "--outdir", default="runs/sensitivity/",
         help="Output directory (default: runs/sensitivity/).",
     )
+    parser.add_argument(
+        "--stage", type=int, default=6, choices=[5, 6],
+        help="Stage roster to use (default: 6). Stage 6 populates the "
+             "predator/mirror/judge id-rate columns; Stage 5 leaves them 0.",
+    )
     args = parser.parse_args(argv)
 
     values = _parse_csv_floats(args.values)
@@ -298,7 +355,7 @@ def main(argv: List[str] = None) -> int:
     if not seeds:
         parser.error("--seeds must contain at least one integer")
 
-    run(args.param, values, seeds, args.hands, args.outdir)
+    run(args.param, values, seeds, args.hands, args.outdir, stage=args.stage)
     return 0
 
 

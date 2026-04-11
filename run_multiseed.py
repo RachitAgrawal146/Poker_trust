@@ -55,38 +55,65 @@ from data.csv_exporter import (
 
 
 # =============================================================================
-# Agent roster — Stage 5 canonical (matches run_demo._stage5_agents).
+# Agent roster — stage-aware builder so the same orchestration can drive
+# either the Stage 5 static table or the Stage 6 full 8-archetype table.
+# Must be called once per seed so every seed gets fresh stats.
 # =============================================================================
-def build_agents():
-    """Return a fresh 8-seat Stage 5 roster. Must be called once per seed."""
+def build_agents(stage: int = 6):
+    """Return a fresh 8-seat roster for the requested stage.
+
+    - Stage 5: Oracle / Sentinel / Firestorm / Wall / Phantom + 3 Oracle
+      fillers. Matches ``run_demo._stage5_agents``.
+    - Stage 6: full canonical roster with Predator / Mirror / Judge filling
+      seats 5-7. Matches ``run_demo._stage6_agents``. This is the default
+      for new research runs.
+    """
     from agents.oracle import Oracle
     from agents.sentinel import Sentinel
     from agents.firestorm import Firestorm
     from agents.wall import Wall
     from agents.phantom import Phantom
 
-    return [
+    base = [
         Oracle(seat=0),
         Sentinel(seat=1),
         Firestorm(seat=2),
         Wall(seat=3),
         Phantom(seat=4),
-        Oracle(seat=5, name="Oracle-5"),
-        Oracle(seat=6, name="Oracle-6"),
-        Oracle(seat=7, name="Oracle-7"),
     ]
+
+    if stage == 5:
+        return base + [
+            Oracle(seat=5, name="Oracle-5"),
+            Oracle(seat=6, name="Oracle-6"),
+            Oracle(seat=7, name="Oracle-7"),
+        ]
+    if stage == 6:
+        from agents.predator import Predator
+        from agents.mirror import Mirror
+        from agents.judge import Judge
+
+        return base + [
+            Predator(seat=5),
+            Mirror(seat=6),
+            Judge(seat=7),
+        ]
+    raise ValueError(
+        f"run_multiseed supports stage 5 and 6, got {stage}. "
+        f"Add a new branch to build_agents to register more stages."
+    )
 
 
 # =============================================================================
 # Core: run one seed and collect CSVs + in-memory agents/hands.
 # =============================================================================
-def run_one_seed(seed: int, num_hands: int, outdir: str) -> Tuple[list, list]:
+def run_one_seed(seed: int, num_hands: int, outdir: str, stage: int = 6) -> Tuple[list, list]:
     """Play ``num_hands`` hands with a fresh roster at ``seed`` and write
     the three per-seed CSVs under ``outdir/seed_{seed}/``. Returns
     ``(agents, hands)`` so callers can aggregate further."""
     from engine.table import Table
 
-    agents = build_agents()
+    agents = build_agents(stage=stage)
     table = Table(agents, seed=seed)
     hands: list = []
     for _ in range(num_hands):
@@ -189,7 +216,7 @@ def write_seed_aggregates(
 # =============================================================================
 # High-level orchestration + CLI
 # =============================================================================
-def run(seeds: List[int], num_hands: int, outdir: str) -> Dict[int, list]:
+def run(seeds: List[int], num_hands: int, outdir: str, stage: int = 6) -> Dict[int, list]:
     """Run every seed, write per-seed CSVs + aggregates. Returns the per-seed
     agent dict so in-process callers (tests) can inspect final state."""
     os.makedirs(outdir, exist_ok=True)
@@ -197,7 +224,7 @@ def run(seeds: List[int], num_hands: int, outdir: str) -> Dict[int, list]:
     per_seed_summary: List[str] = []
 
     for seed in seeds:
-        agents, _hands = run_one_seed(seed, num_hands, outdir)
+        agents, _hands = run_one_seed(seed, num_hands, outdir, stage=stage)
         per_seed_agents[seed] = agents
         # Canonical 5 archetypes (seats 0-4) drive the summary line.
         arch5 = agents[:5]
@@ -256,13 +283,19 @@ def main(argv: List[str] = None) -> int:
         "--outdir", default="runs/",
         help="Output root directory (default: runs/)",
     )
+    parser.add_argument(
+        "--stage", type=int, default=6, choices=[5, 6],
+        help="Stage roster to use: 5 = Oracle fillers in seats 5-7; "
+             "6 = full 8-archetype canonical table with Predator/Mirror/Judge "
+             "(default: 6)",
+    )
     args = parser.parse_args(argv)
 
     seeds = _parse_seeds(args.seeds)
     if not seeds:
         parser.error("--seeds must contain at least one integer")
 
-    run(seeds, args.hands, args.outdir)
+    run(seeds, args.hands, args.outdir, stage=args.stage)
     return 0
 
 

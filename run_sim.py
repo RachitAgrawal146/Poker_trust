@@ -61,10 +61,40 @@ def _stage5_roster() -> List:
     ]
 
 
-#: stage number → zero-arg agent-builder. Stage 6 registers its 8-archetype
-#: roster here when that track lands.
+def _stage6_roster() -> List:
+    """Full 8-archetype canonical roster for Stage 6 research runs.
+
+    Matches ``_stage6_agents`` in ``run_demo.py`` and ``_build_stage_6`` in
+    ``run_tests.py``: seats 0-4 are the static archetypes (Oracle / Sentinel
+    / Firestorm / Wall / Phantom) and seats 5-7 are the adaptive agents
+    (Predator / Mirror / Judge). This is the canonical Phase 1 roster.
+    """
+    from agents.oracle import Oracle
+    from agents.sentinel import Sentinel
+    from agents.firestorm import Firestorm
+    from agents.wall import Wall
+    from agents.phantom import Phantom
+    from agents.predator import Predator
+    from agents.mirror import Mirror
+    from agents.judge import Judge
+
+    return [
+        Oracle(seat=0),
+        Sentinel(seat=1),
+        Firestorm(seat=2),
+        Wall(seat=3),
+        Phantom(seat=4),
+        Predator(seat=5),
+        Mirror(seat=6),
+        Judge(seat=7),
+    ]
+
+
+#: stage number → zero-arg agent-builder. Stage 5 is retained for
+#: reproducibility with older runs; Stage 6 is the canonical research roster.
 _STAGE_ROSTERS: Dict[int, Callable[[], List]] = {
     5: _stage5_roster,
+    6: _stage6_roster,
 }
 
 
