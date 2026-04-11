@@ -107,13 +107,17 @@ def _build_stage_5() -> dict:
 
 
 #: Maps a stage number to a zero-arg builder that returns the modules dict.
-#: Later stages register themselves here as they come online.
+#: Later stages register themselves here as they come online. Stages 10 and
+#: 11 (research exports) reuse the Stage 5 builder — they don't introduce a
+#: new agent roster, only new export plumbing on top of the canonical one.
 STAGE_BUILDERS = {
     1: _build_stage_1,
     2: _build_stage_2,
     3: _build_stage_3,
     4: _build_stage_4,
     5: _build_stage_5,
+    10: _build_stage_5,
+    11: _build_stage_5,
 }
 
 #: Maps a stage number to an extra-assertions function from ``stage_extras``.
@@ -123,6 +127,8 @@ STAGE_EXTRAS = {
     3: stage_extras.stage3_extras,
     4: stage_extras.stage4_extras,
     5: stage_extras.stage5_extras,
+    10: stage_extras.stage10_extras,
+    11: stage_extras.stage11_extras,
 }
 
 

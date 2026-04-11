@@ -756,3 +756,309 @@ def stage2_extras(modules) -> List[str]:
     )
 
     return results
+
+
+def stage10_extras(modules) -> List[str]:
+    """Multi-seed orchestration sanity check.
+
+    Drives ``run_multiseed.run`` programmatically with 2 seeds x 30 hands
+    and asserts every promise from the Stage 10 spec: two seed
+    subdirectories exist, each has the full three-CSV triple with correct
+    headers, the aggregate CSV has the expected row count (8 archetypes x 2
+    seeds), chips are conserved across every seed, and re-running with the
+    same seeds produces byte-identical CSVs.
+    """
+    import os
+    import shutil
+    import tempfile
+
+    import run_multiseed
+    from config import NUM_PLAYERS, SIMULATION
+    from data.csv_exporter import (
+        ACTIONS_HEADER,
+        HANDS_HEADER,
+        AGENT_STATS_HEADER,
+    )
+
+    results: List[str] = []
+
+    def check(name: str, cond: bool, detail: str = "") -> None:
+        prefix = "PASS" if cond else "FAIL"
+        results.append(f"{prefix} {name}{': ' + detail if detail else ''}")
+
+    seeds = [42, 137]
+    num_hands = 30
+
+    outdir = tempfile.mkdtemp(prefix="stage10_")
+    try:
+        per_seed_agents = run_multiseed.run(seeds, num_hands, outdir)
+
+        # 1. Two seed subdirectories exist.
+        subdirs = sorted(
+            d for d in os.listdir(outdir)
+            if os.path.isdir(os.path.join(outdir, d))
+        )
+        check(
+            "10.1: two seed subdirectories exist",
+            subdirs == ["seed_137", "seed_42"],
+            f"got {subdirs}",
+        )
+
+        # 2. Every seed dir has the full CSV triple with the right header +
+        #    at least one row, and CSVs parse round-trip.
+        triple_ok = True
+        header_ok = True
+        nonempty_ok = True
+        for seed in seeds:
+            seed_dir = os.path.join(outdir, f"seed_{seed}")
+            for fname, expected_header in (
+                ("actions.csv",     ACTIONS_HEADER),
+                ("hands.csv",       HANDS_HEADER),
+                ("agent_stats.csv", AGENT_STATS_HEADER),
+            ):
+                path = os.path.join(seed_dir, fname)
+                if not os.path.exists(path):
+                    triple_ok = False
+                    continue
+                import csv as _csv
+                with open(path, newline="") as f:
+                    reader = _csv.reader(f)
+                    try:
+                        header = next(reader)
+                    except StopIteration:
+                        header_ok = False
+                        continue
+                    if header != expected_header:
+                        header_ok = False
+                    rows = list(reader)
+                    if len(rows) < 1:
+                        nonempty_ok = False
+
+        check(
+            "10.2a: each seed dir has actions.csv + hands.csv + agent_stats.csv",
+            triple_ok,
+        )
+        check("10.2b: every CSV has the declared header", header_ok)
+        check("10.2c: every CSV has at least one data row", nonempty_ok)
+
+        # 3. seed_aggregate.csv has 8 archetypes (=seats) * 2 seeds = 16 rows.
+        agg_path = os.path.join(outdir, "seed_aggregate.csv")
+        import csv as _csv
+        with open(agg_path, newline="") as f:
+            reader = _csv.reader(f)
+            _agg_header = next(reader)
+            agg_rows = list(reader)
+        check(
+            "10.3: seed_aggregate.csv has 8 archetypes x 2 seeds = 16 rows",
+            len(agg_rows) == 16,
+            f"got {len(agg_rows)}",
+        )
+
+        # 4. Chip conservation across all seeds.
+        starting_total = NUM_PLAYERS * SIMULATION["starting_stack"]
+        chips_ok = True
+        for seed in seeds:
+            agents = per_seed_agents[seed]
+            total_chips = sum(a.stack for a in agents)
+            rebuys = sum(getattr(a, "rebuys", 0) for a in agents)
+            expected = starting_total + rebuys * SIMULATION["starting_stack"]
+            if total_chips != expected:
+                chips_ok = False
+        check(
+            "10.4: chip conservation across all seeds (stacks + rebuys)",
+            chips_ok,
+        )
+
+        # 5. Reproducibility — run again into a second outdir and compare
+        #    CSV bytes per-seed. The three CSVs must be identical.
+        outdir2 = tempfile.mkdtemp(prefix="stage10b_")
+        try:
+            run_multiseed.run(seeds, num_hands, outdir2)
+            reproducible = True
+            for seed in seeds:
+                for fname in ("actions.csv", "hands.csv", "agent_stats.csv"):
+                    p1 = os.path.join(outdir,  f"seed_{seed}", fname)
+                    p2 = os.path.join(outdir2, f"seed_{seed}", fname)
+                    with open(p1, "rb") as f1, open(p2, "rb") as f2:
+                        if f1.read() != f2.read():
+                            reproducible = False
+            check(
+                "10.R: same seeds → byte-identical CSVs",
+                reproducible,
+            )
+        finally:
+            shutil.rmtree(outdir2, ignore_errors=True)
+
+        results.append(
+            f"INFO 10.x: wrote {len(seeds)} seed runs x {num_hands} hands to temp"
+        )
+    finally:
+        shutil.rmtree(outdir, ignore_errors=True)
+
+    return results
+
+
+def stage11_extras(modules) -> List[str]:
+    """CSV exporter sanity check on an in-memory 10-hand run.
+
+    Verifies the three writers in ``data.csv_exporter`` produce CSVs whose
+    schemas match what the downstream analysis notebooks expect: row counts
+    line up with the underlying in-memory state, required columns are never
+    null, and everything parses cleanly via ``csv.DictReader``.
+    """
+    import csv as _csv
+    import os
+    import tempfile
+
+    from data.csv_exporter import (
+        write_actions_csv,
+        write_hands_csv,
+        write_agent_stats_csv,
+        ACTIONS_HEADER,
+        HANDS_HEADER,
+        AGENT_STATS_HEADER,
+    )
+
+    create_agents = modules["create_agents"]
+    Table = modules["Table"]
+
+    results: List[str] = []
+
+    def check(name: str, cond: bool, detail: str = "") -> None:
+        prefix = "PASS" if cond else "FAIL"
+        results.append(f"{prefix} {name}{': ' + detail if detail else ''}")
+
+    # ------------------------------------------------------------------
+    # Play 10 hands in-memory with the Stage-5 canonical roster.
+    # ------------------------------------------------------------------
+    agents = create_agents()
+    table = Table(agents, seed=42)
+    hands: list = []
+    for _ in range(10):
+        table.play_hand()
+        hands.append(table.last_hand)
+
+    expected_action_rows = sum(len(h.action_log) for h in hands)
+
+    tmpdir = tempfile.mkdtemp(prefix="stage11_")
+    try:
+        actions_path = os.path.join(tmpdir, "actions.csv")
+        hands_path = os.path.join(tmpdir, "hands.csv")
+        stats_path = os.path.join(tmpdir, "agent_stats.csv")
+
+        n_actions = write_actions_csv(hands, agents, actions_path, "seed_42")
+        n_hands = write_hands_csv(hands, agents, hands_path, "seed_42")
+        n_stats = write_agent_stats_csv(agents, "seed_42", stats_path)
+
+        # 1. Row counts match the underlying engine state.
+        check(
+            "11.1: actions.csv row count == sum(len(hand.action_log))",
+            n_actions == expected_action_rows,
+            f"csv={n_actions}, log={expected_action_rows}",
+        )
+        check(
+            "11.2: hands.csv row count == len(hands)",
+            n_hands == len(hands),
+            f"csv={n_hands}, hands={len(hands)}",
+        )
+        check(
+            "11.3: agent_stats.csv has exactly 8 rows",
+            n_stats == 8,
+            f"got {n_stats}",
+        )
+
+        # 2. CSVs parse round-trip with DictReader and row counts match.
+        def _count_rows(path: str) -> int:
+            with open(path, newline="") as f:
+                return sum(1 for _ in _csv.DictReader(f))
+
+        a_count = _count_rows(actions_path)
+        h_count = _count_rows(hands_path)
+        s_count = _count_rows(stats_path)
+        check(
+            "11.4: CSVs parse round-trip via csv.DictReader (row counts match)",
+            (a_count, h_count, s_count) == (n_actions, n_hands, n_stats),
+            f"dictreader=({a_count},{h_count},{s_count}) "
+            f"writer=({n_actions},{n_hands},{n_stats})",
+        )
+
+        # 3. No null values in required columns. "Required" = everything
+        # except observer-0 trust columns (which are legitimately blank for
+        # self-actions) and walkover_winner (blank on showdowns).
+        REQUIRED_ACTION_COLS = [
+            "run_id", "hand_id", "seq", "round", "seat", "archetype",
+            "action_type", "amount", "pot_before", "pot_after",
+            "stack_before", "stack_after", "bet_count", "current_bet",
+        ]
+        null_violations = 0
+        with open(actions_path, newline="") as f:
+            for row in _csv.DictReader(f):
+                for col in REQUIRED_ACTION_COLS:
+                    if row.get(col, "") == "":
+                        null_violations += 1
+        check(
+            "11.5: actions.csv required columns have no empty values",
+            null_violations == 0,
+            f"{null_violations} empty cells",
+        )
+
+        REQUIRED_HANDS_COLS = [
+            "run_id", "hand_id", "dealer", "sb_seat", "bb_seat",
+            "final_pot", "had_showdown",
+        ] + [f"mean_trust_into_seat_{i}" for i in range(8)]
+        null_violations = 0
+        with open(hands_path, newline="") as f:
+            for row in _csv.DictReader(f):
+                for col in REQUIRED_HANDS_COLS:
+                    if row.get(col, "") == "":
+                        null_violations += 1
+        check(
+            "11.6: hands.csv required columns have no empty values",
+            null_violations == 0,
+            f"{null_violations} empty cells",
+        )
+
+        REQUIRED_STATS_COLS = [
+            "run_id", "seat", "name", "archetype", "hands_dealt",
+            "vpip_pct", "pfr_pct", "af", "showdowns", "showdowns_won",
+            "final_stack", "rebuys",
+        ]
+        null_violations = 0
+        with open(stats_path, newline="") as f:
+            for row in _csv.DictReader(f):
+                for col in REQUIRED_STATS_COLS:
+                    if row.get(col, "") == "":
+                        null_violations += 1
+        check(
+            "11.7: agent_stats.csv required columns have no empty values",
+            null_violations == 0,
+            f"{null_violations} empty cells",
+        )
+
+        # 4. Sanity: headers match what csv_exporter declares.
+        def _read_header(path: str) -> list:
+            with open(path, newline="") as f:
+                return next(_csv.reader(f))
+
+        check(
+            "11.8: actions.csv header matches ACTIONS_HEADER",
+            _read_header(actions_path) == ACTIONS_HEADER,
+        )
+        check(
+            "11.9: hands.csv header matches HANDS_HEADER",
+            _read_header(hands_path) == HANDS_HEADER,
+        )
+        check(
+            "11.10: agent_stats.csv header matches AGENT_STATS_HEADER",
+            _read_header(stats_path) == AGENT_STATS_HEADER,
+        )
+
+        results.append(
+            f"INFO 11.x: 10 hands → {n_actions} action rows, "
+            f"{n_hands} hand rows, {n_stats} stat rows"
+        )
+    finally:
+        import shutil
+        shutil.rmtree(tmpdir, ignore_errors=True)
+
+    return results
