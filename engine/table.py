@@ -53,6 +53,10 @@ class Table:
         self._rng: np.random.Generator = (
             rng if rng is not None else np.random.default_rng(seed)
         )
+        #: Reference to the most recently played ``Hand`` instance. External
+        #: tooling (e.g. the visualizer exporter) reads this to recover the
+        #: full per-hand state without requiring Table to know about logging.
+        self.last_hand: Optional[Hand] = None
 
     # ------------------------------------------------------------------
     def play_hand(self) -> Tuple[List[ActionRecord], Optional[List[dict]]]:
@@ -61,6 +65,7 @@ class Table:
         deck = Deck(rng=self._rng)
         hand = Hand(self, deck, self._rng, self.hand_number)
         action_log, showdown_data = hand.play()
+        self.last_hand = hand
         self._rotate_dealer()
         return action_log, showdown_data
 

@@ -112,10 +112,22 @@ class Hand:
         self.active: set = set(self._all_seats)
         self.folded: set = set()
 
+        # Snapshots taken now so the table's dealer_button can rotate after
+        # play() without corrupting anything downstream (e.g. the visualizer
+        # exporter).
+        self.dealer_seat: int = table.dealer_button
+        self.sb_seat: int = (table.dealer_button + 1) % NUM_PLAYERS
+        self.bb_seat: int = (table.dealer_button + 2) % NUM_PLAYERS
+
         # Per-hand bookkeeping.
         self.hole_cards: Dict[int, List[int]] = {}
         self.community_cards: List[int] = []
+        # Per-street community, for the replay visualizer.
+        self.flop_cards: List[int] = []
+        self.turn_card: List[int] = []
+        self.river_card: List[int] = []
         self.pot: int = 0
+        self.final_pot: int = 0    # pot before award (for display)
         # Total contribution this hand, per seat, used for showdown accounting.
         self.hand_contribution: Dict[int, int] = {s: 0 for s in self._all_seats}
         # Contribution within the current betting round (reset each round).
@@ -124,6 +136,8 @@ class Hand:
         self.stack_before_hand: Dict[int, int] = {
             a.seat: a.stack for a in self.table.seats
         }
+        # Filled in at end of play().
+        self.stack_after_hand: Dict[int, int] = {}
 
         self.action_log: List[ActionRecord] = []
         self.showdown_data: Optional[List[dict]] = None
@@ -149,6 +163,8 @@ class Hand:
         else:
             self._award_pot_to_last_standing()
 
+        # Snapshot for downstream visualizers / loggers.
+        self.stack_after_hand = {a.seat: a.stack for a in self.table.seats}
         return self.action_log, self.showdown_data
 
     # ------------------------------------------------------------------
@@ -447,12 +463,21 @@ class Hand:
     # Community cards
     # ------------------------------------------------------------------
     def _deal_community(self, n: int) -> None:
-        self.community_cards.extend(self.deck.deal(n))
+        cards = self.deck.deal(n)
+        self.community_cards.extend(cards)
+        # Tag by street for the visualizer.
+        if len(self.community_cards) == 3:
+            self.flop_cards = list(cards)
+        elif len(self.community_cards) == 4:
+            self.turn_card = list(cards)
+        elif len(self.community_cards) == 5:
+            self.river_card = list(cards)
 
     # ------------------------------------------------------------------
     # Showdown / pot award
     # ------------------------------------------------------------------
     def _showdown(self) -> None:
+        self.final_pot = self.pot
         contenders: List[int] = [s for s in self.active if s not in self.folded]
         # treys: lower rank = better hand.
         ranked: List[Tuple[int, int]] = []
@@ -494,9 +519,11 @@ class Hand:
             a.observe_showdown(self.showdown_data)
 
     def _award_pot_to_last_standing(self) -> None:
+        self.final_pot = self.pot
         survivors = [s for s in self.active if s not in self.folded]
         assert len(survivors) == 1, f"Expected 1 survivor, got {len(survivors)}"
         winner = survivors[0]
         self.table.seats[winner].stack += self.pot
         self.showdown_data = None  # No showdown on a walkover
+        self._walkover_winner: int = winner
         self.pot = 0
