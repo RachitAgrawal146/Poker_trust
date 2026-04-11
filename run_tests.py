@@ -78,6 +78,34 @@ def _build_stage_4() -> dict:
     }
 
 
+def _build_stage_5() -> dict:
+    # Stage 5 shares the Stage 4 agent roster — trust is a property every
+    # BaseAgent subclass inherits, so no new agent classes are introduced.
+    # The canonical ``test_cases.test_stage_5`` expects a ``create_agents``
+    # callable that returns the 8-seat static roster.
+    from agents.oracle import Oracle
+    from agents.sentinel import Sentinel
+    from agents.firestorm import Firestorm
+    from agents.wall import Wall
+    from agents.phantom import Phantom
+
+    def create_agents():
+        return [
+            Oracle(seat=0),
+            Sentinel(seat=1),
+            Firestorm(seat=2),
+            Wall(seat=3),
+            Phantom(seat=4),
+            Oracle(seat=5, name="Oracle-5"),
+            Oracle(seat=6, name="Oracle-6"),
+            Oracle(seat=7, name="Oracle-7"),
+        ]
+
+    modules = _build_stage_4()
+    modules["create_agents"] = create_agents
+    return modules
+
+
 #: Maps a stage number to a zero-arg builder that returns the modules dict.
 #: Later stages register themselves here as they come online.
 STAGE_BUILDERS = {
@@ -85,6 +113,7 @@ STAGE_BUILDERS = {
     2: _build_stage_2,
     3: _build_stage_3,
     4: _build_stage_4,
+    5: _build_stage_5,
 }
 
 #: Maps a stage number to an extra-assertions function from ``stage_extras``.
@@ -93,6 +122,7 @@ STAGE_EXTRAS = {
     2: stage_extras.stage2_extras,
     3: stage_extras.stage3_extras,
     4: stage_extras.stage4_extras,
+    5: stage_extras.stage5_extras,
 }
 
 

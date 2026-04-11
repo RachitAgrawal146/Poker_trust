@@ -85,11 +85,20 @@ def _stage4_agents():
     ]
 
 
+def _stage5_agents():
+    # Stage 5: same 5-archetype table as Stage 4 — trust is not a new agent
+    # class but rather state that every BaseAgent subclass accumulates. The
+    # exporter picks up each agent's ``posteriors`` / ``trust_score`` /
+    # ``entropy`` accessors and writes the per-hand snapshot into data.js.
+    return _stage4_agents()
+
+
 # stage -> (agents builder, label)
 STAGE_DEMOS: dict = {
     2: (_stage2_agents, "Stage 2 demo · scripted engine test"),
     3: (_stage3_agents, "Stage 3 demo · Oracle vs scripted mix"),
     4: (_stage4_agents, "Stage 4 demo · 5 static archetypes + Oracle fillers"),
+    5: (_stage5_agents, "Stage 5 demo · Bayesian trust model in action"),
 }
 
 HIGHEST_STAGE = max(STAGE_DEMOS)

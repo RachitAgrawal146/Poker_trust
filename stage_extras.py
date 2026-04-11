@@ -347,6 +347,189 @@ def stage3_extras(modules) -> List[str]:
     return results
 
 
+def stage5_extras(modules) -> List[str]:
+    """500-hand Bayesian trust model sanity check.
+
+    Same canonical 5-archetype table as Stage 4 (Oracle / Sentinel /
+    Firestorm / Wall / Phantom + 3 Oracle fillers). Stage 5 adds no new
+    agents, only new state on every agent — posteriors over the 8 archetype
+    types for every other seat.
+
+    What we assert:
+
+    1. Every posterior is a valid probability distribution (sums to ~1, all
+       non-negative, length 8).
+    2. Every agent has posteriors for all 7 opponents (they were all
+       observed at least once — trivially true in 500 hands).
+    3. Entropy drops below the uniform-max for most opponents — i.e. the
+       model actually *learns* something. Max entropy is log2(8) = 3.
+    4. Trust scores are in ``[0, 1]``.
+    5. Wall is correctly identified as the highest-trust archetype (its
+       honesty is 0.962, far above the average 0.75). Firestorm should be
+       the lowest-trust (honesty 0.375).
+    6. Reproducibility: same seed twice → identical posteriors.
+    """
+    import numpy as np
+
+    Oracle = modules["Oracle"]
+    Sentinel = modules["Sentinel"]
+    Firestorm = modules["Firestorm"]
+    Wall = modules["Wall"]
+    Phantom = modules["Phantom"]
+    Table = modules["Table"]
+
+    results: List[str] = []
+
+    def check(name: str, cond: bool, detail: str = "") -> None:
+        prefix = "PASS" if cond else "FAIL"
+        results.append(f"{prefix} {name}{': ' + detail if detail else ''}")
+
+    def build():
+        return [
+            Oracle(seat=0),
+            Sentinel(seat=1),
+            Firestorm(seat=2),
+            Wall(seat=3),
+            Phantom(seat=4),
+            Oracle(seat=5, name="Oracle-5"),
+            Oracle(seat=6, name="Oracle-6"),
+            Oracle(seat=7, name="Oracle-7"),
+        ]
+
+    num_hands = 500
+    agents = build()
+    table = Table(agents, seed=42)
+    for _ in range(num_hands):
+        table.play_hand()
+
+    # ------------------------------------------------------------------
+    # Validity checks across every (observer, target) pair.
+    # ------------------------------------------------------------------
+    all_valid = True
+    total_entropy = 0.0
+    drops_below_max = 0
+    total_posteriors = 0
+    trust_in_range = True
+    max_entropy = 3.0
+    for obs in agents:
+        for target in range(8):
+            if target == obs.seat:
+                continue
+            total_posteriors += 1
+            post = obs.posteriors.get(target)
+            if post is None:
+                all_valid = False
+                continue
+            if len(post) != 8:
+                all_valid = False
+                continue
+            s = float(post.sum())
+            if not (0.9999 <= s <= 1.0001):
+                all_valid = False
+            if (post < 0).any():
+                all_valid = False
+            h = obs.entropy(target)
+            total_entropy += h
+            if h < max_entropy - 0.05:
+                drops_below_max += 1
+            t = obs.trust_score(target)
+            if not (0.0 <= t <= 1.0):
+                trust_in_range = False
+
+    check(
+        "5.1: every posterior is a valid distribution",
+        all_valid,
+        f"checked {total_posteriors} posteriors",
+    )
+    check(
+        "5.2: trust scores bounded in [0, 1]",
+        trust_in_range,
+        f"across {total_posteriors} (observer, target) pairs",
+    )
+    mean_h = total_entropy / max(total_posteriors, 1)
+    check(
+        "5.3: mean posterior entropy is below uniform-max",
+        mean_h < max_entropy - 0.05,
+        f"mean H = {mean_h:.3f} bits (max = {max_entropy:.3f})",
+    )
+    check(
+        "5.4: most posteriors show measurable learning (H < max - 0.05)",
+        drops_below_max >= total_posteriors * 0.8,
+        f"{drops_below_max}/{total_posteriors} below max",
+    )
+
+    # ------------------------------------------------------------------
+    # Wall is very distinctive: honesty 0.962. Table-averaged trust
+    # toward seat 3 (Wall) should be the highest among seats 1-4.
+    # ------------------------------------------------------------------
+    def mean_trust_toward(target: int) -> float:
+        vals = [a.trust_score(target) for a in agents if a.seat != target]
+        return sum(vals) / len(vals)
+
+    trust_toward = {s: mean_trust_toward(s) for s in range(5)}
+    best_seat = max(trust_toward, key=trust_toward.get)
+    check(
+        "5.5: Wall (seat 3) has the highest mean trust score",
+        best_seat == 3,
+        f"trust_toward={ {k: round(v, 3) for k, v in trust_toward.items()} }",
+    )
+
+    # Firestorm (seat 2) should have lower trust than Wall (seat 3).
+    check(
+        "5.6: trust(Firestorm) < trust(Wall)",
+        trust_toward[2] < trust_toward[3],
+        f"F={trust_toward[2]:.3f} W={trust_toward[3]:.3f}",
+    )
+
+    # ------------------------------------------------------------------
+    # Reproducibility.
+    # ------------------------------------------------------------------
+    agents2 = build()
+    table2 = Table(agents2, seed=42)
+    for _ in range(num_hands):
+        table2.play_hand()
+    reproducible = True
+    max_diff = 0.0
+    for a, b in zip(agents, agents2):
+        for seat in range(8):
+            if seat == a.seat:
+                continue
+            pa = a.posteriors.get(seat)
+            pb = b.posteriors.get(seat)
+            if pa is None or pb is None:
+                reproducible = pa is pb
+                continue
+            diff = float(np.abs(pa - pb).max())
+            max_diff = max(max_diff, diff)
+            if diff > 1e-12:
+                reproducible = False
+    check(
+        "5.R: reproducibility (same seed -> identical posteriors)",
+        reproducible,
+        f"max |diff| = {max_diff:.2e}",
+    )
+
+    # ------------------------------------------------------------------
+    # Info line — researcher reads the top archetype picked per seat.
+    # ------------------------------------------------------------------
+    from trust import posterior_to_dict
+    oracle_obs = agents[0]
+    results.append(
+        f"INFO 5.x: Oracle@0 posterior top-pick after {num_hands} hands:"
+    )
+    for seat in range(1, 8):
+        post = posterior_to_dict(oracle_obs.posteriors[seat])
+        top_arch, top_p = max(post.items(), key=lambda kv: kv[1])
+        h = oracle_obs.entropy(seat)
+        t = oracle_obs.trust_score(seat)
+        results.append(
+            f"  INFO 5.x:   seat{seat} -> {top_arch:18} p={top_p:.3f} "
+            f"T={t:.3f} H={h:.3f}"
+        )
+
+    return results
+
+
 def stage2_extras(modules) -> List[str]:
     Table = modules["Table"]
     DummyAgent = modules["DummyAgent"]

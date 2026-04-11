@@ -519,8 +519,9 @@ class Hand:
             self.showdown_data.append(entry)
 
         self.pot = 0
+        community_snapshot = list(self.community_cards)
         for a in self.table.seats:
-            a.observe_showdown(self.showdown_data)
+            a.observe_showdown(self.showdown_data, community_cards=community_snapshot)
 
     def _award_pot_to_last_standing(self) -> None:
         self.final_pot = self.pot

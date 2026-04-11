@@ -39,9 +39,11 @@ class DummyAgent:
         # update posteriors here.
         pass
 
-    def observe_showdown(self, showdown_data) -> None:
+    def observe_showdown(self, showdown_data, community_cards=None) -> None:
         # Stage 2 doesn't use trust. Later stages update beliefs from
-        # revealed hole cards here.
+        # revealed hole cards here. ``community_cards`` is provided by the
+        # engine so Stage 5 agents can recompute the revealed opponent's
+        # hand-strength bucket at each round.
         pass
 
 
