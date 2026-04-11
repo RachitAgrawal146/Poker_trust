@@ -152,6 +152,8 @@ STAGE_BUILDERS = {
     4: _build_stage_4,
     5: _build_stage_5,
     7: _build_stage_7,
+    10: _build_stage_5,
+    11: _build_stage_5,
 }
 
 #: Maps a stage number to an extra-assertions function from ``stage_extras``.
@@ -162,6 +164,8 @@ STAGE_EXTRAS = {
     4: stage_extras.stage4_extras,
     5: stage_extras.stage5_extras,
     7: stage_extras.stage7_extras,
+    10: stage_extras.stage10_extras,
+    11: stage_extras.stage11_extras,
 }
 
 
