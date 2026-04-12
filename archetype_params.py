@@ -145,22 +145,22 @@ ARCHETYPE_PARAMS = {
         "preflop": {
             "br": 0.60, "vbr": 0.65, "cr": 0.30, "mbr": 0.55,
             "strong_raise": 0.40, "strong_call": 0.45, "strong_fold": 0.15,
-            "med_raise": 0.08, "weak_call": 0.10,
+            "med_raise": 0.08, "weak_call": 0.35,
         },
         "flop": {
             "br": 0.55, "vbr": 0.60, "cr": 0.25, "mbr": 0.50,
             "strong_raise": 0.35, "strong_call": 0.45, "strong_fold": 0.20,
-            "med_raise": 0.06, "weak_call": 0.08,
+            "med_raise": 0.06, "weak_call": 0.30,
         },
         "turn": {
             "br": 0.50, "vbr": 0.55, "cr": 0.20, "mbr": 0.45,
             "strong_raise": 0.30, "strong_call": 0.45, "strong_fold": 0.25,
-            "med_raise": 0.04, "weak_call": 0.06,
+            "med_raise": 0.04, "weak_call": 0.22,
         },
         "river": {
             "br": 0.45, "vbr": 0.50, "cr": 0.15, "mbr": 0.40,
             "strong_raise": 0.25, "strong_call": 0.45, "strong_fold": 0.30,
-            "med_raise": 0.03, "weak_call": 0.05,
+            "med_raise": 0.03, "weak_call": 0.15,
         },
     },
 

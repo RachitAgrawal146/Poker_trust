@@ -541,7 +541,7 @@ def s15_predator(db, R):
 def s16_judge(db, R):
     R.header(16, "JUDGE RETALIATION DEEP DIVE")
 
-    R.subheader("Judge (seat 7) aggression over time — ALL streets, run 1")
+    R.subheader("Judge (seat 7) overall aggression over time — ALL streets, run 1")
     R.w("  (Rolling 200-hand window of bet+raise rate across all streets)")
     rows = _q(db, """
         SELECT hand_id,
@@ -565,6 +565,40 @@ def s16_judge(db, R):
     for hand_id, rate in sampled[:20]:
         bar = "#" * int(rate * 50)
         R.w(f"    h{hand_id:>5}: {rate:.3f} |{bar}")
+
+    R.subheader("Judge bet rate CONDITIONAL on each opponent being in the hand")
+    R.w("  (Key insight: retaliation only fires when a triggered opponent is")
+    R.w("   active. The aggregate rate dilutes the signal. Per-opponent rates")
+    R.w("   reveal the behavioral shift.)")
+    seat_arch = {}
+    for r in _q(db, "SELECT seat, archetype FROM agent_stats WHERE run_id=1"):
+        seat_arch[r['seat']] = r['archetype']
+    run_ids = [r['run_id'] for r in _q(db, "SELECT run_id FROM runs ORDER BY run_id LIMIT 5")]
+    for opp_seat in range(8):
+        if opp_seat == 7:
+            continue
+        arch = seat_arch.get(opp_seat, '?')
+        # For each seed, compute Judge's bet+raise rate in hands where
+        # this opponent also acted (both were in the hand).
+        rates = []
+        for rid in run_ids:
+            row = _q1(db, """
+                SELECT
+                    SUM(CASE WHEN a.action_type IN ('bet','raise') THEN 1 ELSE 0 END) AS br,
+                    COUNT(*) AS total
+                FROM actions a
+                WHERE a.run_id = ? AND a.seat = 7
+                  AND a.hand_id IN (
+                      SELECT DISTINCT hand_id FROM actions
+                      WHERE run_id = ? AND seat = ?
+                  )
+            """, (rid, rid, opp_seat))
+            if row and row['total'] and row['total'] > 0:
+                rates.append(row['br'] / row['total'])
+        if rates:
+            mean_rate = sum(rates) / len(rates)
+            R.w(f"    vs S{opp_seat} ({arch:<12}): bet_rate={mean_rate:.3f} "
+                f"(across {len(rates)} seeds)")
 
     R.subheader("Judge trust RECEIVED from others over time (run 1)")
     R.w("  (If retaliation is detected, trust toward Judge should drop)")
