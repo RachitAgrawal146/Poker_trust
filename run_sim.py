@@ -176,6 +176,18 @@ def run_one_seed(
 
     logger.log_agent_stats(run_id, table)
 
+    # Print Judge grievance summary for this seed (if Judge is present).
+    for a in agents:
+        if a.archetype == "judge" and hasattr(a, "grievance_summary"):
+            summary_lines = a.grievance_summary()
+            if summary_lines:
+                print(f"  Judge grievances (seed={seed}):")
+                for s_seat, count, triggered, trigger_hand in summary_lines:
+                    arch_name = agents[s_seat].archetype if s_seat < len(agents) else f"seat{s_seat}"
+                    t_str = f"TRIGGERED at hand {trigger_hand}" if triggered else "not triggered"
+                    print(f"    vs {arch_name:15s} (seat {s_seat}): grievance={count:3d}  {t_str}")
+            break
+
     # Per-run summary. Everything comes back out of SQLite so we verify the
     # logger is round-trip consistent in the same process.
     cur = logger.conn.cursor()

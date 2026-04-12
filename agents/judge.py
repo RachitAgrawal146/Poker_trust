@@ -26,13 +26,13 @@ Key details from the spec (§12.4) and ``worked_examples.md`` Example 3:
   the Judge folded are not grievances; they couldn't have been
   intended as deception against the Judge.
 - Only BET or RAISE actions count. CALL is not a deception signal.
-- If ANY active opponent at the table is triggered, the Judge uses
-  retaliatory params for the ENTIRE hand, against everyone in the pot.
-  This is a simplification — per the spec the Judge's behavior is
-  per-opponent, but decide_action is a single-agent policy and multi-way
-  pots need a single answer. Triggering on "any active opponent is a
-  grudge target" produces the right emergent signature without
-  splitting the policy per-seat.
+- The Judge activates retaliatory params only when a triggered opponent
+  has actively bet or raised against the Judge in the current hand.
+  If a triggered opponent is at the table but hasn't aggressed this
+  hand (e.g., checked or hasn't acted yet), the Judge plays cooperative.
+  This produces the spec's intended behavioral split: observers see
+  cooperative play in calm hands and retaliatory play only when a
+  known deceiver is actively pressuring.
 """
 
 from __future__ import annotations
@@ -143,11 +143,13 @@ class Judge(BaseAgent):
 
     # ------------------------------------------------------------------
     def get_params(self, betting_round: str, game_state: GameState) -> dict:
-        # If ANY active opponent in this pot is on the grudge list, the
-        # Judge plays retaliatory for this hand. See module docstring for
-        # the rationale behind the "any active opponent" simplification.
-        for opp_seat in game_state.active_opponent_seats or ():
-            if self.triggered.get(opp_seat, False):
+        # Only retaliate if a TRIGGERED opponent has actively bet or raised
+        # against the Judge in THIS hand — not just if they're at the table.
+        # _bluff_candidates tracks exactly this: seats that have bet/raised
+        # while the Judge was still holding cards, accumulated across all
+        # streets this hand, reset in on_hand_start.
+        for seat in self._bluff_candidates:
+            if self.triggered.get(seat, False):
                 return self.RETALIATORY_PARAMS[betting_round]
         return self.COOPERATIVE_PARAMS[betting_round]
 

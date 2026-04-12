@@ -621,7 +621,16 @@ def s17_mirror(db, R):
     R.header(17, "MIRROR MIMICRY ANALYSIS")
 
     R.subheader("Mirror (seat 6) behavioral profile over time — run 1")
-    R.w("  (Rolling 200-hand VPIP and aggression rate)")
+    R.w("  (Rolling 200-hand aggression rate. NOTE: rolling VPIP proxy may")
+    R.w("   overcount due to action-table sampling. Authoritative cumulative")
+    R.w("   VPIP from agent_stats is in Section 3.)")
+    # Print the authoritative cumulative VPIP for reference.
+    cum = _q1(db, """
+        SELECT vpip_count*100.0/hands_dealt AS vpip, (bets+raises)*1.0/CASE WHEN calls>0 THEN calls ELSE 1 END AS af
+        FROM agent_stats WHERE run_id=1 AND seat=6
+    """)
+    if cum:
+        R.w(f"  Authoritative cumulative: VPIP={cum['vpip']:.1f}%  AF={cum['af']:.2f}")
     rows = _q(db, """
         SELECT hand_id, betting_round, action_type
         FROM actions WHERE run_id=1 AND seat=6 ORDER BY hand_id, sequence_num

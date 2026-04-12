@@ -127,6 +127,19 @@ def run_one_seed(seed: int, num_hands: int, outdir: str, stage: int = 6) -> Tupl
     write_actions_csv(hands, agents, os.path.join(seed_dir, "actions.csv"), run_id)
     write_hands_csv(hands, agents, os.path.join(seed_dir, "hands.csv"), run_id)
     write_agent_stats_csv(agents, run_id, os.path.join(seed_dir, "agent_stats.csv"))
+
+    # Print Judge grievance summary for this seed (if Judge is present).
+    for a in agents:
+        if a.archetype == "judge" and hasattr(a, "grievance_summary"):
+            summary_lines = a.grievance_summary()
+            if summary_lines:
+                print(f"  Judge grievances (seed={seed}):")
+                for s_seat, count, triggered, trigger_hand in summary_lines:
+                    arch_name = agents[s_seat].archetype if s_seat < len(agents) else f"seat{s_seat}"
+                    t_str = f"TRIGGERED at hand {trigger_hand}" if triggered else "not triggered"
+                    print(f"    vs {arch_name:15s} (seat {s_seat}): grievance={count:3d}  {t_str}")
+            break
+
     return agents, hands
 
 
