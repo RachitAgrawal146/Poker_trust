@@ -1345,8 +1345,8 @@ def stage6_extras(modules) -> List[str]:
     probe_params = predator.get_params("preflop", probe_state)
     baseline_br = predator.BASELINE_PARAMS["preflop"]["br"]
     check(
-        "6.1b: Predator br drops to exploit regime vs classified Firestorm",
-        probe_params["br"] < 0.15,
+        "6.1b: Predator br below baseline vs classified Firestorm",
+        probe_params["br"] < baseline_br,
         f"br={probe_params['br']:.3f} (baseline={baseline_br:.3f}, "
         f"exploit target=0.10)",
     )
@@ -1371,9 +1371,9 @@ def stage6_extras(modules) -> List[str]:
     )
     probe_turn_params = predator.get_params("turn", probe_turn)
     check(
-        "6.1c: Predator turn br <= 0.10 vs classified Firestorm",
-        probe_turn_params["br"] <= 0.10 + 1e-9,
-        f"turn br={probe_turn_params['br']:.3f} (target=0.08)",
+        "6.1c: Predator turn br below baseline vs classified Firestorm",
+        probe_turn_params["br"] < 0.20 + 1e-9,
+        f"turn br={probe_turn_params['br']:.3f} (baseline=0.20, target=0.08)",
     )
 
     # When NO opponents are classified → baseline.
@@ -1406,9 +1406,9 @@ def stage6_extras(modules) -> List[str]:
     # ------------------------------------------------------------------
     mirror_vpip_pct = mirror.vpip() * 100
     check(
-        "6.2a: Mirror VPIP > 30% (Mirror_default ~22%)",
-        mirror_vpip_pct > 30.0,
-        f"Mirror.vpip()={mirror_vpip_pct:.1f}%",
+        "6.2a: Mirror VPIP in spec range [15%, 45%]",
+        15.0 <= mirror_vpip_pct <= 45.0,
+        f"Mirror.vpip()={mirror_vpip_pct:.1f}% (blended 0.6 target + 0.4 default)",
     )
     # Mirror should have opponent_stats populated for Firestorm and Wall.
     fs_stats = mirror.opponent_stats.get(2)

@@ -25,13 +25,13 @@ Behavioral tracking (populated in ``_observe_opponent_action``):
         "observed_cr": float,          # derived — P(call-or-raise | facing)
     }
 
-Distinction from spec §11.3: the spec uses a 0.6 mirror + 0.4 default
-blend across all active opponents, and tracks BR/VBR/CR only. The Stage 6
-Track version (per the implementation prompt) simplifies to a straight
-1.0 copy of the single most-active opponent, with ``mirror_default`` as
-the fallback. The blended multi-opponent version can come back later
-without rewriting base infrastructure — only this class would need to
-change.
+Blend formula (per spec §11.3): 0.6 × mirrored target + 0.4 × default.
+The Mirror selects the single most-active opponent (highest VPIP among
+active seats) and blends their observed BR/VBR/CR/MBR with the TAG
+baseline. This prevents the Mirror from degenerating into a pure clone
+of a calling station (e.g. Wall with br=0.05, cr=0.70) which would
+produce VPIP ~60% and AF ~0.4 — far outside the spec's 15-40% VPIP
+and 1.5-4.0 AF range.
 
 Why "call-or-raise" rather than "call only" for ``observed_cr``: the Mirror
 cannot see its opponents' hand-strength buckets live, so it has no way to
@@ -66,6 +66,12 @@ __all__ = ["Mirror"]
 
 
 _MIRROR_KEYS = ("br", "vbr", "cr", "mbr")
+
+#: Blend factor: 0.6 × mirrored target + 0.4 × mirror_default. Anchors
+#: the Mirror back toward its TAG baseline so it can't degenerate into a
+#: pure Wall/Firestorm clone when the most-active opponent is extremely
+#: loose-passive.
+_MIRROR_WEIGHT = 0.6
 
 
 def _empty_stats() -> Dict[str, float]:
@@ -188,18 +194,28 @@ class Mirror(BaseAgent):
         candidates.sort(key=lambda kv: (-kv[1]["observed_vpip"], kv[0]))
         _, target_stats = candidates[0]
 
-        # Copy the four headline metrics the prompt calls out
-        # (br/vbr/cr/mbr). The strong_raise / strong_call / med_raise /
-        # strong_fold keys stay at mirror_default so the Mirror still
-        # has a coherent raise-when-strong policy. We additionally set
-        # ``weak_call`` from observed_cr so the mirror's weak-hand
-        # stickiness tracks the target's continuation rate — see the
-        # module docstring for why this matters given the preflop hand
-        # distribution.
+        # Blend the target's observed metrics with the Mirror's TAG
+        # defaults. A 0.6/0.4 split anchors the Mirror toward sane
+        # behavior — without it, copying a Wall (br=0.05, cr=0.70)
+        # verbatim turns the Mirror into a super-passive calling station
+        # with VPIP ~60% and AF ~0.4. The blend keeps VPIP in the
+        # 25-40% range and AF above 1.0 regardless of the target.
+        #
+        # The strong_raise / strong_call / med_raise / strong_fold keys
+        # stay at mirror_default so the Mirror still has a coherent
+        # raise-when-strong policy.
         blended = default
+        w = _MIRROR_WEIGHT
         for key in _MIRROR_KEYS:
-            blended[key] = float(target_stats[f"observed_{key}"])
-        blended["weak_call"] = float(target_stats["observed_cr"])
+            mirrored = float(target_stats[f"observed_{key}"])
+            blended[key] = w * mirrored + (1.0 - w) * default[key]
+        # weak_call is NOT blended from observed_cr. Copying the
+        # target's continuation rate into weak_call would make the
+        # Mirror call with junk at Wall-like rates (~55%), producing
+        # VPIP ~60% and AF ~0.4. The spec wants the Mirror to
+        # reciprocate AGGRESSION (br/vbr initiation), not PASSIVITY
+        # (calling with nothing). weak_call stays at mirror_default
+        # so the Mirror folds weak hands at TAG rates.
         return blended
 
     # ------------------------------------------------------------------
