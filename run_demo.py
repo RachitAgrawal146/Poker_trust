@@ -18,7 +18,6 @@ result.
 from __future__ import annotations
 
 import argparse
-from typing import Callable, List, Tuple
 
 from data.visualizer_export import run_and_export
 

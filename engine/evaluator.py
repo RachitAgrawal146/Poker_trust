@@ -20,7 +20,7 @@ counted with ``my_rank < opp_rank`` and ties with ``==`` (half-credit).
 
 from __future__ import annotations
 
-from typing import List, Optional, Sequence
+from typing import Optional, Sequence
 
 import numpy as np
 from treys import Evaluator

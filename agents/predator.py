@@ -32,7 +32,6 @@ import numpy as np
 
 from agents.base_agent import BaseAgent
 from archetype_params import ARCHETYPE_PARAMS, PREDATOR_EXPLOIT
-from config import NUM_PLAYERS
 from engine.game import GameState
 from trust import TRUST_TYPE_LIST
 

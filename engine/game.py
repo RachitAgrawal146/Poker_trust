@@ -43,10 +43,10 @@ cap.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Sequence, Tuple
+from typing import Dict, List, Optional, Tuple
 
 import numpy as np
-from treys import Card, Evaluator
+from treys import Evaluator
 
 from config import NUM_PLAYERS, SIMULATION
 from engine.actions import ActionRecord, ActionType

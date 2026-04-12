@@ -29,7 +29,7 @@ import os
 import sqlite3
 import subprocess
 from datetime import datetime, timezone
-from typing import Iterable, List, Optional, Sequence
+from typing import Iterable, Optional, Sequence
 
 from engine.actions import ActionRecord
 from engine.game import Hand
