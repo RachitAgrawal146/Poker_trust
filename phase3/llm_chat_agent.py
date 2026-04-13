@@ -268,6 +268,7 @@ class LLMChatAgent(BaseAgent):
         self.llm_total_time: float = 0.0
 
     def decide_action(self, game_state: GameState) -> ActionType:
+        import sys
         rng = self.rng or np.random.default_rng()
 
         # Compute hand strength (cached per street).
@@ -276,12 +277,16 @@ class LLMChatAgent(BaseAgent):
         round_key = game_state.betting_round
         hs = self._hs_cache.get(round_key)
         if hs is None:
+            print(f"    {self.name} computing hand strength ({round_key})...",
+                  end="", flush=True)
+            t_hs = time.time()
             hs = get_hand_strength(
                 self.hole_cards,
                 game_state.community_cards,
                 rng=rng,
-                num_samples=100,
+                num_samples=50,
             )
+            print(f" {hs} ({time.time()-t_hs:.1f}s)", flush=True)
             self._hs_cache[round_key] = hs
 
         # Build prompt and call LLM
@@ -289,6 +294,7 @@ class LLMChatAgent(BaseAgent):
             game_state, self.hole_cards, hs, self.archetype
         )
 
+        print(f"    {self.name} calling LLM...", end="", flush=True)
         t0 = time.time()
         try:
             response = _call_llm(
@@ -296,17 +302,20 @@ class LLMChatAgent(BaseAgent):
                 self._system_prompt, user_msg,
             )
             self.llm_calls += 1
+            elapsed = time.time() - t0
+            action = _parse_action(response)
+            print(f" -> {response.strip()!r} ({elapsed:.1f}s)", flush=True)
         except RuntimeError as e:
             self.llm_failures += 1
-            if self.llm_failures <= 3:
-                import sys
-                print(f"\n  [LLM ERROR] {self.name}: {e}", file=sys.stderr)
+            elapsed = time.time() - t0
+            print(f" FAILED ({elapsed:.1f}s)", flush=True)
+            if self.llm_failures <= 5:
+                print(f"    [LLM ERROR] {self.name}: {e}", file=sys.stderr, flush=True)
             return ActionType.CHECK if game_state.cost_to_call == 0 else ActionType.FOLD
         finally:
             self.llm_total_time += time.time() - t0
 
-        # Parse response
-        action = _parse_action(response)
+        # Parse response (action was set above in the try block)
         if action is None:
             self.llm_failures += 1
             return ActionType.CHECK if game_state.cost_to_call == 0 else ActionType.FOLD
