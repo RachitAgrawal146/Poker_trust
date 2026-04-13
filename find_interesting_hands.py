@@ -58,14 +58,23 @@ def print_hand(db, run_id, hand_id, label=""):
               f"{amt:4d}  {pb:3d}->{pa:3d}  {sb2:4d}->{sa:4d}  {bc:4d}")
 
     # Showdown
+    # Map seat -> archetype from actions table
+    seat_arch = {}
+    for r in db.execute("""
+        SELECT DISTINCT seat, archetype FROM actions
+        WHERE run_id=? AND hand_id=?
+    """, (run_id, hand_id)):
+        seat_arch[r[0]] = r[1]
+
     sd_rows = db.execute("""
-        SELECT seat, archetype, hole_cards, hand_rank, won, pot_won
+        SELECT seat, hole_cards, hand_rank, won, pot_won
         FROM showdowns WHERE run_id=? AND hand_id=? ORDER BY hand_rank
     """, (run_id, hand_id)).fetchall()
     if sd_rows:
         print()
         print("  SHOWDOWN:")
-        for seat, arch, hc, rank, won, pw in sd_rows:
+        for seat, hc, rank, won, pw in sd_rows:
+            arch = seat_arch.get(seat, "unknown")
             w = "WINNER" if won else "      "
             print(f"    S{seat} ({arch:12s})  {cards_str(hc):12s}  "
                   f"rank={rank:5d}  {w}  pot_won={pw}")
