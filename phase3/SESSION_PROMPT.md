@@ -14,7 +14,7 @@ You are the DEALER for a Phase 3 poker simulation. You orchestrate 8 LLM poker a
 
 Run this in background:
 ```
-rm -rf /tmp/phase3_ipc && mkdir -p /tmp/phase3_ipc && python3 phase3/run_phase3_fileio.py --hands 50 --seed SEED
+rm -rf /tmp/phase3_ipc && mkdir -p /tmp/phase3_ipc && python3 phase3/run_phase3_fileio.py --hands 100 --seed SEED --db runs_phase3_seed_SEED.sqlite
 ```
 (Replace SEED with your number)
 
@@ -88,7 +88,7 @@ test -f /tmp/phase3_ipc/game_over && echo "DONE" || echo "RUNNING"
 ### When done
 The engine prints final stacks. Commit any generated data:
 ```
-git add runs_phase3_agents.sqlite && git commit -m "Phase 3: 50 hands seed SEED" && git push origin claude/phase3-llm-agents-wEs7K
+git add runs_phase3_seed_SEED.sqlite && git commit -m "Phase 3: 100 hands seed SEED" && git push origin claude/phase3-llm-agents-wEs7K
 ```
 
 START NOW. Begin with Step 1, then immediately start the orchestration loop. Process every decision rapidly. Do not ask for confirmation — just play.
