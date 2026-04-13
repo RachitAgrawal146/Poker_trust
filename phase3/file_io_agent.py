@@ -147,11 +147,18 @@ class FileIOAgent(BaseAgent):
         except (json.JSONDecodeError, FileNotFoundError):
             action_str = "fold"
         finally:
-            # Clean up for next request
-            if DONE_FILE.exists():
-                DONE_FILE.unlink()
-            if READY_FILE.exists():
-                READY_FILE.unlink()
+            # Clean up for next request (use missing_ok to avoid race conditions)
+            try:
+                DONE_FILE.unlink(missing_ok=True)
+            except TypeError:
+                # Python < 3.8 fallback
+                if DONE_FILE.exists():
+                    DONE_FILE.unlink()
+            try:
+                READY_FILE.unlink(missing_ok=True)
+            except TypeError:
+                if READY_FILE.exists():
+                    READY_FILE.unlink()
 
         # Parse action
         action_map = {
