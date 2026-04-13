@@ -200,9 +200,10 @@ def _call_llm(
     model: str,
     system_prompt: str,
     user_message: str,
-    max_retries: int = 2,
+    max_retries: int = 1,
 ) -> str:
     """Call the LLM and return the raw text response."""
+    last_error = None
     for attempt in range(max_retries + 1):
         try:
             if provider == "anthropic":
@@ -226,8 +227,9 @@ def _call_llm(
                 )
                 return response.choices[0].message.content
         except Exception as e:
+            last_error = e
             if attempt < max_retries:
-                time.sleep(1.0 * (attempt + 1))
+                time.sleep(0.5)
                 continue
             raise RuntimeError(f"LLM call failed after {max_retries + 1} attempts: {e}")
 
@@ -268,7 +270,9 @@ class LLMChatAgent(BaseAgent):
     def decide_action(self, game_state: GameState) -> ActionType:
         rng = self.rng or np.random.default_rng()
 
-        # Compute hand strength (cached per street, same as Phase 1)
+        # Compute hand strength (cached per street).
+        # Use fewer MC samples than Phase 1 (100 vs 1000) since the LLM
+        # makes the strategic decision anyway — the bucket is just context.
         round_key = game_state.betting_round
         hs = self._hs_cache.get(round_key)
         if hs is None:
@@ -276,6 +280,7 @@ class LLMChatAgent(BaseAgent):
                 self.hole_cards,
                 game_state.community_cards,
                 rng=rng,
+                num_samples=100,
             )
             self._hs_cache[round_key] = hs
 
@@ -291,9 +296,11 @@ class LLMChatAgent(BaseAgent):
                 self._system_prompt, user_msg,
             )
             self.llm_calls += 1
-        except RuntimeError:
+        except RuntimeError as e:
             self.llm_failures += 1
-            # Fallback: check or fold
+            if self.llm_failures <= 3:
+                import sys
+                print(f"\n  [LLM ERROR] {self.name}: {e}", file=sys.stderr)
             return ActionType.CHECK if game_state.cost_to_call == 0 else ActionType.FOLD
         finally:
             self.llm_total_time += time.time() - t0
