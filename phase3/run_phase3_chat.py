@@ -130,7 +130,25 @@ def run_one_seed(
 
     started = time.time()
     for i in range(1, num_hands + 1):
+        hand_start = time.time()
         table.play_hand()
+        hand_elapsed = time.time() - hand_start
+
+        # Count actions and LLM calls this hand
+        n_actions = len(table.last_hand.action_log) if table.last_hand else 0
+        llm_calls_so_far = sum(getattr(a, "llm_calls", 0) for a in agents)
+
+        # Print every hand so the user can see progress
+        elapsed = time.time() - started
+        rate = i / elapsed if elapsed > 0 else 0.0
+        remaining = (num_hands - i) / rate if rate > 0 else 0.0
+        print(
+            f"  Hand {i:>5}/{num_hands}  "
+            f"{hand_elapsed:5.1f}s  {n_actions:>2} actions  "
+            f"LLM calls: {llm_calls_so_far}  "
+            f"rate: {rate:4.2f} hand/s  "
+            f"ETA: {_fmt_eta(remaining)}"
+        )
 
         # Post-hand audit
         seat_stacks = [a.stack for a in agents]
@@ -154,9 +172,6 @@ def run_one_seed(
                     vpip_this_hand.add(record.seat)
         for a in agents:
             dealer.record_hand_vpip(a.seat, a.seat in vpip_this_hand)
-
-        if i % 10 == 0 or i == num_hands:
-            _print_progress(seed, i, num_hands, started)
 
     sys.stdout.write("\n")
     sys.stdout.flush()
