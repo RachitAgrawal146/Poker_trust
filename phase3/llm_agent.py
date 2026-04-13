@@ -19,12 +19,11 @@ Phase 1 agents is the source of their parameter tables.
 Usage::
 
     from phase3.llm_agent import LLMAgent, LLMPredator, LLMJudge
-    from phase3.generated_params import GENERATED_PARAMS, PREDATOR_EXPLOIT
+    from phase3.generated_params import GENERATED_PARAMS
 
     oracle = LLMAgent(seat=0, name="LLM-Oracle", archetype="oracle",
                       params=GENERATED_PARAMS)
-    predator = LLMPredator(seat=5, params=GENERATED_PARAMS,
-                           exploit_params=PREDATOR_EXPLOIT)
+    predator = LLMPredator(seat=5, params=GENERATED_PARAMS)
     judge = LLMJudge(seat=7, params=GENERATED_PARAMS)
 """
 

@@ -47,7 +47,7 @@ from phase3.llm_agent import (
     LLMJudge,
     LLMPredator,
 )
-from phase3.generated_params import GENERATED_PARAMS, PREDATOR_EXPLOIT
+from phase3.generated_params import GENERATED_PARAMS
 from phase3.dealer import Dealer
 
 
@@ -69,8 +69,7 @@ PHASE3_HANDS = 25_000
 # Roster builder
 # ---------------------------------------------------------------------------
 
-def build_phase3_roster(params: Dict[str, Any],
-                        exploit_params: Optional[Dict[str, Any]] = None) -> List:
+def build_phase3_roster(params: Dict[str, Any]) -> List:
     """Build the canonical 8-seat Phase 3 roster with LLM-generated params.
 
     Seats match Phase 1 canonical layout:
@@ -83,8 +82,7 @@ def build_phase3_roster(params: Dict[str, Any],
         LLMAgent(seat=2, name="LLM-Firestorm", archetype="firestorm", params=params),
         LLMAgent(seat=3, name="LLM-Wall", archetype="wall", params=params),
         LLMAgent(seat=4, name="LLM-Phantom", archetype="phantom", params=params),
-        LLMPredator(seat=5, params=params, name="LLM-Predator",
-                    exploit_params=exploit_params),
+        LLMPredator(seat=5, params=params, name="LLM-Predator"),
         LLMAgent(seat=6, name="LLM-Mirror", archetype="mirror", params=params),
         LLMJudge(seat=7, params=params, name="LLM-Judge"),
     ]
@@ -133,13 +131,12 @@ def run_one_seed(
     params: Dict[str, Any],
     logger: SQLiteLogger,
     label: str,
-    exploit_params: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
     """Build a table with LLM agents, play num_hands, log everything.
 
     Returns a per-seed summary dict.
     """
-    agents = build_phase3_roster(params, exploit_params=exploit_params)
+    agents = build_phase3_roster(params)
     num_seats = len(agents)
     starting_stack = SIMULATION["starting_stack"]
 
@@ -296,10 +293,8 @@ def main(argv: List[str] = None) -> int:
 
     # Load LLM-generated parameters (imported from Python module)
     params = GENERATED_PARAMS
-    exploit_params = PREDATOR_EXPLOIT
     print("Loading LLM-generated parameters...")
     print(f"  Loaded {len(params)} archetype param sets")
-    print(f"  Loaded predator exploit table with {len(exploit_params)} targets")
     print()
 
     logger = SQLiteLogger(args.db)
@@ -320,7 +315,6 @@ def main(argv: List[str] = None) -> int:
             params=params,
             logger=logger,
             label=label,
-            exploit_params=exploit_params,
         )
         summaries.append(summary)
         combined_dealer = summary["dealer"]

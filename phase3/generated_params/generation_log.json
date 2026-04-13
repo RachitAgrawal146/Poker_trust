@@ -1,0 +1,617 @@
+{
+  "model": "claude-sonnet-4-20250514",
+  "temperature": 0.3,
+  "timestamp": "2026-04-13 19:09:34 UTC",
+  "archetypes": {
+    "oracle": {
+      "spec_file": "phase3\\personality_specs\\oracle.md",
+      "prompt_length": 7191,
+      "attempts": [
+        {
+          "attempt": 1,
+          "raw_response": "{\n    \"preflop\": {\n        \"br\": 0.33,\n        \"vbr\": 0.90,\n        \"cr\": 0.33,\n        \"mbr\": 0.45,\n        \"strong_raise\": 0.50,\n        \"strong_call\": 0.40,\n        \"strong_fold\": 0.10,\n        \"med_raise\": 0.15,\n        \"weak_call\": 0.12\n    },\n    \"flop\": {\n        \"br\": 0.33,\n        \"vbr\": 0.90,\n        \"cr\": 0.33,\n        \"mbr\": 0.45,\n        \"strong_raise\": 0.50,\n        \"strong_call\": 0.40,\n        \"strong_fold\": 0.10,\n        \"med_raise\": 0.15,\n        \"weak_call\": 0.10\n    },\n    \"turn\": {\n        \"br\": 0.30,\n        \"vbr\": 0.85,\n        \"cr\": 0.33,\n        \"mbr\": 0.40,\n        \"strong_raise\": 0.50,\n        \"strong_call\": 0.40,\n        \"strong_fold\": 0.10,\n        \"med_raise\": 0.12,\n        \"weak_call\": 0.08\n    },\n    \"river\": {\n        \"br\": 0.28,\n        \"vbr\": 0.80,\n        \"cr\": 0.33,\n        \"mbr\": 0.35,\n        \"strong_raise\": 0.50,\n        \"strong_call\": 0.40,\n        \"strong_fold\": 0.10,\n        \"med_raise\": 0.10,\n        \"weak_call\": 0.06\n    }\n}",
+          "error": null,
+          "validation": {
+            "label": "oracle",
+            "warnings": [],
+            "errors": [],
+            "fixes_applied": []
+          }
+        }
+      ],
+      "final_params": {
+        "preflop": {
+          "br": 0.33,
+          "vbr": 0.9,
+          "cr": 0.33,
+          "mbr": 0.45,
+          "strong_raise": 0.5,
+          "strong_call": 0.4,
+          "strong_fold": 0.1,
+          "med_raise": 0.15,
+          "weak_call": 0.12
+        },
+        "flop": {
+          "br": 0.33,
+          "vbr": 0.9,
+          "cr": 0.33,
+          "mbr": 0.45,
+          "strong_raise": 0.5,
+          "strong_call": 0.4,
+          "strong_fold": 0.1,
+          "med_raise": 0.15,
+          "weak_call": 0.1
+        },
+        "turn": {
+          "br": 0.3,
+          "vbr": 0.85,
+          "cr": 0.33,
+          "mbr": 0.4,
+          "strong_raise": 0.5,
+          "strong_call": 0.4,
+          "strong_fold": 0.1,
+          "med_raise": 0.12,
+          "weak_call": 0.08
+        },
+        "river": {
+          "br": 0.28,
+          "vbr": 0.8,
+          "cr": 0.33,
+          "mbr": 0.35,
+          "strong_raise": 0.5,
+          "strong_call": 0.4,
+          "strong_fold": 0.1,
+          "med_raise": 0.1,
+          "weak_call": 0.06
+        }
+      },
+      "validation": {
+        "label": "oracle",
+        "warnings": [],
+        "errors": [],
+        "fixes_applied": []
+      },
+      "sanity_warnings": []
+    },
+    "sentinel": {
+      "spec_file": "phase3\\personality_specs\\sentinel.md",
+      "prompt_length": 7114,
+      "attempts": [
+        {
+          "attempt": 1,
+          "raw_response": "{\n    \"preflop\": {\n        \"br\": 0.10,\n        \"vbr\": 0.95,\n        \"cr\": 0.25,\n        \"mbr\": 0.15,\n        \"strong_raise\": 0.65,\n        \"strong_call\": 0.30,\n        \"strong_fold\": 0.05,\n        \"med_raise\": 0.05,\n        \"weak_call\": 0.10\n    },\n    \"flop\": {\n        \"br\": 0.08,\n        \"vbr\": 0.90,\n        \"cr\": 0.30,\n        \"mbr\": 0.25,\n        \"strong_raise\": 0.60,\n        \"strong_call\": 0.35,\n        \"strong_fold\": 0.05,\n        \"med_raise\": 0.10,\n        \"weak_call\": 0.08\n    },\n    \"turn\": {\n        \"br\": 0.08,\n        \"vbr\": 0.90,\n        \"cr\": 0.32,\n        \"mbr\": 0.20,\n        \"strong_raise\": 0.55,\n        \"strong_call\": 0.40,\n        \"strong_fold\": 0.05,\n        \"med_raise\": 0.08,\n        \"weak_call\": 0.06\n    },\n    \"river\": {\n        \"br\": 0.05,\n        \"vbr\": 0.85,\n        \"cr\": 0.35,\n        \"mbr\": 0.15,\n        \"strong_raise\": 0.50,\n        \"strong_call\": 0.40,\n        \"strong_fold\": 0.10,\n        \"med_raise\": 0.05,\n        \"weak_call\": 0.04\n    }\n}",
+          "error": null,
+          "validation": {
+            "label": "sentinel",
+            "warnings": [],
+            "errors": [],
+            "fixes_applied": []
+          }
+        }
+      ],
+      "final_params": {
+        "preflop": {
+          "br": 0.1,
+          "vbr": 0.95,
+          "cr": 0.25,
+          "mbr": 0.15,
+          "strong_raise": 0.65,
+          "strong_call": 0.3,
+          "strong_fold": 0.05,
+          "med_raise": 0.05,
+          "weak_call": 0.1
+        },
+        "flop": {
+          "br": 0.08,
+          "vbr": 0.9,
+          "cr": 0.3,
+          "mbr": 0.25,
+          "strong_raise": 0.6,
+          "strong_call": 0.35,
+          "strong_fold": 0.05,
+          "med_raise": 0.1,
+          "weak_call": 0.08
+        },
+        "turn": {
+          "br": 0.08,
+          "vbr": 0.9,
+          "cr": 0.32,
+          "mbr": 0.2,
+          "strong_raise": 0.55,
+          "strong_call": 0.4,
+          "strong_fold": 0.05,
+          "med_raise": 0.08,
+          "weak_call": 0.06
+        },
+        "river": {
+          "br": 0.05,
+          "vbr": 0.85,
+          "cr": 0.35,
+          "mbr": 0.15,
+          "strong_raise": 0.5,
+          "strong_call": 0.4,
+          "strong_fold": 0.1,
+          "med_raise": 0.05,
+          "weak_call": 0.04
+        }
+      },
+      "validation": {
+        "label": "sentinel",
+        "warnings": [],
+        "errors": [],
+        "fixes_applied": []
+      },
+      "sanity_warnings": []
+    },
+    "firestorm": {
+      "spec_file": "phase3\\personality_specs\\firestorm.md",
+      "prompt_length": 7413,
+      "attempts": [
+        {
+          "attempt": 1,
+          "raw_response": "{\n    \"preflop\": {\n        \"br\": 0.70,\n        \"vbr\": 0.98,\n        \"cr\": 0.35,\n        \"mbr\": 0.80,\n        \"strong_raise\": 0.75,\n        \"strong_call\": 0.20,\n        \"strong_fold\": 0.05,\n        \"med_raise\": 0.15,\n        \"weak_call\": 0.40\n    },\n    \"flop\": {\n        \"br\": 0.65,\n        \"vbr\": 0.95,\n        \"cr\": 0.30,\n        \"mbr\": 0.75,\n        \"strong_raise\": 0.70,\n        \"strong_call\": 0.25,\n        \"strong_fold\": 0.05,\n        \"med_raise\": 0.20,\n        \"weak_call\": 0.35\n    },\n    \"turn\": {\n        \"br\": 0.60,\n        \"vbr\": 0.92,\n        \"cr\": 0.25,\n        \"mbr\": 0.70,\n        \"strong_raise\": 0.65,\n        \"strong_call\": 0.30,\n        \"strong_fold\": 0.05,\n        \"med_raise\": 0.15,\n        \"weak_call\": 0.30\n    },\n    \"river\": {\n        \"br\": 0.55,\n        \"vbr\": 0.90,\n        \"cr\": 0.20,\n        \"mbr\": 0.65,\n        \"strong_raise\": 0.60,\n        \"strong_call\": 0.35,\n        \"strong_fold\": 0.05,\n        \"med_raise\": 0.10,\n        \"weak_call\": 0.25\n    }\n}",
+          "error": null,
+          "validation": {
+            "label": "firestorm",
+            "warnings": [],
+            "errors": [],
+            "fixes_applied": []
+          }
+        }
+      ],
+      "final_params": {
+        "preflop": {
+          "br": 0.7,
+          "vbr": 0.98,
+          "cr": 0.35,
+          "mbr": 0.8,
+          "strong_raise": 0.75,
+          "strong_call": 0.2,
+          "strong_fold": 0.05,
+          "med_raise": 0.15,
+          "weak_call": 0.4
+        },
+        "flop": {
+          "br": 0.65,
+          "vbr": 0.95,
+          "cr": 0.3,
+          "mbr": 0.75,
+          "strong_raise": 0.7,
+          "strong_call": 0.25,
+          "strong_fold": 0.05,
+          "med_raise": 0.2,
+          "weak_call": 0.35
+        },
+        "turn": {
+          "br": 0.6,
+          "vbr": 0.92,
+          "cr": 0.25,
+          "mbr": 0.7,
+          "strong_raise": 0.65,
+          "strong_call": 0.3,
+          "strong_fold": 0.05,
+          "med_raise": 0.15,
+          "weak_call": 0.3
+        },
+        "river": {
+          "br": 0.55,
+          "vbr": 0.9,
+          "cr": 0.2,
+          "mbr": 0.65,
+          "strong_raise": 0.6,
+          "strong_call": 0.35,
+          "strong_fold": 0.05,
+          "med_raise": 0.1,
+          "weak_call": 0.25
+        }
+      },
+      "validation": {
+        "label": "firestorm",
+        "warnings": [],
+        "errors": [],
+        "fixes_applied": []
+      },
+      "sanity_warnings": []
+    },
+    "wall": {
+      "spec_file": "phase3\\personality_specs\\wall.md",
+      "prompt_length": 7474,
+      "attempts": [
+        {
+          "attempt": 1,
+          "raw_response": "{\n    \"preflop\": {\n        \"br\": 0.01,\n        \"vbr\": 0.25,\n        \"cr\": 0.85,\n        \"mbr\": 0.08,\n        \"strong_raise\": 0.02,\n        \"strong_call\": 0.96,\n        \"strong_fold\": 0.02,\n        \"med_raise\": 0.01,\n        \"weak_call\": 0.55\n    },\n    \"flop\": {\n        \"br\": 0.05,\n        \"vbr\": 0.50,\n        \"cr\": 0.82,\n        \"mbr\": 0.12,\n        \"strong_raise\": 0.12,\n        \"strong_call\": 0.82,\n        \"strong_fold\": 0.06,\n        \"med_raise\": 0.03,\n        \"weak_call\": 0.50\n    },\n    \"turn\": {\n        \"br\": 0.03,\n        \"vbr\": 0.45,\n        \"cr\": 0.82,\n        \"mbr\": 0.10,\n        \"strong_raise\": 0.10,\n        \"strong_call\": 0.82,\n        \"strong_fold\": 0.08,\n        \"med_raise\": 0.02,\n        \"weak_call\": 0.42\n    },\n    \"river\": {\n        \"br\": 0.02,\n        \"vbr\": 0.40,\n        \"cr\": 0.82,\n        \"mbr\": 0.08,\n        \"strong_raise\": 0.08,\n        \"strong_call\": 0.82,\n        \"strong_fold\": 0.10,\n        \"med_raise\": 0.01,\n        \"weak_call\": 0.35\n    }\n}",
+          "error": null,
+          "validation": {
+            "label": "wall",
+            "warnings": [],
+            "errors": [],
+            "fixes_applied": []
+          }
+        }
+      ],
+      "final_params": {
+        "preflop": {
+          "br": 0.01,
+          "vbr": 0.25,
+          "cr": 0.85,
+          "mbr": 0.08,
+          "strong_raise": 0.02,
+          "strong_call": 0.96,
+          "strong_fold": 0.02,
+          "med_raise": 0.01,
+          "weak_call": 0.55
+        },
+        "flop": {
+          "br": 0.05,
+          "vbr": 0.5,
+          "cr": 0.82,
+          "mbr": 0.12,
+          "strong_raise": 0.12,
+          "strong_call": 0.82,
+          "strong_fold": 0.06,
+          "med_raise": 0.03,
+          "weak_call": 0.5
+        },
+        "turn": {
+          "br": 0.03,
+          "vbr": 0.45,
+          "cr": 0.82,
+          "mbr": 0.1,
+          "strong_raise": 0.1,
+          "strong_call": 0.82,
+          "strong_fold": 0.08,
+          "med_raise": 0.02,
+          "weak_call": 0.42
+        },
+        "river": {
+          "br": 0.02,
+          "vbr": 0.4,
+          "cr": 0.82,
+          "mbr": 0.08,
+          "strong_raise": 0.08,
+          "strong_call": 0.82,
+          "strong_fold": 0.1,
+          "med_raise": 0.01,
+          "weak_call": 0.35
+        }
+      },
+      "validation": {
+        "label": "wall",
+        "warnings": [],
+        "errors": [],
+        "fixes_applied": []
+      },
+      "sanity_warnings": []
+    },
+    "phantom": {
+      "spec_file": "phase3\\personality_specs\\phantom.md",
+      "prompt_length": 7671,
+      "attempts": [
+        {
+          "attempt": 1,
+          "raw_response": "{\n    \"preflop\": {\n        \"br\": 0.65,\n        \"vbr\": 0.70,\n        \"cr\": 0.55,\n        \"mbr\": 0.60,\n        \"strong_raise\": 0.45,\n        \"strong_call\": 0.40,\n        \"strong_fold\": 0.15,\n        \"med_raise\": 0.25,\n        \"weak_call\": 0.35\n    },\n    \"flop\": {\n        \"br\": 0.55,\n        \"vbr\": 0.60,\n        \"cr\": 0.45,\n        \"mbr\": 0.50,\n        \"strong_raise\": 0.35,\n        \"strong_call\": 0.45,\n        \"strong_fold\": 0.20,\n        \"med_raise\": 0.20,\n        \"weak_call\": 0.30\n    },\n    \"turn\": {\n        \"br\": 0.50,\n        \"vbr\": 0.55,\n        \"cr\": 0.40,\n        \"mbr\": 0.45,\n        \"strong_raise\": 0.30,\n        \"strong_call\": 0.45,\n        \"strong_fold\": 0.25,\n        \"med_raise\": 0.15,\n        \"weak_call\": 0.22\n    },\n    \"river\": {\n        \"br\": 0.45,\n        \"vbr\": 0.50,\n        \"cr\": 0.35,\n        \"mbr\": 0.40,\n        \"strong_raise\": 0.25,\n        \"strong_call\": 0.45,\n        \"strong_fold\": 0.30,\n        \"med_raise\": 0.10,\n        \"weak_call\": 0.15\n    }\n}",
+          "error": null,
+          "validation": {
+            "label": "phantom",
+            "warnings": [],
+            "errors": [],
+            "fixes_applied": []
+          }
+        }
+      ],
+      "final_params": {
+        "preflop": {
+          "br": 0.65,
+          "vbr": 0.7,
+          "cr": 0.55,
+          "mbr": 0.6,
+          "strong_raise": 0.45,
+          "strong_call": 0.4,
+          "strong_fold": 0.15,
+          "med_raise": 0.25,
+          "weak_call": 0.35
+        },
+        "flop": {
+          "br": 0.55,
+          "vbr": 0.6,
+          "cr": 0.45,
+          "mbr": 0.5,
+          "strong_raise": 0.35,
+          "strong_call": 0.45,
+          "strong_fold": 0.2,
+          "med_raise": 0.2,
+          "weak_call": 0.3
+        },
+        "turn": {
+          "br": 0.5,
+          "vbr": 0.55,
+          "cr": 0.4,
+          "mbr": 0.45,
+          "strong_raise": 0.3,
+          "strong_call": 0.45,
+          "strong_fold": 0.25,
+          "med_raise": 0.15,
+          "weak_call": 0.22
+        },
+        "river": {
+          "br": 0.45,
+          "vbr": 0.5,
+          "cr": 0.35,
+          "mbr": 0.4,
+          "strong_raise": 0.25,
+          "strong_call": 0.45,
+          "strong_fold": 0.3,
+          "med_raise": 0.1,
+          "weak_call": 0.15
+        }
+      },
+      "validation": {
+        "label": "phantom",
+        "warnings": [],
+        "errors": [],
+        "fixes_applied": []
+      },
+      "sanity_warnings": []
+    },
+    "predator": {
+      "spec_file": "phase3\\personality_specs\\predator.md",
+      "prompt_length": 7887,
+      "attempts": [
+        {
+          "attempt": 1,
+          "raw_response": "{\n    \"preflop\": {\n        \"br\": 0.25,\n        \"vbr\": 0.90,\n        \"cr\": 0.35,\n        \"mbr\": 0.40,\n        \"strong_raise\": 0.60,\n        \"strong_call\": 0.35,\n        \"strong_fold\": 0.05,\n        \"med_raise\": 0.15,\n        \"weak_call\": 0.12\n    },\n    \"flop\": {\n        \"br\": 0.25,\n        \"vbr\": 0.85,\n        \"cr\": 0.32,\n        \"mbr\": 0.35,\n        \"strong_raise\": 0.55,\n        \"strong_call\": 0.38,\n        \"strong_fold\": 0.07,\n        \"med_raise\": 0.12,\n        \"weak_call\": 0.10\n    },\n    \"turn\": {\n        \"br\": 0.20,\n        \"vbr\": 0.80,\n        \"cr\": 0.30,\n        \"mbr\": 0.30,\n        \"strong_raise\": 0.50,\n        \"strong_call\": 0.42,\n        \"strong_fold\": 0.08,\n        \"med_raise\": 0.10,\n        \"weak_call\": 0.08\n    },\n    \"river\": {\n        \"br\": 0.15,\n        \"vbr\": 0.80,\n        \"cr\": 0.28,\n        \"mbr\": 0.25,\n        \"strong_raise\": 0.45,\n        \"strong_call\": 0.45,\n        \"strong_fold\": 0.10,\n        \"med_raise\": 0.08,\n        \"weak_call\": 0.06\n    }\n}",
+          "error": null,
+          "validation": {
+            "label": "predator",
+            "warnings": [],
+            "errors": [],
+            "fixes_applied": []
+          }
+        }
+      ],
+      "final_params": {
+        "preflop": {
+          "br": 0.25,
+          "vbr": 0.9,
+          "cr": 0.35,
+          "mbr": 0.4,
+          "strong_raise": 0.6,
+          "strong_call": 0.35,
+          "strong_fold": 0.05,
+          "med_raise": 0.15,
+          "weak_call": 0.12
+        },
+        "flop": {
+          "br": 0.25,
+          "vbr": 0.85,
+          "cr": 0.32,
+          "mbr": 0.35,
+          "strong_raise": 0.55,
+          "strong_call": 0.38,
+          "strong_fold": 0.07,
+          "med_raise": 0.12,
+          "weak_call": 0.1
+        },
+        "turn": {
+          "br": 0.2,
+          "vbr": 0.8,
+          "cr": 0.3,
+          "mbr": 0.3,
+          "strong_raise": 0.5,
+          "strong_call": 0.42,
+          "strong_fold": 0.08,
+          "med_raise": 0.1,
+          "weak_call": 0.08
+        },
+        "river": {
+          "br": 0.15,
+          "vbr": 0.8,
+          "cr": 0.28,
+          "mbr": 0.25,
+          "strong_raise": 0.45,
+          "strong_call": 0.45,
+          "strong_fold": 0.1,
+          "med_raise": 0.08,
+          "weak_call": 0.06
+        }
+      },
+      "validation": {
+        "label": "predator",
+        "warnings": [],
+        "errors": [],
+        "fixes_applied": []
+      },
+      "sanity_warnings": []
+    },
+    "mirror": {
+      "spec_file": "phase3\\personality_specs\\mirror.md",
+      "prompt_length": 7782,
+      "attempts": [
+        {
+          "attempt": 1,
+          "raw_response": "{\n    \"preflop\": {\n        \"br\": 0.12,\n        \"vbr\": 0.90,\n        \"cr\": 0.33,\n        \"mbr\": 0.30,\n        \"strong_raise\": 0.62,\n        \"strong_call\": 0.33,\n        \"strong_fold\": 0.05,\n        \"med_raise\": 0.15,\n        \"weak_call\": 0.10\n    },\n    \"flop\": {\n        \"br\": 0.10,\n        \"vbr\": 0.85,\n        \"cr\": 0.30,\n        \"mbr\": 0.25,\n        \"strong_raise\": 0.58,\n        \"strong_call\": 0.35,\n        \"strong_fold\": 0.07,\n        \"med_raise\": 0.12,\n        \"weak_call\": 0.08\n    },\n    \"turn\": {\n        \"br\": 0.08,\n        \"vbr\": 0.85,\n        \"cr\": 0.28,\n        \"mbr\": 0.20,\n        \"strong_raise\": 0.53,\n        \"strong_call\": 0.37,\n        \"strong_fold\": 0.10,\n        \"med_raise\": 0.10,\n        \"weak_call\": 0.06\n    },\n    \"river\": {\n        \"br\": 0.05,\n        \"vbr\": 0.80,\n        \"cr\": 0.25,\n        \"mbr\": 0.15,\n        \"strong_raise\": 0.48,\n        \"strong_call\": 0.40,\n        \"strong_fold\": 0.12,\n        \"med_raise\": 0.08,\n        \"weak_call\": 0.05\n    }\n}",
+          "error": null,
+          "validation": {
+            "label": "mirror",
+            "warnings": [],
+            "errors": [],
+            "fixes_applied": []
+          }
+        }
+      ],
+      "final_params": {
+        "preflop": {
+          "br": 0.12,
+          "vbr": 0.9,
+          "cr": 0.33,
+          "mbr": 0.3,
+          "strong_raise": 0.62,
+          "strong_call": 0.33,
+          "strong_fold": 0.05,
+          "med_raise": 0.15,
+          "weak_call": 0.1
+        },
+        "flop": {
+          "br": 0.1,
+          "vbr": 0.85,
+          "cr": 0.3,
+          "mbr": 0.25,
+          "strong_raise": 0.58,
+          "strong_call": 0.35,
+          "strong_fold": 0.07,
+          "med_raise": 0.12,
+          "weak_call": 0.08
+        },
+        "turn": {
+          "br": 0.08,
+          "vbr": 0.85,
+          "cr": 0.28,
+          "mbr": 0.2,
+          "strong_raise": 0.53,
+          "strong_call": 0.37,
+          "strong_fold": 0.1,
+          "med_raise": 0.1,
+          "weak_call": 0.06
+        },
+        "river": {
+          "br": 0.05,
+          "vbr": 0.8,
+          "cr": 0.25,
+          "mbr": 0.15,
+          "strong_raise": 0.48,
+          "strong_call": 0.4,
+          "strong_fold": 0.12,
+          "med_raise": 0.08,
+          "weak_call": 0.05
+        }
+      },
+      "validation": {
+        "label": "mirror",
+        "warnings": [],
+        "errors": [],
+        "fixes_applied": []
+      },
+      "sanity_warnings": []
+    },
+    "judge": {
+      "spec_file": "phase3\\personality_specs\\judge.md",
+      "prompt_length": 9771,
+      "attempts": [
+        {
+          "attempt": 1,
+          "raw_response": "{\n    \"pre_trigger\": {\n        \"preflop\": {\n            \"br\": 0.02,\n            \"vbr\": 0.85,\n            \"cr\": 0.12,\n            \"mbr\": 0.08,\n            \"strong_raise\": 0.75,\n            \"strong_call\": 0.20,\n            \"strong_fold\": 0.05,\n            \"med_raise\": 0.15,\n            \"weak_call\": 0.03\n        },\n        \"flop\": {\n            \"br\": 0.05,\n            \"vbr\": 0.80,\n            \"cr\": 0.18,\n            \"mbr\": 0.12,\n            \"strong_raise\": 0.70,\n            \"strong_call\": 0.25,\n            \"strong_fold\": 0.05,\n            \"med_raise\": 0.20,\n            \"weak_call\": 0.08\n        },\n        \"turn\": {\n            \"br\": 0.03,\n            \"vbr\": 0.82,\n            \"cr\": 0.15,\n            \"mbr\": 0.10,\n            \"strong_raise\": 0.72,\n            \"strong_call\": 0.23,\n            \"strong_fold\": 0.05,\n            \"med_raise\": 0.18,\n            \"weak_call\": 0.06\n        },\n        \"river\": {\n            \"br\": 0.02,\n            \"vbr\": 0.85,\n            \"cr\": 0.12,\n            \"mbr\": 0.08,\n            \"strong_raise\": 0.75,\n            \"strong_call\": 0.20,\n            \"strong_fold\": 0.05,\n            \"med_raise\": 0.15,\n            \"weak_call\": 0.04\n        }\n    },\n    \"post_trigger\": {\n        \"preflop\": {\n            \"br\": 0.35,\n            \"vbr\": 0.90,\n            \"cr\": 0.08,\n            \"mbr\": 0.45,\n            \"strong_raise\": 0.85,\n            \"strong_call\": 0.12,\n            \"strong_fold\": 0.03,\n            \"med_raise\": 0.55,\n            \"weak_call\": 0.02\n        },\n        \"flop\": {\n            \"br\": 0.40,\n            \"vbr\": 0.88,\n            \"cr\": 0.10,\n            \"mbr\": 0.50,\n            \"strong_raise\": 0.80,\n            \"strong_call\": 0.15,\n            \"strong_fold\": 0.05,\n            \"med_raise\": 0.60,\n            \"weak_call\": 0.03\n        },\n        \"turn\": {\n            \"br\": 0.32,\n            \"vbr\": 0.85,\n            \"cr\": 0.08,\n            \"mbr\": 0.42,\n            \"strong_raise\": 0.78,\n            \"strong_call\": 0.17,\n            \"strong_fold\": 0.05,\n            \"med_raise\": 0.52,\n            \"weak_call\": 0.02\n        },\n        \"river\": {\n            \"br\": 0.28,\n            \"vbr\": 0.88,\n            \"cr\": 0.06,\n            \"mbr\": 0.38,\n            \"strong_raise\": 0.82,\n            \"strong_call\": 0.15,\n            \"strong_fold\": 0.03,\n            \"med_raise\": 0.48,\n            \"weak_call\": 0.01\n        }\n    }\n}",
+          "error": null,
+          "validation": {
+            "label": "judge",
+            "warnings": [],
+            "errors": [],
+            "fixes_applied": []
+          }
+        }
+      ],
+      "final_params": {
+        "pre_trigger": {
+          "preflop": {
+            "br": 0.02,
+            "vbr": 0.85,
+            "cr": 0.12,
+            "mbr": 0.08,
+            "strong_raise": 0.75,
+            "strong_call": 0.2,
+            "strong_fold": 0.05,
+            "med_raise": 0.15,
+            "weak_call": 0.03
+          },
+          "flop": {
+            "br": 0.05,
+            "vbr": 0.8,
+            "cr": 0.18,
+            "mbr": 0.12,
+            "strong_raise": 0.7,
+            "strong_call": 0.25,
+            "strong_fold": 0.05,
+            "med_raise": 0.2,
+            "weak_call": 0.08
+          },
+          "turn": {
+            "br": 0.03,
+            "vbr": 0.82,
+            "cr": 0.15,
+            "mbr": 0.1,
+            "strong_raise": 0.72,
+            "strong_call": 0.23,
+            "strong_fold": 0.05,
+            "med_raise": 0.18,
+            "weak_call": 0.06
+          },
+          "river": {
+            "br": 0.02,
+            "vbr": 0.85,
+            "cr": 0.12,
+            "mbr": 0.08,
+            "strong_raise": 0.75,
+            "strong_call": 0.2,
+            "strong_fold": 0.05,
+            "med_raise": 0.15,
+            "weak_call": 0.04
+          }
+        },
+        "post_trigger": {
+          "preflop": {
+            "br": 0.35,
+            "vbr": 0.9,
+            "cr": 0.08,
+            "mbr": 0.45,
+            "strong_raise": 0.85,
+            "strong_call": 0.12,
+            "strong_fold": 0.03,
+            "med_raise": 0.55,
+            "weak_call": 0.02
+          },
+          "flop": {
+            "br": 0.4,
+            "vbr": 0.88,
+            "cr": 0.1,
+            "mbr": 0.5,
+            "strong_raise": 0.8,
+            "strong_call": 0.15,
+            "strong_fold": 0.05,
+            "med_raise": 0.6,
+            "weak_call": 0.03
+          },
+          "turn": {
+            "br": 0.32,
+            "vbr": 0.85,
+            "cr": 0.08,
+            "mbr": 0.42,
+            "strong_raise": 0.78,
+            "strong_call": 0.17,
+            "strong_fold": 0.05,
+            "med_raise": 0.52,
+            "weak_call": 0.02
+          },
+          "river": {
+            "br": 0.28,
+            "vbr": 0.88,
+            "cr": 0.06,
+            "mbr": 0.38,
+            "strong_raise": 0.82,
+            "strong_call": 0.15,
+            "strong_fold": 0.03,
+            "med_raise": 0.48,
+            "weak_call": 0.01
+          }
+        }
+      },
+      "validation": {
+        "label": "judge",
+        "warnings": [],
+        "errors": [],
+        "fixes_applied": []
+      },
+      "sanity_warnings": [
+        "Firestorm br=0.35 too low (spec: high bluff rate)"
+      ]
+    }
+  }
+}
