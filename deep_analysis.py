@@ -580,10 +580,10 @@ def s16_judge(db, R):
         bar = "#" * int(rate * 50)
         R.w(f"    h{hand_id:>5}: {rate:.3f} |{bar}")
 
-    R.subheader("Judge bet rate SPLIT by opponent aggression status")
-    R.w("  (Key insight: retaliation only fires when a triggered opponent has")
-    R.w("   BET or RAISED in the current hand. Splitting into 'opponent aggressed'")
-    R.w("   vs 'opponent present but passive' reveals the behavioral shift.)")
+    R.subheader("Judge aggression rate (bet+raise) SPLIT by opponent aggression status")
+    R.w("  (Aggression = (bet+raise) / (bet+raise+call) — voluntary aggression")
+    R.w("   among non-fold actions. Retaliation fires when a triggered opponent")
+    R.w("   has BET or RAISED in the current hand.)")
     seat_arch = {}
     for r in _q(db, "SELECT seat, archetype FROM agent_stats WHERE run_id=1"):
         seat_arch[r['seat']] = r['archetype']
@@ -601,7 +601,7 @@ def s16_judge(db, R):
             row_agg = _q1(db, """
                 SELECT
                     SUM(CASE WHEN a.action_type IN ('bet','raise') THEN 1 ELSE 0 END) AS br,
-                    COUNT(*) AS total
+                    SUM(CASE WHEN a.action_type IN ('bet','raise','call') THEN 1 ELSE 0 END) AS voluntary
                 FROM actions a
                 WHERE a.run_id = ? AND a.seat = 7
                   AND a.hand_id IN (
@@ -614,7 +614,7 @@ def s16_judge(db, R):
             row_pas = _q1(db, """
                 SELECT
                     SUM(CASE WHEN a.action_type IN ('bet','raise') THEN 1 ELSE 0 END) AS br,
-                    COUNT(*) AS total
+                    SUM(CASE WHEN a.action_type IN ('bet','raise','call') THEN 1 ELSE 0 END) AS voluntary
                 FROM actions a
                 WHERE a.run_id = ? AND a.seat = 7
                   AND a.hand_id IN (
@@ -626,10 +626,10 @@ def s16_judge(db, R):
                         AND action_type IN ('bet','raise')
                   )
             """, (rid, rid, opp_seat, rid, opp_seat))
-            if row_agg and row_agg['total'] and row_agg['total'] > 0:
-                rates_aggressed.append(row_agg['br'] / row_agg['total'])
-            if row_pas and row_pas['total'] and row_pas['total'] > 0:
-                rates_passive.append(row_pas['br'] / row_pas['total'])
+            if row_agg and row_agg['voluntary'] and row_agg['voluntary'] > 0:
+                rates_aggressed.append(row_agg['br'] / row_agg['voluntary'])
+            if row_pas and row_pas['voluntary'] and row_pas['voluntary'] > 0:
+                rates_passive.append(row_pas['br'] / row_pas['voluntary'])
         agg_mean = sum(rates_aggressed) / len(rates_aggressed) if rates_aggressed else 0.0
         pas_mean = sum(rates_passive) / len(rates_passive) if rates_passive else 0.0
         delta = agg_mean - pas_mean
