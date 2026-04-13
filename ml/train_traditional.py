@@ -54,7 +54,6 @@ def train_all(
             "class": LogisticRegression,
             "params": {
                 "solver": "lbfgs",
-                "multi_class": "multinomial",
                 "max_iter": 1000,
                 "C": 1.0,
                 "random_state": 42,
