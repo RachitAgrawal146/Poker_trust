@@ -125,13 +125,18 @@ visualizer/
                         # DesignCues file at the repo root is the
                         # authoritative style guide.
 
-notes/
-  stage5_identifiability.md  # mathematical explanation of why the
-                             # Sentinel entropy test can't pass
-
 docs/
   schema.md             # SQLite schema reference + query cookbook
-                        # for the Stage 8 research dataset
+  stage5_identifiability.md  # why the Sentinel entropy test can't pass
+  worked_examples.md    # hand walkthrough + Bayesian update example
+  CHANGELOG.md          # stage milestones
+  Claude_Code_Implementation_Prompt.md  # full build spec
+  The_Eight_Archetypes_Specification.docx
+  DesignCues            # dark-editorial design system
+
+analysis/
+  analyze_runs.py       # 9-section standard report
+  deep_analysis.py      # 31-section deep analysis + scorecard
 
 tests/
   test_trust_model.py   # Unit tests for trust primitives (run with
@@ -197,7 +202,7 @@ bits in the best case and ~2.5 bits in practice (with leakage from
 Phantom, which also has tight cr). Stage 5 tests that ARE achievable
 (all stage5_extras, Firestorm and Wall identification at 100%, trust
 bounds, reproducibility) all pass cleanly. See
-`notes/stage5_identifiability.md` for the full derivation.
+`docs/stage5_identifiability.md` for the full derivation.
 
 **Do not "fix" this by weakening the threshold.** Leave the aspirational
 test in place as a reminder of the identifiability wall.
@@ -378,8 +383,8 @@ smoke-test the runner CLIs at every stage, not just the unit tests.
 
 - The full build spec: `Claude_Code_Implementation_Prompt.md`
 - Archetype definitions: `The_Eight_Archetypes_Specification.docx`
-- Worked hand + Bayesian update example: `worked_examples.md`
+- Worked hand + Bayesian update example: `docs/worked_examples.md`
 - Design system for the viewer: `DesignCues` (at the repo root)
-- Stage milestones: `CHANGELOG.md`
+- Stage milestones: `docs/CHANGELOG.md`
 - Research dataset schema: `docs/schema.md`
-- Stage 5.3 math: `notes/stage5_identifiability.md`
+- Stage 5.3 math: `docs/stage5_identifiability.md`
