@@ -425,6 +425,15 @@ def s12_identification(db, R):
     for r in _q(db, "SELECT seat, archetype FROM agent_stats WHERE run_id=1"):
         seat_arch[r['seat']] = r['archetype']
 
+    # Map true archetypes to the trust-type names used in posteriors.
+    # The trust model uses "predator_baseline", "mirror_default",
+    # "judge_cooperative" — not the short archetype names.
+    _TRUE_TO_TRUST = {
+        "predator": "predator_baseline",
+        "mirror":   "mirror_default",
+        "judge":    "judge_cooperative",
+    }
+
     rows = _q(db, """
         WITH fh AS (SELECT run_id, MAX(hand_id) AS lh FROM trust_snapshots GROUP BY run_id)
         SELECT t.target_seat, t.top_archetype, AVG(t.top_prob) AS avg_prob,
@@ -440,10 +449,15 @@ def s12_identification(db, R):
 
     for seat in range(8):
         true_arch = seat_arch.get(seat, "?")
-        R.w(f"\n  Seat {seat} (true: {true_arch}):")
+        trust_name = _TRUE_TO_TRUST.get(true_arch, true_arch)
         entries = by_seat.get(seat, [])
+        n_total = sum(e['n'] for e in entries)
+        n_correct = sum(e['n'] for e in entries if e['top_archetype'] == trust_name)
+        accuracy = _pct(n_correct, n_total) if n_total > 0 else 0.0
+        R.w(f"\n  Seat {seat} (true: {true_arch})  "
+            f"Accuracy: {n_correct}/{n_total} = {accuracy:.1f}%")
         for e in entries[:4]:
-            match = " <-- CORRECT" if true_arch in e['top_archetype'] else ""
+            match = " <-- CORRECT" if e['top_archetype'] == trust_name else ""
             R.w(f"    {e['top_archetype']:<25} avg_prob={e['avg_prob']:.3f}  n={e['n']}{match}")
 
 
@@ -566,23 +580,25 @@ def s16_judge(db, R):
         bar = "#" * int(rate * 50)
         R.w(f"    h{hand_id:>5}: {rate:.3f} |{bar}")
 
-    R.subheader("Judge bet rate CONDITIONAL on each opponent being in the hand")
-    R.w("  (Key insight: retaliation only fires when a triggered opponent is")
-    R.w("   active. The aggregate rate dilutes the signal. Per-opponent rates")
-    R.w("   reveal the behavioral shift.)")
+    R.subheader("Judge bet rate SPLIT by opponent aggression status")
+    R.w("  (Key insight: retaliation only fires when a triggered opponent has")
+    R.w("   BET or RAISED in the current hand. Splitting into 'opponent aggressed'")
+    R.w("   vs 'opponent present but passive' reveals the behavioral shift.)")
     seat_arch = {}
     for r in _q(db, "SELECT seat, archetype FROM agent_stats WHERE run_id=1"):
         seat_arch[r['seat']] = r['archetype']
     run_ids = [r['run_id'] for r in _q(db, "SELECT run_id FROM runs ORDER BY run_id LIMIT 5")]
+    R.w(f"  {'Opponent':<20} {'Opp Aggressed':>15} {'Opp Passive':>15} {'Delta':>8}")
+    R.w(f"  {'-'*20} {'-'*15} {'-'*15} {'-'*8}")
     for opp_seat in range(8):
         if opp_seat == 7:
             continue
         arch = seat_arch.get(opp_seat, '?')
-        # For each seed, compute Judge's bet+raise rate in hands where
-        # this opponent also acted (both were in the hand).
-        rates = []
+        rates_aggressed = []
+        rates_passive = []
         for rid in run_ids:
-            row = _q1(db, """
+            # Hands where opponent BET or RAISED (aggressed)
+            row_agg = _q1(db, """
                 SELECT
                     SUM(CASE WHEN a.action_type IN ('bet','raise') THEN 1 ELSE 0 END) AS br,
                     COUNT(*) AS total
@@ -591,14 +607,33 @@ def s16_judge(db, R):
                   AND a.hand_id IN (
                       SELECT DISTINCT hand_id FROM actions
                       WHERE run_id = ? AND seat = ?
+                        AND action_type IN ('bet','raise')
                   )
             """, (rid, rid, opp_seat))
-            if row and row['total'] and row['total'] > 0:
-                rates.append(row['br'] / row['total'])
-        if rates:
-            mean_rate = sum(rates) / len(rates)
-            R.w(f"    vs S{opp_seat} ({arch:<12}): bet_rate={mean_rate:.3f} "
-                f"(across {len(rates)} seeds)")
+            # Hands where opponent was present but did NOT bet/raise
+            row_pas = _q1(db, """
+                SELECT
+                    SUM(CASE WHEN a.action_type IN ('bet','raise') THEN 1 ELSE 0 END) AS br,
+                    COUNT(*) AS total
+                FROM actions a
+                WHERE a.run_id = ? AND a.seat = 7
+                  AND a.hand_id IN (
+                      SELECT DISTINCT hand_id FROM actions
+                      WHERE run_id = ? AND seat = ?
+                      EXCEPT
+                      SELECT DISTINCT hand_id FROM actions
+                      WHERE run_id = ? AND seat = ?
+                        AND action_type IN ('bet','raise')
+                  )
+            """, (rid, rid, opp_seat, rid, opp_seat))
+            if row_agg and row_agg['total'] and row_agg['total'] > 0:
+                rates_aggressed.append(row_agg['br'] / row_agg['total'])
+            if row_pas and row_pas['total'] and row_pas['total'] > 0:
+                rates_passive.append(row_pas['br'] / row_pas['total'])
+        agg_mean = sum(rates_aggressed) / len(rates_aggressed) if rates_aggressed else 0.0
+        pas_mean = sum(rates_passive) / len(rates_passive) if rates_passive else 0.0
+        delta = agg_mean - pas_mean
+        R.w(f"  S{opp_seat} ({arch:<14}) {agg_mean:>14.3f} {pas_mean:>14.3f} {delta:>+8.3f}")
 
     R.subheader("Judge trust RECEIVED from others over time (run 1)")
     R.w("  (If retaliation is detected, trust toward Judge should drop)")
@@ -620,11 +655,9 @@ def s16_judge(db, R):
 def s17_mirror(db, R):
     R.header(17, "MIRROR MIMICRY ANALYSIS")
 
-    R.subheader("Mirror (seat 6) behavioral profile over time — run 1")
-    R.w("  (Rolling 200-hand aggression rate. NOTE: rolling VPIP proxy may")
-    R.w("   overcount due to action-table sampling. Authoritative cumulative")
-    R.w("   VPIP from agent_stats is in Section 3.)")
-    # Print the authoritative cumulative VPIP for reference.
+    R.subheader("Mirror (seat 6) rolling aggression factor over time — run 1")
+    R.w("  (Rolling 200-hand AF = (bets+raises)/calls. Authoritative cumulative")
+    R.w("   stats from agent_stats shown for reference.)")
     cum = _q1(db, """
         SELECT vpip_count*100.0/hands_dealt AS vpip, (bets+raises)*1.0/CASE WHEN calls>0 THEN calls ELSE 1 END AS af
         FROM agent_stats WHERE run_id=1 AND seat=6
@@ -632,15 +665,12 @@ def s17_mirror(db, R):
     if cum:
         R.w(f"  Authoritative cumulative: VPIP={cum['vpip']:.1f}%  AF={cum['af']:.2f}")
     rows = _q(db, """
-        SELECT hand_id, betting_round, action_type
+        SELECT hand_id, action_type
         FROM actions WHERE run_id=1 AND seat=6 ORDER BY hand_id, sequence_num
     """)
-    # Compute per-hand: did Mirror VPIP? did Mirror bet/raise?
-    hand_actions = defaultdict(lambda: {"vpip": False, "br": 0, "calls": 0})
+    hand_actions = defaultdict(lambda: {"br": 0, "calls": 0})
     for r in rows:
         hid = r['hand_id']
-        if r['betting_round'] == 'preflop' and r['action_type'] in ('call', 'bet', 'raise'):
-            hand_actions[hid]["vpip"] = True
         if r['action_type'] in ('bet', 'raise'):
             hand_actions[hid]["br"] += 1
         if r['action_type'] == 'call':
@@ -653,11 +683,10 @@ def s17_mirror(db, R):
         if len(window) > 200:
             window.pop(0)
         if len(window) >= 50 and hid % 200 == 0:
-            vpip_rate = sum(1 for w in window if w["vpip"]) / len(window)
             br_sum = sum(w["br"] for w in window)
             call_sum = max(sum(w["calls"] for w in window), 1)
             af = br_sum / call_sum
-            R.w(f"    h{hid:>5}: VPIP={vpip_rate*100:5.1f}%  AF={af:.2f}")
+            R.w(f"    h{hid:>5}: AF={af:.2f}")
 
     R.subheader("Mirror trust identification over time (run 1)")
     max_h = _q1(db, "SELECT MAX(hand_id) AS m FROM trust_snapshots WHERE run_id=1")['m'] or 0
@@ -1031,22 +1060,25 @@ def s26_personality_fidelity(db, R):
 def s27_ecological_footprint(db, R):
     R.header(27, "ECOLOGICAL FOOTPRINT")
     R.w("  (How much does each agent's presence change others' behavior?)")
+    R.w("  Footprint = mean |Δ bet_rate| of all other agents in hands where X")
+    R.w("  stayed in (any non-fold action) vs hands where X folded preflop.")
 
     seat_arch = {}
     for r in _q(db, "SELECT seat, archetype FROM agent_stats WHERE run_id=1"):
         seat_arch[r['seat']] = r['archetype']
 
-    # For each seat X, find hands where X was active (any non-fold action)
-    # vs hands where X folded preflop. Compare other agents' behavior.
+    # For each seat X, split hands into "X stayed in" (any non-fold action
+    # including preflop call/bet/raise) vs "X folded preflop". This correctly
+    # makes Firestorm (VPIP ~50%) present in many hands, giving a large
+    # active set, while its inactive set is the ~50% where it folded.
     footprints = {}
     for x_seat in range(8):
-        # Hands where X was active (non-fold action exists for X)
+        # Hands where X took any voluntary action (call, bet, raise on any street)
         active_hands = set(r['hand_id'] for r in _q(db, """
             SELECT DISTINCT hand_id FROM actions
-            WHERE run_id=1 AND seat=? AND action_type != 'fold'
-            AND betting_round != 'preflop'
+            WHERE run_id=1 AND seat=? AND action_type IN ('call','bet','raise')
         """, (x_seat,)))
-        # All hands
+        # All hands X participated in
         all_hands = set(r['hand_id'] for r in _q(db, """
             SELECT DISTINCT hand_id FROM actions WHERE run_id=1 AND seat=?
         """, (x_seat,)))
@@ -1055,33 +1087,39 @@ def s27_ecological_footprint(db, R):
             footprints[seat_arch.get(x_seat, '?')] = 0.0
             continue
 
-        # For other agents, compute bet rate in active vs inactive sets
+        # For other agents, compute bet+raise rate in active vs inactive sets.
+        # Sample up to 5000 hand_ids per set to keep query fast.
+        active_sample = ','.join(str(h) for h in sorted(active_hands)[:5000])
+        inactive_sample = ','.join(str(h) for h in sorted(inactive_hands)[:5000])
         shifts = []
         for o_seat in range(8):
             if o_seat == x_seat:
                 continue
-            for hand_set, label in [(active_hands, 'a'), (inactive_hands, 'i')]:
-                if not hand_set:
-                    continue
-            # Bet rate when X active
             r_a = _q1(db, """
                 SELECT SUM(CASE WHEN action_type IN ('bet','raise') THEN 1 ELSE 0 END)*1.0/COUNT(*) AS br
                 FROM actions WHERE run_id=1 AND seat=? AND hand_id IN ({})
-            """.format(','.join(str(h) for h in list(active_hands)[:5000])), (o_seat,))
-            # Bet rate when X inactive
+            """.format(active_sample), (o_seat,))
             r_i = _q1(db, """
                 SELECT SUM(CASE WHEN action_type IN ('bet','raise') THEN 1 ELSE 0 END)*1.0/COUNT(*) AS br
                 FROM actions WHERE run_id=1 AND seat=? AND hand_id IN ({})
-            """.format(','.join(str(h) for h in list(inactive_hands)[:5000])), (o_seat,))
+            """.format(inactive_sample), (o_seat,))
             if r_a and r_i and r_a['br'] is not None and r_i['br'] is not None:
                 shifts.append(abs(r_a['br'] - r_i['br']))
 
         footprints[seat_arch.get(x_seat, '?')] = sum(shifts) / len(shifts) if shifts else 0.0
 
+    # Rank by footprint value. Use relative ranking for interpretation:
+    # top 2 = Dominant, middle 4 = Moderate, bottom 2 = Minimal.
+    ranked = sorted(footprints, key=lambda a: -footprints[a])
     data = []
-    for arch in sorted(footprints, key=lambda a: -footprints[a]):
+    for i, arch in enumerate(ranked):
         fp = footprints[arch]
-        interp = "Dominant presence" if fp > 0.05 else "Moderate impact" if fp > 0.02 else "Minimal impact"
+        if i < 2:
+            interp = "Dominant presence"
+        elif i < 6:
+            interp = "Moderate impact"
+        else:
+            interp = "Minimal impact"
         data.append([arch, f"{fp:.4f}", interp])
     R.table(["Archetype", "Footprint", "Interpretation"], data, [20, 12, 30])
 
@@ -1195,12 +1233,21 @@ def s29_information(db, R):
                 prev_trusts[obs] = r['trust']
         gen_scores[arch] = sum(deltas) / len(deltas) if deltas else 0.0
 
+    # Rank by relative position instead of absolute thresholds, so the
+    # labels adapt to any parameter regime or run length.
+    ranked = sorted(gen_scores, key=lambda a: -gen_scores[a])
+    n = len(ranked)
     data = []
-    for arch in sorted(gen_scores, key=lambda a: -gen_scores[a]):
+    for i, arch in enumerate(ranked):
         score = gen_scores[arch]
-        interp = "High" if score > 0.03 else "Moderate" if score > 0.015 else "Low"
-        data.append([arch, f"{score:.4f}", interp])
-    R.table(["Archetype", "AvgDelta", "Generation"], data, [20, 12, 15])
+        if i < max(1, n // 4):
+            interp = "High"
+        elif i >= n - max(1, n // 4):
+            interp = "Low"
+        else:
+            interp = "Moderate"
+        data.append([arch, f"{score:.4f}", f"#{i+1}", interp])
+    R.table(["Archetype", "AvgDelta", "Rank", "Generation"], data, [20, 12, 6, 15])
 
     R.subheader("Information Consumption")
     consumers = {
@@ -1213,10 +1260,12 @@ def s29_information(db, R):
         R.w(f"  {arch:<20} {level}")
 
     R.subheader("Information Roles")
-    high_gen = [a for a, s in gen_scores.items() if s > 0.025]
-    low_gen = [a for a, s in gen_scores.items() if s <= 0.015]
-    R.w(f"  DONORS:    {', '.join(high_gen) if high_gen else '(none above threshold)'}")
-    R.w(f"  NEUTRAL:   {', '.join(low_gen) if low_gen else '(none below threshold)'}")
+    top_quarter = max(1, n // 4)
+    bot_quarter = max(1, n // 4)
+    high_gen = ranked[:top_quarter]
+    low_gen = ranked[n - bot_quarter:]
+    R.w(f"  DONORS:    {', '.join(high_gen)} (top {top_quarter} by signal generation)")
+    R.w(f"  NEUTRAL:   {', '.join(low_gen)} (bottom {bot_quarter} by signal generation)")
     R.w(f"  CONSUMERS: predator")
     R.w(f"  CATALYSTS: mirror, judge (generate AND consume)")
 
@@ -1231,10 +1280,24 @@ def s30_narrative(db, R):
 
     run_ids = [r['run_id'] for r in _q(db, "SELECT run_id FROM runs ORDER BY run_id")]
     max_h = _q1(db, "SELECT MAX(hand_id) AS m FROM trust_snapshots")['m'] or 0
+    hands_per_seed = _q1(db, "SELECT num_hands FROM runs ORDER BY run_id LIMIT 1")
+    hands_per_seed = hands_per_seed['num_hands'] if hands_per_seed else max_h
     milestones = [h for h in range(100, min(max_h + 1, 25001), 100)]
     if len(milestones) < 2:
         R.w("  (insufficient data)")
         return
+
+    # Scale thresholds by run length relative to the 10k-hand baseline.
+    # Longer runs generate proportionally more events; grading must adapt.
+    scale = hands_per_seed / 10000.0 if hands_per_seed > 0 else 1.0
+    thresh_sparse = int(5 * scale)
+    thresh_low = int(8 * scale)
+    thresh_ideal_hi = int(15 * scale)
+    thresh_high = int(25 * scale)
+
+    R.w(f"  Grading scaled by hands_per_seed/10000 = {scale:.2f}")
+    R.w(f"  Thresholds: SPARSE<={thresh_sparse}  LOW<={thresh_low}  "
+        f"IDEAL<={thresh_ideal_hi}  HIGH<={thresh_high}  CHAOTIC>{thresh_high}")
 
     seed_events = []
     for rid in run_ids:
@@ -1279,13 +1342,13 @@ def s30_narrative(db, R):
 
         total = events["collapses"] + events["classifs"] + events["cascades"]
         seed = _q1(db, "SELECT seed FROM runs WHERE run_id=?", (rid,))['seed']
-        if total <= 5:
+        if total <= thresh_sparse:
             grade = "SPARSE"
-        elif total <= 8:
+        elif total <= thresh_low:
             grade = "LOW"
-        elif total <= 15:
+        elif total <= thresh_ideal_hi:
             grade = "IDEAL"
-        elif total <= 25:
+        elif total <= thresh_high:
             grade = "HIGH"
         else:
             grade = "CHAOTIC"
@@ -1301,17 +1364,20 @@ def s30_narrative(db, R):
 
     if seed_events:
         mean_total = sum(se['total'] for se in seed_events) / len(seed_events)
-        ideal_pct = _pct(sum(1 for se in seed_events if 8 <= se['total'] <= 15), len(seed_events))
+        ideal_lo = thresh_low + 1
+        ideal_pct = _pct(sum(1 for se in seed_events if ideal_lo <= se['total'] <= thresh_ideal_hi), len(seed_events))
         R.w(f"\n  Mean events/seed: {mean_total:.1f}")
-        R.w(f"  Seeds in ideal range (8-15): {ideal_pct:.0f}%")
-        if mean_total < 5:
+        R.w(f"  Seeds in ideal range ({ideal_lo}-{thresh_ideal_hi}): {ideal_pct:.0f}%")
+        if mean_total <= thresh_sparse:
             R.w("  Narrative grade: STATIC")
-        elif mean_total < 8:
+        elif mean_total <= thresh_low:
             R.w("  Narrative grade: ADEQUATE")
-        elif mean_total <= 15:
+        elif mean_total <= thresh_ideal_hi:
             R.w("  Narrative grade: COMPELLING")
-        else:
+        elif mean_total <= thresh_high:
             R.w("  Narrative grade: HIGH EVENT RATE")
+        else:
+            R.w("  Narrative grade: CHAOTIC")
 
 
 # ---------------------------------------------------------------------------
