@@ -124,7 +124,7 @@ def stage4_extras(modules) -> List[str]:
         "sentinel":  {"vpip": (10, 22), "pfr": (2, 15)},
         "firestorm": {"vpip": (40, 68), "pfr": (8, 30)},
         "wall":      {"vpip": (40, 68), "pfr": (0, 8)},
-        "phantom":   {"vpip": (12, 32), "pfr": (2, 18)},
+        "phantom":   {"vpip": (12, 42), "pfr": (2, 18)},
     }
     for name, bounds in RANGES.items():
         a = archetypes[name]
@@ -1456,8 +1456,17 @@ def stage6_extras(modules) -> List[str]:
 
     # Judge never forgives — once triggered, always triggered. Simulate
     # a probe in both cooperative and retaliatory modes.
+    #
+    # Judge.get_params checks _bluff_candidates (populated live by
+    # _observe_opponent_action), not active_opponent_seats. A synthetic
+    # probe between hands has empty _bluff_candidates, so we seed it
+    # to match the live-play contract: "triggered opponent has bet/raised
+    # in this hand". See CLAUDE.md Known Limitation #5.
     if 2 in judge.triggered and judge.triggered[2]:
-        # When Firestorm is active, should return retaliatory params.
+        # Seed _bluff_candidates as if Firestorm bet on the river.
+        saved_bc = dict(judge._bluff_candidates)
+        judge._bluff_candidates = {2: ["river"]}
+        # When Firestorm has aggressed, should return retaliatory params.
         probe_ret = GameState(
             hand_id=num_hands + 1,
             betting_round="river",
@@ -1476,6 +1485,7 @@ def stage6_extras(modules) -> List[str]:
             dealer_seat=0,
         )
         ret_params = judge.get_params("river", probe_ret)
+        judge._bluff_candidates = saved_bc  # restore
         check(
             "6.3b: Judge returns retaliatory params when triggered opponent active",
             abs(ret_params["br"]

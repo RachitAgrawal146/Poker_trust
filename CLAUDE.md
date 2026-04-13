@@ -151,9 +151,10 @@ python3 run_tests.py --stage 6
 python3 tests/test_trust_model.py
 ```
 
-Expected output: every stage passes **except the aspirational Stage
-5.3 failure** (see "Known limitations"). Any new failure is a
-regression and must be investigated before committing.
+Expected output: every stage passes **except** the aspirational
+**Stage 5.3** and **Stage 6.1** canonical-test failures (see "Known
+limitations" #1 and #4). Any other failure is a regression and must
+be investigated before committing.
 
 ## Running simulations
 
@@ -223,6 +224,33 @@ pays the cost once per street. **Never call `get_hand_strength` from
 the showdown refinement hot path** &mdash; use
 `agents/base_agent.py::_fast_bucket` instead, which uses the
 deterministic treys rank class (O(1)) for revealed hands.
+
+### 4. Stage 6.1 Predator classification threshold is aspirational
+
+`test_cases.test_stage_6` asserts that the Predator confidently
+classifies at least 3 of 7 opponents (posterior > 0.60) after 1000
+hands. In practice the Predator only classifies 2: Wall (1.00) and
+Firestorm (~0.82). The same Sentinel/Mirror/Judge identifiability
+cluster that blocks Stage 5.3 prevents the Predator from reaching
+0.60 confidence on any cluster member. This is the same root cause
+as limitation #1 above.
+
+**Do not "fix" this by lowering the threshold.** The test documents
+the intended classification capability; the identifiability ceiling
+is the real constraint.
+
+### 5. Stage 6.3b Judge probe test requires live hand context
+
+`stage_extras.stage6_extras` test 6.3b constructs a synthetic
+`GameState` with Firestorm in `active_opponent_seats` and expects
+Judge to return retaliatory params. However, Judge's `get_params`
+checks `self._bluff_candidates` (populated during live
+`_observe_opponent_action` calls within a hand), not
+`active_opponent_seats`. A synthetic probe between hands has an
+empty `_bluff_candidates` dict, so the Judge always returns
+cooperative params. The test seeds `_bluff_candidates` before the
+probe to match the live-play contract. During actual simulation
+play, retaliation fires correctly when triggered opponents aggress.
 
 ## The 4-track parallel development pattern
 
