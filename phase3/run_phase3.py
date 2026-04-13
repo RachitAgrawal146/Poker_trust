@@ -46,8 +46,8 @@ from phase3.llm_agent import (
     LLMAgent,
     LLMJudge,
     LLMPredator,
-    load_params,
 )
+from phase3.generated_params import GENERATED_PARAMS, PREDATOR_EXPLOIT
 from phase3.dealer import Dealer
 
 
@@ -69,7 +69,8 @@ PHASE3_HANDS = 25_000
 # Roster builder
 # ---------------------------------------------------------------------------
 
-def build_phase3_roster(params: Dict[str, Any]) -> List:
+def build_phase3_roster(params: Dict[str, Any],
+                        exploit_params: Optional[Dict[str, Any]] = None) -> List:
     """Build the canonical 8-seat Phase 3 roster with LLM-generated params.
 
     Seats match Phase 1 canonical layout:
@@ -82,7 +83,8 @@ def build_phase3_roster(params: Dict[str, Any]) -> List:
         LLMAgent(seat=2, name="LLM-Firestorm", archetype="firestorm", params=params),
         LLMAgent(seat=3, name="LLM-Wall", archetype="wall", params=params),
         LLMAgent(seat=4, name="LLM-Phantom", archetype="phantom", params=params),
-        LLMPredator(seat=5, params=params, name="LLM-Predator"),
+        LLMPredator(seat=5, params=params, name="LLM-Predator",
+                    exploit_params=exploit_params),
         LLMAgent(seat=6, name="LLM-Mirror", archetype="mirror", params=params),
         LLMJudge(seat=7, params=params, name="LLM-Judge"),
     ]
@@ -131,12 +133,13 @@ def run_one_seed(
     params: Dict[str, Any],
     logger: SQLiteLogger,
     label: str,
+    exploit_params: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
     """Build a table with LLM agents, play num_hands, log everything.
 
     Returns a per-seed summary dict.
     """
-    agents = build_phase3_roster(params)
+    agents = build_phase3_roster(params, exploit_params=exploit_params)
     num_seats = len(agents)
     starting_stack = SIMULATION["starting_stack"]
 
@@ -174,19 +177,17 @@ def run_one_seed(
             showdown_data=showdown_data,
         )
 
-        # Track VPIP for each agent
-        for a in agents:
-            was_vpip = (
-                a.stats["vpip_count"] > 0
-                and a._current_hand_id == table.hand_number
-            )
-            dealer.record_hand_vpip(a.seat, was_vpip)
-
-        # Track actions for anomaly detection
+        # Track VPIP for each agent using per-hand action log
+        vpip_this_hand = set()
         if table.last_hand is not None:
             for record in table.last_hand.action_log:
-                dealer._trackers[record.seat].record_action(record.action_type)
                 dealer._seat_archetypes[record.seat] = record.archetype
+                if (record.betting_round == "preflop"
+                        and record.action_type in (
+                            ActionType.CALL, ActionType.BET, ActionType.RAISE)):
+                    vpip_this_hand.add(record.seat)
+        for a in agents:
+            dealer.record_hand_vpip(a.seat, a.seat in vpip_this_hand)
 
         if i % 100 == 0 or i == num_hands:
             _print_progress(seed, i, num_hands, started)
@@ -279,11 +280,6 @@ def main(argv: List[str] = None) -> int:
         help="SQLite database path (default: runs_phase3.sqlite).",
     )
     parser.add_argument(
-        "--params",
-        default=None,
-        help="Path to all_params.json (default: phase3/generated_params/all_params.json).",
-    )
-    parser.add_argument(
         "--label",
         default=None,
         help="Free-form label stored in the runs table.",
@@ -298,16 +294,12 @@ def main(argv: List[str] = None) -> int:
     seeds = [int(s.strip()) for s in args.seeds.split(",") if s.strip()]
     label = args.label or f"phase3-{args.hands}h"
 
-    # Load LLM-generated parameters
+    # Load LLM-generated parameters (imported from Python module)
+    params = GENERATED_PARAMS
+    exploit_params = PREDATOR_EXPLOIT
     print("Loading LLM-generated parameters...")
-    try:
-        params = load_params(args.params)
-    except FileNotFoundError as e:
-        print(f"\nERROR: {e}", file=sys.stderr)
-        return 1
-    print(f"  Loaded {len(params.get('archetype_params', {}))} archetype param sets")
-    if "predator_exploit" in params:
-        print(f"  Loaded predator exploit table with {len(params['predator_exploit'])} targets")
+    print(f"  Loaded {len(params)} archetype param sets")
+    print(f"  Loaded predator exploit table with {len(exploit_params)} targets")
     print()
 
     logger = SQLiteLogger(args.db)
@@ -328,6 +320,7 @@ def main(argv: List[str] = None) -> int:
             params=params,
             logger=logger,
             label=label,
+            exploit_params=exploit_params,
         )
         summaries.append(summary)
         combined_dealer = summary["dealer"]

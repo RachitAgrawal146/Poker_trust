@@ -18,18 +18,18 @@ Phase 1 agents is the source of their parameter tables.
 
 Usage::
 
-    from phase3.llm_agent import LLMAgent, LLMPredator, LLMJudge, load_params
+    from phase3.llm_agent import LLMAgent, LLMPredator, LLMJudge
+    from phase3.generated_params import GENERATED_PARAMS, PREDATOR_EXPLOIT
 
-    params = load_params()  # loads phase3/generated_params/all_params.json
-    oracle = LLMAgent(seat=0, name="LLM-Oracle", archetype="oracle", params=params)
-    predator = LLMPredator(seat=5, params=params)
-    judge = LLMJudge(seat=7, params=params)
+    oracle = LLMAgent(seat=0, name="LLM-Oracle", archetype="oracle",
+                      params=GENERATED_PARAMS)
+    predator = LLMPredator(seat=5, params=GENERATED_PARAMS,
+                           exploit_params=PREDATOR_EXPLOIT)
+    judge = LLMJudge(seat=7, params=GENERATED_PARAMS)
 """
 
 from __future__ import annotations
 
-import json
-from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
@@ -51,50 +51,7 @@ __all__ = [
     "LLMAgent",
     "LLMPredator",
     "LLMJudge",
-    "load_params",
 ]
-
-# ---------------------------------------------------------------------------
-# Paths
-# ---------------------------------------------------------------------------
-PHASE3_DIR = Path(__file__).resolve().parent
-GENERATED_PARAMS_DIR = PHASE3_DIR / "generated_params"
-ALL_PARAMS_FILE = GENERATED_PARAMS_DIR / "all_params.json"
-
-
-# ---------------------------------------------------------------------------
-# Parameter loading
-# ---------------------------------------------------------------------------
-
-def load_params(path: Optional[str] = None) -> Dict[str, Any]:
-    """Load the combined LLM-generated parameter file.
-
-    Parameters
-    ----------
-    path : str, optional
-        Path to the JSON file. Defaults to phase3/generated_params/all_params.json.
-
-    Returns
-    -------
-    dict
-        The full parameter dict with keys: archetype_params, predator_exploit,
-        archetype_averages, honesty_scores.
-
-    Raises
-    ------
-    FileNotFoundError
-        If the parameter file doesn't exist. This means generate_params.py
-        hasn't been run yet.
-    """
-    param_path = Path(path) if path else ALL_PARAMS_FILE
-    if not param_path.exists():
-        raise FileNotFoundError(
-            f"Generated parameters not found at: {param_path}\n"
-            f"Run 'python3 phase3/generate_params.py' first to generate them.\n"
-            f"(Requires ANTHROPIC_API_KEY to be set.)"
-        )
-    with open(param_path, "r", encoding="utf-8") as f:
-        return json.load(f)
 
 
 # ---------------------------------------------------------------------------
@@ -121,7 +78,7 @@ _ARCHETYPE_TO_PARAM_KEY = {
 class LLMAgent(BaseAgent):
     """LLM-parameterized agent for static archetypes.
 
-    Loads per-round parameters from the LLM-generated JSON and uses
+    Loads per-round parameters from the GENERATED_PARAMS dict and uses
     the exact same decide_action logic as Phase 1 BaseAgent (probability
     sampling, NOT argmax).
     """
@@ -138,14 +95,13 @@ class LLMAgent(BaseAgent):
 
         # Resolve param key
         param_key = _ARCHETYPE_TO_PARAM_KEY.get(archetype, archetype)
-        archetype_params = params.get("archetype_params", params)
-        if param_key not in archetype_params:
+        if param_key not in params:
             raise KeyError(
                 f"Archetype '{archetype}' (param key '{param_key}') "
                 f"not found in generated params. "
-                f"Available: {list(archetype_params.keys())}"
+                f"Available: {list(params.keys())}"
             )
-        self._params: Dict[str, Dict[str, float]] = archetype_params[param_key]
+        self._params: Dict[str, Dict[str, float]] = params[param_key]
 
     def get_params(self, betting_round: str, game_state: GameState) -> dict:
         return self._params[betting_round]
@@ -175,22 +131,20 @@ class LLMPredator(BaseAgent):
         params: Dict[str, Any],
         name: str = "LLM-Predator",
         rng: Optional[np.random.Generator] = None,
+        exploit_params: Optional[Dict[str, Any]] = None,
     ) -> None:
         super().__init__(name=name, archetype="predator", seat=seat, rng=rng)
 
-        archetype_params = params.get("archetype_params", params)
-        if "predator_baseline" not in archetype_params:
+        if "predator_baseline" not in params:
             raise KeyError(
                 "predator_baseline not found in generated params. "
-                f"Available: {list(archetype_params.keys())}"
+                f"Available: {list(params.keys())}"
             )
-        self._baseline: Dict[str, Dict[str, float]] = archetype_params["predator_baseline"]
+        self._baseline: Dict[str, Dict[str, float]] = params["predator_baseline"]
 
         # Exploit table (optional — Predator still works without it,
         # just plays baseline permanently)
-        self._exploit: Dict[str, Dict[str, Dict[str, float]]] = params.get(
-            "predator_exploit", {}
-        )
+        self._exploit: Dict[str, Dict[str, Dict[str, float]]] = exploit_params or {}
 
     def get_params(self, betting_round: str, game_state: GameState) -> dict:
         baseline = self._baseline[betting_round]
@@ -255,19 +209,18 @@ class LLMJudge(BaseAgent):
         super().__init__(name=name, archetype="judge", seat=seat, rng=rng)
         self.tau: int = tau
 
-        archetype_params = params.get("archetype_params", params)
-        if "judge_cooperative" not in archetype_params:
+        if "judge_cooperative" not in params:
             raise KeyError(
                 "judge_cooperative not found in generated params. "
-                f"Available: {list(archetype_params.keys())}"
+                f"Available: {list(params.keys())}"
             )
-        if "judge_retaliatory" not in archetype_params:
+        if "judge_retaliatory" not in params:
             raise KeyError(
                 "judge_retaliatory not found in generated params. "
-                f"Available: {list(archetype_params.keys())}"
+                f"Available: {list(params.keys())}"
             )
-        self._cooperative: Dict[str, Dict[str, float]] = archetype_params["judge_cooperative"]
-        self._retaliatory: Dict[str, Dict[str, float]] = archetype_params["judge_retaliatory"]
+        self._cooperative: Dict[str, Dict[str, float]] = params["judge_cooperative"]
+        self._retaliatory: Dict[str, Dict[str, float]] = params["judge_retaliatory"]
 
         # Persistent grievance state (never decays)
         self.grievance: Dict[int, int] = {}
