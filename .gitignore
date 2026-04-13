@@ -19,3 +19,4 @@ visualizer/data.js
 *.log
 research_runs/
 sens_*/
+runs_v3.sqlite.part_*
