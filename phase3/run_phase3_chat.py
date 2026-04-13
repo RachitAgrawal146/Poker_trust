@@ -114,13 +114,16 @@ def run_one_seed(
     logger: SQLiteLogger,
     label: str,
 ) -> Dict[str, Any]:
+    print("  Building roster...", flush=True)
     agents = build_chat_roster(client, model, provider)
     num_seats = len(agents)
     starting_stack = SIMULATION["starting_stack"]
 
+    print("  Starting SQLite logger...", flush=True)
     run_id = logger.start_run(
         seed=seed, num_hands=num_hands, label=label, agents=agents,
     )
+    print("  Creating table...", flush=True)
     table = Table(agents, seed=seed, logger=logger, run_id=run_id)
 
     dealer = Dealer(
@@ -128,6 +131,7 @@ def run_one_seed(
         anomaly_check_interval=max(50, num_hands // 10),
     )
 
+    print(f"  Playing {num_hands} hands...", flush=True)
     started = time.time()
     for i in range(1, num_hands + 1):
         hand_start = time.time()
@@ -265,17 +269,19 @@ def main(argv: List[str] = None) -> int:
     seeds = [int(s.strip()) for s in args.seeds.split(",") if s.strip()]
     label = args.label or f"phase3-chat-{args.provider}-{args.hands}h"
 
-    print(f"Phase 3 LLM Chat Simulation")
-    print(f"  Provider: {args.provider}")
-    print(f"  Model: {args.model}")
-    print(f"  Seeds: {seeds}")
-    print(f"  Hands/seed: {args.hands}")
-    print(f"  Database: {args.db}")
-    print()
+    print(f"Phase 3 LLM Chat Simulation", flush=True)
+    print(f"  Provider: {args.provider}", flush=True)
+    print(f"  Model: {args.model}", flush=True)
+    print(f"  Seeds: {seeds}", flush=True)
+    print(f"  Hands/seed: {args.hands}", flush=True)
+    print(f"  Database: {args.db}", flush=True)
+    print(flush=True)
 
     # Create client
+    print("  Creating API client...", flush=True)
     client = make_client(args.provider, args.model, base_url=args.ollama_url)
 
+    print("  Opening database...", flush=True)
     logger = SQLiteLogger(args.db)
     summaries = []
 
