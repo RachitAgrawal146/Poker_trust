@@ -140,13 +140,14 @@ class MLAgent(BaseAgent):
             self._hs_cache[game_state.betting_round] = hs_str
 
         # Build feature vector (must match extraction order from
-        # ml/feature_engineering.py)
+        # ml/extract_live.py)
         cost_to_call = game_state.cost_to_call
+        cost_norm = min(cost_to_call, 16) / _STARTING_STACK
         features = [
             _ROUND_MAP.get(game_state.betting_round, 0.0),
             game_state.pot_size / _STARTING_STACK,
             game_state.player_stack / _STARTING_STACK,
-            cost_to_call / _STARTING_STACK,
+            cost_norm,
             game_state.bet_count / 4.0,
             game_state.player_position / 7.0,
             1.0 if cost_to_call > 0 else 0.0,

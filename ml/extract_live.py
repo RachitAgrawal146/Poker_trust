@@ -79,19 +79,44 @@ def _intercept_actions(table, hand_number: int, per_arch: Dict[str, List]):
 
         round_map = {"preflop": 0.0, "flop": 0.25, "turn": 0.5, "river": 0.75}
 
-        # Derive cost_to_call from action context
+        # Derive cost_to_call from game state, NOT from the action taken.
+        # This must match what MLAgent sees at inference time:
+        #   cost_to_call = max(0, current_bet - round_contribution)
+        # Since we don't have per-agent round_contribution in the log, we
+        # use the action semantics:
+        #   BET/CHECK: agent wasn't facing a bet → cost_to_call = 0
+        #   CALL: amount = the cost they paid to match
+        #   RAISE: they faced a cost before raising. The cost they faced is
+        #          (current_bet_before_raise - their_contribution). We can
+        #          approximate: current_bet after raise minus the raise
+        #          increment = the bet level before they raised.
+        #   FOLD: they faced a cost but didn't pay. Similar to raise logic.
+        #
+        # The key rule: is_facing_bet must be 1.0 whenever cost_to_call > 0,
+        # matching the inference-side logic in MLAgent.decide_action.
         action = rec.action_type.value
-        if action == "call":
+        bet_size = 2 if rec.betting_round in ("preflop", "flop") else 4
+
+        if action in ("check", "bet"):
+            cost = 0.0
+            is_facing = 0.0
+        elif action == "call":
             cost = rec.amount / 200.0
-        elif action == "fold":
-            cost = min(rec.current_bet, 8) / 200.0
+            is_facing = 1.0
         elif action == "raise":
-            cost = min(rec.current_bet, 8) / 200.0
+            # Cost they faced = current_bet (after raise) - bet_size = level before raise
+            cost_before = max(rec.current_bet - bet_size, 0)
+            cost = min(cost_before, 16) / 200.0
+            is_facing = 1.0 if cost > 0 else 0.0
+        elif action == "fold":
+            # They faced a cost and folded. Use current_bet as the level.
+            cost = min(rec.current_bet, 16) / 200.0
+            is_facing = 1.0
         else:
             cost = 0.0
+            is_facing = 0.0
 
         position = ((rec.seat - hand.dealer_seat) % 8) / 7.0
-        is_facing = 1.0 if action in ("fold", "call", "raise") else 0.0
 
         features = [
             round_map.get(rec.betting_round, 0.0),
