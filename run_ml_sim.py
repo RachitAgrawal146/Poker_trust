@@ -20,6 +20,9 @@ After the run, use the SAME analysis scripts as Phase 1::
 
 from __future__ import annotations
 
+import warnings
+warnings.filterwarnings("ignore")
+
 import argparse
 import os
 import sys
