@@ -1,0 +1,383 @@
+PHASE 2 TRAINING REPORT — TRADITIONAL ML
+============================================================
+
+MODEL TYPE: LOGREG
+----------------------------------------
+
+Archetype: oracle
+  Train: 110,092  Test: 27,522
+  Accuracy: 95.5%
+  Time: 13.8s
+  Classification report:
+              precision    recall  f1-score   support
+
+        fold       0.00      0.00      0.00         0
+       check       1.00      1.00      1.00      7445
+        call       0.91      0.93      0.92      7601
+         bet       1.00      1.00      1.00      7938
+       raise       0.87      0.85      0.86      4538
+
+    accuracy                           0.95     27522
+   macro avg       0.76      0.76      0.76     27522
+weighted avg       0.95      0.95      0.95     27522
+
+
+Archetype: sentinel
+  Train: 100,674  Test: 25,166
+  Accuracy: 94.5%
+  Time: 13.9s
+  Classification report:
+              precision    recall  f1-score   support
+
+        fold       0.00      0.00      0.00         0
+       check       1.00      1.00      1.00      8109
+        call       0.88      0.92      0.90      6691
+         bet       1.00      1.00      1.00      6352
+       raise       0.85      0.79      0.82      4014
+
+    accuracy                           0.95     25166
+   macro avg       0.75      0.74      0.74     25166
+weighted avg       0.94      0.95      0.94     25166
+
+
+Archetype: firestorm
+  Train: 284,867  Test: 71,215
+  Accuracy: 91.8%
+  Time: 68.1s
+  Classification report:
+              precision    recall  f1-score   support
+
+        fold       0.00      0.00      0.00         0
+       check       1.00      1.00      1.00      9936
+        call       0.85      0.95      0.90     27170
+         bet       1.00      1.00      1.00     22518
+       raise       0.83      0.62      0.71     11591
+
+    accuracy                           0.92     71215
+   macro avg       0.74      0.71      0.72     71215
+weighted avg       0.92      0.92      0.91     71215
+
+
+Archetype: wall
+  Train: 444,919  Test: 111,228
+  Accuracy: 98.1%
+  Time: 12.4s
+  Classification report:
+              precision    recall  f1-score   support
+
+        fold       0.00      0.00      0.00         0
+       check       1.00      1.00      1.00     35959
+        call       0.97      1.00      0.98     67492
+         bet       1.00      1.00      1.00      5171
+       raise       0.75      0.27      0.40      2606
+
+    accuracy                           0.98    111228
+   macro avg       0.75      0.65      0.68    111228
+weighted avg       0.98      0.98      0.98    111228
+
+
+Archetype: phantom
+  Train: 116,724  Test: 29,180
+  Accuracy: 95.8%
+  Time: 3.1s
+  Classification report:
+              precision    recall  f1-score   support
+
+        fold       0.00      0.00      0.00         0
+       check       1.00      1.00      1.00      9269
+        call       0.93      0.95      0.94     10151
+         bet       1.00      1.00      1.00      6475
+       raise       0.84      0.78      0.81      3285
+
+    accuracy                           0.96     29180
+   macro avg       0.75      0.75      0.75     29180
+weighted avg       0.96      0.96      0.96     29180
+
+
+Archetype: predator
+  Train: 109,388  Test: 27,346
+  Accuracy: 93.8%
+  Time: 10.4s
+  Classification report:
+              precision    recall  f1-score   support
+
+        fold       0.00      0.00      0.00         0
+       check       1.00      1.00      1.00      8477
+        call       0.87      0.94      0.91      8838
+         bet       1.00      1.00      1.00      5898
+       raise       0.86      0.71      0.77      4133
+
+    accuracy                           0.94     27346
+   macro avg       0.75      0.73      0.74     27346
+weighted avg       0.94      0.94      0.94     27346
+
+
+Archetype: mirror
+  Train: 129,708  Test: 32,426
+  Accuracy: 95.0%
+  Time: 16.4s
+  Classification report:
+              precision    recall  f1-score   support
+
+        fold       0.00      0.00      0.00         0
+       check       1.00      1.00      1.00     12187
+        call       0.90      0.93      0.92      9936
+         bet       1.00      1.00      1.00      5048
+       raise       0.87      0.81      0.84      5255
+
+    accuracy                           0.95     32426
+   macro avg       0.75      0.75      0.75     32426
+weighted avg       0.95      0.95      0.95     32426
+
+
+Archetype: judge
+  Train: 82,247  Test: 20,560
+  Accuracy: 96.0%
+  Time: 9.9s
+  Classification report:
+              precision    recall  f1-score   support
+
+        fold       0.00      0.00      0.00         0
+       check       1.00      1.00      1.00      6567
+        call       0.92      0.89      0.90      4333
+         bet       1.00      1.00      1.00      5800
+       raise       0.88      0.91      0.90      3860
+
+    accuracy                           0.96     20560
+   macro avg       0.76      0.76      0.76     20560
+weighted avg       0.96      0.96      0.96     20560
+
+
+MODEL TYPE: RF
+----------------------------------------
+
+Archetype: oracle
+  Train: 110,092  Test: 27,522
+  Accuracy: 98.6%
+  Time: 1.9s
+  Classification report:
+              precision    recall  f1-score   support
+
+        fold       0.00      0.00      0.00         0
+       check       1.00      1.00      1.00      7445
+        call       1.00      0.95      0.97      7601
+         bet       1.00      1.00      1.00      7938
+       raise       0.92      0.99      0.96      4538
+
+    accuracy                           0.99     27522
+   macro avg       0.78      0.79      0.79     27522
+weighted avg       0.99      0.99      0.99     27522
+
+  Feature importances:
+    bet_count_norm             0.3783
+    cost_to_call_norm          0.2975
+    is_facing_bet              0.1746
+    betting_round              0.0852
+    pot_normalized             0.0417
+    position_norm              0.0184
+    hand_strength              0.0036
+    stack_normalized           0.0008
+
+Archetype: sentinel
+  Train: 100,674  Test: 25,166
+  Accuracy: 98.5%
+  Time: 1.9s
+  Classification report:
+              precision    recall  f1-score   support
+
+        fold       0.00      0.00      0.00         0
+       check       1.00      1.00      1.00      8109
+        call       1.00      0.95      0.97      6691
+         bet       1.00      1.00      1.00      6352
+       raise       0.92      0.99      0.96      4014
+
+    accuracy                           0.99     25166
+   macro avg       0.78      0.79      0.79     25166
+weighted avg       0.99      0.99      0.99     25166
+
+  Feature importances:
+    bet_count_norm             0.3613
+    cost_to_call_norm          0.3079
+    is_facing_bet              0.1581
+    betting_round              0.0911
+    pot_normalized             0.0537
+    position_norm              0.0180
+    hand_strength              0.0091
+    stack_normalized           0.0008
+
+Archetype: firestorm
+  Train: 284,867  Test: 71,215
+  Accuracy: 98.8%
+  Time: 6.1s
+  Classification report:
+              precision    recall  f1-score   support
+
+        fold       0.00      0.00      0.00         0
+       check       1.00      1.00      1.00      9936
+        call       0.99      0.97      0.98     27170
+         bet       1.00      1.00      1.00     22518
+       raise       0.94      0.99      0.96     11591
+
+    accuracy                           0.99     71215
+   macro avg       0.79      0.79      0.79     71215
+weighted avg       0.99      0.99      0.99     71215
+
+  Feature importances:
+    cost_to_call_norm          0.3312
+    bet_count_norm             0.3188
+    is_facing_bet              0.2305
+    betting_round              0.0616
+    pot_normalized             0.0386
+    position_norm              0.0165
+    hand_strength              0.0026
+    stack_normalized           0.0004
+
+Archetype: wall
+  Train: 444,919  Test: 111,228
+  Accuracy: 99.0%
+  Time: 9.7s
+  Classification report:
+              precision    recall  f1-score   support
+
+        fold       0.00      0.00      0.00         0
+       check       1.00      1.00      1.00     35959
+        call       0.99      1.00      0.99     67492
+         bet       1.00      1.00      1.00      5171
+       raise       0.94      0.61      0.74      2606
+
+    accuracy                           0.99    111228
+   macro avg       0.78      0.72      0.75    111228
+weighted avg       0.99      0.99      0.99    111228
+
+  Feature importances:
+    cost_to_call_norm          0.3687
+    bet_count_norm             0.2779
+    is_facing_bet              0.2673
+    betting_round              0.0375
+    pot_normalized             0.0327
+    position_norm              0.0139
+    hand_strength              0.0019
+    stack_normalized           0.0002
+
+Archetype: phantom
+  Train: 116,724  Test: 29,180
+  Accuracy: 98.8%
+  Time: 3.0s
+  Classification report:
+              precision    recall  f1-score   support
+
+        fold       0.00      0.00      0.00         0
+       check       1.00      1.00      1.00      9269
+        call       1.00      0.97      0.98     10151
+         bet       1.00      1.00      1.00      6475
+       raise       0.91      0.99      0.95      3285
+
+    accuracy                           0.99     29180
+   macro avg       0.78      0.79      0.79     29180
+weighted avg       0.99      0.99      0.99     29180
+
+  Feature importances:
+    bet_count_norm             0.3968
+    cost_to_call_norm          0.3007
+    is_facing_bet              0.1737
+    betting_round              0.0701
+    pot_normalized             0.0386
+    position_norm              0.0183
+    stack_normalized           0.0010
+    hand_strength              0.0007
+
+Archetype: predator
+  Train: 109,388  Test: 27,346
+  Accuracy: 98.7%
+  Time: 3.1s
+  Classification report:
+              precision    recall  f1-score   support
+
+        fold       0.00      0.00      0.00         0
+       check       1.00      1.00      1.00      8477
+        call       1.00      0.96      0.98      8838
+         bet       1.00      1.00      1.00      5898
+       raise       0.92      0.99      0.96      4133
+
+    accuracy                           0.99     27346
+   macro avg       0.78      0.79      0.79     27346
+weighted avg       0.99      0.99      0.99     27346
+
+  Feature importances:
+    bet_count_norm             0.3363
+    cost_to_call_norm          0.3163
+    is_facing_bet              0.1767
+    betting_round              0.0902
+    pot_normalized             0.0450
+    position_norm              0.0269
+    hand_strength              0.0079
+    stack_normalized           0.0009
+
+Archetype: mirror
+  Train: 129,708  Test: 32,426
+  Accuracy: 98.6%
+  Time: 3.0s
+  Classification report:
+              precision    recall  f1-score   support
+
+        fold       0.00      0.00      0.00         0
+       check       1.00      1.00      1.00     12187
+        call       1.00      0.96      0.98      9936
+         bet       1.00      1.00      1.00      5048
+       raise       0.92      1.00      0.96      5255
+
+    accuracy                           0.99     32426
+   macro avg       0.78      0.79      0.79     32426
+weighted avg       0.99      0.99      0.99     32426
+
+  Feature importances:
+    bet_count_norm             0.3661
+    cost_to_call_norm          0.3382
+    is_facing_bet              0.1656
+    betting_round              0.0715
+    pot_normalized             0.0344
+    position_norm              0.0212
+    hand_strength              0.0023
+    stack_normalized           0.0008
+
+Archetype: judge
+  Train: 82,247  Test: 20,560
+  Accuracy: 99.0%
+  Time: 1.7s
+  Classification report:
+              precision    recall  f1-score   support
+
+        fold       0.00      0.00      0.00         0
+       check       1.00      1.00      1.00      6567
+        call       1.00      0.95      0.98      4333
+         bet       1.00      1.00      1.00      5800
+       raise       0.95      1.00      0.97      3860
+
+    accuracy                           0.99     20560
+   macro avg       0.79      0.79      0.79     20560
+weighted avg       0.99      0.99      0.99     20560
+
+  Feature importances:
+    bet_count_norm             0.3586
+    cost_to_call_norm          0.3050
+    is_facing_bet              0.1526
+    betting_round              0.0993
+    pot_normalized             0.0592
+    position_norm              0.0172
+    hand_strength              0.0070
+    stack_normalized           0.0011
+
+============================================================
+ACCURACY SUMMARY
+============================================================
+  Archetype          logreg        rf
+  -----------------------------------
+  oracle              95.5%     98.6%
+  sentinel            94.5%     98.5%
+  firestorm           91.8%     98.8%
+  wall                98.1%     99.0%
+  phantom             95.8%     98.8%
+  predator            93.8%     98.7%
+  mirror              95.0%     98.6%
+  judge               96.0%     99.0%
+  MEAN                95.1%     98.7%

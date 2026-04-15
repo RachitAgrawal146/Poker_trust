@@ -1,0 +1,621 @@
+==============================================================================
+  POKER TRUST SIMULATION — DEEP ANALYSIS REPORT
+  Database: runs.sqlite
+==============================================================================
+
+==============================================================================
+  SECTION 1: DATABASE OVERVIEW
+==============================================================================
+  Runs:              20
+  Hands:             200,000
+  Actions:           2,921,876
+  Showdown entries:  137,694
+  Trust snapshots:   11,200,000
+  Agent stat rows:   160
+  Seeds:             42, 137, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072, 262144, 524288, 1048576, 2097152, 4194304, 8388608, 16777216, 33554432
+  Hands per seed:    10000
+  Seats per run:     8
+  Showdown hands:    65,320 (32.7%)
+  Walkover hands:    134,680 (67.3%)
+
+==============================================================================
+  SECTION 2: ARCHETYPE ECONOMIC PERFORMANCE
+==============================================================================
+  Archetype              MeanStk    MinStk    MaxStk    MeanRB     TotRB   Seeds
+  ------------------------------------------------------------------------------
+  firestorm                 7149      5952      8384       0.1         1      20
+  judge                     2105      1497      3284       0.3         6      20
+  oracle                    1533       223      2835       0.7        13      20
+  mirror                    1178       303      2628       0.6        11      20
+  sentinel                   838       220      1552       0.6        12      20
+  predator                   711        92      1693       1.4        28      20
+  phantom                    147        42       221      24.9       499      20
+  wall                       129        24       313      32.5       649      20
+
+  --- Cross-seed standard deviation of final_stack ---
+    firestorm            mean=    7149  std=     787
+    judge                mean=    2105  std=     426
+    oracle               mean=    1533  std=     723
+    mirror               mean=    1178  std=     622
+    sentinel             mean=     838  std=     364
+    predator             mean=     711  std=     508
+    phantom              mean=     147  std=      61
+    wall                 mean=     129  std=      79
+
+==============================================================================
+  SECTION 3: BEHAVIORAL PROFILE (VPIP / PFR / AF / Showdown %)
+==============================================================================
+  Archetype                VPIP      PFR      AF     SD%   SDWin%
+  ---------------------------------------------------------------
+  wall                    53.9%     1.5%    0.13   22.5%    49.4%
+  firestorm               49.4%    12.0%    1.07   14.2%    38.8%
+  phantom                 38.8%     7.7%    0.64    6.2%    54.6%
+  oracle                  21.4%     6.0%    1.15    5.5%    52.5%
+  predator                18.4%     4.1%    0.84    5.5%    53.4%
+  mirror                  18.3%     5.0%    0.85    6.2%    55.6%
+  sentinel                16.4%     4.2%    1.05    5.0%    54.0%
+  judge                   16.0%     9.8%    2.71    3.9%    53.6%
+
+==============================================================================
+  SECTION 4: ACTION FREQUENCY BY ARCHETYPE
+==============================================================================
+  Archetype               Fold%   Check%    Call%     Bet%   Raise%       Total
+  -----------------------------------------------------------------------------
+  firestorm               29.1%     7.8%    30.4%    20.9%    11.8%     451,616
+  judge                   62.6%     9.1%     7.6%    10.6%    10.0%     284,080
+  mirror                  54.8%    15.7%    16.0%     6.6%     7.1%     321,674
+  oracle                  54.3%    12.1%    15.6%    11.0%     7.0%     321,735
+  phantom                 46.1%    11.6%    25.8%     9.8%     6.7%     369,958
+  predator                55.5%    14.2%    16.4%     7.9%     6.0%     319,894
+  sentinel                57.2%    15.0%    13.5%     8.4%     5.8%     313,428
+  wall                    25.9%    20.7%    47.2%     4.4%     1.8%     539,491
+
+==============================================================================
+  SECTION 5: PER-STREET AGGRESSION (bet+raise % of actions)
+==============================================================================
+  Archetype              Preflop      Flop      Turn     River
+  ------------------------------------------------------------
+  firestorm                10.8%     53.2%     55.4%     56.7%
+  judge                     9.7%     47.1%     51.3%     51.0%
+  mirror                    4.9%     27.5%     31.7%     34.4%
+  oracle                    5.8%     37.8%     44.2%     47.0%
+  phantom                   7.0%     29.7%     32.8%     32.5%
+  predator                  4.0%     28.8%     36.1%     40.0%
+  sentinel                  4.1%     30.4%     37.5%     42.4%
+  wall                      1.3%      9.6%     10.3%     10.8%
+
+==============================================================================
+  SECTION 6: POSITIONAL ANALYSIS (mean pot won by dealer-relative position)
+==============================================================================
+  Position 0 = dealer, 1 = SB, 2 = BB, 3-7 = early to late
+  Archetype               Pos0    Pos1    Pos2    Pos3    Pos4    Pos5    Pos6    Pos7
+  ------------------------------------------------------------------------------------
+  firestorm               39.6    30.5    32.0    39.4    40.5    42.5    39.5    38.1
+  judge                   42.3    39.6    28.4    45.4    45.4    44.1    41.0    47.8
+  mirror                  40.0    36.2    26.0    35.6    37.5    30.3    40.3    37.2
+  oracle                  46.0    38.2    29.4    44.4    42.8    41.7    42.8    34.4
+  phantom                 29.3    28.7    22.6    22.6    32.8    26.9    30.9    31.7
+  predator                40.6    37.1    28.8    41.9    33.1    42.5    40.4    41.7
+  sentinel                34.8    42.1    27.2    43.7    38.7    42.5    39.5    42.4
+  wall                    24.3    26.1    22.1    27.5    23.8    25.2    26.1    24.5
+
+==============================================================================
+  SECTION 7: SHOWDOWN ANALYSIS
+==============================================================================
+
+  --- Win rate at showdown per archetype ---
+  Archetype                 Wins     Total    Win%   AvgRank   AvgPotWon
+  ----------------------------------------------------------------------
+  mirror                   6,851    12,313   55.6%      3427        17.8
+  phantom                  6,765    12,388   54.6%      3583        14.5
+  sentinel                 5,381     9,978   53.9%      3488        18.6
+  judge                    4,188     7,810   53.6%      3515        19.4
+  predator                 5,864    10,988   53.4%      3544        18.5
+  oracle                   5,738    10,932   52.5%      3473        19.1
+  wall                    22,209    44,932   49.4%      3757        12.2
+  firestorm               10,990    28,353   38.8%      3819        14.3
+
+  --- Hand rank distribution at showdown (lower rank = better) ---
+  Archetype               BestRank   WorstRank    MeanRank
+  --------------------------------------------------------
+  mirror                         1        7411        3427
+  oracle                         1        7414        3473
+  sentinel                       1        7411        3488
+  judge                          3        7356        3515
+  predator                       2        7376        3544
+  phantom                        1        7357        3583
+  wall                           1        7414        3757
+  firestorm                      1        7414        3819
+
+==============================================================================
+  SECTION 8: WALKOVER ANALYSIS (wins without showdown)
+==============================================================================
+  Archetype              Walkovers    Share%    AvgPot
+  ----------------------------------------------------
+  firestorm                 40,204     29.9%      17.0
+  phantom                   17,169     12.7%      12.5
+  wall                      15,291     11.4%      13.1
+  judge                     14,303     10.6%      14.8
+  oracle                    14,293     10.6%      15.2
+  mirror                    11,476      8.5%      15.2
+  predator                  11,326      8.4%      15.5
+  sentinel                  10,618      7.9%      16.0
+
+==============================================================================
+  SECTION 9: POT SIZE DISTRIBUTION
+==============================================================================
+
+  --- Overall pot statistics ---
+  Mean pot: 20.8  Min: 2  Max: 202  Hands: 200,000
+
+  --- Mean pot by whether hand reached showdown ---
+  Walkover     mean_pot=15.2  hands=134,680
+  Showdown     mean_pot=32.2  hands=65,320
+
+  --- Pot size by archetype involvement (any non-fold action) ---
+  Archetype                HandsIn   MeanPot    MaxPot
+  ----------------------------------------------------
+  firestorm                103,918      32.5       202
+  mirror                    50,496      31.3       202
+  judge                     39,921      31.2       202
+  oracle                    54,713      31.2       202
+  predator                  52,589      31.0       199
+  sentinel                  48,612      30.6       202
+  wall                     123,108      27.5       202
+  phantom                   84,815      27.1       202
+
+==============================================================================
+  SECTION 10: TRUST MATRIX AT FINAL HAND (all-pairs, averaged across seeds)
+==============================================================================
+          S0(orac)  S1(sent)  S2(fire)  S3(wall)  S4(phan)  S5(pred)  S6(mirr)  S7(judg)
+  S0(orac)   ---    0.792   0.423   0.962   0.656   0.790   0.790   0.768 
+  S1(sent)  0.743    ---    0.424   0.962   0.659   0.787   0.791   0.767 
+  S2(fire)  0.743   0.795    ---    0.962   0.660   0.789   0.792   0.764 
+  S3(wall)  0.742   0.798   0.421    ---    0.656   0.794   0.802   0.762 
+  S4(phan)  0.744   0.799   0.426   0.962    ---    0.792   0.793   0.767 
+  S5(pred)  0.743   0.797   0.425   0.962   0.653    ---    0.794   0.766 
+  S6(mirr)  0.744   0.798   0.424   0.962   0.650   0.787    ---    0.766 
+  S7(judg)  0.743   0.796   0.423   0.962   0.655   0.788   0.791    ---  
+
+==============================================================================
+  SECTION 11: ENTROPY MATRIX AT FINAL HAND (posterior uncertainty, bits)
+==============================================================================
+          S0(orac)  S1(sent)  S2(fire)  S3(wall)  S4(phan)  S5(pred)  S6(mirr)  S7(judg)
+  S0(orac)   ---    2.354   0.495   0.000   2.013   2.432   2.459   2.314 
+  S1(sent)  2.196    ---    0.495   0.001   2.013   2.437   2.471   2.316 
+  S2(fire)  2.160   2.315    ---    0.000   1.999   2.361   2.459   2.280 
+  S3(wall)  2.161   2.317   0.460    ---    1.971   2.409   2.414   2.283 
+  S4(phan)  2.215   2.343   0.495   0.000    ---    2.424   2.470   2.319 
+  S5(pred)  2.217   2.348   0.487   0.000   1.971    ---    2.474   2.328 
+  S6(mirr)  2.221   2.354   0.486   0.001   1.975   2.443    ---    2.332 
+  S7(judg)  2.237   2.359   0.483   0.000   1.997   2.448   2.469    ---  
+
+==============================================================================
+  SECTION 12: ARCHETYPE IDENTIFICATION ACCURACY (top_archetype at final hand)
+==============================================================================
+
+  Seat 0 (true: oracle):
+    phantom                   avg_prob=0.502  n=14
+    oracle                    avg_prob=0.481  n=73 <-- CORRECT
+    mirror_default            avg_prob=0.239  n=28
+    predator_baseline         avg_prob=0.207  n=25
+
+  Seat 1 (true: sentinel):
+    oracle                    avg_prob=0.394  n=51
+    phantom                   avg_prob=0.252  n=8
+    mirror_default            avg_prob=0.251  n=65
+    predator_baseline         avg_prob=0.231  n=16
+
+  Seat 2 (true: firestorm):
+    firestorm                 avg_prob=0.954  n=115 <-- CORRECT
+    phantom                   avg_prob=0.594  n=11
+    oracle                    avg_prob=0.372  n=14
+
+  Seat 3 (true: wall):
+    wall                      avg_prob=1.000  n=140 <-- CORRECT
+
+  Seat 4 (true: phantom):
+    phantom                   avg_prob=0.508  n=124 <-- CORRECT
+    wall                      avg_prob=0.459  n=6
+    oracle                    avg_prob=0.216  n=3
+    predator_baseline         avg_prob=0.200  n=7
+
+  Seat 5 (true: predator):
+    wall                      avg_prob=0.596  n=7
+    phantom                   avg_prob=0.383  n=14
+    oracle                    avg_prob=0.316  n=36
+    mirror_default            avg_prob=0.231  n=45
+
+  Seat 6 (true: mirror):
+    wall                      avg_prob=0.529  n=2
+    oracle                    avg_prob=0.355  n=41
+    phantom                   avg_prob=0.293  n=12
+    mirror_default            avg_prob=0.233  n=65 <-- CORRECT
+
+  Seat 7 (true: judge):
+    oracle                    avg_prob=0.363  n=127
+    phantom                   avg_prob=0.271  n=1
+    mirror_default            avg_prob=0.229  n=7
+    predator_baseline         avg_prob=0.222  n=5
+
+==============================================================================
+  SECTION 13: TRUST CONVERGENCE OVER TIME (mean trust toward each seat, run 1)
+==============================================================================
+  Hand     S0(oracl) S1(senti) S2(fires) S3(wall ) S4(phant) S5(preda) S6(mirro) S7(judge)
+  ----      ----------  ----------  ----------  ----------  ----------  ----------  ----------  ----------
+  1        0.7537      0.7652      0.5411      0.8903      0.7666      0.7662      0.7659      0.7655     
+  10       0.7927      0.7747      0.3763      0.8857      0.7259      0.7848      0.7378      0.7880     
+  50       0.7120      0.8455      0.5855      0.9620      0.6552      0.8634      0.8394      0.8312     
+  100      0.7779      0.8624      0.4686      0.9620      0.6686      0.6918      0.8470      0.8601     
+  250      0.8064      0.8282      0.5574      0.9620      0.7467      0.8368      0.7918      0.7767     
+  500      0.7722      0.7877      0.3815      0.9620      0.7396      0.8003      0.7335      0.7982     
+  1000     0.7643      0.8261      0.3781      0.9620      0.5595      0.6333      0.8058      0.7008     
+  2500     0.8043      0.7962      0.5349      0.9620      0.6334      0.8205      0.8282      0.7685     
+  5000     0.6722      0.7858      0.3973      0.9620      0.8371      0.7091      0.7427      0.8257     
+  10000    0.7000      0.7285      0.3754      0.9620      0.4918      0.8316      0.8031      0.6825     
+
+==============================================================================
+  SECTION 14: ENTROPY CONVERGENCE OVER TIME (bits, run 1)
+==============================================================================
+  Hand     S0(oracl) S1(senti) S2(fires) S3(wall ) S4(phant) S5(preda) S6(mirro) S7(judge)
+  1        2.988       2.956       2.216       0.717       2.947       2.949       2.952       2.954      
+  50       2.467       2.429       1.751       0.000       2.191       2.331       2.468       2.489      
+  100      2.478       2.312       1.596       0.000       2.291       2.373       2.428       2.334      
+  500      2.562       2.537       0.324       0.000       2.427       2.484       2.454       2.556      
+  1000     2.403       2.511       0.170       0.000       1.416       1.919       2.546       2.048      
+  5000     1.862       2.491       0.636       0.000       2.471       2.327       2.420       2.441      
+  10000    2.013       2.504       0.035       0.000       0.447       2.361       2.550       1.992      
+
+==============================================================================
+  SECTION 15: PREDATOR EXPLOITATION ANALYSIS
+==============================================================================
+
+  --- Predator (seat 5) posterior evolution per target, averaged across seeds ---
+
+  Target S0 (oracle):
+    h  100: trust=0.754  H=2.408  top_prob=0.292  top_archs=oracle,predator_baseline,phantom,mirror_default
+    h  500: trust=0.764  H=2.409  top_prob=0.285  top_archs=phantom,mirror_default,predator_baseline,oracle
+    h 1000: trust=0.753  H=2.354  top_prob=0.302  top_archs=oracle,predator_baseline,phantom,mirror_default
+    h 2500: trust=0.738  H=2.308  top_prob=0.331  top_archs=predator_baseline,oracle,mirror_default,firestorm,phantom
+    h 5000: trust=0.736  H=2.348  top_prob=0.327  top_archs=oracle,phantom,mirror_default,predator_baseline
+    h10000: trust=0.743  H=2.217  top_prob=0.383  top_archs=oracle,predator_baseline,phantom,mirror_default
+
+  Target S1 (sentinel):
+    h  100: trust=0.796  H=2.394  top_prob=0.282  top_archs=mirror_default,oracle,phantom,predator_baseline
+    h  500: trust=0.792  H=2.427  top_prob=0.282  top_archs=predator_baseline,oracle,mirror_default,phantom
+    h 1000: trust=0.811  H=2.439  top_prob=0.254  top_archs=mirror_default,oracle,predator_baseline,sentinel
+    h 2500: trust=0.796  H=2.485  top_prob=0.247  top_archs=predator_baseline,mirror_default,oracle,phantom
+    h 5000: trust=0.795  H=2.408  top_prob=0.281  top_archs=oracle,predator_baseline,mirror_default
+    h10000: trust=0.797  H=2.348  top_prob=0.299  top_archs=phantom,mirror_default,oracle,predator_baseline
+
+  Target S2 (firestorm):
+    h  100: trust=0.439  H=0.742  top_prob=0.808  top_archs=firestorm,phantom,oracle
+    h  500: trust=0.412  H=0.513  top_prob=0.878  top_archs=firestorm,oracle,phantom
+    h 1000: trust=0.452  H=0.928  top_prob=0.740  top_archs=firestorm,phantom,oracle
+    h 2500: trust=0.431  H=0.798  top_prob=0.782  top_archs=phantom,firestorm
+    h 5000: trust=0.419  H=0.577  top_prob=0.858  top_archs=firestorm,oracle,phantom
+    h10000: trust=0.425  H=0.487  top_prob=0.870  top_archs=firestorm,phantom,oracle
+
+  Target S3 (wall):
+    h  100: trust=0.962  H=0.000  top_prob=1.000  top_archs=wall
+    h  500: trust=0.962  H=0.000  top_prob=1.000  top_archs=wall
+    h 1000: trust=0.962  H=0.000  top_prob=1.000  top_archs=wall
+    h 2500: trust=0.960  H=0.070  top_prob=0.988  top_archs=wall
+    h 5000: trust=0.962  H=0.001  top_prob=1.000  top_archs=wall
+    h10000: trust=0.962  H=0.000  top_prob=1.000  top_archs=wall
+
+  Target S4 (phantom):
+    h  100: trust=0.642  H=2.024  top_prob=0.486  top_archs=phantom,predator_baseline,oracle
+    h  500: trust=0.690  H=2.234  top_prob=0.390  top_archs=oracle,phantom,predator_baseline,mirror_default
+    h 1000: trust=0.670  H=2.045  top_prob=0.466  top_archs=phantom,oracle,mirror_default
+    h 2500: trust=0.674  H=2.199  top_prob=0.416  top_archs=phantom,oracle,mirror_default
+    h 5000: trust=0.678  H=2.132  top_prob=0.435  top_archs=mirror_default,phantom,oracle
+    h10000: trust=0.653  H=1.971  top_prob=0.493  top_archs=phantom,wall,predator_baseline
+
+  Target S6 (mirror):
+    h  100: trust=0.827  H=2.449  top_prob=0.253  top_archs=mirror_default,oracle,predator_baseline
+    h  500: trust=0.792  H=2.461  top_prob=0.271  top_archs=oracle,predator_baseline,mirror_default,phantom
+    h 1000: trust=0.793  H=2.442  top_prob=0.269  top_archs=predator_baseline,oracle,mirror_default,phantom
+    h 2500: trust=0.778  H=2.395  top_prob=0.309  top_archs=mirror_default,oracle,phantom,predator_baseline
+    h 5000: trust=0.823  H=2.414  top_prob=0.274  top_archs=oracle,predator_baseline,mirror_default
+    h10000: trust=0.794  H=2.474  top_prob=0.269  top_archs=predator_baseline,wall,mirror_default,oracle,phantom
+
+  Target S7 (judge):
+    h  100: trust=0.800  H=2.473  top_prob=0.250  top_archs=mirror_default,phantom,oracle,predator_baseline
+    h  500: trust=0.790  H=2.398  top_prob=0.288  top_archs=predator_baseline,mirror_default,oracle
+    h 1000: trust=0.789  H=2.379  top_prob=0.306  top_archs=oracle,mirror_default,predator_baseline
+    h 2500: trust=0.771  H=2.337  top_prob=0.336  top_archs=oracle,predator_baseline,mirror_default
+    h 5000: trust=0.766  H=2.298  top_prob=0.335  top_archs=predator_baseline,oracle,mirror_default
+    h10000: trust=0.766  H=2.328  top_prob=0.342  top_archs=oracle,predator_baseline,mirror_default
+
+==============================================================================
+  SECTION 16: JUDGE RETALIATION DEEP DIVE
+==============================================================================
+
+  --- Judge (seat 7) overall aggression over time — ALL streets, run 1 ---
+  (Rolling 200-hand window of bet+raise rate across all streets)
+    h  100: 0.108 |#####
+    h  200: 0.108 |#####
+    h  300: 0.162 |########
+    h  400: 0.202 |##########
+    h  500: 0.161 |########
+    h  600: 0.207 |##########
+    h  700: 0.219 |##########
+    h  800: 0.200 |##########
+    h  900: 0.200 |##########
+    h 1000: 0.204 |##########
+    h 1100: 0.179 |########
+    h 1200: 0.197 |#########
+    h 1300: 0.185 |#########
+    h 1400: 0.142 |#######
+    h 1500: 0.191 |#########
+    h 1600: 0.202 |##########
+    h 1700: 0.164 |########
+    h 1800: 0.161 |########
+    h 1900: 0.195 |#########
+    h 2000: 0.233 |###########
+
+  --- Judge bet rate CONDITIONAL on each opponent being in the hand ---
+  (Key insight: retaliation only fires when a triggered opponent is
+   active. The aggregate rate dilutes the signal. Per-opponent rates
+   reveal the behavioral shift.)
+    vs S0 (oracle      ): bet_rate=0.207 (across 5 seeds)
+    vs S1 (sentinel    ): bet_rate=0.207 (across 5 seeds)
+    vs S2 (firestorm   ): bet_rate=0.208 (across 5 seeds)
+    vs S3 (wall        ): bet_rate=0.208 (across 5 seeds)
+    vs S4 (phantom     ): bet_rate=0.207 (across 5 seeds)
+    vs S5 (predator    ): bet_rate=0.207 (across 5 seeds)
+    vs S6 (mirror      ): bet_rate=0.207 (across 5 seeds)
+
+  --- Judge trust RECEIVED from others over time (run 1) ---
+  (If retaliation is detected, trust toward Judge should drop)
+    h  100: trust_received=0.860  entropy_about_judge=2.334
+    h  500: trust_received=0.798  entropy_about_judge=2.556
+    h 1000: trust_received=0.701  entropy_about_judge=2.048
+    h 2000: trust_received=0.827  entropy_about_judge=2.471
+    h 5000: trust_received=0.826  entropy_about_judge=2.441
+    h10000: trust_received=0.683  entropy_about_judge=1.992
+
+==============================================================================
+  SECTION 17: MIRROR MIMICRY ANALYSIS
+==============================================================================
+
+  --- Mirror (seat 6) behavioral profile over time — run 1 ---
+  (Rolling 200-hand VPIP and aggression rate)
+    h  400: VPIP= 77.5%  AF=1.19
+    h 2200: VPIP= 78.5%  AF=0.77
+    h 3600: VPIP= 83.5%  AF=1.02
+    h 4000: VPIP= 84.0%  AF=0.98
+    h 8400: VPIP= 86.0%  AF=1.01
+    h 9400: VPIP= 85.0%  AF=0.81
+    h 9800: VPIP= 82.0%  AF=0.75
+
+  --- Mirror trust identification over time (run 1) ---
+    h   50: trust=0.839  H=2.468  top_prob=0.268
+    h  100: trust=0.847  H=2.428  top_prob=0.251
+    h  500: trust=0.733  H=2.454  top_prob=0.288
+    h 1000: trust=0.806  H=2.546  top_prob=0.214
+    h 5000: trust=0.743  H=2.420  top_prob=0.322
+    h10000: trust=0.803  H=2.550  top_prob=0.210
+
+==============================================================================
+  SECTION 18: TEMPORAL DYNAMICS (early vs late 1000 hands, run 1)
+==============================================================================
+
+  Early (1-1000):
+    firestorm            aggression=32.4%  actions=2253
+    judge                aggression=18.0%  actions=1459
+    oracle               aggression=17.1%  actions=1616
+    phantom              aggression=16.0%  actions=1856
+    sentinel             aggression=14.0%  actions=1578
+    predator             aggression=13.6%  actions=1606
+    mirror               aggression=13.4%  actions=1562
+    wall                 aggression=6.6%  actions=2624
+
+  Late (9001-10000):
+    firestorm            aggression=35.7%  actions=2279
+    judge                aggression=24.7%  actions=1436
+    oracle               aggression=16.4%  actions=1608
+    phantom              aggression=16.0%  actions=1830
+    predator             aggression=14.6%  actions=1572
+    sentinel             aggression=13.9%  actions=1602
+    mirror               aggression=13.7%  actions=1683
+    wall                 aggression=5.4%  actions=2740
+
+==============================================================================
+  SECTION 19: HEAD-TO-HEAD SHOWDOWN MATCHUPS
+==============================================================================
+  (Net chip flow: positive = row archetype profits from column archetype)
+          S0(orac)  S1(sent)  S2(fire)  S3(wall)  S4(phan)  S5(pred)  S6(mirr)  S7(judg)
+  S0(orac)    ---  +  1508  + 35871  + 17808   -1371    -299   -2432    -805 
+  S1(sent)  -1508     ---  + 30927  + 27441  +    29  +   490    -302   -1521 
+  S2(fire) -35871  -30927     ---  -53599  -27142  -35984  -32408  -24013 
+  S3(wall) -17808  -27441  + 53599     ---  -13670  -25501  -25417  -14384 
+  S4(phan) +  1371     -29  + 27142  + 13670     ---  +  1698  +   406    -360 
+  S5(pred) +   299    -490  + 35984  + 25501   -1698     ---   -2633  +   580 
+  S6(mirr) +  2432  +   302  + 32408  + 25417    -406  +  2633     ---  +  1710 
+  S7(judg) +   805  +  1521  + 24013  + 14384  +   360    -580   -1710     --- 
+
+==============================================================================
+  SECTION 20: TRUST-PROFIT CORRELATION
+==============================================================================
+  Does being trusted (high trust received) correlate with stack performance?
+  Archetype              MeanStack  MeanTrustRcvd
+  -----------------------------------------------
+  firestorm                   7149          0.423
+  judge                       2105          0.766
+  mirror                      1178          0.793
+  oracle                      1533          0.743
+  phantom                      147          0.656
+  predator                     711          0.790
+  sentinel                     838          0.796
+  wall                         129          0.962
+
+  Pearson correlation (stack vs trust_received): r = -0.748
+  FINDING: Negative correlation — being trusted does NOT help economically
+
+==============================================================================
+  SECTION 21: CROSS-SEED CONSISTENCY
+==============================================================================
+  Standard deviation of key metrics across seeds:
+  Archetype                        VPIP%              PFR%             Stack
+  --------------------------------------------------------------------------
+  firestorm                 49.4 +/- 0.4      12.0 +/- 0.3      7149 +/- 787
+  judge                     16.0 +/- 0.4       9.8 +/- 0.3      2105 +/- 426
+  mirror                    18.3 +/- 0.4       5.0 +/- 0.2      1178 +/- 622
+  oracle                    21.4 +/- 0.4       6.0 +/- 0.2      1533 +/- 723
+  phantom                   38.8 +/- 0.4       7.7 +/- 0.3        147 +/- 61
+  predator                  18.4 +/- 0.3       4.1 +/- 0.1       711 +/- 508
+  sentinel                  16.4 +/- 0.3       4.2 +/- 0.2       838 +/- 364
+  wall                      53.9 +/- 0.5       1.5 +/- 0.1        129 +/- 79
+
+==============================================================================
+  SECTION 22: BET SIZING ANALYSIS
+==============================================================================
+
+  firestorm:
+    flop       bet      mean_amt=2.00  n=40,202
+    flop       call     mean_amt=2.20  n=25,878
+    flop       raise    mean_amt=4.14  n=14,245
+    preflop    call     mean_amt=2.04  n=89,874
+    preflop    raise    mean_amt=2.93  n=24,444
+    river      bet      mean_amt=4.00  n=22,682
+    river      call     mean_amt=4.14  n=7,592
+    river      raise    mean_amt=8.10  n=5,551
+    turn       bet      mean_amt=4.00  n=31,494
+    turn       call     mean_amt=4.25  n=13,990
+    turn       raise    mean_amt=8.17  n=8,871
+
+  judge:
+    flop       bet      mean_amt=2.00  n=14,639
+    flop       call     mean_amt=2.21  n=4,058
+    flop       raise    mean_amt=4.16  n=4,526
+    preflop    call     mean_amt=2.01  n=14,108
+    preflop    raise    mean_amt=2.89  n=19,985
+    river      bet      mean_amt=4.00  n=6,053
+    river      call     mean_amt=4.12  n=1,346
+    river      raise    mean_amt=8.12  n=1,411
+    turn       bet      mean_amt=4.00  n=9,524
+    turn       call     mean_amt=4.25  n=2,137
+    turn       raise    mean_amt=8.18  n=2,460
+
+  mirror:
+    flop       bet      mean_amt=2.00  n=9,039
+    flop       call     mean_amt=2.23  n=11,200
+    flop       raise    mean_amt=4.18  n=6,068
+    preflop    call     mean_amt=2.02  n=30,675
+    preflop    raise    mean_amt=3.06  n=10,399
+    river      bet      mean_amt=4.00  n=5,196
+    river      call     mean_amt=4.15  n=3,460
+    river      raise    mean_amt=8.15  n=2,436
+    turn       bet      mean_amt=4.00  n=6,863
+    turn       call     mean_amt=4.29  n=5,999
+    turn       raise    mean_amt=8.23  n=3,781
+
+  oracle:
+    flop       bet      mean_amt=2.00  n=16,436
+    flop       call     mean_amt=2.23  n=8,734
+    flop       raise    mean_amt=4.18  n=5,003
+    preflop    call     mean_amt=2.04  n=34,528
+    preflop    raise    mean_amt=2.90  n=12,254
+    river      bet      mean_amt=4.00  n=7,685
+    river      call     mean_amt=4.16  n=2,591
+    river      raise    mean_amt=8.14  n=2,003
+    turn       bet      mean_amt=4.00  n=11,149
+    turn       call     mean_amt=4.24  n=4,356
+    turn       raise    mean_amt=8.19  n=3,170
+
+  phantom:
+    flop       bet      mean_amt=2.00  n=18,687
+    flop       call     mean_amt=2.23  n=14,777
+    flop       raise    mean_amt=4.19  n=5,315
+    preflop    call     mean_amt=2.04  n=71,640
+    preflop    raise    mean_amt=2.60  n=15,526
+    river      bet      mean_amt=3.99  n=6,517
+    river      call     mean_amt=4.11  n=2,979
+    river      raise    mean_amt=8.05  n=1,282
+    turn       bet      mean_amt=3.99  n=11,145
+    turn       call     mean_amt=4.23  n=6,006
+    turn       raise    mean_amt=8.15  n=2,651
+
+  predator:
+    flop       bet      mean_amt=2.00  n=10,466
+    flop       call     mean_amt=2.22  n=11,408
+    flop       raise    mean_amt=4.16  n=5,459
+    preflop    call     mean_amt=2.02  n=32,699
+    preflop    raise    mean_amt=3.30  n=8,473
+    river      bet      mean_amt=4.00  n=6,251
+    river      call     mean_amt=4.15  n=3,026
+    river      raise    mean_amt=8.14  n=1,944
+    turn       bet      mean_amt=4.00  n=8,470
+    turn       call     mean_amt=4.27  n=5,426
+    turn       raise    mean_amt=8.19  n=3,222
+
+  sentinel:
+    flop       bet      mean_amt=2.00  n=11,642
+    flop       call     mean_amt=2.22  n=8,640
+    flop       raise    mean_amt=4.16  n=4,919
+    preflop    call     mean_amt=2.04  n=27,621
+    preflop    raise    mean_amt=3.33  n=8,673
+    river      bet      mean_amt=4.00  n=6,172
+    river      call     mean_amt=4.16  n=2,125
+    river      raise    mean_amt=8.11  n=1,794
+    turn       bet      mean_amt=4.00  n=8,634
+    turn       call     mean_amt=4.24  n=4,028
+    turn       raise    mean_amt=8.22  n=2,750
+
+  wall:
+    flop       bet      mean_amt=2.00  n=9,372
+    flop       call     mean_amt=2.28  n=61,621
+    flop       raise    mean_amt=4.23  n=3,292
+    preflop    call     mean_amt=2.08  n=130,553
+    preflop    raise    mean_amt=3.16  n=3,032
+    river      bet      mean_amt=3.99  n=6,267
+    river      call     mean_amt=4.19  n=24,472
+    river      raise    mean_amt=8.16  n=1,355
+    turn       bet      mean_amt=3.99  n=7,911
+    turn       call     mean_amt=4.32  n=37,913
+    turn       raise    mean_amt=8.26  n=2,087
+
+==============================================================================
+  SECTION 23: BLUFF SUCCESS RATE (bets/raises that won without showdown)
+==============================================================================
+  Approximation: for each archetype, fraction of hands where they
+  bet or raised AND won the pot via walkover (opponent(s) folded).
+  Archetype                HandsAggr  WalkoverWins   FoldEquity%
+  --------------------------------------------------------------
+  firestorm                   74,495        66,015         88.6%
+  judge                       29,703        23,202         78.1%
+  mirror                      25,946        15,355         59.2%
+  oracle                      30,974        21,625         69.8%
+  phantom                     40,709        21,826         53.6%
+  predator                    24,083        16,387         68.0%
+  sentinel                    23,059        16,275         70.6%
+  wall                        27,661        14,241         51.5%
+
+==============================================================================
+  SECTION 24: REBUY ANALYSIS
+==============================================================================
+  Archetype              TotalRB    MeanRB   MinRB   MaxRB
+  --------------------------------------------------------
+  wall                       649      32.5      22      45
+  phantom                    499      24.9      20      31
+  predator                    28       1.4       0       6
+  oracle                      13       0.7       0       3
+  sentinel                    12       0.6       0       3
+  mirror                      11       0.6       0       3
+  judge                        6       0.3       0       2
+  firestorm                    1       0.1       0       1
+
+==============================================================================
+  SECTION 25: SANITY CHECKS
+==============================================================================
+  Chip conservation:   ALL OK
+  Orphan actions:      0 (OK)
+  Trust rows/hand:     56 (expected 56)
+  Mean actions/hand:   14.6
+  Mean SD participants:2.1
+
+==============================================================================
+  END OF REPORT
+==============================================================================

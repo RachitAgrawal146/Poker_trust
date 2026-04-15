@@ -1,0 +1,245 @@
+PHASE 2 TABULAR MODEL TRAINING REPORT
+======================================================================
+Non-parametric empirical action distributions per
+(archetype, round, hand_strength, context)
+
+Archetype: oracle (162,201 rows)
+  Context: nobet
+    Actions: CHECK/BET
+    preflop  Strong : check=1.000  bet=0.000
+    preflop  Medium : check=1.000  bet=0.000
+    preflop  Weak   : check=1.000  bet=0.000
+    flop     Strong : check=0.097  bet=0.903
+    flop     Medium : check=0.558  bet=0.442
+    flop     Weak   : check=0.678  bet=0.322
+    turn     Strong : check=0.149  bet=0.851
+    turn     Medium : check=0.591  bet=0.409
+    turn     Weak   : check=0.668  bet=0.332
+    river    Strong : check=0.198  bet=0.802
+    river    Medium : check=0.640  bet=0.360
+    river    Weak   : check=0.662  bet=0.338
+  Context: facing
+    Actions: FOLD/CALL/RAISE
+    preflop  Strong : fold=0.043  call=0.349  raise=0.608
+    preflop  Medium : fold=0.596  call=0.315  raise=0.089
+    preflop  Weak   : fold=0.824  call=0.144  raise=0.032
+    flop     Strong : fold=0.058  call=0.416  raise=0.526
+    flop     Medium : fold=0.629  call=0.325  raise=0.045
+    flop     Weak   : fold=0.843  call=0.157  raise=0.000
+    turn     Strong : fold=0.066  call=0.426  raise=0.508
+    turn     Medium : fold=0.613  call=0.338  raise=0.049
+    turn     Weak   : fold=0.874  call=0.126  raise=0.000
+    river    Strong : fold=0.101  call=0.432  raise=0.467
+    river    Medium : fold=0.605  call=0.349  raise=0.047
+    river    Weak   : fold=0.876  call=0.124  raise=0.000
+
+Archetype: sentinel (158,078 rows)
+  Context: nobet
+    Actions: CHECK/BET
+    preflop  Strong : check=1.000  bet=0.000
+    preflop  Medium : check=1.000  bet=0.000
+    preflop  Weak   : check=1.000  bet=0.000
+    flop     Strong : check=0.095  bet=0.905
+    flop     Medium : check=0.745  bet=0.255
+    flop     Weak   : check=0.903  bet=0.097
+    turn     Strong : check=0.092  bet=0.908
+    turn     Medium : check=0.807  bet=0.193
+    turn     Weak   : check=0.923  bet=0.077
+    river    Strong : check=0.147  bet=0.853
+    river    Medium : check=0.864  bet=0.136
+    river    Weak   : check=0.943  bet=0.057
+  Context: facing
+    Actions: FOLD/CALL/RAISE
+    preflop  Strong : fold=0.051  call=0.292  raise=0.657
+    preflop  Medium : fold=0.540  call=0.388  raise=0.072
+    preflop  Weak   : fold=0.893  call=0.097  raise=0.010
+    flop     Strong : fold=0.043  call=0.430  raise=0.527
+    flop     Medium : fold=0.594  call=0.359  raise=0.047
+    flop     Weak   : fold=0.918  call=0.082  raise=0.000
+    turn     Strong : fold=0.074  call=0.443  raise=0.484
+    turn     Medium : fold=0.666  call=0.311  raise=0.023
+    turn     Weak   : fold=0.940  call=0.060  raise=0.000
+    river    Strong : fold=0.097  call=0.427  raise=0.475
+    river    Medium : fold=0.737  call=0.245  raise=0.018
+    river    Weak   : fold=0.962  call=0.038  raise=0.000
+
+Archetype: firestorm (228,322 rows)
+  Context: nobet
+    Actions: CHECK/BET
+    preflop  Strong : check=1.000  bet=0.000
+    preflop  Medium : check=1.000  bet=0.000
+    preflop  Weak   : check=1.000  bet=0.000
+    flop     Strong : check=0.052  bet=0.948
+    flop     Medium : check=0.247  bet=0.753
+    flop     Weak   : check=0.344  bet=0.656
+    turn     Strong : check=0.085  bet=0.915
+    turn     Medium : check=0.292  bet=0.708
+    turn     Weak   : check=0.392  bet=0.608
+    river    Strong : check=0.100  bet=0.900
+    river    Medium : check=0.349  bet=0.651
+    river    Weak   : check=0.459  bet=0.541
+  Context: facing
+    Actions: FOLD/CALL/RAISE
+    preflop  Strong : fold=0.022  call=0.233  raise=0.745
+    preflop  Medium : fold=0.048  call=0.657  raise=0.295
+    preflop  Weak   : fold=0.564  call=0.374  raise=0.061
+    flop     Strong : fold=0.029  call=0.342  raise=0.629
+    flop     Medium : fold=0.146  call=0.665  raise=0.189
+    flop     Weak   : fold=0.643  call=0.357  raise=0.000
+    turn     Strong : fold=0.048  call=0.348  raise=0.603
+    turn     Medium : fold=0.220  call=0.604  raise=0.176
+    turn     Weak   : fold=0.705  call=0.295  raise=0.000
+    river    Strong : fold=0.076  call=0.368  raise=0.556
+    river    Medium : fold=0.301  call=0.554  raise=0.145
+    river    Weak   : fold=0.729  call=0.271  raise=0.000
+
+Archetype: wall (271,710 rows)
+  Context: nobet
+    Actions: CHECK/BET
+    preflop  Strong : check=1.000  bet=0.000
+    preflop  Medium : check=1.000  bet=0.000
+    preflop  Weak   : check=1.000  bet=0.000
+    flop     Strong : check=0.507  bet=0.493
+    flop     Medium : check=0.877  bet=0.123
+    flop     Weak   : check=0.951  bet=0.049
+    turn     Strong : check=0.551  bet=0.449
+    turn     Medium : check=0.899  bet=0.101
+    turn     Weak   : check=0.970  bet=0.030
+    river    Strong : check=0.600  bet=0.400
+    river    Medium : check=0.924  bet=0.076
+    river    Weak   : check=0.981  bet=0.019
+  Context: facing
+    Actions: FOLD/CALL/RAISE
+    preflop  Strong : fold=0.044  call=0.764  raise=0.192
+    preflop  Medium : fold=0.177  call=0.791  raise=0.031
+    preflop  Weak   : fold=0.447  call=0.549  raise=0.004
+    flop     Strong : fold=0.058  call=0.825  raise=0.117
+    flop     Medium : fold=0.228  call=0.753  raise=0.019
+    flop     Weak   : fold=0.507  call=0.493  raise=0.000
+    turn     Strong : fold=0.080  call=0.822  raise=0.098
+    turn     Medium : fold=0.294  call=0.696  raise=0.010
+    turn     Weak   : fold=0.580  call=0.420  raise=0.000
+    river    Strong : fold=0.103  call=0.816  raise=0.080
+    river    Medium : fold=0.347  call=0.643  raise=0.010
+    river    Weak   : fold=0.639  call=0.361  raise=0.000
+
+Archetype: phantom (185,524 rows)
+  Context: nobet
+    Actions: CHECK/BET
+    preflop  Strong : check=1.000  bet=0.000
+    preflop  Medium : check=1.000  bet=0.000
+    preflop  Weak   : check=1.000  bet=0.000
+    flop     Strong : check=0.391  bet=0.609
+    flop     Medium : check=0.497  bet=0.503
+    flop     Weak   : check=0.455  bet=0.545
+    turn     Strong : check=0.448  bet=0.552
+    turn     Medium : check=0.554  bet=0.446
+    turn     Weak   : check=0.500  bet=0.500
+    river    Strong : check=0.498  bet=0.502
+    river    Medium : check=0.613  bet=0.387
+    river    Weak   : check=0.568  bet=0.432
+  Context: facing
+    Actions: FOLD/CALL/RAISE
+    preflop  Strong : fold=0.142  call=0.430  raise=0.427
+    preflop  Medium : fold=0.583  call=0.289  raise=0.129
+    preflop  Weak   : fold=0.616  call=0.332  raise=0.052
+    flop     Strong : fold=0.200  call=0.472  raise=0.327
+    flop     Medium : fold=0.695  call=0.246  raise=0.059
+    flop     Weak   : fold=0.704  call=0.296  raise=0.000
+    turn     Strong : fold=0.260  call=0.462  raise=0.279
+    turn     Medium : fold=0.751  call=0.208  raise=0.041
+    turn     Weak   : fold=0.779  call=0.221  raise=0.000
+    river    Strong : fold=0.307  call=0.439  raise=0.255
+    river    Medium : fold=0.834  call=0.143  raise=0.024
+    river    Weak   : fold=0.863  call=0.137  raise=0.000
+
+Archetype: predator (161,215 rows)
+  Context: nobet
+    Actions: CHECK/BET
+    preflop  Strong : check=1.000  bet=0.000
+    preflop  Medium : check=1.000  bet=0.000
+    preflop  Weak   : check=1.000  bet=0.000
+    flop     Strong : check=0.061  bet=0.939
+    flop     Medium : check=0.746  bet=0.254
+    flop     Weak   : check=0.899  bet=0.101
+    turn     Strong : check=0.106  bet=0.894
+    turn     Medium : check=0.769  bet=0.231
+    turn     Weak   : check=0.932  bet=0.068
+    river    Strong : check=0.110  bet=0.890
+    river    Medium : check=0.828  bet=0.172
+    river    Weak   : check=0.960  bet=0.040
+  Context: facing
+    Actions: FOLD/CALL/RAISE
+    preflop  Strong : fold=0.043  call=0.341  raise=0.615
+    preflop  Medium : fold=0.485  call=0.438  raise=0.076
+    preflop  Weak   : fold=0.871  call=0.118  raise=0.011
+    flop     Strong : fold=0.076  call=0.433  raise=0.491
+    flop     Medium : fold=0.500  call=0.452  raise=0.048
+    flop     Weak   : fold=0.916  call=0.084  raise=0.000
+    turn     Strong : fold=0.103  call=0.444  raise=0.453
+    turn     Medium : fold=0.552  call=0.404  raise=0.044
+    turn     Weak   : fold=0.922  call=0.077  raise=0.000
+    river    Strong : fold=0.134  call=0.472  raise=0.394
+    river    Medium : fold=0.550  call=0.417  raise=0.033
+    river    Weak   : fold=0.952  call=0.048  raise=0.000
+
+Archetype: mirror (163,888 rows)
+  Context: nobet
+    Actions: CHECK/BET
+    preflop  Strong : check=1.000  bet=0.000
+    preflop  Medium : check=1.000  bet=0.000
+    preflop  Weak   : check=1.000  bet=0.000
+    flop     Strong : check=0.468  bet=0.532
+    flop     Medium : check=0.711  bet=0.289
+    flop     Weak   : check=0.771  bet=0.229
+    turn     Strong : check=0.449  bet=0.551
+    turn     Medium : check=0.710  bet=0.290
+    turn     Weak   : check=0.784  bet=0.216
+    river    Strong : check=0.465  bet=0.535
+    river    Medium : check=0.756  bet=0.244
+    river    Weak   : check=0.813  bet=0.187
+  Context: facing
+    Actions: FOLD/CALL/RAISE
+    preflop  Strong : fold=0.049  call=0.338  raise=0.613
+    preflop  Medium : fold=0.426  call=0.500  raise=0.074
+    preflop  Weak   : fold=0.879  call=0.097  raise=0.025
+    flop     Strong : fold=0.059  call=0.401  raise=0.539
+    flop     Medium : fold=0.458  call=0.492  raise=0.051
+    flop     Weak   : fold=0.915  call=0.085  raise=0.000
+    turn     Strong : fold=0.077  call=0.415  raise=0.508
+    turn     Medium : fold=0.499  call=0.455  raise=0.046
+    turn     Weak   : fold=0.914  call=0.086  raise=0.000
+    river    Strong : fold=0.099  call=0.441  raise=0.460
+    river    Medium : fold=0.526  call=0.441  raise=0.033
+    river    Weak   : fold=0.946  call=0.054  raise=0.000
+
+Archetype: judge (153,443 rows)
+  Context: nobet
+    Actions: CHECK/BET
+    preflop  Strong : check=1.000  bet=0.000
+    preflop  Medium : check=1.000  bet=0.000
+    preflop  Weak   : check=1.000  bet=0.000
+    flop     Strong : check=0.085  bet=0.915
+    flop     Medium : check=0.730  bet=0.270
+    flop     Weak   : check=0.889  bet=0.111
+    turn     Strong : check=0.099  bet=0.901
+    turn     Medium : check=0.676  bet=0.324
+    turn     Weak   : check=0.835  bet=0.165
+    river    Strong : check=0.149  bet=0.851
+    river    Medium : check=0.699  bet=0.301
+    river    Weak   : check=0.855  bet=0.145
+  Context: facing
+    Actions: FOLD/CALL/RAISE
+    preflop  Strong : fold=0.044  call=0.302  raise=0.653
+    preflop  Medium : fold=0.558  call=0.340  raise=0.101
+    preflop  Weak   : fold=0.895  call=0.094  raise=0.010
+    flop     Strong : fold=0.068  call=0.357  raise=0.575
+    flop     Medium : fold=0.719  call=0.142  raise=0.139
+    flop     Weak   : fold=0.952  call=0.048  raise=0.000
+    turn     Strong : fold=0.097  call=0.354  raise=0.550
+    turn     Medium : fold=0.775  call=0.131  raise=0.094
+    turn     Weak   : fold=0.975  call=0.025  raise=0.000
+    river    Strong : fold=0.122  call=0.386  raise=0.492
+    river    Medium : fold=0.830  call=0.085  raise=0.086
+    river    Weak   : fold=0.980  call=0.020  raise=0.000
+

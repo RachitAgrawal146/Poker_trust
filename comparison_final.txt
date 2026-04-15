@@ -1,0 +1,83 @@
+==============================================================================
+  PHASE 1 vs PHASE 2 COMPARISON REPORT
+==============================================================================
+  Phase 1: runs_v3.sqlite
+  Phase 2: ml_runs_tabular_final.sqlite
+
+TABLE 1: BEHAVIORAL FINGERPRINT COMPARISON
+------------------------------------------------------------------------------
+                               --- Phase 1 ---                 --- Phase 2 ---        
+  Archetype                VPIP     PFR     AF    SD%     VPIP     PFR     AF    SD%
+  ----------------------------------------------------------------------------
+  firestorm               49.4%   12.0%   1.12  14.8%    46.3%   10.4%   1.24  17.3%
+  judge                   15.9%    4.4%   1.39   4.3%    15.5%    4.0%   1.36   4.5%
+  mirror                  18.6%    5.2%   0.88   6.5%    18.1%    4.7%   0.88   7.1%
+  oracle                  21.6%    6.1%   1.18   5.6%    20.7%    5.5%   1.19   6.4%
+  phantom                 38.7%    7.7%   0.67   6.4%    37.0%    7.0%   0.73   7.5%
+  predator                18.5%    4.1%   0.83   5.6%    18.3%    3.7%   0.83   6.1%
+  sentinel                16.2%    4.1%   1.07   5.1%    15.8%    3.6%   1.05   5.4%
+  wall                    53.9%    1.5%   0.13  23.1%    54.6%    1.3%   0.14  24.3%
+
+TABLE 2: ECONOMIC PERFORMANCE COMPARISON
+----------------------------------------------------------------------
+  Archetype               P1 Stack   P1 RB    P2 Stack   P2 RB    Delta%
+  --------------------------------------------------------------------
+  firestorm                  17862    0.1       20971    0.0    +17.4%
+  judge                       1995    0.8        1661    0.0    -16.8%
+  mirror                      2856    0.6        2561    1.4    -10.3%
+  oracle                      3091    0.6        2919    0.8     -5.6%
+  phantom                      129   58.1         150   66.2    +15.7%
+  predator                    1125    2.7         745    3.8    -33.8%
+  sentinel                    2797    0.5        2189    2.4    -21.7%
+  wall                         174   78.9         125   74.0    -28.6%
+
+TABLE 3: TRUST DYNAMICS COMPARISON
+------------------------------------------------------------
+  Archetype               P1 Trust    P1 H    P2 Trust    P2 H
+  ----------------------------------------------------------
+  firestorm                 0.4350   0.823      0.3892   0.414
+  judge                     0.8149   2.467      0.7967   2.494
+  mirror                    0.7978   2.446      0.8130   2.462
+  oracle                    0.7585   2.250      0.7297   2.103
+  phantom                   0.6672   2.170      0.6166   1.644
+  predator                  0.7653   2.426      0.7908   2.442
+  sentinel                  0.7844   2.282      0.7866   2.164
+  wall                      0.9620   0.001      0.9620   0.000
+
+  Trust-profit correlation:  Phase 1 r=-0.837  Phase 2 r=-0.825
+
+TABLE 4: CLASSIFICATION ACCURACY (top_archetype at final hand)
+------------------------------------------------------------
+  Archetype                 P1 Acc      P2 Acc
+  --------------------------------------------
+  firestorm                  67.1%      100.0%
+  judge                       0.0%        0.0%
+  mirror                     47.9%       20.0%
+  oracle                     52.1%       40.0%
+  phantom                    92.1%       60.0%
+  predator                   30.0%       22.9%
+  sentinel                    0.0%        0.0%
+  wall                      100.0%      100.0%
+
+  Classification ceiling:  Phase 1 = 4/8  Phase 2 = 3/8
+
+==============================================================================
+  KEY FINDINGS
+==============================================================================
+
+  Q1: Top economic performer
+      Phase 1: firestorm (17862)
+      Phase 2: firestorm (20971)
+      SAME — dominance is a property of the strategy, not implementation
+
+  Q2: Trust-profit anticorrelation
+      Phase 1: r=-0.837  Phase 2: r=-0.825
+      ROBUST — anticorrelation holds across implementation methods
+
+  Q3: Bayesian classification of ML agents
+      Phase 1 ceiling: 4/8  Phase 2 ceiling: 3/8
+      HARDER — ML agents are more nuanced
+
+==============================================================================
+  END OF COMPARISON
+==============================================================================

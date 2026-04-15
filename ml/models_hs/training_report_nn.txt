@@ -1,0 +1,154 @@
+PHASE 2 TRAINING REPORT — NEURAL NETWORK (MLP)
+============================================================
+Architecture: (64, 32)
+Activation: relu
+Max iterations: 200
+
+Archetype: oracle
+  Train: 110,092  Test: 27,522
+  Accuracy: 98.7%
+  Epochs: 34  Time: 21.7s
+  Classification report:
+              precision    recall  f1-score   support
+
+        fold       0.00      0.00      0.00         0
+       check       1.00      1.00      1.00      7445
+        call       0.99      0.96      0.98      7601
+         bet       1.00      1.00      1.00      7938
+       raise       0.94      0.98      0.96      4538
+
+    accuracy                           0.99     27522
+   macro avg       0.79      0.79      0.79     27522
+weighted avg       0.99      0.99      0.99     27522
+
+Archetype: sentinel
+  Train: 100,674  Test: 25,166
+  Accuracy: 98.6%
+  Epochs: 35  Time: 18.6s
+  Classification report:
+              precision    recall  f1-score   support
+
+        fold       0.00      0.00      0.00         0
+       check       1.00      1.00      1.00      8109
+        call       0.99      0.96      0.97      6691
+         bet       1.00      1.00      1.00      6352
+       raise       0.93      0.99      0.96      4014
+
+    accuracy                           0.99     25166
+   macro avg       0.78      0.79      0.79     25166
+weighted avg       0.99      0.99      0.99     25166
+
+Archetype: firestorm
+  Train: 284,867  Test: 71,215
+  Accuracy: 98.8%
+  Epochs: 63  Time: 703.4s
+  Classification report:
+              precision    recall  f1-score   support
+
+        fold       0.00      0.00      0.00         0
+       check       1.00      1.00      1.00      9936
+        call       1.00      0.97      0.98     27170
+         bet       1.00      1.00      1.00     22518
+       raise       0.94      0.99      0.96     11591
+
+    accuracy                           0.99     71215
+   macro avg       0.79      0.79      0.79     71215
+weighted avg       0.99      0.99      0.99     71215
+
+Archetype: wall
+  Train: 444,919  Test: 111,228
+  Accuracy: 99.1%
+  Epochs: 41  Time: 556.3s
+  Classification report:
+              precision    recall  f1-score   support
+
+        fold       0.00      0.00      0.00         0
+       check       1.00      1.00      1.00     35959
+        call       0.99      1.00      0.99     67492
+         bet       1.00      1.00      1.00      5171
+       raise       0.89      0.70      0.79      2606
+
+    accuracy                           0.99    111228
+   macro avg       0.78      0.74      0.76    111228
+weighted avg       0.99      0.99      0.99    111228
+
+Archetype: phantom
+  Train: 116,724  Test: 29,180
+  Accuracy: 98.8%
+  Epochs: 37  Time: 24.2s
+  Classification report:
+              precision    recall  f1-score   support
+
+        fold       0.00      0.00      0.00         0
+       check       1.00      1.00      1.00      9269
+        call       1.00      0.97      0.98     10151
+         bet       1.00      1.00      1.00      6475
+       raise       0.91      0.99      0.95      3285
+
+    accuracy                           0.99     29180
+   macro avg       0.78      0.79      0.79     29180
+weighted avg       0.99      0.99      0.99     29180
+
+Archetype: predator
+  Train: 109,388  Test: 27,346
+  Accuracy: 98.6%
+  Epochs: 36  Time: 19.0s
+  Classification report:
+              precision    recall  f1-score   support
+
+        fold       0.00      0.00      0.00         0
+       check       1.00      1.00      1.00      8477
+        call       0.99      0.96      0.98      8838
+         bet       1.00      1.00      1.00      5898
+       raise       0.93      0.98      0.95      4133
+
+    accuracy                           0.99     27346
+   macro avg       0.78      0.79      0.79     27346
+weighted avg       0.99      0.99      0.99     27346
+
+Archetype: mirror
+  Train: 129,708  Test: 32,426
+  Accuracy: 98.6%
+  Epochs: 38  Time: 28.2s
+  Classification report:
+              precision    recall  f1-score   support
+
+        fold       0.00      0.00      0.00         0
+       check       1.00      1.00      1.00     12187
+        call       0.99      0.96      0.98      9936
+         bet       1.00      1.00      1.00      5048
+       raise       0.93      0.99      0.96      5255
+
+    accuracy                           0.99     32426
+   macro avg       0.78      0.79      0.79     32426
+weighted avg       0.99      0.99      0.99     32426
+
+Archetype: judge
+  Train: 82,247  Test: 20,560
+  Accuracy: 98.9%
+  Epochs: 34  Time: 13.3s
+  Classification report:
+              precision    recall  f1-score   support
+
+        fold       0.00      0.00      0.00         0
+       check       1.00      1.00      1.00      6567
+        call       0.99      0.96      0.97      4333
+         bet       1.00      1.00      1.00      5800
+       raise       0.95      0.99      0.97      3860
+
+    accuracy                           0.99     20560
+   macro avg       0.79      0.79      0.79     20560
+weighted avg       0.99      0.99      0.99     20560
+
+============================================================
+ACCURACY SUMMARY — NEURAL NETWORK
+============================================================
+  oracle              98.7%
+  sentinel            98.6%
+  firestorm           98.8%
+  wall                99.1%
+  phantom             98.8%
+  predator            98.6%
+  mirror              98.6%
+  judge               98.9%
+  MEAN             98.7%
