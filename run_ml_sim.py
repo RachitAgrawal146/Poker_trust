@@ -40,16 +40,18 @@ def build_ml_agents(model_dir: str) -> List[MLAgent]:
     """Build 8 ML agents, one per archetype, matching Phase 1 seating."""
     agents = []
     for seat, archetype in enumerate(ARCHETYPES):
-        model_path = os.path.join(model_dir, f"{archetype}.pkl")
-        if not os.path.exists(model_path):
+        # Check for split-context models (nobet + facing) or single model
+        nobet_path = os.path.join(model_dir, f"{archetype}_nobet.pkl")
+        single_path = os.path.join(model_dir, f"{archetype}.pkl")
+        if not os.path.exists(nobet_path) and not os.path.exists(single_path):
             raise FileNotFoundError(
-                f"No trained model for {archetype} at {model_path}. "
-                f"Run train_traditional.py or train_neural.py first."
+                f"No trained model for {archetype} in {model_dir}. "
+                f"Run train_split.py or train_traditional.py first."
             )
         agents.append(MLAgent(
             seat=seat,
             archetype=archetype,
-            model_path=model_path,
+            model_dir=model_dir,
         ))
     return agents
 
