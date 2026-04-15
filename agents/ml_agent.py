@@ -1,14 +1,16 @@
 """ML-powered poker agent for Phase 2.
 
-Loads TWO trained sklearn models per archetype — one for the "no bet
-pending" context (CHECK vs BET) and one for the "facing a bet" context
-(FOLD vs CALL vs RAISE). This mirrors the rule-based agent's two-stage
-decision tree exactly.
+Supports two model types:
 
-Uses ``predict_proba`` and SAMPLES from the predicted distribution
-rather than argmax. Without sampling, the ML agent would be deterministic
-(always picking the most likely action), which would change the behavioral
-fingerprint even if the model's probabilities are correct.
+1. **Tabular** (default): loads an empirical action distribution table
+   keyed by (context, round, hand_strength). Samples from the distribution
+   at each decision point. Exactly mirrors the rule-based agent's two-stage
+   decision tree.
+
+2. **Split RF**: loads two sklearn RandomForest models (nobet + facing)
+   and samples from predict_proba. Used for comparison in the paper.
+
+Uses SAMPLING from the predicted/empirical distribution, not argmax.
 """
 
 from __future__ import annotations
@@ -30,13 +32,25 @@ from engine.game import GameState
 __all__ = ["MLAgent"]
 
 
-_ROUND_MAP = {"preflop": 0.0, "flop": 0.25, "turn": 0.5, "river": 0.75}
+_ROUND_NAMES = {
+    "preflop": "preflop", "flop": "flop", "turn": "turn", "river": "river",
+}
 _HS_MAP = {"Strong": 1.0, "Medium": 0.5, "Weak": 0.0}
+_HS_REVERSE = {1.0: "Strong", 0.5: "Medium", 0.0: "Weak"}
 _STARTING_STACK = 200.0
+_ROUND_MAP = {"preflop": 0.0, "flop": 0.25, "turn": 0.5, "river": 0.75}
+
+_IDX_TO_ACTION = {
+    0: ActionType.FOLD,
+    1: ActionType.CHECK,
+    2: ActionType.CALL,
+    3: ActionType.BET,
+    4: ActionType.RAISE,
+}
 
 
 class MLAgent(BaseAgent):
-    """Poker agent that uses trained split-context ML models."""
+    """Poker agent using trained ML models."""
 
     def __init__(
         self,
@@ -54,36 +68,29 @@ class MLAgent(BaseAgent):
             rng=rng,
         )
         self._base_archetype = archetype
-
-        # Load split-context models
-        nobet_path = os.path.join(model_dir, f"{archetype}_nobet.pkl")
-        facing_path = os.path.join(model_dir, f"{archetype}_facing.pkl")
-
-        if os.path.exists(nobet_path) and os.path.exists(facing_path):
-            self._model_nobet = joblib.load(nobet_path)
-            self._model_facing = joblib.load(facing_path)
-            self._split_mode = True
-        else:
-            # Fallback: single 5-way model (legacy)
-            single_path = os.path.join(model_dir, f"{archetype}.pkl")
-            self._model_nobet = joblib.load(single_path)
-            self._model_facing = self._model_nobet
-            self._split_mode = False
-
-        # Detect feature count (7 without HS, 8 with HS)
-        n = getattr(self._model_nobet, "n_features_in_", 7)
-        self._has_hs_feature = n >= 8
-
-        # Build class maps for each model
-        self._nobet_class_map = self._build_map(self._model_nobet)
-        self._facing_class_map = self._build_map(self._model_facing)
-
         self._predictions = 0
         self._fallbacks = 0
 
+        # Try loading tabular model first (preferred)
+        table_path = os.path.join(model_dir, f"{archetype}_table.pkl")
+        if os.path.exists(table_path):
+            self._table = joblib.load(table_path)
+            self._mode = "tabular"
+        else:
+            # Fallback: split RF models
+            nobet_path = os.path.join(model_dir, f"{archetype}_nobet.pkl")
+            facing_path = os.path.join(model_dir, f"{archetype}_facing.pkl")
+            self._model_nobet = joblib.load(nobet_path)
+            self._model_facing = joblib.load(facing_path)
+            self._nobet_map = self._build_map(self._model_nobet)
+            self._facing_map = self._build_map(self._model_facing)
+            n = getattr(self._model_nobet, "n_features_in_", 7)
+            self._has_hs_feature = n >= 8
+            self._mode = "split_rf"
+            self._table = None
+
     @staticmethod
     def _build_map(model) -> dict:
-        """Map model's internal class indices to canonical action indices."""
         classes = getattr(model, "classes_", None)
         if classes is None:
             return {i: i for i in range(5)}
@@ -105,9 +112,71 @@ class MLAgent(BaseAgent):
             )
             self._hs_cache[game_state.betting_round] = hs_str
 
+        try:
+            if self._mode == "tabular":
+                action = self._decide_tabular(game_state, hs_str, rng)
+            else:
+                action = self._decide_split_rf(game_state, hs_str, rng)
+            self._predictions += 1
+            return action
+        except Exception:
+            self._fallbacks += 1
+            if game_state.cost_to_call == 0:
+                return ActionType.CHECK
+            return ActionType.CALL
+
+    def _decide_tabular(self, game_state, hs_str, rng) -> ActionType:
+        """Look up empirical distribution and sample."""
+        round_name = game_state.betting_round
         cost_to_call = game_state.cost_to_call
 
-        # Build feature vector (must match ml/extract_live.py order)
+        if cost_to_call == 0:
+            context = "nobet"
+        else:
+            context = "facing"
+
+        probs = self._table[context][round_name][hs_str]
+        # probs is [P_fold, P_check, P_call, P_bet, P_raise]
+
+        if context == "nobet":
+            # Only CHECK (1) and BET (3) are legal
+            check_p = probs[1]
+            bet_p = probs[3]
+            total = check_p + bet_p
+            if total <= 0:
+                return ActionType.CHECK
+            if rng.random() < (bet_p / total):
+                return ActionType.BET
+            return ActionType.CHECK
+        else:
+            # FOLD (0), CALL (2), RAISE (4)
+            fold_p = probs[0]
+            call_p = probs[2]
+            raise_p = probs[4]
+
+            # At bet cap, convert raise to call
+            if game_state.bet_count >= game_state.bet_cap:
+                call_p += raise_p
+                raise_p = 0.0
+
+            total = fold_p + call_p + raise_p
+            if total <= 0:
+                return ActionType.CALL
+
+            fold_p /= total
+            call_p /= total
+            raise_p /= total
+
+            roll = rng.random()
+            if roll < fold_p:
+                return ActionType.FOLD
+            if roll < fold_p + call_p:
+                return ActionType.CALL
+            return ActionType.RAISE
+
+    def _decide_split_rf(self, game_state, hs_str, rng) -> ActionType:
+        """Use split RF models (legacy fallback)."""
+        cost_to_call = game_state.cost_to_call
         cost_norm = min(cost_to_call, 16) / _STARTING_STACK
         features = [
             _ROUND_MAP.get(game_state.betting_round, 0.0),
@@ -118,85 +187,42 @@ class MLAgent(BaseAgent):
             game_state.player_position / 7.0,
             1.0 if cost_to_call > 0 else 0.0,
         ]
-        if self._has_hs_feature:
+        if getattr(self, "_has_hs_feature", False):
             features.append(_HS_MAP.get(hs_str, 0.0))
-
         X = np.array([features])
 
-        try:
-            if cost_to_call == 0:
-                action = self._decide_nobet(X, rng, game_state)
-            else:
-                action = self._decide_facing(X, rng, game_state)
-            self._predictions += 1
-            return action
-        except Exception:
-            self._fallbacks += 1
-            if cost_to_call == 0:
+        if cost_to_call == 0:
+            raw = self._model_nobet.predict_proba(X)[0]
+            cm = self._nobet_map
+            check_p = sum(raw[i] for i, c in cm.items() if c == 1 and i < len(raw))
+            bet_p = sum(raw[i] for i, c in cm.items() if c == 3 and i < len(raw))
+            total = check_p + bet_p
+            if total <= 0:
                 return ActionType.CHECK
-            return ActionType.CALL
-
-    def _decide_nobet(self, X, rng, game_state) -> ActionType:
-        """No bet pending: CHECK or BET."""
-        raw_probs = self._model_nobet.predict_proba(X)[0]
-        class_map = self._nobet_class_map
-
-        # Map to [check_prob, bet_prob]
-        check_p = 0.0
-        bet_p = 0.0
-        for model_idx, canonical_idx in class_map.items():
-            if model_idx < len(raw_probs):
-                if canonical_idx == 1:  # CHECK
-                    check_p = raw_probs[model_idx]
-                elif canonical_idx == 3:  # BET
-                    bet_p = raw_probs[model_idx]
-
-        total = check_p + bet_p
-        if total <= 0:
+            if rng.random() < (bet_p / total):
+                return ActionType.BET
             return ActionType.CHECK
-
-        # Sample
-        if rng.random() < (bet_p / total):
-            return ActionType.BET
-        return ActionType.CHECK
-
-    def _decide_facing(self, X, rng, game_state) -> ActionType:
-        """Facing a bet: FOLD, CALL, or RAISE."""
-        raw_probs = self._model_facing.predict_proba(X)[0]
-        class_map = self._facing_class_map
-
-        fold_p = 0.0
-        call_p = 0.0
-        raise_p = 0.0
-        for model_idx, canonical_idx in class_map.items():
-            if model_idx < len(raw_probs):
-                if canonical_idx == 0:  # FOLD
-                    fold_p = raw_probs[model_idx]
-                elif canonical_idx == 2:  # CALL
-                    call_p = raw_probs[model_idx]
-                elif canonical_idx == 4:  # RAISE
-                    raise_p = raw_probs[model_idx]
-
-        # If at bet cap, convert raise to call
-        if game_state.bet_count >= game_state.bet_cap:
-            call_p += raise_p
-            raise_p = 0.0
-
-        total = fold_p + call_p + raise_p
-        if total <= 0:
-            return ActionType.CALL
-
-        # Normalize and sample
-        fold_p /= total
-        call_p /= total
-        raise_p /= total
-
-        roll = rng.random()
-        if roll < fold_p:
-            return ActionType.FOLD
-        if roll < fold_p + call_p:
-            return ActionType.CALL
-        return ActionType.RAISE
+        else:
+            raw = self._model_facing.predict_proba(X)[0]
+            cm = self._facing_map
+            fold_p = sum(raw[i] for i, c in cm.items() if c == 0 and i < len(raw))
+            call_p = sum(raw[i] for i, c in cm.items() if c == 2 and i < len(raw))
+            raise_p = sum(raw[i] for i, c in cm.items() if c == 4 and i < len(raw))
+            if game_state.bet_count >= game_state.bet_cap:
+                call_p += raise_p
+                raise_p = 0.0
+            total = fold_p + call_p + raise_p
+            if total <= 0:
+                return ActionType.CALL
+            fold_p /= total
+            call_p /= total
+            raise_p /= total
+            roll = rng.random()
+            if roll < fold_p:
+                return ActionType.FOLD
+            if roll < fold_p + call_p:
+                return ActionType.CALL
+            return ActionType.RAISE
 
     def prediction_stats(self) -> dict:
         total = self._predictions + self._fallbacks
