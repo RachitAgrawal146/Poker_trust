@@ -1,0 +1,73 @@
+PHASE 2 DATA EXTRACTION REPORT
+============================================================
+Database: runs_v3.sqlite
+Hand strength: from showdowns
+Features: ['betting_round', 'pot_normalized', 'stack_normalized', 'cost_to_call_norm', 'bet_count_norm', 'position_norm', 'is_facing_bet', 'hand_strength']
+Test fraction: 0.2
+
+Archetype: oracle
+  Processed: 812,664  Featurized: 137,614  Skipped: 675,050
+  Train: 110,092  Test: 27,522
+    check   :     37,228 ( 27.1%)
+    call    :     38,005 ( 27.6%)
+    bet     :     39,690 ( 28.8%)
+    raise   :     22,691 ( 16.5%)
+
+Archetype: sentinel
+  Processed: 790,054  Featurized: 125,840  Skipped: 664,214
+  Train: 100,674  Test: 25,166
+    check   :     40,546 ( 32.2%)
+    call    :     33,459 ( 26.6%)
+    bet     :     31,764 ( 25.2%)
+    raise   :     20,071 ( 15.9%)
+
+Archetype: firestorm
+  Processed: 1,140,444  Featurized: 356,082  Skipped: 784,362
+  Train: 284,867  Test: 71,215
+    check   :     49,683 ( 14.0%)
+    call    :    135,852 ( 38.2%)
+    bet     :    112,592 ( 31.6%)
+    raise   :     57,955 ( 16.3%)
+
+Archetype: wall
+  Processed: 1,357,692  Featurized: 556,147  Skipped: 801,545
+  Train: 444,919  Test: 111,228
+    check   :    179,797 ( 32.3%)
+    call    :    337,462 ( 60.7%)
+    bet     :     25,856 (  4.6%)
+    raise   :     13,032 (  2.3%)
+
+Archetype: phantom
+  Processed: 928,816  Featurized: 145,904  Skipped: 782,912
+  Train: 116,724  Test: 29,180
+    check   :     46,345 ( 31.8%)
+    call    :     50,757 ( 34.8%)
+    bet     :     32,377 ( 22.2%)
+    raise   :     16,425 ( 11.3%)
+
+Archetype: predator
+  Processed: 806,391  Featurized: 136,734  Skipped: 669,657
+  Train: 109,388  Test: 27,346
+    check   :     42,385 ( 31.0%)
+    call    :     44,190 ( 32.3%)
+    bet     :     29,493 ( 21.6%)
+    raise   :     20,666 ( 15.1%)
+
+Archetype: mirror
+  Processed: 817,504  Featurized: 162,134  Skipped: 655,370
+  Train: 129,708  Test: 32,426
+    check   :     60,936 ( 37.6%)
+    call    :     49,680 ( 30.6%)
+    bet     :     25,242 ( 15.6%)
+    raise   :     26,276 ( 16.2%)
+
+Archetype: judge
+  Processed: 766,480  Featurized: 102,807  Skipped: 663,673
+  Train: 82,247  Test: 20,560
+    check   :     32,837 ( 31.9%)
+    call    :     21,667 ( 21.1%)
+    bet     :     29,003 ( 28.2%)
+    raise   :     19,300 ( 18.8%)
+
+============================================================
+TOTAL: 1,723,262 featurized rows, 5,696,783 skipped

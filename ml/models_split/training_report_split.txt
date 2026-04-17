@@ -1,0 +1,142 @@
+PHASE 2 SPLIT-CONTEXT TRAINING REPORT
+============================================================
+Two models per archetype:
+  nobet:  CHECK(1) vs BET(3)        — when cost_to_call == 0
+  facing: FOLD(0) vs CALL(2) vs RAISE(4) — when cost_to_call > 0
+
+Archetype: oracle
+  Nobet model: acc=1.000  train=38,336  test=9,583
+    Classes: check=20160, bet=18176
+    Bet rate in training data: 47.4%
+  Facing model: acc=0.855  train=123,865  test=30,965
+    Classes: fold=87164, call=25244, raise=11457
+    Raise rate: 9.2%  Fold rate: 70.4%
+  Facing model feature importances:
+    hand_strength              0.2908
+    cost_to_call_norm          0.2538
+    bet_count_norm             0.2119
+    pot_normalized             0.1030
+    position_norm              0.0684
+    betting_round              0.0519
+    stack_normalized           0.0202
+    is_facing_bet              0.0000
+
+Archetype: sentinel
+  Nobet model: acc=1.000  train=37,997  test=9,498
+    Classes: check=24271, bet=13726
+    Bet rate in training data: 36.1%
+  Facing model: acc=0.875  train=120,081  test=30,019
+    Classes: fold=89566, call=21344, raise=9171
+    Raise rate: 7.6%  Fold rate: 74.6%
+  Facing model feature importances:
+    hand_strength              0.3783
+    cost_to_call_norm          0.2101
+    bet_count_norm             0.1929
+    pot_normalized             0.0985
+    betting_round              0.0629
+    position_norm              0.0362
+    stack_normalized           0.0211
+    is_facing_bet              0.0000
+
+Archetype: firestorm
+  Nobet model: acc=1.000  train=67,823  test=16,955
+    Classes: check=18292, bet=49531
+    Bet rate in training data: 73.0%
+  Facing model: acc=0.771  train=160,499  test=40,124
+    Classes: fold=64720, call=68576, raise=27203
+    Raise rate: 16.9%  Fold rate: 40.3%
+  Facing model feature importances:
+    bet_count_norm             0.2743
+    hand_strength              0.2540
+    cost_to_call_norm          0.2080
+    pot_normalized             0.1047
+    position_norm              0.0963
+    betting_round              0.0459
+    stack_normalized           0.0168
+    is_facing_bet              0.0000
+
+Archetype: wall
+  Nobet model: acc=1.000  train=69,564  test=17,390
+    Classes: check=57505, bet=12059
+    Bet rate in training data: 17.3%
+  Facing model: acc=0.729  train=202,146  test=50,535
+    Classes: fold=69110, call=127900, raise=5136
+    Raise rate: 2.5%  Fold rate: 34.2%
+  Facing model feature importances:
+    cost_to_call_norm          0.3094
+    hand_strength              0.2740
+    bet_count_norm             0.1203
+    pot_normalized             0.1095
+    position_norm              0.0926
+    betting_round              0.0634
+    stack_normalized           0.0308
+    is_facing_bet              0.0000
+
+Archetype: phantom
+  Nobet model: acc=1.000  train=40,968  test=10,241
+    Classes: check=22004, bet=18964
+    Bet rate in training data: 46.3%
+  Facing model: acc=0.764  train=144,556  test=36,137
+    Classes: fold=84730, call=47182, raise=12644
+    Raise rate: 8.7%  Fold rate: 58.6%
+  Facing model feature importances:
+    cost_to_call_norm          0.3296
+    bet_count_norm             0.2312
+    hand_strength              0.1469
+    pot_normalized             0.1277
+    position_norm              0.1101
+    betting_round              0.0329
+    stack_normalized           0.0216
+    is_facing_bet              0.0000
+
+Archetype: predator
+  Nobet model: acc=1.000  train=35,724  test=8,929
+    Classes: check=23148, bet=12576
+    Bet rate in training data: 35.2%
+  Facing model: acc=0.849  train=125,491  test=31,372
+    Classes: fold=88878, call=26897, raise=9716
+    Raise rate: 7.7%  Fold rate: 70.8%
+  Facing model feature importances:
+    hand_strength              0.3753
+    cost_to_call_norm          0.2076
+    bet_count_norm             0.1907
+    pot_normalized             0.0978
+    betting_round              0.0676
+    position_norm              0.0399
+    stack_normalized           0.0211
+    is_facing_bet              0.0000
+
+Archetype: mirror
+  Nobet model: acc=1.000  train=38,138  test=9,534
+    Classes: check=26809, bet=11329
+    Bet rate in training data: 29.7%
+  Facing model: acc=0.865  train=125,750  test=31,437
+    Classes: fold=87616, call=26300, raise=11834
+    Raise rate: 9.4%  Fold rate: 69.7%
+  Facing model feature importances:
+    hand_strength              0.3801
+    bet_count_norm             0.2114
+    cost_to_call_norm          0.1816
+    pot_normalized             0.0948
+    betting_round              0.0712
+    position_norm              0.0421
+    stack_normalized           0.0188
+    is_facing_bet              0.0000
+
+Archetype: judge
+  Nobet model: acc=1.000  train=35,598  test=8,898
+    Classes: check=21916, bet=13682
+    Bet rate in training data: 38.4%
+  Facing model: acc=0.896  train=117,845  test=29,460
+    Classes: fold=90104, call=17277, raise=10464
+    Raise rate: 8.9%  Fold rate: 76.5%
+  Facing model feature importances:
+    hand_strength              0.3591
+    bet_count_norm             0.2293
+    cost_to_call_norm          0.2240
+    pot_normalized             0.0898
+    betting_round              0.0455
+    position_norm              0.0334
+    stack_normalized           0.0188
+    is_facing_bet              0.0000
+

@@ -1,0 +1,73 @@
+{
+  "summary": {
+    "total_hands": 2,
+    "total_actions_validated": 0,
+    "total_substitutions": 0,
+    "substitution_rate": 0.0,
+    "chip_conservation_failures": 0,
+    "showdown_audit_failures": 0,
+    "anomaly_flags": 0,
+    "per_archetype_stats": {
+      "seat_0_oracle": {
+        "hands_seen": 2,
+        "cumulative_vpip": 0.5,
+        "cumulative_af": null,
+        "substitutions": 0,
+        "anomalies": 0
+      },
+      "seat_1_sentinel": {
+        "hands_seen": 2,
+        "cumulative_vpip": 0.0,
+        "cumulative_af": null,
+        "substitutions": 0,
+        "anomalies": 0
+      },
+      "seat_2_firestorm": {
+        "hands_seen": 2,
+        "cumulative_vpip": 0.0,
+        "cumulative_af": null,
+        "substitutions": 0,
+        "anomalies": 0
+      },
+      "seat_3_wall": {
+        "hands_seen": 2,
+        "cumulative_vpip": 0.5,
+        "cumulative_af": null,
+        "substitutions": 0,
+        "anomalies": 0
+      },
+      "seat_4_phantom": {
+        "hands_seen": 2,
+        "cumulative_vpip": 0.0,
+        "cumulative_af": null,
+        "substitutions": 0,
+        "anomalies": 0
+      },
+      "seat_5_predator": {
+        "hands_seen": 2,
+        "cumulative_vpip": 0.0,
+        "cumulative_af": null,
+        "substitutions": 0,
+        "anomalies": 0
+      },
+      "seat_6_mirror": {
+        "hands_seen": 2,
+        "cumulative_vpip": 0.5,
+        "cumulative_af": null,
+        "substitutions": 0,
+        "anomalies": 0
+      },
+      "seat_7_judge": {
+        "hands_seen": 2,
+        "cumulative_vpip": 0.0,
+        "cumulative_af": null,
+        "substitutions": 0,
+        "anomalies": 0
+      }
+    }
+  },
+  "substitutions": [],
+  "chip_conservation_failures": [],
+  "showdown_audit_failures": [],
+  "anomaly_flags": []
+}

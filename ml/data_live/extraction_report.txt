@@ -1,0 +1,71 @@
+LIVE EXTRACTION REPORT
+============================================================
+Seeds: [42, 137, 256, 512, 1024]
+Hands per seed: 25000
+Total hands: 125000
+Features: ['betting_round', 'pot_normalized', 'stack_normalized', 'cost_to_call_norm', 'bet_count_norm', 'position_norm', 'is_facing_bet', 'hand_strength']
+
+Archetype: oracle
+  Total: 202,749  Train: 162,201  Test: 40,548
+    fold    :  108,955 ( 53.7%)
+    check   :   25,200 ( 12.4%)
+    call    :   31,554 ( 15.6%)
+    bet     :   22,719 ( 11.2%)
+    raise   :   14,321 (  7.1%)
+
+Archetype: sentinel
+  Total: 197,595  Train: 158,078  Test: 39,517
+    fold    :  111,957 ( 56.7%)
+    check   :   30,338 ( 15.4%)
+    call    :   26,680 ( 13.5%)
+    bet     :   17,157 (  8.7%)
+    raise   :   11,463 (  5.8%)
+
+Archetype: firestorm
+  Total: 285,401  Train: 228,322  Test: 57,079
+    fold    :   80,900 ( 28.3%)
+    check   :   22,865 (  8.0%)
+    call    :   85,720 ( 30.0%)
+    bet     :   61,913 ( 21.7%)
+    raise   :   34,003 ( 11.9%)
+
+Archetype: wall
+  Total: 339,635  Train: 271,710  Test: 67,925
+    fold    :   86,387 ( 25.4%)
+    check   :   71,881 ( 21.2%)
+    call    :  159,875 ( 47.1%)
+    bet     :   15,073 (  4.4%)
+    raise   :    6,419 (  1.9%)
+
+Archetype: phantom
+  Total: 231,902  Train: 185,524  Test: 46,378
+    fold    :  105,912 ( 45.7%)
+    check   :   27,505 ( 11.9%)
+    call    :   58,977 ( 25.4%)
+    bet     :   23,704 ( 10.2%)
+    raise   :   15,804 (  6.8%)
+
+Archetype: predator
+  Total: 201,516  Train: 161,215  Test: 40,301
+    fold    :  111,097 ( 55.1%)
+    check   :   28,934 ( 14.4%)
+    call    :   33,621 ( 16.7%)
+    bet     :   15,719 (  7.8%)
+    raise   :   12,145 (  6.0%)
+
+Archetype: mirror
+  Total: 204,859  Train: 163,888  Test: 40,971
+    fold    :  109,520 ( 53.5%)
+    check   :   33,511 ( 16.4%)
+    call    :   32,875 ( 16.0%)
+    bet     :   14,161 (  6.9%)
+    raise   :   14,792 (  7.2%)
+
+Archetype: judge
+  Total: 191,801  Train: 153,443  Test: 38,358
+    fold    :  112,629 ( 58.7%)
+    check   :   27,394 ( 14.3%)
+    call    :   21,596 ( 11.3%)
+    bet     :   17,102 (  8.9%)
+    raise   :   13,080 (  6.8%)
+
