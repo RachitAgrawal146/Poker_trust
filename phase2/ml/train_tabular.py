@@ -18,6 +18,14 @@ Usage::
 
 from __future__ import annotations
 
+# Ensure repo root is on sys.path
+import sys as _sys
+from pathlib import Path as _Path
+_REPO_ROOT = _Path(__file__).resolve().parent.parent.parent
+if str(_REPO_ROOT) not in _sys.path:
+    _sys.path.insert(0, str(_REPO_ROOT))
+
+
 import argparse
 import csv
 import os
@@ -28,7 +36,7 @@ from typing import Dict, List, Tuple
 
 warnings.filterwarnings("ignore")
 
-from ml.feature_engineering import ARCHETYPES, ACTION_LABELS
+from phase2.ml.feature_engineering import ARCHETYPES, ACTION_LABELS
 
 
 # Feature indices in the CSV (must match extract_live.py order)

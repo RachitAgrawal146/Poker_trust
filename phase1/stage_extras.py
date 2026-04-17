@@ -14,6 +14,14 @@ that the runner prints and tallies.
 
 from __future__ import annotations
 
+# Ensure repo root is on sys.path (this file lives in phase1/ or phase2/)
+import sys as _sys
+from pathlib import Path as _Path
+_REPO_ROOT = _Path(__file__).resolve().parent.parent
+if str(_REPO_ROOT) not in _sys.path:
+    _sys.path.insert(0, str(_REPO_ROOT))
+
+
 from typing import List
 
 
