@@ -110,8 +110,21 @@ Poker_trust/
 ├── analysis/
 │   ├── analyze_runs.py     # 9-section standard report
 │   ├── deep_analysis.py    # 31-section deep analysis + scorecard
-│   ├── find_interesting_hands.py  # Narrative hand miner
-│   └── *.txt               # Generated reports
+│   └── find_interesting_hands.py  # Narrative hand miner
+│
+├── ── REPORTS (generated output) ──────────────────────────
+├── reports/                # All generated analysis reports & audits
+│   ├── deep_analysis_v3_final.txt
+│   ├── deep_analysis_v3_scorecard.txt
+│   ├── ml_deep_analysis_final.txt
+│   ├── comparison_final.txt
+│   ├── interesting_hands.txt
+│   ├── interesting_hands_narrative.md
+│   └── dealer_audit*.json
+│
+├── ── RESEARCH DATA (LFS) ─────────────────────────────────
+├── research_data/
+│   └── runs_v3.sqlite.part_*  # 500k-hand Phase 1 dataset (reassemble; see below)
 │
 ├── ── VISUALIZER ───────────────────────────────────────────
 ├── visualizer/
