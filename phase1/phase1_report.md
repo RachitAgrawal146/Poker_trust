@@ -858,10 +858,10 @@ The v3 database is split into two LFS chunks on GitHub:
 
 ```bash
 # Linux/Mac
-cat runs_v3.sqlite.part_* > runs_v3.sqlite
+cat research_data/runs_v3.sqlite.part_* > runs_v3.sqlite
 
 # Windows
-cmd /c "copy /b runs_v3.sqlite.part_00+runs_v3.sqlite.part_01 runs_v3.sqlite"
+cmd /c "copy /b research_data\runs_v3.sqlite.part_00+research_data\runs_v3.sqlite.part_01 runs_v3.sqlite"
 ```
 
 ### 12.7 Run All Tests

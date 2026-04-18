@@ -1,5 +1,13 @@
 # CLAUDE.md
 
+> **Layout note (2026-04):** Phase-specific files now live under `phase1/`
+> and `phase2/`. Shared engine/trust/analysis packages stay at the repo
+> root. All command examples below have been updated — `run_sim.py` is
+> now `phase1/run_sim.py`, `run_ml_sim.py` is now `phase2/run_ml_sim.py`,
+> etc. Imports inside moved scripts resolve via a small `sys.path`
+> fixup that adds the repo root at import time.
+
+
 Project memory for Claude Code sessions (and humans) working on this
 repo. Read this first before touching any code.
 
@@ -147,10 +155,10 @@ tests/
 
 ```bash
 # Every registered stage (1, 2, 3, 4, 5, 6, 7, 10, 11)
-python3 run_tests.py --stage all
+python3 phase1/run_tests.py --stage all
 
 # One specific stage
-python3 run_tests.py --stage 6
+python3 phase1/run_tests.py --stage 6
 
 # Trust model unit tests
 python3 tests/test_trust_model.py
@@ -165,19 +173,24 @@ be investigated before committing.
 
 ```bash
 # 30-hand viewer demo (fast)
-python3 run_demo.py --stage 6 --hands 30 --seed 42
+python3 phase1/run_demo.py --stage 6 --hands 30 --seed 42
 
 # Full research dataset (hours)
-python3 run_sim.py --seeds 42,137,256,512,1024 --hands 10000 \
+python3 phase1/run_sim.py --seeds 42,137,256,512,1024 --hands 10000 \
                    --db runs.sqlite --stage 6
 
 # Multi-seed CSV exports for Phase 2
-python3 run_multiseed.py --seeds 42,137,256,512,1024 --hands 10000 \
+python3 phase1/run_multiseed.py --seeds 42,137,256,512,1024 --hands 10000 \
                           --outdir research_runs
 
 # Parameter sweeps
-python3 run_sensitivity.py --param lambda --values 0.90,0.93,0.95,0.97,1.0 \
+python3 phase1/run_sensitivity.py --param lambda \
+                            --values 0.90,0.93,0.95,0.97,1.0 \
                             --hands 1000 --seeds 42,137,256
+
+# Phase 2 ML simulation
+python3 phase2/run_ml_sim.py --modeldir phase2/ml/models_tabular/ \
+                              --hands 5000 --seeds 42 --db ml_test.sqlite
 ```
 
 ## Known limitations (intentional, documented)
@@ -361,7 +374,7 @@ smoke-test the runner CLIs at every stage, not just the unit tests.
 
 ## Emergency checklist
 
-- Tests fail: run `python3 run_tests.py --stage N` for the failing
+- Tests fail: run `python3 phase1/run_tests.py --stage N` for the failing
   stage in isolation. Every stage test is self-contained.
 - Simulation hangs: check `ps aux | grep python` — if a runner is
   stuck in `get_hand_strength`, it's probably a rare infinite-loop in

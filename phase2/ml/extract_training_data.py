@@ -20,6 +20,14 @@ Output::
 
 from __future__ import annotations
 
+# Ensure repo root is on sys.path
+import sys as _sys
+from pathlib import Path as _Path
+_REPO_ROOT = _Path(__file__).resolve().parent.parent.parent
+if str(_REPO_ROOT) not in _sys.path:
+    _sys.path.insert(0, str(_REPO_ROOT))
+
+
 import argparse
 import csv
 import math
@@ -30,7 +38,7 @@ import time
 from collections import defaultdict
 from typing import Dict, List, Optional, Set, Tuple
 
-from ml.feature_engineering import (
+from phase2.ml.feature_engineering import (
     ARCHETYPES,
     ACTION_LABELS,
     action_row_to_features,
