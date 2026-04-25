@@ -86,3 +86,28 @@ python phase3/run_phase3_chat.py --provider anthropic --model claude-sonnet-4-20
 - `numpy`, `treys` (Phase 1 deps)
 - For Ollama: `openai` package + Ollama running locally
 - For Claude: `anthropic` package + `ANTHROPIC_API_KEY`
+
+## Metrics Scorecard
+
+After running Phase 3, compute the same metrics scorecard used in Phase 1
+to measure whether LLM agents produce richer strategic behavior:
+
+```bash
+# One-step: run simulation + scorecard
+./run_phase3_scorecard.sh ollama llama3.1:8b 100
+
+# Or manually:
+python phase3/run_phase3_chat.py --provider ollama --model llama3.1:8b --hands 500 --db phase3_run.sqlite
+python compute_metrics.py --db phase3_run.sqlite
+```
+
+Compare output against Phase 1 baselines in `docs/metrics_framework.md`:
+
+| Dimension | Phase 1 Baseline | Phase 3 Target |
+|-----------|-----------------|----------------|
+| Trust–Profit r | −0.838 | weaker (|r| < 0.60) |
+| Trust–TEI r | −0.987 | weaker |
+| Opponent Adaptation (OA) | 0.0003 | > 0.01 |
+| Context Sensitivity (CS) | 0.069 | > 0.15 |
+| Non-Stationarity (NS) | 0.002 | > 0.01 |
+| Trust Manipulation (TMA) | +0.133 (spurious) | > 0.15 (with CoT) |
