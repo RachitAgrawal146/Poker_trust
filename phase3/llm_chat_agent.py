@@ -170,12 +170,12 @@ def make_client(provider: str, model: str, **kwargs) -> Any:
 
     Parameters
     ----------
-    provider : "anthropic" or "ollama"
+    provider : "anthropic", "ollama", or "claude-cli"
     model : model name (e.g. "claude-haiku-4-5-20251001" or "llama3.1:8b")
 
     Returns
     -------
-    Client object (Anthropic or OpenAI-compatible).
+    Client object (Anthropic, OpenAI-compatible, or None for claude-cli).
     """
     if provider == "anthropic":
         import anthropic
@@ -190,8 +190,13 @@ def make_client(provider: str, model: str, **kwargs) -> Any:
             )
         base_url = kwargs.get("base_url", "http://localhost:11434/v1")
         return OpenAI(base_url=base_url, api_key="ollama")
+    elif provider == "claude-cli":
+        # Shells out to the local `claude --print` binary; no client object needed.
+        return None
     else:
-        raise ValueError(f"Unknown provider: {provider}. Use 'anthropic' or 'ollama'.")
+        raise ValueError(
+            f"Unknown provider: {provider}. Use 'anthropic', 'ollama', or 'claude-cli'."
+        )
 
 
 def _call_llm(
@@ -214,6 +219,22 @@ def _call_llm(
                     messages=[{"role": "user", "content": user_message}],
                 )
                 return response.content[0].text
+            elif provider == "claude-cli":
+                import subprocess
+                combined = f"{system_prompt}\n\n---\n\n{user_message}"
+                # cwd=/tmp keeps the nested `claude` from loading the repo's
+                # CLAUDE.md (which would pollute every poker decision and add
+                # ~25s of context-loading overhead per call).
+                result = subprocess.run(
+                    ["claude", "--print", "--model", model, combined],
+                    capture_output=True, text=True, timeout=60, cwd="/tmp",
+                )
+                if result.returncode != 0:
+                    raise RuntimeError(
+                        f"claude CLI exited {result.returncode}: "
+                        f"{result.stderr.strip()[:200]}"
+                    )
+                return result.stdout.strip()
             else:
                 # OpenAI-compatible (Ollama)
                 response = client.chat.completions.create(
