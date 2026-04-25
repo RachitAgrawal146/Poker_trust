@@ -233,7 +233,8 @@ def main(argv: List[str] = None) -> int:
         description="Phase 3 LLM Chat Simulation — 8 LLM agents play poker"
     )
     parser.add_argument(
-        "--provider", default="ollama", choices=["anthropic", "ollama"],
+        "--provider", default="ollama",
+        choices=["anthropic", "ollama", "claude-cli"],
         help="LLM provider (default: ollama).",
     )
     parser.add_argument(
