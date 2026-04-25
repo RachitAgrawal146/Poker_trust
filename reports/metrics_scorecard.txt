@@ -1,0 +1,110 @@
+======================================================================
+METRICS SCORECARD — Phase 1 Baseline
+======================================================================
+
+Trust–Profit Correlation: r = -0.838
+
+──────────────────────────────────────────────────────────────────────
+METRIC 1: Trust Exploitation Index (TEI)
+──────────────────────────────────────────────────────────────────────
+  Agent         Trust   Actual   SD Net NonSD Net     TEI  SD WR  Fold Eq
+  oracle        0.789    +1209    +2160      -951   -0.19 52.9%   70.3%
+  sentinel      0.788     +865    +2103     -1238   -0.25 57.8%   63.6%
+  firestorm     0.421    +2725     -981     +3706   +0.74 35.5%   79.7%
+  wall          0.962     -143    +3423     -3566   -0.71 50.8%   37.7%
+  phantom       0.784     -166    +1281     -1447   -0.29 53.4%   74.4%
+  predator      0.808      +43    +1512     -1469   -0.29 50.9%   66.0%
+  mirror        0.838     +557    +2063     -1506   -0.30 52.9%   61.9%
+  judge         0.732     +110    +1254     -1144   -0.23 52.8%   68.4%
+
+  Trust–TEI Correlation: r = -0.987
+  (Negative = trusted agents lose money from trust dynamics)
+
+──────────────────────────────────────────────────────────────────────
+METRIC 2: Context Sensitivity (CS)
+──────────────────────────────────────────────────────────────────────
+  oracle        0.035  █
+  sentinel      0.118  █████
+  firestorm     0.014  
+  wall          0.009  
+  phantom       0.046  ██
+  predator      0.098  ████
+  mirror        0.101  █████
+  judge         0.132  ██████
+  Mean: 0.069  (0 = no history dependence)
+
+──────────────────────────────────────────────────────────────────────
+METRIC 3: Opponent Adaptation (OA)
+──────────────────────────────────────────────────────────────────────
+  oracle       0.0003  
+  sentinel     0.0002  
+  firestorm    0.0004  
+  wall         0.0000  
+  phantom      0.0002  
+  predator     0.0003  
+  mirror       0.0002  
+  judge        0.0003  
+  Mean: 0.0003  (0 = identical play vs all opponents)
+
+──────────────────────────────────────────────────────────────────────
+METRIC 4: Non-Stationarity (NS)
+──────────────────────────────────────────────────────────────────────
+  oracle        0.00334  █
+  sentinel      0.00270  █
+  firestorm     0.00110  
+  wall          0.00171  
+  phantom       0.00130  
+  predator      0.00209  █
+  mirror        0.00307  █
+  judge         0.00422  ██
+  Mean: 0.00244  (0 = fixed strategy across time)
+
+──────────────────────────────────────────────────────────────────────
+METRIC 5: Strategic Unpredictability (SU)
+──────────────────────────────────────────────────────────────────────
+  oracle        2.576 bits  █████████████████████████
+  sentinel      2.501 bits  █████████████████████████
+  firestorm     1.112 bits  ███████████
+  wall          0.000 bits  
+  phantom       2.575 bits  █████████████████████████
+  predator      2.545 bits  █████████████████████████
+  mirror        2.464 bits  ████████████████████████
+  judge         2.425 bits  ████████████████████████
+  Mean: 2.025 bits  (max = 3.0 bits)
+
+──────────────────────────────────────────────────────────────────────
+METRIC 6: Trust Manipulation Awareness (TMA)
+──────────────────────────────────────────────────────────────────────
+  oracle        +0.251  → farming
+  sentinel      +0.202  → farming
+  firestorm     +0.177  → farming
+  wall          -0.025  → no awareness
+  phantom       +0.089  → no awareness
+  predator      +0.237  → farming
+  mirror        +0.061  → no awareness
+  judge         +0.073  → no awareness
+  Mean: +0.133  (0 = no trust awareness)
+
+======================================================================
+COMBINED SCORECARD
+======================================================================
+
+  Dimension                         Value   Phase 3 Target      Human
+  ──────────────────────────── ────────── ──────────────── ──────────
+  Trust–Profit r                   -0.838           weaker          ?
+  Mean TEI range               -0.71 to +0.74           shifts          ?
+  Context Sensitivity (CS)          0.069              > 0        > 0
+  Opponent Adaptation (OA)         0.0003           > 0.01      0.05+
+  Non-Stationarity (NS)           0.00244              > 0        > 0
+  Unpredictability (SU bits)        2.025            > 1.5    1.5–2.5
+  Trust Manipulation (TMA)         +0.133              > 0          ?
+
+======================================================================
+KEY TAKEAWAY
+======================================================================
+
+  Phase 1 agents score near-zero on 1 of 5 behavioral dimensions:
+    • Opponent Adaptation
+
+  These are the dimensions where Phase 3 LLM agents must score > 0
+  to justify the need for more complex models.
