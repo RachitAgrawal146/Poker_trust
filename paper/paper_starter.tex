@@ -1,0 +1,194 @@
+% =============================================================================
+% paper_starter.tex -- a minimal LaTeX starter for the Polygence paper.
+%
+% This is a SIMPLER alternative to paper.tex (the full Pandoc-converted file).
+% Use this one to learn the LaTeX syntax; paste the actual content from paper.md
+% into the section bodies as you go. Compile in Overleaf -- no local install.
+%
+% Things to know:
+%   * Lines starting with % are comments (LaTeX ignores them).
+%   * \section{Foo} starts a new top-level section. \subsection{Bar} nests one
+%     level deeper.
+%   * Bold = \textbf{...}, italic = \textit{...}, monospace = \texttt{...}.
+%   * Math goes in $...$ for inline or \[...\] for displayed.
+%   * Use \cite{key} for references; the bibliography is at the end.
+% =============================================================================
+
+\documentclass[11pt]{article}
+
+% --- Packages we need ------------------------------------------------------
+\usepackage[margin=1in]{geometry}     % standard 1-inch margins
+\usepackage{amsmath, amssymb}         % math symbols and environments
+\usepackage{graphicx}                 % include figures with \includegraphics
+\usepackage{booktabs}                 % nice table rules (\toprule, \midrule)
+\usepackage{hyperref}                 % clickable links and cross-refs
+\usepackage{natbib}                   % author-year citation style
+\usepackage{xcolor}                   % color text if needed
+\usepackage{caption}                  % nicer figure/table captions
+\usepackage{microtype}                % small typography polish
+
+% --- Title block -----------------------------------------------------------
+\title{Trust Dynamics in Multi-Agent Strategic Interaction:\\
+  A Simulation Study of Bayesian Reputation Systems\\
+  in 8-Player Limit Texas Hold'em}
+\author{Rachit Agrawal\\
+  Polygence Research Project, 2025--2026}
+\date{\today}
+
+% =============================================================================
+\begin{document}
+\maketitle
+
+% --- Abstract --------------------------------------------------------------
+\begin{abstract}
+Reputation systems that infer trustworthiness from observed behavior are
+ubiquitous in online marketplaces, social networks, and financial
+platforms. Yet it remains unclear whether such systems inherently reward
+cooperative behavior or create exploitable dynamics that favor aggression.
+We investigate this question using a controlled multi-agent simulation of
+8-player Limit Texas Hold'em, where eight strategically distinct agents
+interact over hundreds of thousands of hands while maintaining Bayesian
+posterior beliefs about each other's types. We report a strong
+anticorrelation between trust and economic performance (Pearson
+$r = -0.84$): agents perceived as most trustworthy by their opponents
+accumulate the least wealth, while the least-trusted aggressive agent
+dominates through fold equity rather than superior play. We further
+demonstrate a fundamental classification ceiling and validate
+robustness across two independent implementation phases.
+\end{abstract}
+
+% =============================================================================
+\section{Introduction}
+\label{sec:intro}
+
+\subsection{Motivation}
+% TODO: copy the motivation paragraphs from paper.md section 1.1 here.
+
+\subsection{Research Question}
+% TODO: copy from paper.md 1.2.
+
+\subsection{Contributions}
+% TODO: copy from paper.md 1.3. Use a numbered list:
+\begin{enumerate}
+  \item \textbf{Trust--profit anticorrelation.} ...
+  \item \textbf{Aggression dominance via avoidance.} ...
+  \item \textbf{Classification ceiling.} ...
+\end{enumerate}
+
+% =============================================================================
+\section{Related Work}
+\label{sec:related}
+
+% TODO: copy section 2 from paper.md. Cite using \citep{key} for parenthetical
+% citations and \citet{key} for textual ones. Define the keys at the bottom of
+% this file.
+
+% =============================================================================
+\section{Methodology}
+\label{sec:methods}
+
+\subsection{Game environment}
+% TODO
+
+\subsection{Agent archetypes}
+% TODO -- the eight agents. A table is the natural format here:
+\begin{table}[htbp]
+  \centering
+  \begin{tabular}{lll}
+    \toprule
+    Archetype & Style & Bluff rate (BR) \\
+    \midrule
+    Oracle    & Nash equilibrium     & 0.33 \\
+    Sentinel  & Tight-aggressive     & 0.08 \\
+    Firestorm & Loose-aggressive     & 0.62 \\
+    Wall      & Tight-passive        & 0.04 \\
+    Phantom   & Deceptive            & 0.52 \\
+    Predator  & Adaptive exploiter   & 0.21 \\
+    Mirror    & Imitator             & 0.09 \\
+    Judge     & Conditional retaliator & 0.08 / 0.62 \\
+    \bottomrule
+  \end{tabular}
+  \caption{The eight agent archetypes. Bluff rate is the probability of
+    betting with a weak hand. Judge has two values (cooperative /
+    retaliatory).}
+  \label{tab:archetypes}
+\end{table}
+
+\subsection{Bayesian trust model}
+% TODO. Math example:
+% Each agent maintains a posterior over opponent types updated by
+\[
+  P(t \mid a_{1:n}) \propto P(a_n \mid t)^\lambda \cdot P(t \mid a_{1:n-1}),
+\]
+% where $\lambda$ is the recency-weighting parameter.
+
+% =============================================================================
+\section{Experimental Setup}
+\label{sec:setup}
+
+% TODO: 5 seeds, 10000 hands, etc. Reference Table~\ref{tab:archetypes}.
+
+% =============================================================================
+\section{Results}
+\label{sec:results}
+
+\subsection{Phase 1: Behavioral profiles}
+% TODO
+
+\subsection{Phase 1: Trust--profit anticorrelation}
+% This is the headline result. Numbers from reports/metrics_scorecard.txt:
+% trust-profit r = -0.837 (Phase 1, 5 seeds x 10000 hands).
+
+\subsection{Phase 1: Firestorm dominance via fold equity}
+% TODO -- 87.1\% fold equity number from reports.
+
+\subsection{Phase 1: Classification ceiling}
+% TODO -- the Sentinel/Mirror/Judge identifiability cluster.
+
+\subsection{Phase 2: Bounded online optimization (adaptive)}
+% NEW: copy from phase2/adaptive/phase2_report.md.
+% Headline: r unchanged at -0.769 vs Phase 1's -0.773.
+% This section replaces the OLD Phase 2 (imitation) content in paper.md.
+
+% =============================================================================
+\section{Discussion}
+\label{sec:discussion}
+
+\subsection{Why trust is costly}
+% TODO
+
+\subsection{Implications for reputation system design}
+% TODO
+
+\subsection{Limitations}
+% TODO
+
+% =============================================================================
+\section{Conclusion}
+\label{sec:conclusion}
+
+% TODO: 2-3 paragraph summary.
+
+% =============================================================================
+\section*{References}
+\label{sec:references}
+
+% Simple manual references (no .bib file needed for now). Switch to BibTeX
+% later when the list grows past ~10 entries.
+\begin{thebibliography}{99}
+
+\bibitem{neumann1944}
+J.~von Neumann and O.~Morgenstern,
+\textit{Theory of Games and Economic Behavior}.
+Princeton University Press, 1944.
+
+\bibitem{nash1950}
+J.~Nash, ``Equilibrium points in n-person games,''
+\textit{Proceedings of the National Academy of Sciences},
+vol.~36, no.~1, pp.~48--49, 1950.
+
+% TODO: add the rest from paper.md's reference section.
+
+\end{thebibliography}
+
+\end{document}
