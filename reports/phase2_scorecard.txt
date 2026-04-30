@@ -22,7 +22,7 @@ TABLE 0 -- HEADLINE SCORECARD (Phase 1 vs Phase 2)
 TABLE 1 -- BEHAVIORAL FINGERPRINTS (VPIP / PFR / AF)
 ==============================================================================
 
-  Per-archetype mean +/- std across 3 seeds. AF = (bets+raises)/calls.
+  Per-archetype mean +/- std across 3 seeds (42, 137, 256). AF = (bets+raises)/calls.
 
   Archetype         VPIP P1        VPIP P2         PFR P1         PFR P2          AF P1          AF P2
   ---------- -------------- -------------- -------------- -------------- -------------- --------------
@@ -39,7 +39,7 @@ TABLE 1 -- BEHAVIORAL FINGERPRINTS (VPIP / PFR / AF)
 TABLE 2 -- ECONOMIC ORDERING (final stacks, rebuys, rank)
 ==============================================================================
 
-  Final stack and rebuy count are mean +/- std across 3 seeds.
+  Final stack and rebuy count are mean +/- std across 3 seeds (42, 137, 256).
   Rank: 1 = highest mean stack across seeds. Delta = P2 rank minus P1 rank
         (negative = climbed, positive = fell).
 
@@ -94,7 +94,7 @@ TABLE 5 -- ADAPTATION SUCCESS (last-1000-hand profit + Firestorm)
 ==============================================================================
 
   Per-archetype net chip flow over the FINAL 1000 hands
-  (mean +/- std across 3 seeds). Profit_vs_FS is chips invested into
+  (mean +/- std across 3 seeds (42, 137, 256)). Profit_vs_FS is chips invested into
   hands Firestorm won at showdown (lower is better; emergent defense).
 
   Archetype          Last-1000 P1         Last-1000 P2          Delta    Loss->FS P1    Loss->FS P2
