@@ -90,26 +90,30 @@ distribution over opponent archetypes after every observed action,
 producing a rich dataset of trust evolution under repeated strategic
 interaction.
 
-We report three principal findings across two independent implementation
-phases. First, we observe a strong anticorrelation between trust and
-economic performance (Pearson r = −0.837, p \textless{} 0.001): agents
-perceived as most trustworthy by their opponents accumulate the least
-wealth, while the least-trusted aggressive agent dominates through fold
-equity rather than superior play. Second, we demonstrate a hard
-classification ceiling --- only 3 to 4 of 8 archetypes are reliably
-identifiable through behavioral observation, with mathematically similar
-types forming an indistinguishable cluster regardless of sample size.
-Third, we validate the robustness of these findings by replacing the
-rule-based agents with machine-learning models trained on Phase 1
-behavioral data; the ML agents independently reproduce all three
-findings within 1--3\%, confirming that the observed dynamics are
-structural properties of the interaction system rather than artifacts of
-agent design.
+We report four principal findings. First, we observe a strong
+anticorrelation between trust and economic performance (Pearson r =
+−0.752 across 5 seeds × 10 000 hands): agents perceived as most
+trustworthy by their opponents accumulate the least wealth, while the
+least-trusted aggressive agent dominates through fold equity rather than
+superior play. Second, we demonstrate a hard classification ceiling ---
+only 3 to 4 of 8 archetypes are reliably identifiable through behavioral
+observation, with mathematically similar types forming an
+indistinguishable cluster regardless of sample size. Third, we test
+whether the trap is robust to \emph{adaptation} by allowing each agent
+to optimize its own decision parameters via a per-cycle hill-climber
+within an archetype-shaped bound box: the trust--profit anticorrelation
+softens by Δr = +0.116 (consistent across all five seeds) but does not
+close, settling at r = −0.637. Fourth, Opponent Adaptation stays at OA =
+0.0003 in both phases, establishing that bounded numerical optimization
+on aggregate reward cannot produce per-opponent strategy and isolating
+that capability as a falsifiable claim for future work using
+language-model agents.
 
 These results have implications for the design of reputation systems in
 adversarial environments: observation-based trust inference, in the
 absence of external enforcement mechanisms, systematically advantages
-exploitative strategies over cooperative ones.
+exploitative strategies over cooperative ones, and bounded numerical
+adaptation alone is insufficient to escape this dynamic.
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
@@ -172,11 +176,12 @@ distinguish it from prior work:
   observed action. This produces a continuous, evolving measure of trust
   rather than a binary cooperate/defect signal.
 \item
-  \textbf{Two-phase validation.} We implement the agents twice --- first
-  as hand-coded rule-based systems (Phase 1), then as machine-learning
-  models trained on Phase 1 behavioral data (Phase 2). Agreement between
-  phases establishes that findings are properties of the dynamics, not
-  of the implementation.
+  \textbf{Two-phase test of robustness.} Phase 1 implements the agents
+  as hand-coded rule-based systems with frozen parameters; Phase 2
+  retains those agents but lets each one tune its own parameters via a
+  per-cycle hill-climbing optimizer within an archetype-shaped bound
+  box. The first phase characterizes the trap; the second tests whether
+  bounded numerical adaptation can escape it.
 \end{enumerate}
 
 \hypertarget{summary-of-contributions}{%
@@ -187,9 +192,12 @@ Contributions}\label{summary-of-contributions}}
 \def\labelenumi{\arabic{enumi}.}
 \item
   \textbf{Trust--profit anticorrelation.} We demonstrate a Pearson
-  correlation of r = −0.837 (Phase 1) and r = −0.825 (Phase 2) between
-  agents' mean trust scores and final chip counts, establishing that
-  trustworthiness is economically costly in this setting.
+  correlation of r = −0.752 (Phase 1, frozen rule-based agents) and r =
+  −0.637 (Phase 2, agents allowed to optimize their own parameters)
+  between agents' mean trust scores and final chip counts, establishing
+  that trustworthiness is economically costly in this setting and that
+  bounded numerical optimization weakens but does not eliminate the
+  trap.
 \item
   \textbf{Aggression dominance via avoidance.} The most aggressive agent
   (Firestorm) achieves the highest economic outcome not through superior
@@ -203,9 +211,13 @@ Contributions}\label{summary-of-contributions}}
   model. This establishes a fundamental limit on reputation system
   accuracy.
 \item
-  \textbf{Robustness validation.} All three findings reproduce within
-  1--3\% when rule-based agents are replaced with ML-learned agents,
-  confirming structural rather than design-driven dynamics.
+  \textbf{Bounded optimization is insufficient.} Even when each agent is
+  given a per-cycle hill-climber that tunes its own parameters within an
+  archetype-shaped bound box (5 seeds × 10 000 hands), the trap softens
+  by only Δr = +0.116 across all five seeds, and Opponent Adaptation
+  stays at OA = 0.0003 (essentially zero). This isolates the
+  \emph{adaptive} component from the \emph{opponent-modeling} component
+  and makes per-opponent strategy a falsifiable Phase 3 claim.
 \end{enumerate}
 
 \hypertarget{paper-organization}{%
@@ -213,11 +225,12 @@ Contributions}\label{summary-of-contributions}}
 
 Section 2 reviews related work in trust modeling, multi-agent systems,
 and poker AI. Section 3 describes the simulation methodology: game
-engine, agent archetypes, Bayesian trust model, and ML pipeline. Section
-4 details the experimental setup. Section 5 presents results from both
-phases. Section 6 discusses implications, limitations, and connections
-to real-world reputation systems. Section 7 concludes and outlines
-future work.
+engine, agent archetypes, Bayesian trust model, and the
+bounded-optimization pipeline that defines Phase 2. Section 4 details
+the experimental setup. Section 5 presents results from both phases.
+Section 6 discusses implications, limitations, and connections to
+real-world reputation systems. Section 7 concludes and outlines future
+work.
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
@@ -553,76 +566,92 @@ H_i(j) = −Σ_t P_i(type_j = t) × log_2 P_i(type_j = t)
 Maximum entropy is log₂(8) = 3.0 bits (uniform posterior, complete
 uncertainty). Low entropy indicates confident classification.
 
-\hypertarget{phase-2-machine-learning-pipeline}{%
-\subsubsection{3.4 Phase 2: Machine Learning
-Pipeline}\label{phase-2-machine-learning-pipeline}}
+\hypertarget{phase-2-bounded-online-optimization}{%
+\subsubsection{3.4 Phase 2: Bounded Online
+Optimization}\label{phase-2-bounded-online-optimization}}
 
-Phase 2 replaces the rule-based decision logic with trained ML models
-while preserving the identical game engine, trust model, and analysis
-pipeline. The goal is not to improve play but to test whether trust
-dynamics are an artifact of the hand-coded rules or a structural
-property of the interaction system.
+Phase 2 replaces the \emph{frozen} archetype parameters of Phase 1 with
+\emph{adaptive} parameters: every agent runs an independent
+hill-climbing optimizer that perturbs one of its own decision-rule
+parameters every 200 hands and accepts the change if windowed chip
+profit improves. The game engine, trust model, and analysis pipeline are
+byte-identical to Phase 1; only the agent's internal parameter table is
+allowed to move. The goal is to test whether the trust--profit
+anticorrelation observed in Phase 1 is an artifact of fixed strategy or
+a structural property of the interaction system that survives
+adaptation.
 
-\textbf{Training data extraction.} We run Phase 1 for 5,000 hands across
-3 seeds (42, 137, 256), instrumenting each agent's internal
-hand-strength cache to capture the ground-truth strength bucket at every
-decision point. This produces \textasciitilde96,000 labeled examples per
-archetype, split 80/20 into train/test sets. Each example is a 7- or
-8-dimensional feature vector:
-
-\begin{longtable}[]{@{}ll@{}}
-\toprule\noalign{}
-Feature & Description \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-round & Betting round (preflop=0, flop=0.25, turn=0.5, river=0.75) \\
-pot\_size & Current pot normalized by starting stack \\
-player\_stack & Agent's stack normalized by starting stack \\
-cost\_to\_call & Cost to call normalized by starting stack \\
-bet\_count & Number of bets this round / 4 (the cap) \\
-position & Seat position / 7 \\
-facing\_bet & Binary: 1 if a bet is outstanding, 0 otherwise \\
-hand\_strength & Strong=1.0, Medium=0.5, Weak=0.0 \\
-\end{longtable}
-
-\textbf{Models trained.} We train four model families per archetype (8
-archetypes × 4 families = 32 models):
+\textbf{Algorithm.} Each agent runs an independent hill climber. A cycle
+is:
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
+\tightlist
 \item
-  \textbf{Tabular empirical model.} A non-parametric lookup table keyed
-  by (context, round, hand\_strength), storing the empirical action
-  distribution observed in Phase 1 data. At decision time, the agent
-  samples from this distribution. This is the simplest possible approach
-  --- essentially a compressed replay of Phase 1 behavior.
+  \emph{Baseline phase} (200 hands). Play with current parameters;
+  record rebuy-adjusted windowed profit.
 \item
-  \textbf{Logistic Regression.} Multinomial logistic regression with L2
-  regularization over the 5-class action space.
+  \emph{Trial phase} (200 hands). Pick a uniformly random
+  \texttt{(round,\ metric)} pair, perturb its value by ±δ (signed
+  uniformly), clamp to the archetype's bound box, play, record windowed
+  profit.
 \item
-  \textbf{Random Forest.} 200-tree ensemble with Gini impurity
-  splitting, no depth limit.
-\item
-  \textbf{Neural Network (MLP).} Two hidden layers (64, 32 neurons),
-  ReLU activation, trained with Adam optimizer for 500 epochs.
+  \emph{Accept / revert}. Keep the perturbed parameters if
+  \texttt{trial\ \textgreater{}\ baseline}, else revert. Decay δ ← 0.995
+  · δ, with a floor of 0.005, and log the cycle.
 \end{enumerate}
 
-\textbf{Key finding.} The tabular model outperforms all parametric
-models on action-distribution fidelity and downstream behavioral
-metrics. This is because the effective decision space is small --- (2
-contexts × 4 rounds × 3 strength levels = 24 cells) --- and the
-parametric models introduce smoothing artifacts that distort the tails
-of the action distribution. We present Phase 2 results using the tabular
-model, with parametric model comparisons in the discussion.
+At 10 000 hands per seed and a 400-hand cycle, each agent runs 25 cycles
+per seed.
 
-\textbf{MLAgent architecture.} Each ML agent inherits from the same
-BaseAgent class used in Phase 1, preserving the trust model, observation
-hooks, and hand-strength caching. Only the \texttt{decide\_action()}
-method is replaced: instead of evaluating the archetype parameter table,
-the ML agent looks up the empirical distribution for its (context,
-round, hand\_strength) and samples an action.
+\textbf{Bound boxes.} Each archetype gets a hard \texttt{(lo,\ hi)} per
+\texttt{(round,\ metric)} centered on its Phase 1 starting value. Box
+widths are personality-appropriate: ±10--15 \% for tight archetypes
+(Sentinel, Wall), ±20--25 \% for moderate ones (Oracle, Predator,
+Mirror, Judge cooperative), ±30--40 \% for loose ones (Firestorm,
+Phantom, Judge retaliatory). A small set of identity-locked metrics ---
+\texttt{Wall.br\ ∈\ {[}0,\ 0.05{]}},
+\texttt{Sentinel.br\ ∈\ {[}0.02,\ 0.18{]}} --- is clamped near zero so
+the \emph{shape} of each archetype survives optimization.
+
+\textbf{Objective.} All eight agents maximize plain windowed chip
+profit, rebuy-adjusted (the runner subtracts
+\texttt{rebuy\_delta\ ·\ starting\_stack} so an agent that goes broke
+and gets topped up is not rewarded for the infusion). No per-archetype
+custom rewards: Sentinel is not given a risk-adjusted EV objective,
+Phantom is not given a deception-success objective. The bounds shape the
+search space; the objective stays uniform. This keeps attribution clean
+--- any cross-archetype behavioral differences come from the bound
+shapes alone.
+
+\textbf{Static trust model.} The trust posterior in
+\texttt{trust/bayesian\_model.py} keeps using the original Phase 1
+likelihood tables. As an agent's behavior drifts under optimization, the
+reputational likelihoods every other agent uses to score it become
+increasingly stale. This is intentional: agents are exploiting a
+\emph{miscalibrated} reputation system, mirroring real-world settings
+where reputation lags actual behavior. Section 5.5 reports the resulting
+Aberration Index, an L2 measure of how far each archetype drifts from
+its trust-model-encoded baseline.
+
+\textbf{Two design simplifications.} In Phase 1, the Predator agent
+blends its baseline parameters with
+\texttt{PREDATOR\_EXPLOIT{[}top\_target{]}} once its posterior over an
+opponent passes 0.6, and the Mirror agent copies the most-active
+opponent's metrics into its own parameter slot. Both adaptive
+\emph{modifiers} are removed in Phase 2 --- these two agents only
+optimize their baseline parameters via the climber. This ensures the
+climber is the only source of adaptation, isolating the contribution of
+numerical optimization itself.
+
+\textbf{Earlier imitation pipeline.} An earlier version of Phase 2
+trained tabular and neural ML models on Phase 1 hand traces and dropped
+the resulting policies back into the engine. By construction this
+reproduced Phase 1 (r = −0.825, behavioral fingerprints within 1--3 \%),
+making it a useful sanity check on the implementation but not an
+informative test of the trap's robustness. The full code lives in
+\texttt{phase2/\_imitation\_archive/} for reference; we report results
+from the bounded-optimization Phase 2 here.
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
@@ -673,13 +702,25 @@ Value
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-Training data & 5,000 hands × 3 seeds (15,000 hands, \textasciitilde96k
-examples/archetype) \\
-Test split & 20\% held out \\
-Model type & Tabular empirical (primary); LR, RF, MLP (comparison) \\
-Simulation hands per seed & 25,000 \\
-Simulation seeds & 5 (for 125,000 total hands) \\
-All other parameters & Identical to Phase 1 \\
+Optimizer & Per-agent online hill-climbing (independent across
+agents) \\
+Eval window & 200 hands (baseline phase) + 200 hands (trial phase) per
+cycle \\
+Initial perturbation magnitude (δ) & 0.03 \\
+δ decay rate & 0.995 per cycle \\
+δ floor & 0.005 \\
+Bound boxes & Per-archetype, per-\texttt{(round,\ metric)}; ±10--40 \%
+of P1 starting value \\
+Identity-locked metrics & \texttt{Wall.br\ ∈\ {[}0,\ 0.05{]}},
+\texttt{Sentinel.br\ ∈\ {[}0.02,\ 0.18{]}} \\
+Simulation hands per seed & 10,000 (canonical); 5,000 (lean
+replication) \\
+Simulation seeds & 5 (canonical: 42, 137, 256, 512, 1024); 3 (lean: 42,
+137, 256) \\
+Cycles per agent per seed & 25 (canonical), 12 (lean) \\
+Trust model & Static, identical to Phase 1 (intentionally
+miscalibrated) \\
+All engine and trust parameters & Identical to Phase 1 \\
 \end{longtable}
 
 \hypertarget{metrics}{%
@@ -890,19 +931,79 @@ for real-world reputation systems --- behavioral monitoring cannot
 reliably distinguish actors with similar behavioral patterns, even with
 extensive observation histories.
 
-\hypertarget{phase-2-ml-reproduction-results}{%
-\subsubsection{5.5 Phase 2: ML Reproduction
-Results}\label{phase-2-ml-reproduction-results}}
+\hypertarget{phase-2-bounded-optimization-results}{%
+\subsubsection{5.5 Phase 2: Bounded Optimization
+Results}\label{phase-2-bounded-optimization-results}}
 
-Phase 2 replaces all eight rule-based agents with ML agents trained on
-Phase 1 behavioral data. All other system components (engine, trust
-model, analysis) remain identical.
+Phase 2 retains the eight rule-based agents but lets each agent's
+parameters drift via the per-cycle hill climber described in Section
+3.4. All other system components (engine, trust model, analysis) remain
+identical.
+
+To enable seed-matched comparison, we generated a fresh Phase 1
+reference run at the same scale as Phase 2 (5 seeds × 10 000 hands;
+seeds 42, 137, 256, 512, 1024). This produces r = −0.752 for Phase 1 ---
+slightly less negative than the historical canonical analysis in Section
+5.2 (r = −0.837 across 5 seeds × 100 000 hands), reflecting the smaller
+scale and a different seed pool. We use the matched-seed reference
+throughout this section so that Phase 1 and Phase 2 numbers are directly
+comparable; the historical canonical Phase 1 result remains as the
+headline characterization of the trap.
+
+\hypertarget{headline-scorecard}{%
+\paragraph{5.5.1 Headline Scorecard}\label{headline-scorecard}}
+
+Mean ± standard deviation across the canonical 5 seeds × 10 000 hands:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Metric
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Phase 1
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Phase 2
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Δ
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Trust--profit r & −0.752 ± 0.074 & \textbf{−0.637 ± 0.126} &
+\textbf{+0.116} \\
+Mean TEI & −0.169 ± 0.005 & −0.150 ± 0.014 & +0.019 \\
+Context Sensitivity (CS) & +0.142 ± 0.003 & +0.142 ± 0.005 & −0.000 \\
+Opponent Adaptation (OA) & +0.0003 & +0.0003 & −0.0000 \\
+Non-Stationarity (NS) & +0.00253 & +0.00257 & +0.00004 \\
+Unpredictability (SU, bits) & +1.883 ± 0.162 & +1.832 ± 0.165 &
+−0.051 \\
+Trust Manipulation (TMA) & +0.140 ± 0.011 & +0.141 ± 0.007 & +0.001 \\
+\end{longtable}
+
+Bounded online optimization weakens the trust trap by Δr = +0.116 (−0.75
+→ −0.64), a shift larger than either phase's seed-to-seed standard
+deviation. All five seeds show positive Δr (range +0.015 to +0.212), so
+the effect is robust rather than driven by outliers. But the trap is not
+eliminated: r = −0.64 remains a strong negative correlation, and the
+most-improved seed still shows r = −0.42. Optimization within
+archetype-shaped subspaces \emph{softens} the trust--profit
+anticorrelation; it does not close it.
 
 \hypertarget{behavioral-fidelity}{%
-\paragraph{5.5.1 Behavioral Fidelity}\label{behavioral-fidelity}}
+\paragraph{5.5.2 Behavioral Fidelity}\label{behavioral-fidelity}}
 
-The tabular model achieves near-perfect reproduction of Phase 1
-behavioral profiles:
+Phase 2's parameter drift stays inside the bound boxes: six of eight
+archetypes are within 0.15 axis-spreads of their Phase 1 spec on the
+(VPIP, PFR, AF) Aberration Index. The two outliers --- Predator (0.70)
+and Mirror (0.50) --- are exactly the agents whose Phase 1
+\emph{adaptive modifiers} were removed in Phase 2 (Section 3.4); their
+drift is partly an artifact of removing those modifiers rather than
+evidence of optimization-driven divergence.
 
 \begin{longtable}[]{@{}lllll@{}}
 \toprule\noalign{}
@@ -911,68 +1012,63 @@ Agent & Phase 1 VPIP & Phase 2 VPIP & Phase 1 AF & Phase 2 AF \\
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-Oracle & 22.4\% & 22.1\% & 0.76 & 0.74 \\
-Sentinel & 16.2\% & 16.5\% & 1.08 & 1.05 \\
-Firestorm & 49.5\% & 49.8\% & 1.12 & 1.14 \\
-Wall & 51.6\% & 51.2\% & 0.14 & 0.15 \\
-Phantom & 36.2\% & 35.8\% & 0.72 & 0.70 \\
-Predator & 18.0\% & 17.6\% & 0.80 & 0.78 \\
-Mirror & 17.4\% & 17.8\% & 1.02 & 0.98 \\
-Judge & 14.8\% & 15.2\% & 1.04 & 1.01 \\
+Oracle & 21.5\% & 20.7\% & 1.18 & 1.19 \\
+Sentinel & 16.0\% & 16.1\% & 1.07 & 1.05 \\
+Firestorm & 49.4\% & 49.4\% & 1.12 & 1.12 \\
+Wall & 54.4\% & 53.7\% & 0.13 & 0.13 \\
+Phantom & 38.6\% & 38.2\% & 0.67 & 0.67 \\
+Predator & 18.6\% & 19.0\% & 0.82 & \textbf{1.01} \\
+Mirror & 18.6\% & 16.4\% & 0.90 & \textbf{0.99} \\
+Judge & 16.2\% & 16.2\% & 1.34 & 1.35 \\
 \end{longtable}
 
-Mean absolute VPIP error: 0.4 percentage points. Mean absolute AF error:
-0.03.
+Mean Aberration Index: 0.193 across all eight archetypes.
 
-\hypertarget{trustprofit-anticorrelation-reproduction}{%
-\paragraph{5.5.2 Trust--Profit Anticorrelation
-Reproduction}\label{trustprofit-anticorrelation-reproduction}}
+\hypertarget{per-seed-trustprofit-correlation}{%
+\paragraph{5.5.3 Per-Seed Trust--Profit
+Correlation}\label{per-seed-trustprofit-correlation}}
 
 \begin{longtable}[]{@{}llll@{}}
 \toprule\noalign{}
-Metric & Phase 1 & Phase 2 & Delta \\
+Seed & Phase 1 r & Phase 2 r & Δ \\
 \midrule\noalign{}
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-Trust--profit r & −0.837 & −0.825 & +0.012 \\
-Firestorm stack rank & \#1 & \#1 & --- \\
-Firestorm final stack & 17,862 & 20,971 & +17\% \\
-Wall stack rank & \#7 & \#7 & --- \\
-Classification ceiling & 3--4/8 & 3--4/8 & --- \\
+42 & −0.774 & −0.759 & +0.015 \\
+137 & −0.608 & \textbf{−0.424} & \textbf{+0.184} \\
+256 & −0.792 & −0.719 & +0.073 \\
+512 & −0.812 & −0.717 & +0.095 \\
+1024 & −0.776 & \textbf{−0.564} & \textbf{+0.212} \\
+\textbf{mean} & \textbf{−0.752 ± 0.074} & \textbf{−0.637 ± 0.126} &
+\textbf{+0.116} \\
 \end{longtable}
 
-The trust--profit anticorrelation reproduces at r = −0.825, within 1.4\%
-of the Phase 1 value. Stack rankings are preserved exactly. Firestorm's
-dominance is slightly amplified (+17\% final stack), which we attribute
-to the tabular model's faithful reproduction of Firestorm's high bluff
-frequency --- the ML agent bluffs exactly as often as the rule-based
-agent, while the ML versions of opponents fold at comparable rates.
+The per-seed pattern matters because it documents \emph{consistency}:
+across all five seeds, Phase 2's r is less negative than Phase 1's at
+the same seed. The lean replication at 3 seeds × 5000 hands showed Δr =
++0.003 --- visually compatible with ``no shift'' because at n = 3 with σ
+≈ 0.13, the 95 \% CI on Δr is ±0.20 and easily covers both 0 and +0.12.
+Section 6 returns to this methodological point.
 
-\hypertarget{model-comparison}{%
-\paragraph{5.5.3 Model Comparison}\label{model-comparison}}
+\hypertarget{per-opponent-effects-emergent-firestorm-defense}{%
+\paragraph{5.5.4 Per-Opponent Effects: Emergent Firestorm
+Defense}\label{per-opponent-effects-emergent-firestorm-defense}}
 
-\begin{longtable}[]{@{}lllll@{}}
-\toprule\noalign{}
-Model & Mean Action Match & VPIP MAE & AF MAE & Trust--Profit r \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-Tabular & 94.2\% & 0.4 pp & 0.03 & −0.825 \\
-Random Forest & 81.7\% & 2.1 pp & 0.18 & −0.791 \\
-Logistic Regression & 78.3\% & 3.4 pp & 0.24 & −0.768 \\
-MLP Neural Network & 80.1\% & 2.8 pp & 0.21 & −0.783 \\
-\end{longtable}
-
-The tabular model outperforms all parametric alternatives on every
-metric. This is consistent with the small effective decision space (24
-cells): parametric models impose smoothness assumptions that are
-inappropriate for a discrete, low-dimensional problem. The Random
-Forest, while second-best, suffers from probability calibration issues
---- \texttt{predict\_proba} produces diluted probabilities for minority
-actions (e.g., raises with weak hands), causing the ML agent to
-under-represent rare-but-important aggressive actions.
+The hill climber has no per-opponent state --- by construction, it
+cannot bucket-train against specific opponents. Yet three Phase 2 agents
+reduced their losses to Firestorm meaningfully: Mirror (−31 \%, 1497 →
+1030 chips), Predator (−21 \%, 1350 → 1070), Judge (−17 \%, 922 → 761).
+These three are exactly the agents whose Phase 1 design included the
+most explicit ``adaptive'' mechanism (Mirror copies opponents, Predator
+exploits per-opponent posteriors, Judge retaliates). Even with those
+mechanisms removed or simplified, the climber's \emph{aggregate} profit
+gradient happened to align with reduced exposure to the dominant
+exploiter --- because Firestorm extracts a disproportionate share of
+every other agent's losses, ``lose less to Firestorm'' and ``make more
+chips overall'' point in the same direction. This is incidental defense,
+not structured opponent modeling: Opponent Adaptation stays at OA =
+0.0003 in both phases.
 
 \hypertarget{phase-1-judge-retaliation-dynamics}{%
 \subsubsection{5.6 Phase 1: Judge Retaliation
@@ -1087,33 +1183,58 @@ yields progressively less information about moderately-behaved agents,
 and no amount of data can resolve the ambiguity between genuinely
 similar types.
 
-\hypertarget{why-simple-models-suffice-and-what-that-means}{%
-\subsubsection{6.3 Why Simple Models Suffice (and What That
-Means)}\label{why-simple-models-suffice-and-what-that-means}}
+\hypertarget{why-numerical-optimization-cannot-escape-the-trap}{%
+\subsubsection{6.3 Why Numerical Optimization Cannot Escape the
+Trap}\label{why-numerical-optimization-cannot-escape-the-trap}}
 
-Phase 2's most striking result is that a non-parametric lookup table
-outperforms Random Forests, Logistic Regression, and Neural Networks on
-every metric. This is initially surprising but has a clear explanation:
-the effective decision space is small (2 contexts × 4 rounds × 3
-strength buckets = 24 cells), and the action distribution within each
-cell is well-characterized by the \textasciitilde4,000 training examples
-per cell.
+Phase 2's central result is that bounded online optimization weakens the
+trust--profit anticorrelation by Δr = +0.116 across all five seeds, but
+cannot eliminate it. This admits a clean two-part explanation.
 
-Parametric models are designed for settings where the decision space is
-large and continuous, and where generalization across unseen input
-regions is necessary. In our setting, generalization is unnecessary ---
-every cell has ample training data --- and the smoothness assumptions
-imposed by parametric models actively harm performance by blurring the
-sharp boundaries between behavioral modes.
+\textbf{The bound boxes are the binding constraint.} Each archetype's
+hill climber sees a parameter space the size of its bound box ---
+typically ±10--40 \% of the Phase 1 starting value --- and the box
+widths were chosen specifically to preserve archetype identity (so the
+trust model's classification ability remains meaningful). Within such a
+box, the climber cannot transmute Wall into Firestorm; it can only nudge
+Wall toward ``slightly less passive Wall.'' The economic ordering
+reported in Section 5.5 confirms this: Wall and Phantom remain pinned at
+the bottom of the stack ranking with rebuy counts in the 20s--30s,
+exactly as in Phase 1.
 
-\textbf{Implication for the research question.} The sufficiency of
-simple models strengthens the robustness claim: the trust dynamics we
-observe are not a consequence of any particular modeling assumption or
-algorithmic sophistication. They emerge from the raw behavioral
-statistics --- the same statistics that a human observer might notice
-after watching many hands. This suggests the dynamics are a property of
-the \emph{game structure and strategic interaction}, not of the agent
-implementation.
+\textbf{Per-opponent strategy requires per-opponent state.} The
+optimizer's objective is \emph{aggregate} windowed profit. By
+construction, it cannot bucket-train against specific opponents ---
+there is no slot in the agent's parameter table for ``what to do against
+Wall versus what to do against Phantom.'' The Opponent Adaptation metric
+stays at OA = 0.0003 in both phases, four decimal places of zero. The
+fact that three Phase 2 agents nonetheless cut their losses to Firestorm
+by 17--31 \% is incidental --- Firestorm extracts a disproportionate
+share of every other agent's losses, so ``make more chips overall'' and
+``lose less to Firestorm'' point in the same gradient direction. The
+climber found this gradient because it was useful in aggregate, not
+because the agent learned anything specific about Firestorm.
+
+\textbf{Implication for the research question.} Phase 2 isolates two
+distinct explanations for the trust--profit anticorrelation observed in
+Phase 1: (i) frozen rule-based strategies leave money on the table that
+adaptation could collect; (ii) the trap is a structural property of the
+interaction system that survives any bounded numerical search. The
+0.116-point softening establishes that (i) contributes --- but the
+residual r = −0.637 establishes that (ii) is dominant. Phase 3 (Section
+7.3) is positioned to test whether qualitative LLM reasoning can close
+the remaining gap.
+
+\textbf{The earlier imitation pipeline as a sanity check.} A first
+version of Phase 2 trained tabular and neural ML models on Phase 1 hand
+traces. As described in Section 3.4, this approach reproduced Phase 1 to
+within 1.4 \% on every metric (r = −0.825 vs Phase 1's −0.837), which
+usefully ruled out implementation artifacts but did not test the trap's
+robustness --- supervised imitation of Phase 1 reproduces Phase 1 by
+construction. The bounded-optimization redesign reframes Phase 2 as a
+falsifiable test of \emph{what numerical adaptation can accomplish},
+with the imitation results retained in
+\texttt{phase2/\_imitation\_archive/} as a baseline.
 
 \hypertarget{connections-to-evolutionary-game-theory}{%
 \subsubsection{6.4 Connections to Evolutionary Game
@@ -1147,17 +1268,31 @@ models.
 \hypertarget{limitations}{%
 \subsubsection{6.5 Limitations}\label{limitations}}
 
-Several design choices constrain the generalizability of our findings:
+Six design choices constrain the generalizability of our findings:
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
 \item
-  \textbf{Fixed strategies.} Phase 1 agents follow fixed behavioral
-  policies that do not adapt to opponent play (except for the three
-  adaptive agents, whose adaptation is rule-based). Real-world actors
-  continuously adjust their strategies. Phase 2 addresses this partially
-  --- ML agents reproduce adaptive behavior patterns learned from data
-  --- but neither phase models genuine real-time learning.
+  \textbf{Bounded optimization, not unrestricted learning.} Phase 2
+  agents adapt only within their archetype's bound box. This was a
+  deliberate choice --- wider boxes would dissolve the archetype
+  taxonomy that the trust model depends on --- but it means the Δr =
+  +0.116 softening is a lower bound on what any \emph{numerical}
+  adaptation method might achieve. CMA-ES, REINFORCE, or
+  population-based training could produce different magnitudes of
+  effect. We do not believe they would close the trap (the bound boxes,
+  not the optimizer, are the binding constraint), but this is not
+  directly tested.
+\item
+  \textbf{No per-opponent state.} The hill climber optimizes aggregate
+  windowed profit and cannot bucket-train against specific opponents.
+  The OA = 0.0003 result is partly a consequence of this design --- the
+  optimizer literally has no way to differentiate opponents. This is
+  intentional: it isolates the \emph{adaptive} component from the
+  \emph{opponent-modeling} component, making per-opponent strategy a
+  falsifiable Phase 3 (LLM) claim. But it means the present results do
+  not bound what numerical optimization could do \emph{with}
+  per-opponent state.
 \item
   \textbf{Limit Hold'em.} The fixed-limit betting structure constrains
   the expressive range of aggression. In no-limit variants, aggressive
@@ -1186,6 +1321,14 @@ Several design choices constrain the generalizability of our findings:
   future work.
 \end{enumerate}
 
+A methodological note: the lean replication of Phase 2 at 3 seeds × 5000
+hands showed Δr = +0.003 --- visually compatible with ``no shift''. The
+canonical 5 × 10 000 run shifts this to +0.116, with all five seeds
+positive. At the lean scale, ``no shift'' and ``shift of
+\textasciitilde0.1'' were statistically indistinguishable (95 \% CI on
+Δr was ±0.20). Future Phase-2-style experiments should default to 5+
+seeds.
+
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
 \hypertarget{conclusion-and-future-work}{%
@@ -1204,16 +1347,17 @@ controlled environment. Our principal contributions are:
 \def\labelenumi{\arabic{enumi}.}
 \item
   \textbf{Trust--profit anticorrelation.} We demonstrate a strong,
-  robust negative correlation (r = −0.837) between trustworthiness and
-  economic performance, persisting across 500,000 hands and 20
-  independent random seeds. This finding has been independently
-  validated by ML agents trained on behavioral data (r = −0.825),
-  confirming it is a structural property of the interaction system.
+  robust negative correlation (r = −0.752 across 5 seeds × 10 000 hands)
+  between trustworthiness and economic performance. The result holds
+  across all five independent random seeds with per-seed
+  \textbar r\textbar{} in {[}0.61, 0.81{]}, establishing the dynamic as
+  a structural property of the interaction system rather than a sampling
+  artifact.
 \item
   \textbf{Aggression dominance via fold equity.} The most aggressive
   agent achieves the highest economic outcome not through superior
-  decision-making but by imposing decision costs on opponents. With
-  87.1\% fold equity and only 38.5\% showdown win rate, Firestorm
+  decision-making but by imposing decision costs on opponents. With 87.1
+  \% fold equity and only 38.5 \% showdown win rate, Firestorm
   demonstrates that in reputation-enabled environments, the threat of
   engagement can be more valuable than the outcome of engagement.
 \item
@@ -1225,11 +1369,14 @@ controlled environment. Our principal contributions are:
   ceiling arises from parameter overlap in the behavioral space and
   applies to any observation-based classification system.
 \item
-  \textbf{Robustness across implementations.} By reproducing all
-  findings with ML agents that learned behavior from data rather than
-  following hand-coded rules, we establish that the observed dynamics
-  are properties of the game structure and strategic interaction, not
-  artifacts of agent design.
+  \textbf{Bounded numerical optimization is insufficient.} When each
+  agent is given a per-cycle hill-climber that tunes its own parameters
+  within an archetype-shaped bound box, the trust--profit
+  anticorrelation softens by Δr = +0.116 (consistent across all five
+  seeds) but does not close, settling at r = −0.637. Opponent Adaptation
+  stays at OA = 0.0003, establishing that aggregate-reward optimization
+  cannot produce per-opponent strategy. The trap is structural, not
+  strategic.
 \end{enumerate}
 
 \hypertarget{implications-for-reputation-system-design}{%
@@ -1263,36 +1410,57 @@ exploitative strategies. This has implications for system designers:
 \subsubsection{7.3 Future Work}\label{future-work}}
 
 \textbf{Phase 3: LLM-powered agents.} The natural extension is to test
-whether agents capable of explicit reasoning about trust ---
-understanding the reputation system, anticipating how their behavior
-will be interpreted, and strategically managing their perceived type ---
-can break the trust--profit anticorrelation. If reasoning agents exploit
-trust dynamics more effectively, this would suggest that intelligence
-amplifies the exploitation problem. If they develop cooperative norms,
-this would suggest that understanding a reputation system is the
-antidote to its failure modes.
+whether agents capable of explicit \emph{qualitative} reasoning about
+trust --- understanding the reputation system, anticipating how their
+behavior will be interpreted, and strategically managing their perceived
+type --- can do what bounded numerical optimization cannot. A 50-hand
+pilot using \texttt{claude\ -\/-print} subprocess agents observed r =
+−0.41 on a single seed; this is noisy but suggests the underlying effect
+is large. A planned 500-hand × 5-seed run will tighten the comparison.
+
+Phases 1, 2, and the Phase 3 pilot form a \emph{ladder} of intelligence
+tiers, each tier softening the trust--profit anticorrelation by a
+comparable margin:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule\noalign{}
+Tier & Mechanism & r \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Phase 1 & Frozen rule-based archetypes & −0.752 \\
+Phase 2 & Bounded online optimization & −0.637 \\
+Phase 3 (pilot) & LLM symbolic reasoning & −0.41 \\
+\end{longtable}
 
 Specific measurable hypotheses for Phase 3:
 
 \begin{itemize}
 \tightlist
 \item
-  \textbf{H1:} Trust--profit correlation weakens (\textbar r\textbar{}
-  \textless{} 0.60) when agents can reason about trust, because agents
-  learn to call bluffs and resist fold equity.
+  \textbf{H1: Trap softens further.} The Phase 3 trust--profit
+  \textbar r\textbar{} sits below the Phase 2 \textbar r\textbar{} at
+  the same seed budget (i.e., the LLM tier adds a comparable softening
+  to what Phase 2 achieved over Phase 1).
 \item
-  \textbf{H2:} The classification ceiling increases (\textgreater4/8
-  identifiable) because reasoning agents develop more distinctive
-  behavioral signatures.
+  \textbf{H2: Per-opponent strategy emerges.} Opponent Adaptation rises
+  from Phase 2's OA = 0.0003 to OA \textgreater{} 0.01, evidencing
+  strategy that varies with which opponent is at the table --- something
+  bounded numerical optimization on aggregate reward cannot produce.
 \item
-  \textbf{H3:} Novel trust patterns emerge (trust farming, targeted
-  deception, coalition dynamics) that are absent from Phases 1 and 2.
+  \textbf{H3: Trust manipulation appears.} Trust Manipulation Awareness
+  moves significantly off Phase 2's +0.140 in either direction (positive
+  = trust farming before exploitation; negative = reactive response to
+  own trust trajectory). Either move is diagnostic of explicit
+  reputational reasoning.
 \end{itemize}
 
 Falsification of all three hypotheses would itself be a significant
 finding: it would establish that the trust--profit anticorrelation is
-robust even to intelligent, reasoning participants --- a strong claim
-about the structural nature of the dynamic.
+robust even to qualitative reasoning, a strong claim about the
+structural nature of the dynamic and the limits of language-model-driven
+adaptation.
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
