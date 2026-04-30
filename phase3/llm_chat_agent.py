@@ -212,10 +212,21 @@ def _call_llm(
     for attempt in range(max_retries + 1):
         try:
             if provider == "anthropic":
+                # Cache the system prompt: personality specs are constant per
+                # archetype across an entire run, so caching cuts input cost
+                # by ~10x on the cached portion (~$0.08/M vs $0.80/M for
+                # Haiku). The user message (game state) is not cached
+                # because it changes every call.
                 response = client.messages.create(
                     model=model,
                     max_tokens=16,
-                    system=system_prompt,
+                    system=[
+                        {
+                            "type": "text",
+                            "text": system_prompt,
+                            "cache_control": {"type": "ephemeral"},
+                        }
+                    ],
                     messages=[{"role": "user", "content": user_message}],
                 )
                 return response.content[0].text
