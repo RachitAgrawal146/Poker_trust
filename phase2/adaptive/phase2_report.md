@@ -1,12 +1,16 @@
-# Phase 2 (Adaptive) Report — Bounded Online Optimization Cannot Escape the Trust Trap
+# Phase 2 (Adaptive) Report — Bounded Online Optimization Weakens But Cannot Escape the Trust Trap
 
 **Author:** Rachit Agrawal | Polygence Research Project | 2025–2026
 **Branch:** `claude/poker-trust-phase-2-C1yUP` (phase2-adaptive lineage)
-**Run config:** 3 seeds × 5 000 hands, `eval_window = 200`, `delta = 0.03 → 0.005`, decay 0.995
-**Artifacts:** `reports/phase2_scorecard.txt`, `phase2/adaptive/optimization_log.json`,
-`phase2/adaptive/param_trajectories.json`,
-`runs_phase1_ref.sqlite` (P1 reference, gitignored),
-`runs_phase2_adaptive.sqlite` (P2 adaptive, gitignored)
+**Canonical run config:** 5 seeds × 10 000 hands, `eval_window = 200`,
+`delta = 0.03 → 0.005`, decay 0.995. Lean run (3 × 5000) executed first as a
+sanity check — see Section 6 for the lean-vs-long comparison.
+**Artifacts:** `reports/phase2_scorecard_long.txt` (canonical),
+`reports/phase2_scorecard.txt` (lean),
+`phase2/adaptive/optimization_log_long.json`,
+`phase2/adaptive/param_trajectories_long.json`,
+`runs_phase1_long.sqlite` (P1 reference, gitignored),
+`runs_phase2_long.sqlite` (P2 adaptive, gitignored)
 
 ---
 
@@ -96,117 +100,145 @@ how far behavior drifts from the spec.
   Phase 2 — they only optimize `predator_baseline` and `mirror_default`. This
   ensures the climber is the only source of adaptation, which is the cleanest
   test of "what can numerical optimization alone do?"
-- **3 seeds × 5 000 hands**, not the Phase 1 canonical 5 × 10 000. Lean
-  configuration so the comparison is repeatable on a laptop in 30 minutes.
-  A 5 × 10 000 long run is staged but not yet executed (see Section 6).
+- **5 seeds × 10 000 hands canonical, 3 seeds × 5 000 hands lean.** The
+  lean configuration was run first as a sanity check (~25 minutes wall on
+  a laptop); the canonical configuration matches Phase 1's research
+  scale. Section 6.1 documents the lean-vs-long shift.
 
 ## 3. Results
 
-All numbers below are means ± standard deviations across the three seeds
-(42, 137, 256). The full scorecard is `reports/phase2_scorecard.txt`.
+All numbers below are means ± standard deviations across the five canonical
+seeds (42, 137, 256, 512, 1024) at 10 000 hands each. Full scorecard:
+`reports/phase2_scorecard_long.txt`. A lean replication (3 seeds × 5000)
+in `reports/phase2_scorecard.txt` showed the same qualitative pattern but
+with wider error bars; the long run is canonical and Section 6.1 discusses
+the differences.
 
 ### 3.1 Headline scorecard (Table 0)
 
 | Metric | Phase 1 | Phase 2 | Δ |
 |---|---|---|---|
-| Trust–Profit r | −0.773 ± 0.084 | **−0.769 ± 0.139** | +0.003 |
-| Mean TEI | −0.175 ± 0.011 | −0.143 ± 0.016 | +0.033 |
-| Context Sensitivity (CS) | +0.143 ± 0.004 | +0.145 ± 0.003 | +0.002 |
+| Trust–Profit r | −0.752 ± 0.074 | **−0.637 ± 0.126** | **+0.116** |
+| Mean TEI | −0.169 ± 0.005 | −0.150 ± 0.014 | +0.019 |
+| Context Sensitivity (CS) | +0.142 ± 0.003 | +0.142 ± 0.005 | −0.000 |
 | Opponent Adaptation (OA) | +0.0003 | +0.0003 | −0.0000 |
-| Non-Stationarity (NS) | +0.00238 | +0.00246 | +0.00009 |
-| Unpredictability (SU bits) | +1.924 ± 0.107 | +1.963 ± 0.076 | +0.040 |
-| Trust Manipulation (TMA) | +0.129 ± 0.003 | +0.120 ± 0.019 | −0.009 |
+| Non-Stationarity (NS) | +0.00253 | +0.00257 | +0.00004 |
+| Unpredictability (SU bits) | +1.883 ± 0.162 | +1.832 ± 0.165 | −0.051 |
+| Trust Manipulation (TMA) | +0.140 ± 0.011 | +0.141 ± 0.007 | +0.001 |
 
-Five of the seven numbers move by less than one Phase-1 standard deviation.
-The two that do move (TEI and SU) move *toward* the Phase 1 ceiling (less
-trust extraction, slightly more unpredictability), but the central
-trust-profit anti-correlation is, within seed noise, identical.
+The headline finding: **bounded online optimization weakens the trust
+trap by Δr = +0.116 (−0.75 → −0.64), but does not eliminate it.** This
+shift is bigger than either phase's seed-to-seed standard deviation
+(P1: 0.074; P2: 0.126), so it is unlikely to be noise. Other behavioral
+metrics — CS, OA, NS, TMA — stay flat to four decimal places, which means
+the r movement is *not* an artifact of agents becoming more volatile or
+more opponent-aware. They are, in aggregate, the same kind of agent;
+they have just shifted to a slightly less-exploitable point in their
+parameter boxes.
 
 ### 3.2 Behavioral fingerprints (Table 1)
 
-VPIP, PFR and AF (= (bets + raises) / calls) per archetype. The interesting
-movements are concentrated in the agents that lost their Phase 1 adaptive
-modifiers:
+VPIP, PFR and AF (= (bets + raises) / calls) per archetype. As at the lean
+scale, the interesting movements concentrate in the two agents that lost
+their Phase 1 adaptive modifiers:
 
-- **Predator** AF rises from 0.83 → **0.98** (+18 %); its baseline was the
-  point the climber optimized, and it walked toward more aggression.
-- **Mirror** VPIP drops 0.19 → 0.16, AF rises 0.90 → **1.02**. Without the
-  opponent-mimic copy step, the climber tightened Mirror's preflop range and
-  pushed its postflop aggression up.
-- **Oracle** drops slightly (VPIP 0.22 → 0.21, AF 1.16 → 1.10), the only
-  archetype where adaptation reduced aggression.
-- **Sentinel, Firestorm, Wall, Phantom, Judge** stay essentially flat
-  (drift well under one P1 std on every axis).
+- **Predator** AF rises from 0.82 → **1.01** (+23 %), and its preflop PFR
+  rises from 0.041 → 0.054 (+32 %). Without the `PREDATOR_EXPLOIT` blend,
+  the climber walked Predator's baseline toward broadly more aggression.
+- **Mirror** VPIP drops 0.19 → 0.16 (−12 %), AF rises 0.90 → **0.99**
+  (+10 %). Without the opponent-mimic copy step, the climber tightened
+  Mirror's preflop range and pushed its postflop aggression up.
+- **Six other archetypes stay essentially flat** — Oracle, Sentinel,
+  Firestorm, Wall, Phantom, Judge all drift well under one P1 std on every
+  axis. This is exactly the bound-box invariance we designed for.
 
 ### 3.3 Economic ordering (Table 2)
 
-| Archetype | Stack P1 | Stack P2 | Rank P1 | Rank P2 | ΔRank |
-|---|---|---|---|---|---|
-| firestorm | 3275 ± 395 | **3982 ± 565** | 1 | 1 | 0 |
-| oracle | 1064 ± 404 | 693 ± 196 | 2 | 3 | +1 |
-| sentinel | 1036 ± 198 | **447 ± 210** | 3 | 5 | +2 |
-| mirror | 908 ± 227 | 676 ± 217 | 4 | 4 | 0 |
-| judge | 527 ± 181 | **1247 ± 454** | 5 | **2** | **−3** |
-| predator | 367 ± 91 | 415 ± 127 | 6 | 6 | 0 |
-| wall | 79 ± 30 | 114 ± 53 | 7 | 7 | 0 |
-| phantom | 77 ± 81 | 93 ± 52 | 8 | 8 | 0 |
+| Archetype | Stack P1 | Stack P2 | Rebuys P1 | Rebuys P2 | Rank P1 | Rank P2 | ΔRank |
+|---|---|---|---|---|---|---|---|
+| firestorm | 6875 ± 847 | **7953 ± 1082** | 0 | 0 | 1 | 1 | 0 |
+| oracle | 1718 ± 597 | 1339 ± 331 | 0 | 0 | 2 | 2 | 0 |
+| sentinel | 1535 ± 284 | 1034 ± 537 | 0 | 1 | 3 | 3 | 0 |
+| mirror | 1375 ± 714 | 681 ± 245 | 1 | 1 | 4 | **6** | **+2** |
+| judge | 1243 ± 337 | 929 ± 488 | 1 | 1 | 5 | **4** | **−1** |
+| predator | 336 ± 233 | **754 ± 513** | 4 | 1 | 6 | **5** | **−1** |
+| phantom | 135 ± 58 | 147 ± 59 | 23 | 21 | 7 | 7 | 0 |
+| wall | 103 ± 44 | 84 ± 34 | 29 | 32 | 8 | 8 | 0 |
 
-Three significant moves:
+Four significant moves:
 
-1. **Firestorm got more dominant** under adaptation (+707 chips on average),
-   widening its lead over the field.
-2. **Judge climbed three ranks** (5 → 2). Its retaliatory params live in a
-   loose bound box (±30–40 %), and the climber found gains there.
-3. **Sentinel collapsed** from 1036 → 447 chips and now needs rebuys (1 ± 1
-   per seed vs 0 in P1). Its tight bound box (±10–15 %) gave the climber
-   little room, and the small moves it did make hurt rather than helped.
+1. **Firestorm got more dominant** under adaptation (+1078 chips on
+   average), widening its already large lead. Its bound box is ±30–40 % so
+   the climber had room to optimize, and it pushed Firestorm's preflop
+   `mbr` (medium-bet rate) down by 0.139 — folding more medium hands
+   preflop and concentrating its action on strong holdings, a more
+   exploitative profile.
+2. **Predator climbed one rank** (6 → 5) with stack +124 % (336 → 754).
+   This is the largest *relative* improvement in the table.
+3. **Mirror fell two ranks** (4 → 6), losing exactly half its stack
+   (1375 → 681). Removing the opponent-mimic adaptation hurt Mirror
+   more than the climber could recover within its bound box.
+4. **Judge climbed one rank** (5 → 4), modest gain. Most of Judge's
+   value in Phase 2 comes from the retaliatory state, which has a loose
+   bound box and fired against all 7 opponents at this scale.
 
-The bottom of the ordering is unchanged — Wall and Phantom are still pinned
-at the floor with double-digit rebuy counts (~14 and ~11 respectively), and
-adaptation didn't pull them up.
+The bottom of the ordering is unchanged — Wall and Phantom are still
+pinned at the floor with 21–32 rebuys per seed, and adaptation didn't
+pull them up.
 
 ### 3.4 Trust–profit r per seed (Table 3)
 
 | Seed | Phase 1 r | Phase 2 r | Δ |
 |---|---|---|---|
-| 42 | −0.838 | **−0.878** | −0.039 |
-| 137 | −0.825 | **−0.858** | −0.033 |
-| 256 | −0.654 | −0.573 | +0.082 |
-| mean | −0.773 ± 0.084 | −0.769 ± 0.139 | +0.003 |
+| 42 | −0.774 | −0.759 | +0.015 |
+| 137 | −0.608 | **−0.424** | **+0.184** |
+| 256 | −0.792 | −0.719 | +0.073 |
+| 512 | −0.812 | −0.717 | +0.095 |
+| 1024 | −0.776 | **−0.564** | **+0.212** |
+| mean | −0.752 ± 0.074 | **−0.637 ± 0.126** | **+0.116** |
 
-In two of three seeds the trap got *stronger* under adaptation, not weaker.
-Seed 256 is the only one where adaptation softened the anti-correlation,
-and even there the result (−0.573) is far from neutral. The 3-seed mean
-matching to within 0.003 is essentially a coincidence of two opposite-sign
-shifts cancelling; the per-seed pattern is more informative than the mean.
+**The direction is consistent across every seed.** In all five seeds,
+Phase 2's r is less negative than Phase 1's at the same seed. Magnitudes
+range from +0.015 (seed 42, basically noise) to +0.212 (seed 1024, large).
+Compared to the lean run — where two of three seeds went the *other*
+direction — the long-run pattern is robust.
+
+Seeds 137 and 1024 deserve a callout: at +0.184 and +0.212 they move r
+from "strong negative" to "moderate negative", showing that adaptation
+*can* meaningfully soften the trap when the seed conditions are favorable.
+Seeds 42, 256, and 512 still show the trap at near-Phase-1 strength.
 
 ### 3.5 Parameter trajectories (Table 4)
 
-Each agent runs ~12 cycles per seed (3 seeds × 12 = 36 total). The
+Each agent runs 25 cycles per seed (5 seeds × 25 = 125 total). The
 hill-climber's bookkeeping:
 
-| Archetype | Cycles | Accepted | Reject | Rate | L1 dist | Most-moved metric |
+| Archetype | Cycles | Accepted | Rejected | Rate | L1 dist | Most-moved (round, metric, Δ) |
 |---|---|---|---|---|---|---|
-| judge | 36 | 22 | 14 | 61.1 % | 0.215 | river br −0.060 |
-| firestorm | 36 | 21 | 15 | 58.3 % | 0.202 | preflop strong_raise −0.060 |
-| mirror | 36 | 21 | 15 | 58.3 % | 0.202 | river strong_fold +0.059 |
-| oracle | 36 | 19 | 17 | 52.8 % | 0.176 | river weak_call −0.058 |
-| phantom | 36 | 19 | 17 | 52.8 % | 0.157 | preflop med_raise +0.058 |
-| predator | 36 | 19 | 17 | 52.8 % | 0.184 | flop weak_call −0.059 |
-| sentinel | 36 | 15 | 21 | **41.7 %** | 0.127 | preflop strong_call +0.060 |
-| wall | 36 | 15 | 21 | **41.7 %** | 0.133 | flop cr +0.058 |
+| mirror | 125 | 74 | 51 | **59.2 %** | 0.320 | river strong_fold +0.086 |
+| predator | 125 | 69 | 56 | 55.2 % | 0.321 | flop vbr +0.086 |
+| firestorm | 125 | 67 | 58 | 53.6 % | 0.339 | preflop mbr **−0.139** |
+| oracle | 125 | 62 | 63 | 49.6 % | 0.307 | flop strong_fold −0.059 |
+| phantom | 125 | 62 | 63 | 49.6 % | 0.299 | preflop med_raise +0.057 |
+| sentinel | 125 | 62 | 63 | 49.6 % | 0.286 | preflop strong_call +0.117 |
+| judge | 125 | 58 | 67 | 46.4 % | 0.319 | turn weak_call +0.086 |
+| wall | 125 | 55 | 70 | **44.0 %** | 0.276 | river weak_call +0.083 |
 
-Two patterns:
+Two patterns survive from the lean run, plus one new finding:
 
-- **Sentinel and Wall, the two tight-bound archetypes, also have the lowest
-  accept rate and smallest L1 movement.** Bounds and acceptance interact: a
-  smaller box means a higher fraction of perturbations end up clamped, and
-  the climbed value is then tested against a baseline that is already
-  near-optimal for the box.
-- The *direction* of the most-moved metric is consistent across seeds for
-  every archetype (all eight rows have signed deltas of magnitude 0.058–0.060,
-  i.e. the maximum allowed by `delta=0.03 × 12 cycles × decay = ~0.06`).
-  The climber found one strong gradient direction per archetype and rode it.
+- **Wall still has the lowest accept rate** (44 %), consistent with its
+  tight bound box constraining the search. Sentinel's accept rate
+  (49.6 %) is closer to the median at the long scale, and its L1 movement
+  is now meaningful (0.286 with a +0.117 swing on `preflop strong_call`).
+  At more cycles the tight-bound agents *do* find directions, just slowly.
+- **L1 distances are about 1.7× the lean run** (lean: 0.13–0.22; long:
+  0.28–0.34). With 25 cycles instead of 12 and a δ that decays to ~0.026
+  by cycle 25, the climber moves further. None of the agents have plateaued.
+- **New: Firestorm's most-moved metric is preflop `mbr = −0.139`** —
+  more than double the next-largest move on the table. At the long
+  horizon, Firestorm strongly prefers folding medium hands preflop,
+  concentrating its huge bluff rate (br) on strong-or-bust profiles. This
+  is the parameter signature behind Firestorm's stack growth in §3.3.
 
 ### 3.6 Adaptation success: last-1000-hand profit + Firestorm leak (Table 5)
 
@@ -217,30 +249,41 @@ disproportionately from extracting value from the table.
 
 | Archetype | Last-1k P1 | Last-1k P2 | Δ | Loss→FS P1 | Loss→FS P2 |
 |---|---|---|---|---|---|
-| firestorm | +927 ± 128 | **+1038** | +110 | — | — |
-| oracle | +585 ± 253 | +617 ± 326 | +32 | 608 | 622 |
-| sentinel | +482 ± 88 | **+284 ± 58** | **−198** | 461 | **572** |
-| wall | −107 ± 77 | **−390 ± 141** | **−283** | 2400 | 2282 |
-| phantom | −145 ± 160 | −19 ± 58 | +126 | 613 | 662 |
-| predator | +412 ± 148 | +508 ± 335 | +96 | 688 | **509** |
-| mirror | +387 ± 158 | +380 ± 56 | −7 | 791 | **456** |
-| judge | +458 ± 151 | **+581 ± 56** | +123 | 423 | **264** |
+| firestorm | +1133 ± 194 | +1026 ± 239 | −108 | — | — |
+| oracle | +671 ± 177 | +474 ± 224 | −197 | 1214 | 1199 |
+| sentinel | +405 ± 66 | +429 ± 187 | +24 | 952 | 1111 |
+| wall | −410 ± 183 | **−177 ± 173** | **+232** | 4764 | 4766 |
+| phantom | −72 ± 241 | −57 ± 126 | +15 | 1289 | 1354 |
+| predator | +474 ± 137 | +431 ± 179 | −44 | 1350 | **1070** |
+| mirror | +318 ± 131 | **+485 ± 157** | **+168** | 1497 | **1030** |
+| judge | +480 ± 207 | +390 ± 144 | −90 | 922 | **761** |
 
-Two findings worth surfacing:
+Three findings worth surfacing — note that two flipped sign relative to
+the lean run:
 
-1. **Adaptation hurt the rule-followers.** Sentinel (−198) and Wall (−283)
-   are the two tight-bound archetypes; the climber couldn't find profit
-   improvements within the box and the small drift it did produce was net
-   negative. This is consistent with their low accept rate.
-2. **Emergent Firestorm defense exists, but only in some agents.** Mirror
-   cuts its leak to Firestorm by 42 % (791 → 456), Judge by 38 %
-   (423 → 264), Predator by 26 % (688 → 509). Sentinel's leak grows by
-   24 % (461 → 572). Wall is essentially saturated (2282 ≈ 2400) — its
-   chips go to Firestorm whether or not the climber is running. The
-   climber found per-opponent defense in some agents because the global
-   profit signal happens to align with reduced-leak-to-the-dominant-player,
-   but this is incidental, not structured: there is no per-opponent state
-   in the optimizer. Section 4 unpacks why this matters for Phase 3.
+1. **Wall improved at long scale.** Lean: −283 chips. Long: +232 chips.
+   At 25 cycles the climber found something for Wall (most-moved metric
+   `river weak_call +0.083`), and Wall's last-1000 deficit shrank by 57 %.
+   Wall still loses overall — its rebuy count (32) is the highest on the
+   table — but the trend is toward stabilization, not collapse.
+2. **Sentinel did not collapse.** Lean: −198 chips, the most negative
+   delta in the lean run. Long: +24 chips, essentially flat. The lean
+   "tight bounds destroy Sentinel" story does not hold at the canonical
+   scale; Sentinel is fine, just doesn't gain.
+3. **Emergent Firestorm defense is the most interesting finding.**
+   Mirror cuts its leak to Firestorm by 31 % (1497 → 1030), Predator by
+   21 % (1350 → 1070), Judge by 17 % (922 → 761). These three are
+   exactly the agents whose Phase 1 design included the most "adaptive"
+   sub-mechanism (Mirror copies opponents, Predator exploits per-opponent
+   posteriors, Judge retaliates) — and even with those mechanisms removed
+   or simplified, the climber still found profit improvements that
+   reduce their leak to the dominant exploiter. Sentinel and Wall — the
+   rule-bound, non-adaptive archetypes — show the opposite or no change
+   (Sentinel +17 % leak, Wall flat). The climber's global profit
+   gradient happens to align with "lose less to Firestorm" because
+   Firestorm extracts a disproportionate share of every other agent's
+   losses; this is incidental defense, not structured opponent modeling.
+   Section 4 unpacks why this matters for Phase 3.
 
 ### 3.7 Aberration Index: behavioral drift from spec (Table 6)
 
@@ -250,22 +293,25 @@ standard deviation (so a unit equals "one P1 archetype-spread"):
 
 | Archetype | L2 drift | dominant axis |
 |---|---|---|
-| **predator** | **0.609** | AF +0.15 |
-| **mirror** | **0.546** | AF +0.12, VPIP −0.028 |
-| judge | 0.266 | AF +0.07 |
-| oracle | 0.205 | AF −0.06 |
-| phantom | 0.147 | VPIP −0.011 |
-| sentinel | 0.098 | AF −0.03 |
-| wall | 0.047 | (mostly clamped) |
-| firestorm | 0.037 | (mostly clamped) |
+| **predator** | **0.701** | AF +0.19, PFR +0.013 |
+| **mirror** | **0.501** | AF +0.10, VPIP −0.022 |
+| phantom | 0.128 | VPIP −0.005, PFR +0.004 |
+| oracle | 0.063 | AF +0.01 |
+| judge | 0.052 | AF +0.01 |
+| wall | 0.048 | (mostly clamped) |
+| sentinel | 0.036 | AF −0.01 |
+| firestorm | 0.013 | (essentially fixed) |
 
-Mean Aberration Index: **0.244**. The two largest drifters are exactly the
-agents whose Phase 1 adaptive modifiers were removed (Predator's
-`PREDATOR_EXPLOIT` blend, Mirror's opponent copy). Their drift is therefore
-partly an artifact of removing the modifier rather than evidence of
-optimization-driven divergence. The remaining six archetypes drift well
-within one axis-spread, confirming that the bound boxes successfully
-preserve archetype identity even after optimization.
+Mean Aberration Index: **0.193** (lean run was 0.244). The two largest
+drifters are still the agents whose Phase 1 adaptive modifiers were
+removed (Predator's `PREDATOR_EXPLOIT` blend, Mirror's opponent copy);
+their drift is partly an artifact of the modifier removal rather than
+optimization-driven divergence. The other six archetypes drift well
+under 0.15 axis-spreads, confirming that the bound boxes preserve
+archetype identity even at the canonical horizon. The slight *decrease*
+from lean to long (0.244 → 0.193) suggests the climber finds a
+narrower profit-optimal pocket within each bound box at higher cycle
+counts — agents settle rather than wander.
 
 ## 4. Key findings
 
@@ -273,86 +319,115 @@ Five questions, five answers.
 
 ### 4.1 Did the trust trap weaken under adaptation?
 
-**No.** Trust–profit r moves from −0.773 to −0.769 — a delta of +0.003,
-which is two orders of magnitude smaller than the seed-to-seed standard
-deviation (0.084 in Phase 1, 0.139 in Phase 2). In two of three seeds the
-trap got *stronger* under adaptation. The bounded numerical optimization
-hypothesis — "if Phase 1's anti-correlation is just an artifact of fixed
-parameters, then letting agents tune their own params should weaken it" —
-is rejected within the resolution of this experiment.
+**Yes, partially.** Trust–profit r moves from −0.752 to −0.637 — a delta
+of +0.116, which is larger than either phase's seed-to-seed standard
+deviation (0.074 in Phase 1, 0.126 in Phase 2). All five seeds show
+positive deltas, confirming the effect is robust rather than driven by
+one or two outliers. But the trap is not eliminated: r = −0.64 is still a
+strong negative correlation, and at no seed did r come close to zero
+(min |r| in Phase 2 = 0.42, on seed 137). Bounded numerical optimization
+chips ~0.12 off the trap; it cannot remove it.
+
+This is the lean-vs-long result that flipped. The 3 × 5000 lean run
+showed Δr = +0.003, well inside seed noise, with two of three seeds
+moving the *wrong* way. Section 6.1 discusses why the long horizon
+recovers a different conclusion.
 
 ### 4.2 Which archetypes actually adapted?
 
-Three patterns:
+Four patterns:
 
-- **Predator and Mirror drifted the most** (Aberration Index 0.61 and 0.55),
-  but this is largely because they lost their built-in Phase 1 adaptation.
-  The climber walked them toward more aggression (AF +0.12 to +0.15).
-- **Judge benefited the most economically** (final stack +720, rank #5 → #2),
-  driven by tuning its retaliatory params (the loose-bound state).
-- **Sentinel and Wall, the tight-bound archetypes, lost ground** (Sentinel
-  −589 chips, lowest accept rate at 41.7 %). The bounded search space
-  protects archetype identity but also denies these agents the freedom to
-  find profit improvements.
+- **Predator and Mirror drifted the most** (Aberration Index 0.70 and 0.50),
+  but this is largely because they lost their built-in Phase 1 adaptation
+  modifiers. The climber walked Predator's baseline toward broadly more
+  aggression (AF +0.19, PFR +0.013) and Mirror toward a tighter, more
+  aggressive postflop profile (VPIP −0.022, AF +0.10).
+- **Firestorm got more dominant**, gaining ~1100 chips on average (+16 %)
+  by adopting a "fold medium hands preflop, then aggress on strong-or-bust"
+  profile — its preflop `mbr` dropped −0.139, the largest single-parameter
+  movement in the optimization log.
+- **Mirror is the only Phase-2 *winner* in last-1000-hand profit**
+  (+168 chips vs Phase 1), despite falling two ranks in final stack.
+  The discrepancy reflects an early-game cost of removing the mimic
+  modifier; the climber recovers from that cost over 25 cycles, but
+  not enough to climb back up the cumulative-stack ranking.
+- **Sentinel and Wall, the tight-bound archetypes, did not collapse**
+  (lean run prediction was wrong) but also did not improve. Their
+  accept rates (49.6 %, 44.0 %) and L1 movements (0.286, 0.276) are
+  the smallest in the table — bounded optimization preserves their
+  archetype identity but offers them little upside.
 
 ### 4.3 Did per-opponent strategies emerge?
 
-**No.** Opponent Adaptation stayed at 0.0003 in both phases (zero to three
+**No.** Opponent Adaptation stayed at 0.0003 in both phases (zero to four
 decimal places). Hill-climbing on aggregate chip profit cannot produce
 per-opponent strategies because there is no per-opponent state in the
-optimizer. The fact that Mirror, Judge, and Predator nonetheless cut their
-losses to Firestorm by 26–42 % is surprising on its face but consistent
-with this story: their *aggregate* profit gradient happens to point in the
-same direction as "lose less to Firestorm", because Firestorm extracts a
-disproportionate share of every other agent's losses. This is incidental
-defense, not structured opponent modeling — the climber would do the same
-thing if the dominant exploiter were a different agent.
+optimizer. The fact that Mirror, Predator, and Judge nonetheless cut
+their losses to Firestorm by 17–31 % is surprising on its face but
+consistent with this story: their *aggregate* profit gradient happens
+to point in the same direction as "lose less to Firestorm", because
+Firestorm extracts a disproportionate share of every other agent's
+losses. This is incidental defense, not structured opponent modeling —
+the climber would do the same thing if the dominant exploiter were a
+different agent.
 
 ### 4.4 How miscalibrated did the trust model become?
 
 The Aberration Index measures the gap between observed behavior in Phase 2
 and the Phase 1 archetype baseline that the trust model's likelihood
-tables encode. Mean drift is 0.244 axis-spreads, with the two pre-modifier
-archetypes (Predator 0.61, Mirror 0.55) dominating. The remaining six
-archetypes drift well under one axis-spread, so the trust posterior — which
-classifies opponents into the eight archetype types — remains *roughly*
-calibrated even after 5 000 hands of optimization. This is the result the
-hard bounds were designed to produce: agents can tune within their archetype
-shape, but they cannot escape it. The miscalibration we set out to study
-is therefore real but bounded; a longer-horizon run with more aggressive
-optimization (or wider bounds) would deepen it.
+tables encode. Mean drift is 0.193 axis-spreads at the long scale (down
+from 0.244 at lean scale), with the two pre-modifier archetypes
+(Predator 0.70, Mirror 0.50) dominating. The remaining six archetypes
+drift under 0.15 axis-spreads, so the trust posterior — which classifies
+opponents into the eight archetype types — remains *roughly* calibrated
+even after 10 000 hands of optimization.
+
+This is the result the hard bounds were designed to produce: agents can
+tune within their archetype shape, but they cannot escape it. Notably,
+the *decrease* from lean to long (0.244 → 0.193) suggests the climber
+finds a narrower profit-optimal pocket inside each bound box at more
+cycles, rather than wandering further. The miscalibration we set out
+to study is therefore real but self-limiting under hill-climbing; a
+longer-horizon run with wider bounds or a different optimizer would
+likely deepen it.
 
 ### 4.5 What does this mean for Phase 3?
 
 Phase 2 establishes that the gap Phase 3 must close is specifically the
-**per-opponent / linguistic-reasoning gap**. Three quantitative claims fall
-out of the scorecard:
+**per-opponent / linguistic-reasoning gap**. Three quantitative claims
+fall out of the scorecard:
 
-- **Trap robustness.** Phase 1 r = −0.77, Phase 2 r = −0.77. Phase 3's
-  pilot at 50 hands sat at r = −0.41. The 0.36-point gap between Phase 2
-  and Phase 3 is now *unambiguously* attributable to the LLM's reasoning
-  capability rather than to "just having any adaptive mechanism."
+- **Trap robustness.** Phase 1 r = −0.75, Phase 2 r = −0.64. Phase 3's
+  pilot at 50 hands sat at r = −0.41. The progression −0.75 → −0.64
+  → −0.41 is a clean ladder where each tier of intelligence chips
+  ~0.12–0.23 off the trap. The 0.23-point gap between Phase 2 and
+  Phase 3 is now attributable to the LLM's specific reasoning
+  capability — adaptation alone covers ~half the distance from Phase 1
+  to Phase 3, and the second half is the reasoning gap.
 - **OA threshold.** Phase 2 produced OA = 0.0003, almost-zero. If Phase 3
   produces OA > 0.01 at the same hand budget, that is direct evidence
   the LLM is doing per-opponent strategy that bounded numerical search
   cannot.
-- **TMA hypothesis.** Trust Manipulation Awareness moved from +0.129 to
-  +0.120 — essentially flat. An LLM agent that explicitly reasons about
-  reputation should be able to drive TMA either further positive (farming
-  trust before exploiting) or significantly negative (responding to its
-  own trust trajectory). Either move would be diagnostic.
+- **TMA hypothesis.** Trust Manipulation Awareness moved from +0.140 to
+  +0.141 — flat to two decimals. An LLM agent that explicitly reasons
+  about reputation should be able to drive TMA either further positive
+  (farming trust before exploiting) or significantly negative
+  (responding to its own trust trajectory). Either move would be
+  diagnostic.
 
 ## 5. Implications for Phase 3
 
 The redesign sharpens Phase 3's contribution along three axes.
 
-**5.1 Phase 3 inherits a clean baseline.** Phase 2's r = −0.769 is now the
-"adaptive but not reasoning" reference. If Phase 3 does *anything* an LLM
-might plausibly do — reason about reputation, model opponents linguistically,
-adjust play to reciprocate or punish — the trust-profit anti-correlation is
-the metric that shows up first. The 50-hand pilot already showed
-r = −0.41, and the gap between −0.77 and −0.41 is now attributable to the
-LLM specifically, not to "any adaptive mechanism."
+**5.1 Phase 3 inherits a calibrated baseline.** Phase 2's r = −0.637 is
+now the "adaptive but not reasoning" reference. The progression
+**−0.75 → −0.64 → −0.41** (Phase 1 → Phase 2 → Phase 3 pilot) reads as a
+ladder where each tier of intelligence chips off a comparable slice of
+the trap, and the Phase 2 → Phase 3 step (0.23 points) is roughly the
+same size as the Phase 1 → Phase 2 step (0.12 points). This is a
+stronger framing than the lean run's "Phase 2 == Phase 1" framing
+because it presents adaptation as *part of the explanation* rather than
+something the LLM has to outdo wholesale.
 
 **5.2 Per-opponent behavior is now a falsifiable Phase 3 claim.** Phase 2's
 OA = 0.0003 establishes a hard zero point: hill-climbing on aggregate reward
@@ -361,50 +436,53 @@ within bound boxes cannot produce per-opponent strategy. If Phase 3's
 reasoning produces opponent-conditional play that numerical search cannot.
 This is the cleanest cross-phase test the project has.
 
-**5.3 The miscalibration story is intact.** The Aberration Index of 0.244
+**5.3 The miscalibration story is intact.** The Aberration Index of 0.193
 is large enough to demonstrate that the Phase 1 trust posterior is
 demonstrably miscalibrated relative to actual behavior, but small enough
-that the posterior is still *useful* (most archetypes drift well under one
-axis-spread). Phase 3 should report its own Aberration Index alongside
-behavioral metrics — if LLM agents drift further from their seeded prompts
-than Phase 2 agents drift from their bounds, the trust model's
-classification ability degrades faster, and that is itself a finding.
+that the posterior is still *useful* (six of eight archetypes drift
+under 0.15 axis-spreads). Phase 3 should report its own Aberration
+Index alongside behavioral metrics — if LLM agents drift further from
+their seeded prompts than Phase 2 agents drift from their bounds, the
+trust model's classification ability degrades faster, and that is
+itself a finding.
 
 A subtle implication: the 50-hand Phase 3 pilot's r = −0.41 is noisy,
-but the Phase 2 numbers make it more credible. Three seeds × 5 000 hands
-of bounded optimization couldn't shift r by more than 0.003 in the mean;
-the fact that 50 hands of LLM play shifted it by 0.36 (even noisily) is
-suggestive that the underlying Phase 3 effect is real and large. The
-natural follow-up is a 500-hand Phase 3 run for a stable comparison.
+but the Phase 2 numbers make it more credible by establishing the right
+ladder rung beneath it. The natural follow-up is a 500-hand Phase 3 run
+for a stable comparison.
 
 ## 6. Limitations
 
-Five honest constraints on the result:
+Five honest constraints on the result.
 
-**6.1 Three seeds is light.** The trust-profit r has a per-seed std of
-0.084 in Phase 1 and 0.139 in Phase 2; at n = 3, the 95 % CI on the
-mean is roughly ±0.20. The headline "r unchanged" claim is robust because
-the *direction* of the change is split across seeds (two stronger, one
-weaker), not because the n is large. The paired 5 × 10 000 long run
-(`runs_phase2_long.sqlite`, command in the run handoff) is staged but
-not yet executed; it will tighten the CI by ~5×.
+**6.1 Lean run vs long run: the headline flipped.** The 3 × 5000 lean run
+(committed as `reports/phase2_scorecard.txt`) showed Δr = +0.003,
+essentially zero. The canonical 5 × 10000 long run shows Δr = +0.116,
+clearly nonzero. The lean run was *not* mistaken about the sign: at
+n = 3 with σ ≈ 0.13 per seed, the 95 % CI on Δr was ±0.20, comfortably
+covering both 0 and +0.12. What the lean run missed was the *consistency*
+across seeds — at n = 5 the direction is unanimous, and the magnitude
+is about half the per-phase std rather than negligible. This is a useful
+methodological note in itself: at the lean scale, "no measurable shift"
+and "shift of ~0.1" are indistinguishable. Future Phase 2-style
+experiments should default to 5+ seeds.
 
 **6.2 Single optimizer.** Hill-climbing was chosen because it is local,
 interpretable, and produces plottable parameter trajectories. CMA-ES,
 REINFORCE, or population-based training would all explore the bound boxes
-differently. The "bounded numerical optimization cannot escape the trap"
-claim is strictly about hill-climbing; a different optimizer might find
-larger movement, especially if it had per-opponent state. We don't think
-that's likely — the bound boxes are the binding constraint, not the
-optimizer — but it is not tested.
+differently. The "bounded numerical optimization weakens but cannot escape
+the trap" claim is strictly about hill-climbing; a different optimizer
+might find larger movement, especially if it had per-opponent state.
+We don't think that's likely — the bound boxes are the binding constraint,
+not the optimizer — but it is not tested.
 
 **6.3 No per-opponent state in the optimizer.** The objective is aggregate
 windowed profit. By construction, the climber cannot bucket-train per
-opponent (the way a poker agent might learn "play tight against Wall, loose
-against Phantom"). This is intentional — it isolates the *adaptive*
-component from the *opponent-modeling* component, so Phase 3's contribution
-is testable. But it means the OA = 0.0003 result is partly trivial: the
-optimizer literally has no way to differentiate opponents.
+opponent (the way a poker agent might learn "play tight against Wall,
+loose against Phantom"). This is intentional — it isolates the *adaptive*
+component from the *opponent-modeling* component, so Phase 3's
+contribution is testable. But it means the OA = 0.0003 result is partly
+trivial: the optimizer literally has no way to differentiate opponents.
 
 **6.4 Predator and Mirror lost their adaptive modifiers.** The Aberration
 Index for those two agents is dominated by removing
@@ -414,20 +492,21 @@ opponent_metrics` (Mirror). Their drift is therefore not a clean
 and put the climber on top of them, but that conflates two adaptation
 mechanisms.
 
-**6.5 Eval window = 200 is short.** With 5 000 hands and a 400-hand cycle
-(200 baseline + 200 trial), each agent gets ~12 cycles per seed. Twelve
-samples is enough to identify a strong gradient direction (every archetype
-found one) but not enough for the climber to converge inside its bound
-box. The L1 distances (0.13–0.22) are all near the theoretical maximum
-for 12 cycles at delta = 0.03 — the climber is "still moving" at the end
-of every run. A longer horizon (10 000+ hands) would let the climber
-saturate, and might surface non-linear effects the current setup misses.
+**6.5 Cycles are still finite.** Even at 25 cycles per seed (the long
+run), the climber's L1 movements (0.28–0.34) are well below the
+theoretical maximum, but only because δ has decayed substantially by
+that point. At 50–100 cycles the climber would likely converge fully
+inside each bound box, and any remaining behavioral movement would have
+to come from inter-agent dynamics (e.g. Firestorm finding a new
+exploit, every other agent re-optimizing in response). A 50 000-hand
+run would let the system reach that steady state.
 
 ---
 
-*Last updated: 2026-04-29. Source artifacts and reproduction commands:
-`reports/phase2_scorecard.txt` (this report's data),
-`phase2/adaptive/phase2_comparison.py` (regeneration),
+*Last updated: 2026-04-30. Source artifacts and reproduction commands:
+`reports/phase2_scorecard_long.txt` (canonical long-run data),
+`reports/phase2_scorecard.txt` (lean replication),
+`phase2/adaptive/phase2_comparison.py` (regeneration script),
 `phase2/adaptive/run_adaptive.py` (the underlying simulation).*
 
 

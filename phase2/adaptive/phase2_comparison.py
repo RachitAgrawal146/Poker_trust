@@ -510,12 +510,18 @@ def _section(out: StringIO, title: str) -> None:
     out.write("=" * 78 + "\n")
 
 
+def _seeds_phrase(p1: Dict[str, Any], p2: Dict[str, Any]) -> str:
+    """Build a 'across N seeds (a, b, c)' phrase for table headers."""
+    seeds = sorted({r["seed"] for r in p1["runs"]} | {r["seed"] for r in p2["runs"]})
+    return f"across {len(seeds)} seeds ({', '.join(str(s) for s in seeds)})"
+
+
 def render_table0_headline(
     out: StringIO, p1: Dict[str, Any], p2: Dict[str, Any]
 ) -> None:
     _section(out, "TABLE 0 -- HEADLINE SCORECARD (Phase 1 vs Phase 2)")
     out.write(
-        "\n  All values are mean +/- std across 3 seeds (42, 137, 256).\n"
+        f"\n  All values are mean +/- std {_seeds_phrase(p1, p2)}.\n"
     )
 
     # global r
@@ -583,7 +589,7 @@ def render_table1_fingerprints(
 ) -> None:
     _section(out, "TABLE 1 -- BEHAVIORAL FINGERPRINTS (VPIP / PFR / AF)")
     out.write(
-        "\n  Per-archetype mean +/- std across 3 seeds. AF = (bets+raises)/calls.\n"
+        f"\n  Per-archetype mean +/- std {_seeds_phrase(p1, p2)}. AF = (bets+raises)/calls.\n"
     )
     out.write(
         f"\n  {'Archetype':<10} "
@@ -614,7 +620,7 @@ def render_table2_economic(
 ) -> None:
     _section(out, "TABLE 2 -- ECONOMIC ORDERING (final stacks, rebuys, rank)")
     out.write(
-        "\n  Final stack and rebuy count are mean +/- std across 3 seeds.\n"
+        f"\n  Final stack and rebuy count are mean +/- std {_seeds_phrase(p1, p2)}.\n"
         "  Rank: 1 = highest mean stack across seeds. Delta = P2 rank minus P1 rank\n"
         "        (negative = climbed, positive = fell).\n"
     )
@@ -697,8 +703,9 @@ def render_table4_trajectories(
     trajectories: Dict[str, Any],
 ) -> None:
     _section(out, "TABLE 4 -- PARAMETER TRAJECTORIES (hill-climbing summary)")
+    n_seeds = len(optlog) if isinstance(optlog, dict) else 0
     out.write(
-        "\n  Aggregated across all 3 seeds. Cycles/accepted/rejected are sums.\n"
+        f"\n  Aggregated across all {n_seeds} seeds. Cycles/accepted/rejected are sums.\n"
         "  Most-moved (round, metric) is the (round, metric) with the largest\n"
         "  cumulative *accepted* delta (signed). Total L1 = mean across seeds\n"
         "  of sum-of-absolute-changes from initial to final params.\n"
@@ -737,7 +744,7 @@ def render_table5_adaptation(
     _section(out, "TABLE 5 -- ADAPTATION SUCCESS (last-1000-hand profit + Firestorm)")
     out.write(
         f"\n  Per-archetype net chip flow over the FINAL {LAST_WINDOW_HANDS} hands\n"
-        "  (mean +/- std across 3 seeds). Profit_vs_FS is chips invested into\n"
+        f"  (mean +/- std {_seeds_phrase(p1, p2)}). Profit_vs_FS is chips invested into\n"
         "  hands Firestorm won at showdown (lower is better; emergent defense).\n"
     )
 
