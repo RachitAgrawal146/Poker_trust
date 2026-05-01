@@ -4,6 +4,118 @@ All notable changes to this project. Organized by stage, in build
 order rather than reverse-chronological, because the research
 milestones are easier to reason about that way.
 
+## [Phase 3.1 Complete] &mdash; 2026-05-01
+
+### Phase 3.1 &mdash; LLM agents with reasoning scaffolding
+
+The headline finding of the project. Adds three opt-in features behind a
+single `--phase31` flag in `phase3/run_phase3_chat.py`:
+
+- **Chain-of-thought prompts.** System prompt asks the agent to reason in
+  at most 2 short sentences before emitting an `ACTION:` marker line.
+  Output token budget raised from 16 → 96.
+- **Persistent per-opponent memory.** Every 10 hands the agent reduces
+  its `_opp_action_log` (populated from the existing `observe_action`
+  hook) to short text summaries per opponent ("aggressive 8/12, called
+  2/12") and injects them into the user message.
+- **Adaptive personality specs.** Every 25 hands the agent makes one
+  extra LLM call asking itself to update its `_strategy_notes` field;
+  notes are appended to subsequent decision prompts.
+
+**Result (5 seeds × 150 hands, $17 total cost):**
+- Trust–profit r drops from −0.510 (Phase 3) to **−0.094** (Phase 3.1) —
+  statistically indistinguishable from zero
+- Δr = +0.416 — larger than the previous three phase transitions combined
+- 2 of 5 seeds show *positive* r (trap inversion)
+- Wall (most trusted) climbs from rank 8 to rank 1 in economic ordering
+- 4 of 6 behavioral metric targets met (vs Phase 3's 2/6); SU > 1.5
+  bits for the first time, TMA jumps to +0.242
+
+**Validation:** `phase3/validate_phase31.py` — 50-check unit suite
+exercising every new code path with mock client (no API spend).
+
+**Artifacts:** `reports/phase31_long_scorecard.txt`,
+`phase3/phase31_report.md`, `phase31_stats.json`, `phase31_long_audit.json`
+
+## [Phase 3 Complete] &mdash; 2026-04-29
+
+### Phase 3 &mdash; LLM personality role-players
+
+8 independent LLM agents (claude-haiku-4-5) replace the rule-based and
+adaptive agents from Phases 1/2. Each agent gets an archetype-specific
+personality spec as its system prompt and returns one of `FOLD CHECK
+CALL BET RAISE` per decision.
+
+- `phase3/personality_specs/<archetype>.md` — qualitative + quantitative
+  spec for each of the 8 archetypes
+- `phase3/llm_chat_agent.py` — `LLMChatAgent` + `LLMChatJudge` wrapping
+  Anthropic / Ollama / claude-cli backends. All trust + observation +
+  hand-strength caching machinery inherited from Phase 1 BaseAgent
+- `phase3/run_phase3_chat.py` — runner with `--provider` and `--model`
+  flags. Supports prompt caching (commit `230d6ab`) for ~38% cost
+  reduction
+- `phase3/file_io_agent.py` + `phase3/run_phase3_fileio.py` +
+  `phase3/orchestrate.py` — alternative file-IPC mode where Claude
+  Code itself acts as the LLM (no API key required)
+- `phase3/dealer.py` — game-integrity layer that validates LLM actions
+  and substitutes a legal default if the LLM emits something illegal
+
+**Result (5 seeds × 500 hands, $33.10 total cost):**
+- Trust–profit r softens to **−0.510** (Δr = +0.127 from Phase 2)
+- High variance (σ = 0.268, ~2× Phase 2)
+- 4 of 6 behavioral metric targets MISSED — three move backward
+- Phantom climbs from rank 7 to rank 1; Firestorm falls from 1 to 5;
+  Sentinel falls from 3 to 7
+- Diagnostic finding: LLMs faithfully role-play personality specs
+  but do not spontaneously develop opponent-conditional, time-varying,
+  or unpredictable behavior
+
+**Artifacts:** `reports/phase3_long_scorecard.txt`,
+`phase3/phase3_report.md`, `phase3_stats.json`,
+`extract_phase3_stats.py`
+
+## [Phase 2 Complete] &mdash; 2026-04-29
+
+### Phase 2 (canonical) &mdash; Bounded online optimization (adaptive)
+
+Replaces the original imitation-based Phase 2 with a per-cycle hill
+climber that tunes each agent's parameters within an archetype-shaped
+bound box. The earlier ML-imitation Phase 2 (which reproduced Phase 1
+by construction) is preserved at `phase2/_imitation_archive/`.
+
+- `phase2/adaptive/bounds.py` &mdash; `ARCHETYPE_BOUNDS` dict defining
+  `(lo, hi)` per `(archetype, round, metric)`. Tight (Sentinel, Wall):
+  ±10–15 %. Moderate (Oracle, Predator, Mirror, Judge cooperative):
+  ±20–25 %. Loose (Firestorm, Phantom, Judge retaliatory): ±30–40 %.
+  Identity-locked metrics clamped near zero so archetype shape survives.
+- `phase2/adaptive/adaptive_agent.py` &mdash; `AdaptiveAgent` and
+  `AdaptiveJudge` classes wrapping `BaseAgent` with mutable parameters
+  and a `record_snapshot` hook for trajectory logging.
+- `phase2/adaptive/hill_climber.py` &mdash; per-agent online optimizer.
+  Every 200 hands: baseline phase, then trial phase with one perturbed
+  `(round, metric)` parameter, accept if windowed profit improves.
+  δ decays 0.995 per cycle, floor 0.005.
+- `phase2/adaptive/run_adaptive.py` &mdash; simulation runner. Supports
+  multi-seed serial execution with per-seed `chip_delta` audit.
+- `phase2/adaptive/phase2_comparison.py` &mdash; cross-phase scorecard
+  generator. Produces 7 tables comparing Phase 1 reference vs Phase 2
+  adaptive across r, behavioral fingerprints, economic ordering,
+  parameter trajectories, and Aberration Index.
+
+**Result (5 seeds × 10 000 hands):**
+- Trust–profit r softens to **−0.637** (Δr = +0.116 from Phase 1)
+- Direction consistent across all 5 seeds
+- Opponent Adaptation stays at OA = 0.0003 — bounded numerical
+  optimization on aggregate reward cannot produce per-opponent strategy
+- Aberration Index 0.193 — bound boxes preserve archetype identity
+- Mentor briefing doc: `phase2/adaptive/PHASE2_REDESIGN_PLAN.md`
+
+**Artifacts:** `reports/phase2_scorecard_long.txt` (canonical 5 × 10000),
+`reports/phase2_scorecard.txt` (lean 3 × 5000),
+`phase2/adaptive/phase2_report.md`,
+`phase2/adaptive/param_trajectories.json`,
+`phase2/adaptive/optimization_log.json`
+
 ## [Phase 1 Complete] &mdash; 2026-04-11
 
 ### Stage 12 &mdash; Sensitivity analysis scaffold

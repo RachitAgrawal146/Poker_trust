@@ -13,14 +13,27 @@ repo. Read this first before touching any code.
 
 ## Project overview
 
-**Poker Trust Simulation** &mdash; Phase 1 of a two-phase research
-build. Eight rule-based archetype agents play Limit Texas Hold'em
-against each other while every agent maintains a Bayesian posterior
-over what archetype every other agent is. The output is a
-machine-learning-ready dataset of ~2.8 million trust-snapshot rows
-that Phase 2 (not in this repo) will train models on.
+**Poker Trust Simulation** &mdash; a four-tier research build. Eight
+archetype agents play Limit Texas Hold'em against each other while every
+agent maintains a Bayesian posterior over what archetype every other
+agent is.
 
-All 12 stages are complete. The canonical research dataset is produced
+**Status as of 2026-05-01:** all four phases complete. Headline result
+is the four-tier ladder of trust-profit r values:
+
+  Phase 1 (frozen rule-based)              r = -0.752
+  Phase 2 (bounded hill-climbing)          r = -0.637
+  Phase 3 (LLM personality role-play)      r = -0.510
+  Phase 3.1 (LLM + CoT + memory + adaptive) r = -0.094 (trap broken)
+
+Detailed reports in `phase1/phase1_report.md`,
+`phase2/adaptive/phase2_report.md`, `phase3/phase3_report.md`,
+`phase3/phase31_report.md`. Cross-phase scorecards in
+`reports/phase31_long_scorecard.txt` (the most recent / most complete).
+The Polygence paper draft is at `paper.md` (Markdown source) and
+`paper/paper.tex` (Pandoc-converted LaTeX for Overleaf).
+
+All 12 Phase 1 stages are complete. The canonical Phase 1 dataset is produced
 by `run_sim.py` with 5 seeds × 10 000 hands at Stage 6.
 
 ## Non-negotiable conventions
