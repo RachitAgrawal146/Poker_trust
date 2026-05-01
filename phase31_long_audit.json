@@ -1,0 +1,245 @@
+{
+  "summary": {
+    "total_hands": 150,
+    "total_actions_validated": 0,
+    "total_substitutions": 0,
+    "substitution_rate": 0.0,
+    "chip_conservation_failures": 0,
+    "showdown_audit_failures": 0,
+    "anomaly_flags": 19,
+    "per_archetype_stats": {
+      "seat_0_oracle": {
+        "hands_seen": 150,
+        "cumulative_vpip": 0.2867,
+        "cumulative_af": null,
+        "substitutions": 0,
+        "anomalies": 3
+      },
+      "seat_1_sentinel": {
+        "hands_seen": 150,
+        "cumulative_vpip": 0.0933,
+        "cumulative_af": null,
+        "substitutions": 0,
+        "anomalies": 3
+      },
+      "seat_2_firestorm": {
+        "hands_seen": 150,
+        "cumulative_vpip": 0.6067,
+        "cumulative_af": null,
+        "substitutions": 0,
+        "anomalies": 3
+      },
+      "seat_3_wall": {
+        "hands_seen": 150,
+        "cumulative_vpip": 0.4933,
+        "cumulative_af": null,
+        "substitutions": 0,
+        "anomalies": 2
+      },
+      "seat_4_phantom": {
+        "hands_seen": 150,
+        "cumulative_vpip": 0.1933,
+        "cumulative_af": null,
+        "substitutions": 0,
+        "anomalies": 3
+      },
+      "seat_5_predator": {
+        "hands_seen": 150,
+        "cumulative_vpip": 0.24,
+        "cumulative_af": null,
+        "substitutions": 0,
+        "anomalies": 2
+      },
+      "seat_6_mirror": {
+        "hands_seen": 150,
+        "cumulative_vpip": 0.16,
+        "cumulative_af": null,
+        "substitutions": 0,
+        "anomalies": 0
+      },
+      "seat_7_judge": {
+        "hands_seen": 150,
+        "cumulative_vpip": 0.08,
+        "cumulative_af": null,
+        "substitutions": 0,
+        "anomalies": 3
+      }
+    }
+  },
+  "substitutions": [],
+  "chip_conservation_failures": [],
+  "showdown_audit_failures": [],
+  "anomaly_flags": [
+    {
+      "hand_id": 50,
+      "seat": 0,
+      "archetype": "oracle",
+      "metric": "vpip",
+      "observed": 0.3061,
+      "target": 0.216,
+      "tolerance": 0.05
+    },
+    {
+      "hand_id": 50,
+      "seat": 1,
+      "archetype": "sentinel",
+      "metric": "vpip",
+      "observed": 0.0612,
+      "target": 0.162,
+      "tolerance": 0.05
+    },
+    {
+      "hand_id": 50,
+      "seat": 2,
+      "archetype": "firestorm",
+      "metric": "vpip",
+      "observed": 0.7347,
+      "target": 0.494,
+      "tolerance": 0.08
+    },
+    {
+      "hand_id": 50,
+      "seat": 3,
+      "archetype": "wall",
+      "metric": "vpip",
+      "observed": 0.3878,
+      "target": 0.539,
+      "tolerance": 0.08
+    },
+    {
+      "hand_id": 50,
+      "seat": 4,
+      "archetype": "phantom",
+      "metric": "vpip",
+      "observed": 0.2449,
+      "target": 0.387,
+      "tolerance": 0.07
+    },
+    {
+      "hand_id": 50,
+      "seat": 5,
+      "archetype": "predator",
+      "metric": "vpip",
+      "observed": 0.2653,
+      "target": 0.185,
+      "tolerance": 0.05
+    },
+    {
+      "hand_id": 50,
+      "seat": 7,
+      "archetype": "judge",
+      "metric": "vpip",
+      "observed": 0.102,
+      "target": 0.159,
+      "tolerance": 0.05
+    },
+    {
+      "hand_id": 100,
+      "seat": 0,
+      "archetype": "oracle",
+      "metric": "vpip",
+      "observed": 0.303,
+      "target": 0.216,
+      "tolerance": 0.05
+    },
+    {
+      "hand_id": 100,
+      "seat": 1,
+      "archetype": "sentinel",
+      "metric": "vpip",
+      "observed": 0.0808,
+      "target": 0.162,
+      "tolerance": 0.05
+    },
+    {
+      "hand_id": 100,
+      "seat": 2,
+      "archetype": "firestorm",
+      "metric": "vpip",
+      "observed": 0.6465,
+      "target": 0.494,
+      "tolerance": 0.08
+    },
+    {
+      "hand_id": 100,
+      "seat": 3,
+      "archetype": "wall",
+      "metric": "vpip",
+      "observed": 0.3232,
+      "target": 0.539,
+      "tolerance": 0.08
+    },
+    {
+      "hand_id": 100,
+      "seat": 4,
+      "archetype": "phantom",
+      "metric": "vpip",
+      "observed": 0.2121,
+      "target": 0.387,
+      "tolerance": 0.07
+    },
+    {
+      "hand_id": 100,
+      "seat": 7,
+      "archetype": "judge",
+      "metric": "vpip",
+      "observed": 0.0707,
+      "target": 0.159,
+      "tolerance": 0.05
+    },
+    {
+      "hand_id": 150,
+      "seat": 0,
+      "archetype": "oracle",
+      "metric": "vpip",
+      "observed": 0.2886,
+      "target": 0.216,
+      "tolerance": 0.05
+    },
+    {
+      "hand_id": 150,
+      "seat": 1,
+      "archetype": "sentinel",
+      "metric": "vpip",
+      "observed": 0.094,
+      "target": 0.162,
+      "tolerance": 0.05
+    },
+    {
+      "hand_id": 150,
+      "seat": 2,
+      "archetype": "firestorm",
+      "metric": "vpip",
+      "observed": 0.6107,
+      "target": 0.494,
+      "tolerance": 0.08
+    },
+    {
+      "hand_id": 150,
+      "seat": 4,
+      "archetype": "phantom",
+      "metric": "vpip",
+      "observed": 0.1879,
+      "target": 0.387,
+      "tolerance": 0.07
+    },
+    {
+      "hand_id": 150,
+      "seat": 5,
+      "archetype": "predator",
+      "metric": "vpip",
+      "observed": 0.2416,
+      "target": 0.185,
+      "tolerance": 0.05
+    },
+    {
+      "hand_id": 150,
+      "seat": 7,
+      "archetype": "judge",
+      "metric": "vpip",
+      "observed": 0.0805,
+      "target": 0.159,
+      "tolerance": 0.05
+    }
+  ]
+}

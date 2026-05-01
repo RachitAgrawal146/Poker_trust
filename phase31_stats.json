@@ -1,0 +1,749 @@
+{
+  "seeds": [
+    {
+      "seed": 42,
+      "run_id": 1,
+      "r": -0.2886254043286614,
+      "trust_scores": [
+        0.6981781612011725,
+        0.8014074800207381,
+        0.375000010261806,
+        0.6739354006440229,
+        0.7535972112705657,
+        0.8042467871491574,
+        0.8163706623813664,
+        0.7514100093908374
+      ],
+      "final_stacks": [
+        204,
+        182,
+        246,
+        451,
+        199,
+        219,
+        191,
+        108
+      ],
+      "per_seat": [
+        {
+          "seat": 0,
+          "archetype": "oracle",
+          "trust": 0.6981781612011725,
+          "final_stack": 204,
+          "rebuys": 0,
+          "hands_dealt": 150,
+          "showdowns": 14,
+          "showdowns_won": 7
+        },
+        {
+          "seat": 1,
+          "archetype": "sentinel",
+          "trust": 0.8014074800207381,
+          "final_stack": 182,
+          "rebuys": 0,
+          "hands_dealt": 150,
+          "showdowns": 1,
+          "showdowns_won": 1
+        },
+        {
+          "seat": 2,
+          "archetype": "firestorm",
+          "trust": 0.375000010261806,
+          "final_stack": 246,
+          "rebuys": 1,
+          "hands_dealt": 150,
+          "showdowns": 34,
+          "showdowns_won": 13
+        },
+        {
+          "seat": 3,
+          "archetype": "wall",
+          "trust": 0.6739354006440229,
+          "final_stack": 451,
+          "rebuys": 0,
+          "hands_dealt": 150,
+          "showdowns": 22,
+          "showdowns_won": 16
+        },
+        {
+          "seat": 4,
+          "archetype": "phantom",
+          "trust": 0.7535972112705657,
+          "final_stack": 199,
+          "rebuys": 0,
+          "hands_dealt": 150,
+          "showdowns": 20,
+          "showdowns_won": 9
+        },
+        {
+          "seat": 5,
+          "archetype": "predator",
+          "trust": 0.8042467871491574,
+          "final_stack": 219,
+          "rebuys": 0,
+          "hands_dealt": 150,
+          "showdowns": 16,
+          "showdowns_won": 7
+        },
+        {
+          "seat": 6,
+          "archetype": "mirror",
+          "trust": 0.8163706623813664,
+          "final_stack": 191,
+          "rebuys": 0,
+          "hands_dealt": 150,
+          "showdowns": 13,
+          "showdowns_won": 6
+        },
+        {
+          "seat": 7,
+          "archetype": "judge",
+          "trust": 0.7514100093908374,
+          "final_stack": 108,
+          "rebuys": 0,
+          "hands_dealt": 150,
+          "showdowns": 11,
+          "showdowns_won": 6
+        }
+      ],
+      "behavioral": {
+        "oracle": {
+          "vpip": 0.31333333333333335,
+          "pfr": 0.12666666666666668,
+          "af": 0.8888888888888888
+        },
+        "sentinel": {
+          "vpip": 0.10666666666666667,
+          "pfr": 0.06666666666666667,
+          "af": 2.6363636363636362
+        },
+        "firestorm": {
+          "vpip": 0.8581081081081081,
+          "pfr": 0.6486486486486487,
+          "af": 3.3026315789473686
+        },
+        "wall": {
+          "vpip": 0.33557046979865773,
+          "pfr": 0.06711409395973154,
+          "af": 0.49019607843137253
+        },
+        "phantom": {
+          "vpip": 0.46,
+          "pfr": 0.16,
+          "af": 1.3214285714285714
+        },
+        "predator": {
+          "vpip": 0.26666666666666666,
+          "pfr": 0.08666666666666667,
+          "af": 0.8888888888888888
+        },
+        "mirror": {
+          "vpip": 0.22,
+          "pfr": 0.08,
+          "af": 0.7692307692307693
+        },
+        "judge": {
+          "vpip": 0.26,
+          "pfr": 0.1,
+          "af": 1.0526315789473684
+        }
+      }
+    },
+    {
+      "seed": 137,
+      "run_id": 2,
+      "r": -0.33804884211690595,
+      "trust_scores": [
+        0.5397253407412932,
+        0.8290614944884686,
+        0.375024993999058,
+        0.9619999999999911,
+        0.7508869099683734,
+        0.7744882257281474,
+        0.7738042097126254,
+        0.8043675737753218
+      ],
+      "final_stacks": [
+        242,
+        297,
+        306,
+        225,
+        193,
+        55,
+        62,
+        220
+      ],
+      "per_seat": [
+        {
+          "seat": 0,
+          "archetype": "oracle",
+          "trust": 0.5397253407412932,
+          "final_stack": 242,
+          "rebuys": 0,
+          "hands_dealt": 150,
+          "showdowns": 17,
+          "showdowns_won": 8
+        },
+        {
+          "seat": 1,
+          "archetype": "sentinel",
+          "trust": 0.8290614944884686,
+          "final_stack": 297,
+          "rebuys": 0,
+          "hands_dealt": 150,
+          "showdowns": 8,
+          "showdowns_won": 6
+        },
+        {
+          "seat": 2,
+          "archetype": "firestorm",
+          "trust": 0.375024993999058,
+          "final_stack": 306,
+          "rebuys": 0,
+          "hands_dealt": 150,
+          "showdowns": 37,
+          "showdowns_won": 19
+        },
+        {
+          "seat": 3,
+          "archetype": "wall",
+          "trust": 0.9619999999999911,
+          "final_stack": 225,
+          "rebuys": 0,
+          "hands_dealt": 150,
+          "showdowns": 43,
+          "showdowns_won": 21
+        },
+        {
+          "seat": 4,
+          "archetype": "phantom",
+          "trust": 0.7508869099683734,
+          "final_stack": 193,
+          "rebuys": 0,
+          "hands_dealt": 150,
+          "showdowns": 16,
+          "showdowns_won": 7
+        },
+        {
+          "seat": 5,
+          "archetype": "predator",
+          "trust": 0.7744882257281474,
+          "final_stack": 55,
+          "rebuys": 0,
+          "hands_dealt": 150,
+          "showdowns": 12,
+          "showdowns_won": 4
+        },
+        {
+          "seat": 6,
+          "archetype": "mirror",
+          "trust": 0.7738042097126254,
+          "final_stack": 62,
+          "rebuys": 0,
+          "hands_dealt": 150,
+          "showdowns": 13,
+          "showdowns_won": 5
+        },
+        {
+          "seat": 7,
+          "archetype": "judge",
+          "trust": 0.8043675737753218,
+          "final_stack": 220,
+          "rebuys": 0,
+          "hands_dealt": 150,
+          "showdowns": 4,
+          "showdowns_won": 2
+        }
+      ],
+      "behavioral": {
+        "oracle": {
+          "vpip": 0.26666666666666666,
+          "pfr": 0.07333333333333333,
+          "af": 0.9696969696969697
+        },
+        "sentinel": {
+          "vpip": 0.12666666666666668,
+          "pfr": 0.06666666666666667,
+          "af": 2.2222222222222223
+        },
+        "firestorm": {
+          "vpip": 0.7248322147651006,
+          "pfr": 0.46308724832214765,
+          "af": 3.234375
+        },
+        "wall": {
+          "vpip": 0.64,
+          "pfr": 0.05333333333333334,
+          "af": 0.16037735849056603
+        },
+        "phantom": {
+          "vpip": 0.4066666666666667,
+          "pfr": 0.16,
+          "af": 1.2307692307692308
+        },
+        "predator": {
+          "vpip": 0.21333333333333335,
+          "pfr": 0.10666666666666667,
+          "af": 1.3488372093023255
+        },
+        "mirror": {
+          "vpip": 0.24666666666666667,
+          "pfr": 0.1,
+          "af": 0.96
+        },
+        "judge": {
+          "vpip": 0.18666666666666668,
+          "pfr": 0.12,
+          "af": 2.1666666666666665
+        }
+      }
+    },
+    {
+      "seed": 256,
+      "run_id": 3,
+      "r": -0.32749406785985535,
+      "trust_scores": [
+        0.6831703623993309,
+        0.815302342681241,
+        0.3851132208352822,
+        0.9619999997520432,
+        0.7194299566233985,
+        0.7629898596277254,
+        0.798596603889952,
+        0.7249098259426692
+      ],
+      "final_stacks": [
+        93,
+        133,
+        359,
+        262,
+        155,
+        314,
+        244,
+        240
+      ],
+      "per_seat": [
+        {
+          "seat": 0,
+          "archetype": "oracle",
+          "trust": 0.6831703623993309,
+          "final_stack": 93,
+          "rebuys": 0,
+          "hands_dealt": 150,
+          "showdowns": 21,
+          "showdowns_won": 8
+        },
+        {
+          "seat": 1,
+          "archetype": "sentinel",
+          "trust": 0.815302342681241,
+          "final_stack": 133,
+          "rebuys": 0,
+          "hands_dealt": 150,
+          "showdowns": 5,
+          "showdowns_won": 2
+        },
+        {
+          "seat": 2,
+          "archetype": "firestorm",
+          "trust": 0.3851132208352822,
+          "final_stack": 359,
+          "rebuys": 0,
+          "hands_dealt": 150,
+          "showdowns": 37,
+          "showdowns_won": 20
+        },
+        {
+          "seat": 3,
+          "archetype": "wall",
+          "trust": 0.9619999997520432,
+          "final_stack": 262,
+          "rebuys": 0,
+          "hands_dealt": 150,
+          "showdowns": 51,
+          "showdowns_won": 24
+        },
+        {
+          "seat": 4,
+          "archetype": "phantom",
+          "trust": 0.7194299566233985,
+          "final_stack": 155,
+          "rebuys": 1,
+          "hands_dealt": 150,
+          "showdowns": 23,
+          "showdowns_won": 8
+        },
+        {
+          "seat": 5,
+          "archetype": "predator",
+          "trust": 0.7629898596277254,
+          "final_stack": 314,
+          "rebuys": 0,
+          "hands_dealt": 150,
+          "showdowns": 13,
+          "showdowns_won": 10
+        },
+        {
+          "seat": 6,
+          "archetype": "mirror",
+          "trust": 0.798596603889952,
+          "final_stack": 244,
+          "rebuys": 0,
+          "hands_dealt": 150,
+          "showdowns": 7,
+          "showdowns_won": 3
+        },
+        {
+          "seat": 7,
+          "archetype": "judge",
+          "trust": 0.7249098259426692,
+          "final_stack": 240,
+          "rebuys": 0,
+          "hands_dealt": 150,
+          "showdowns": 9,
+          "showdowns_won": 7
+        }
+      ],
+      "behavioral": {
+        "oracle": {
+          "vpip": 0.2866666666666667,
+          "pfr": 0.11333333333333333,
+          "af": 1.1451612903225807
+        },
+        "sentinel": {
+          "vpip": 0.11409395973154363,
+          "pfr": 0.08053691275167785,
+          "af": 3.5
+        },
+        "firestorm": {
+          "vpip": 0.72,
+          "pfr": 0.4666666666666667,
+          "af": 3.365079365079365
+        },
+        "wall": {
+          "vpip": 0.9731543624161074,
+          "pfr": 0.06040268456375839,
+          "af": 0.2339622641509434
+        },
+        "phantom": {
+          "vpip": 0.49333333333333335,
+          "pfr": 0.16666666666666666,
+          "af": 0.97
+        },
+        "predator": {
+          "vpip": 0.21333333333333335,
+          "pfr": 0.12,
+          "af": 1.6451612903225807
+        },
+        "mirror": {
+          "vpip": 0.08666666666666667,
+          "pfr": 0.05333333333333334,
+          "af": 1.1666666666666667
+        },
+        "judge": {
+          "vpip": 0.16,
+          "pfr": 0.10666666666666667,
+          "af": 2.130434782608696
+        }
+      }
+    },
+    {
+      "seed": 512,
+      "run_id": 4,
+      "r": 0.04692388158659037,
+      "trust_scores": [
+        0.7771834165047883,
+        0.775602875338764,
+        0.647047574515243,
+        0.6850453516702977,
+        0.7256667471570128,
+        0.818023755519541,
+        0.778231580233478,
+        0.8286208551880121
+      ],
+      "final_stacks": [
+        235,
+        156,
+        56,
+        261,
+        311,
+        76,
+        314,
+        191
+      ],
+      "per_seat": [
+        {
+          "seat": 0,
+          "archetype": "oracle",
+          "trust": 0.7771834165047883,
+          "final_stack": 235,
+          "rebuys": 0,
+          "hands_dealt": 150,
+          "showdowns": 14,
+          "showdowns_won": 6
+        },
+        {
+          "seat": 1,
+          "archetype": "sentinel",
+          "trust": 0.775602875338764,
+          "final_stack": 156,
+          "rebuys": 0,
+          "hands_dealt": 150,
+          "showdowns": 9,
+          "showdowns_won": 3
+        },
+        {
+          "seat": 2,
+          "archetype": "firestorm",
+          "trust": 0.647047574515243,
+          "final_stack": 56,
+          "rebuys": 0,
+          "hands_dealt": 150,
+          "showdowns": 24,
+          "showdowns_won": 10
+        },
+        {
+          "seat": 3,
+          "archetype": "wall",
+          "trust": 0.6850453516702977,
+          "final_stack": 261,
+          "rebuys": 0,
+          "hands_dealt": 150,
+          "showdowns": 36,
+          "showdowns_won": 18
+        },
+        {
+          "seat": 4,
+          "archetype": "phantom",
+          "trust": 0.7256667471570128,
+          "final_stack": 311,
+          "rebuys": 0,
+          "hands_dealt": 150,
+          "showdowns": 28,
+          "showdowns_won": 15
+        },
+        {
+          "seat": 5,
+          "archetype": "predator",
+          "trust": 0.818023755519541,
+          "final_stack": 76,
+          "rebuys": 0,
+          "hands_dealt": 150,
+          "showdowns": 17,
+          "showdowns_won": 6
+        },
+        {
+          "seat": 6,
+          "archetype": "mirror",
+          "trust": 0.778231580233478,
+          "final_stack": 314,
+          "rebuys": 0,
+          "hands_dealt": 150,
+          "showdowns": 11,
+          "showdowns_won": 6
+        },
+        {
+          "seat": 7,
+          "archetype": "judge",
+          "trust": 0.8286208551880121,
+          "final_stack": 191,
+          "rebuys": 0,
+          "hands_dealt": 150,
+          "showdowns": 9,
+          "showdowns_won": 5
+        }
+      ],
+      "behavioral": {
+        "oracle": {
+          "vpip": 0.29333333333333333,
+          "pfr": 0.09333333333333334,
+          "af": 1.1290322580645162
+        },
+        "sentinel": {
+          "vpip": 0.13333333333333333,
+          "pfr": 0.09333333333333334,
+          "af": 2.0
+        },
+        "firestorm": {
+          "vpip": 0.6241610738255033,
+          "pfr": 0.30201342281879195,
+          "af": 1.7108433734939759
+        },
+        "wall": {
+          "vpip": 0.5666666666666667,
+          "pfr": 0.09333333333333334,
+          "af": 0.4578313253012048
+        },
+        "phantom": {
+          "vpip": 0.5637583892617449,
+          "pfr": 0.2080536912751678,
+          "af": 1.1782178217821782
+        },
+        "predator": {
+          "vpip": 0.26666666666666666,
+          "pfr": 0.13333333333333333,
+          "af": 1.3265306122448979
+        },
+        "mirror": {
+          "vpip": 0.2080536912751678,
+          "pfr": 0.08053691275167785,
+          "af": 1.5
+        },
+        "judge": {
+          "vpip": 0.16891891891891891,
+          "pfr": 0.10135135135135136,
+          "af": 1.6521739130434783
+        }
+      }
+    },
+    {
+      "seed": 1024,
+      "run_id": 5,
+      "r": 0.4352436361388022,
+      "trust_scores": [
+        0.4287075118400113,
+        0.7083338341929882,
+        0.6226968102091365,
+        0.9619995088968729,
+        0.7880727588757288,
+        0.8236161512297349,
+        0.4753983253726702,
+        0.7962409356671375
+      ],
+      "final_stacks": [
+        103,
+        149,
+        189,
+        203,
+        296,
+        231,
+        233,
+        196
+      ],
+      "per_seat": [
+        {
+          "seat": 0,
+          "archetype": "oracle",
+          "trust": 0.4287075118400113,
+          "final_stack": 103,
+          "rebuys": 0,
+          "hands_dealt": 150,
+          "showdowns": 19,
+          "showdowns_won": 6
+        },
+        {
+          "seat": 1,
+          "archetype": "sentinel",
+          "trust": 0.7083338341929882,
+          "final_stack": 149,
+          "rebuys": 0,
+          "hands_dealt": 150,
+          "showdowns": 7,
+          "showdowns_won": 4
+        },
+        {
+          "seat": 2,
+          "archetype": "firestorm",
+          "trust": 0.6226968102091365,
+          "final_stack": 189,
+          "rebuys": 0,
+          "hands_dealt": 150,
+          "showdowns": 32,
+          "showdowns_won": 19
+        },
+        {
+          "seat": 3,
+          "archetype": "wall",
+          "trust": 0.9619995088968729,
+          "final_stack": 203,
+          "rebuys": 0,
+          "hands_dealt": 150,
+          "showdowns": 45,
+          "showdowns_won": 19
+        },
+        {
+          "seat": 4,
+          "archetype": "phantom",
+          "trust": 0.7880727588757288,
+          "final_stack": 296,
+          "rebuys": 0,
+          "hands_dealt": 150,
+          "showdowns": 13,
+          "showdowns_won": 8
+        },
+        {
+          "seat": 5,
+          "archetype": "predator",
+          "trust": 0.8236161512297349,
+          "final_stack": 231,
+          "rebuys": 0,
+          "hands_dealt": 150,
+          "showdowns": 14,
+          "showdowns_won": 6
+        },
+        {
+          "seat": 6,
+          "archetype": "mirror",
+          "trust": 0.4753983253726702,
+          "final_stack": 233,
+          "rebuys": 0,
+          "hands_dealt": 150,
+          "showdowns": 12,
+          "showdowns_won": 6
+        },
+        {
+          "seat": 7,
+          "archetype": "judge",
+          "trust": 0.7962409356671375,
+          "final_stack": 196,
+          "rebuys": 0,
+          "hands_dealt": 150,
+          "showdowns": 4,
+          "showdowns_won": 1
+        }
+      ],
+      "behavioral": {
+        "oracle": {
+          "vpip": 0.348993288590604,
+          "pfr": 0.1476510067114094,
+          "af": 1.445945945945946
+        },
+        "sentinel": {
+          "vpip": 0.12,
+          "pfr": 0.09333333333333334,
+          "af": 2.2777777777777777
+        },
+        "firestorm": {
+          "vpip": 0.6824324324324325,
+          "pfr": 0.38513513513513514,
+          "af": 2.259259259259259
+        },
+        "wall": {
+          "vpip": 0.6133333333333333,
+          "pfr": 0.06,
+          "af": 0.3015075376884422
+        },
+        "phantom": {
+          "vpip": 0.26174496644295303,
+          "pfr": 0.11409395973154363,
+          "af": 1.7435897435897436
+        },
+        "predator": {
+          "vpip": 0.28,
+          "pfr": 0.14666666666666667,
+          "af": 1.6666666666666667
+        },
+        "mirror": {
+          "vpip": 0.22,
+          "pfr": 0.12,
+          "af": 1.169811320754717
+        },
+        "judge": {
+          "vpip": 0.0945945945945946,
+          "pfr": 0.060810810810810814,
+          "af": 2.3636363636363638
+        }
+      }
+    }
+  ]
+}
