@@ -9,9 +9,9 @@ Polygence Research Project, 2025–2026
 
 Reputation systems that infer trustworthiness from observed behavior are ubiquitous in online marketplaces, social networks, and financial platforms. Yet it remains unclear whether such systems inherently reward cooperative behavior or create exploitable dynamics that favor aggression. We investigate this question using a controlled multi-agent simulation of 8-player Limit Texas Hold'em, where eight strategically distinct agents — five static and three adaptive — interact over hundreds of thousands of hands while maintaining Bayesian posterior beliefs about each other's types. Each agent updates a probability distribution over opponent archetypes after every observed action, producing a rich dataset of trust evolution under repeated strategic interaction.
 
-We report four principal findings. First, we observe a strong anticorrelation between trust and economic performance (Pearson r = −0.752 across 5 seeds × 10 000 hands): agents perceived as most trustworthy by their opponents accumulate the least wealth, while the least-trusted aggressive agent dominates through fold equity rather than superior play. Second, we demonstrate a hard classification ceiling — only 3 to 4 of 8 archetypes are reliably identifiable through behavioral observation, with mathematically similar types forming an indistinguishable cluster regardless of sample size. Third, we test whether the trap is robust to *adaptation* by allowing each agent to optimize its own decision parameters via a per-cycle hill-climber within an archetype-shaped bound box: the trust–profit anticorrelation softens by Δr = +0.116 (consistent across all five seeds) but does not close, settling at r = −0.637. Fourth, Opponent Adaptation stays at OA = 0.0003 in both phases, establishing that bounded numerical optimization on aggregate reward cannot produce per-opponent strategy and isolating that capability as a falsifiable claim for future work using language-model agents.
+We report five principal findings across three independent agent architectures. First, we observe a strong anticorrelation between trust and economic performance (Pearson r = −0.752 across 5 seeds × 10 000 hands of frozen rule-based agents): agents perceived as most trustworthy by their opponents accumulate the least wealth, while the least-trusted aggressive agent dominates through fold equity rather than superior play. Second, we demonstrate a hard classification ceiling — only 3 to 4 of 8 archetypes are reliably identifiable through behavioral observation, with mathematically similar types forming an indistinguishable cluster regardless of sample size. Third, we test whether the trap is robust to *adaptation* by allowing each agent to optimize its own decision parameters via a per-cycle hill-climber within an archetype-shaped bound box: the trust–profit anticorrelation softens by Δr = +0.116 (consistent across all five seeds) but does not close, settling at r = −0.637. Fourth, we replace the rule-based and adaptive agents with LLM-driven agents (`claude-haiku-4-5-20251001`, 8 independent personality role-players) and observe the trap softens an additional Δr = +0.127 to r = −0.510 — the increment from Phase 1 to Phase 2 and the increment from Phase 2 to Phase 3 are essentially equal. Fifth, the four behavioral dimensions targeted by the metrics framework (Context Sensitivity, Opponent Adaptation, Non-Stationarity, Strategic Unpredictability) all *fail* to meet their thresholds under LLM agents — three move backward — demonstrating that LLMs faithfully role-play archetypes but do not spontaneously develop opponent-conditional, time-varying, or unpredictable strategy.
 
-These results have implications for the design of reputation systems in adversarial environments: observation-based trust inference, in the absence of external enforcement mechanisms, systematically advantages exploitative strategies over cooperative ones, and bounded numerical adaptation alone is insufficient to escape this dynamic.
+These results have implications for the design of reputation systems in adversarial environments: observation-based trust inference, in the absence of external enforcement mechanisms, systematically advantages exploitative strategies over cooperative ones; bounded numerical adaptation chips at the trap but does not close it; and LLM-driven role-playing produces a comparable additional reduction without unlocking the higher-order strategic dimensions that would distinguish "agents that reason about reputation" from "agents that play their characters."
 
 ---
 
@@ -39,13 +39,15 @@ To answer this, we construct a simulation with three design choices that disting
 
 ### 1.3 Summary of Contributions
 
-1. **Trust–profit anticorrelation.** We demonstrate a Pearson correlation of r = −0.752 (Phase 1, frozen rule-based agents) and r = −0.637 (Phase 2, agents allowed to optimize their own parameters) between agents' mean trust scores and final chip counts, establishing that trustworthiness is economically costly in this setting and that bounded numerical optimization weakens but does not eliminate the trap.
+1. **Trust–profit anticorrelation.** We demonstrate a Pearson correlation of r = −0.752 (Phase 1, frozen rule-based agents), r = −0.637 (Phase 2, agents allowed to optimize their own parameters), and r = −0.510 (Phase 3, LLM personality role-players) between agents' mean trust scores and final chip counts, establishing that trustworthiness is economically costly in this setting and that successive tiers of agent intelligence each chip ~0.12 off the trap without closing it.
 
 2. **Aggression dominance via avoidance.** The most aggressive agent (Firestorm) achieves the highest economic outcome not through superior hand evaluation but through 87.1% fold equity — opponents surrender pots rather than engage, producing a dynamic analogous to aggressive pricing in oligopolistic markets.
 
 3. **Classification ceiling.** We prove that behavioral observation alone cannot distinguish more than 3–4 of 8 archetypes, regardless of sample size, due to parameter overlap in the Bayesian likelihood model. This establishes a fundamental limit on reputation system accuracy.
 
-4. **Bounded optimization is insufficient.** Even when each agent is given a per-cycle hill-climber that tunes its own parameters within an archetype-shaped bound box (5 seeds × 10 000 hands), the trap softens by only Δr = +0.116 across all five seeds, and Opponent Adaptation stays at OA = 0.0003 (essentially zero). This isolates the *adaptive* component from the *opponent-modeling* component and makes per-opponent strategy a falsifiable Phase 3 claim.
+4. **Bounded optimization is insufficient.** Even when each agent is given a per-cycle hill-climber that tunes its own parameters within an archetype-shaped bound box (5 seeds × 10 000 hands), the trap softens by only Δr = +0.116 across all five seeds, and Opponent Adaptation stays at OA = 0.0003 (essentially zero). This isolates the *adaptive* component from the *opponent-modeling* component.
+
+5. **LLMs role-play archetypes but do not invent strategy.** Replacing the rule-based agents with eight independent LLM personality role-players (Phase 3) further softens the trap by Δr = +0.127 (matching the Phase 1→2 step) but produces *no* increase in opponent-conditional, time-varying, or unpredictable behavior. Three of the four behavioral dimension targets actually move backward. The diagnostic finding: LLMs faithfully follow descriptive personality specs but do not spontaneously generate higher-order strategic reasoning that those specs do not explicitly require.
 
 ### 1.4 Paper Organization
 
@@ -421,6 +423,66 @@ Judge reliably triggers retaliation against Firestorm within the first 300 hands
 
 This demonstrates that reputation-based punishment can function within the simulation, but only against agents whose behavior is extreme enough to cross the detection threshold. Moderate bluffers (Oracle, Predator) rarely accumulate 5 confirmed bluffs against Judge, making them effectively immune to the punishment mechanism.
 
+### 5.7 Phase 3: LLM Personality Role-Players
+
+Phase 3 replaces the rule-based / hill-climber agents of Phases 1 and 2 with eight independent LLM agents (`claude-haiku-4-5-20251001`), each given an archetype-specific personality spec as its system prompt. Each decision triggers an API call; the LLM returns one of `FOLD CHECK CALL BET RAISE`. The game engine, trust posterior, and metrics framework are byte-identical to Phase 1.
+
+**Run config:** 5 seeds × 500 hands; 43,943 total LLM calls; 0.034% failure rate; $33.10 total API cost; 12.6 hr wall (sequential). Prompt caching (commit `230d6ab`) cut input cost ~38%.
+
+#### 5.7.1 Headline scorecard
+
+| Phase | Mechanism | Mean trust–profit r | Std |
+|---|---|---|---|
+| 1 | Frozen archetype rules | −0.752 | 0.073 |
+| 2 | Bounded online optimization | −0.637 | 0.125 |
+| **3** | **LLM personality role-play** | **−0.510** | **0.268** |
+
+The "ladder" reads cleanly at the mean: each tier of intelligence chips ~0.12–0.13 off the trap (Δr from Phase 1→2 = +0.115; Phase 2→3 = +0.127, **essentially equal**). But Phase 3's seed-to-seed variance doubled to σ = 0.268 — large enough that the 95% CI on the mean spans more than the effect size itself.
+
+#### 5.7.2 Per-seed pattern
+
+| Seed | Phase 1 r | Phase 2 r | Phase 3 r | Δ(P3 − P2) |
+|---|---|---|---|---|
+| 42 | −0.774 | −0.759 | −0.884 | **−0.125** |
+| 137 | −0.608 | −0.424 | −0.525 | −0.101 |
+| 256 | −0.792 | −0.719 | −0.171 | **+0.548** |
+| 512 | −0.812 | −0.717 | −0.712 | +0.005 |
+| 1024 | −0.776 | −0.564 | −0.259 | **+0.305** |
+| **mean** | **−0.752** | **−0.637** | **−0.510** | **+0.127** |
+
+The variance is itself a finding: in 2 of 5 seeds (42, 137), the LLM tier *deepened* the trap; in 2 of 5 seeds (256, 1024), it dramatically opened the trap; in 1 seed (512) nothing measurable changed. LLM agents are *unreliable*. They sometimes generate genuinely novel cooperative dynamics, sometimes collapse to even-more-stereotyped exploitation than the rule-based versions. We attribute this to four mechanisms: (i) LLM temperature stochasticity, (ii) statelessness across calls (no memory of prior decisions), (iii) cascade effects from out-of-character early decisions, and (iv) different game trajectories per seed under non-deterministic agents.
+
+#### 5.7.3 Behavioral dimensions: 4 of 6 targets missed
+
+The metrics framework defined six Phase 3 targets. Only two are met:
+
+| Metric | P1 | P2 | P3 | Target | Met? |
+|---|---|---|---|---|---|
+| Trust-Profit r | −0.752 | −0.637 | −0.510 | weaker | ✓ |
+| Mean TEI shifts | −0.169 | −0.150 | shifts | shifts | ✓ |
+| Context Sensitivity (CS) | +0.142 | +0.142 | **+0.076** | > 0.15 | ✗ |
+| Opponent Adaptation (OA) | +0.0003 | +0.0003 | +0.0008 | > 0.01 | ✗ |
+| Non-Stationarity (NS) | +0.00253 | +0.00257 | **+0.000** | > 0 | ✗ |
+| Unpredictability (SU) | +1.88 | +1.83 | **+1.19** bits | > 1.5 | ✗ |
+| Trust Manipulation (TMA) | +0.140 | +0.141 | +0.164 | > 0 | ✓ |
+
+Three of the dropped metrics moved *backward* relative to Phase 1/2. The diagnostic finding: **LLMs faithfully role-play the personality specs they are given, but they do not spontaneously develop opponent-conditional, time-varying, or unpredictable behavior.** Mechanistic explanations: (a) the personality specs tell agents what to do, not how to *reason*; (b) each LLM call is stateless, so non-stationarity collapses to zero by construction; (c) LLMs collapse onto the canonical interpretation of each archetype, becoming *more* classifiable than the explicitly-stochastic rule-based agents (SU 1.83 → 1.19 bits).
+
+#### 5.7.4 Economic ordering shifted dramatically
+
+| Archetype | P1 stack | P3 stack | Rank P1 → P3 |
+|---|---|---|---|
+| **phantom** | 135 | **749** | 7 → **1** (−6) |
+| mirror | 1375 | 632 | 4 → 2 (−2) |
+| oracle | 1718 | 531 | 2 → 3 (+1) |
+| judge | 1243 | 477 | 5 → 4 (−1) |
+| **firestorm** | 6875 | **452** | 1 → **5** (+4) |
+| predator | 336 | 448 | 6 → 6 (0) |
+| **sentinel** | 1535 | **328** | 3 → **7** (+4) |
+| wall | 103 | 100 | 8 → 8 (0) |
+
+Phantom climbed from #7 to #1, Firestorm fell from #1 to #5, and Sentinel fell from #3 to #7. The mechanism: every archetype except Wall raised its aggression factor substantially (Firestorm AF 1.12 → 7.16; Phantom AF 0.67 → 3.03; Sentinel AF 1.07 → 3.73). LLMs over-emphasize the *direction* of each archetype's aggression but lose the *frequency* calibration. Phantom's spec ("bluff weak hands often") becomes "bet aggressively whenever possible"; the resulting fold equity dominates. Firestorm's calibrated maniac play becomes uncalibrated maniac play and bleeds chips on too-frequent bluffs that get called. The full Phase 3 writeup is in `phase3/phase3_report.md`.
+
 ---
 
 ## 6. Discussion
@@ -511,23 +573,23 @@ Our findings suggest that reputation systems based purely on behavioral observat
 
 ### 7.3 Future Work
 
-**Phase 3: LLM-powered agents.** The natural extension is to test whether agents capable of explicit *qualitative* reasoning about trust — understanding the reputation system, anticipating how their behavior will be interpreted, and strategically managing their perceived type — can do what bounded numerical optimization cannot. A 50-hand pilot using `claude --print` subprocess agents observed r = −0.41 on a single seed; this is noisy but suggests the underlying effect is large. A planned 500-hand × 5-seed run will tighten the comparison.
+**Phase 3.1: LLM agents with persistent memory + chain-of-thought + adaptive specs.** The current Phase 3 (Section 5.7) showed that LLMs faithfully role-play their personality specs but do not spontaneously develop opponent-conditional, time-varying, or unpredictable strategy — three of the four behavioral dimension targets were missed, and the fourth (SU) actually moved backward. Three targeted interventions should each fix one missed dimension:
 
-Phases 1, 2, and the Phase 3 pilot form a *ladder* of intelligence tiers, each tier softening the trust–profit anticorrelation by a comparable margin:
+1. **Persistent memory** — append a per-opponent rolling summary ("Wall called my bet 4 of 5 times this hour") to the system prompt. Forces the agent to accumulate state. Targets OA (currently 0.0008, target > 0.01).
 
-| Tier | Mechanism | r |
-|---|---|---|
-| Phase 1 | Frozen rule-based archetypes | −0.752 |
-| Phase 2 | Bounded online optimization | −0.637 |
-| Phase 3 (pilot) | LLM symbolic reasoning | −0.41 |
+2. **Chain-of-thought prompts** — ask the agent to reason step-by-step before deciding, instead of returning a one-word action. Should surface latent reasoning that a one-shot answer hides. Targets CS (currently 0.076, target > 0.15) and TMA.
 
-Specific measurable hypotheses for Phase 3:
+3. **Adaptive personality specs** — allow the agent to update its own spec across hand boundaries based on what it has learned. Targets NS (currently 0, target > 0).
 
-- **H1: Trap softens further.** The Phase 3 trust–profit |r| sits below the Phase 2 |r| at the same seed budget (i.e., the LLM tier adds a comparable softening to what Phase 2 achieved over Phase 1).
-- **H2: Per-opponent strategy emerges.** Opponent Adaptation rises from Phase 2's OA = 0.0003 to OA > 0.01, evidencing strategy that varies with which opponent is at the table — something bounded numerical optimization on aggregate reward cannot produce.
-- **H3: Trust manipulation appears.** Trust Manipulation Awareness moves significantly off Phase 2's +0.140 in either direction (positive = trust farming before exploitation; negative = reactive response to own trust trajectory). Either move is diagnostic of explicit reputational reasoning.
+A Phase 3.1 run with all three interventions is a falsifiable test: if the targets remain unmet, this further constrains the claim space — not "LLMs lack reasoning" but "LLMs given full strategic scaffolding still fail to develop these behaviors." If the targets are met, that quantifies the contribution of memory, CoT, and adaptation to LLM-driven strategic play.
 
-Falsification of all three hypotheses would itself be a significant finding: it would establish that the trust–profit anticorrelation is robust even to qualitative reasoning, a strong claim about the structural nature of the dynamic and the limits of language-model-driven adaptation.
+**Beyond LLM agents.** Three other open research directions surface from the present work:
+
+1. **Multi-LLM tournaments.** All Phase 3 calls go to the same Haiku instance — decisions are correlated through a single weights set. Running with mixed models (e.g., Sentinel as Sonnet, Firestorm as GPT-4, Wall as a smaller open model) would test whether the trust trap is robust to *agent diversity*, not just agent capability.
+
+2. **No-limit Hold'em.** The fixed-limit betting structure constrains aggression. In no-limit, aggressive agents can size bets to maximize fold equity; the trap may be substantially deeper (or shallower if defenders adapt).
+
+3. **Dynamic table composition.** Real reputation systems involve agents joining and leaving. Adding a "rebuy with new identity" or "agent enters at hand N" mechanism would test whether the trap's dynamics depend on the persistent 8-agent table assumption.
 
 ---
 
