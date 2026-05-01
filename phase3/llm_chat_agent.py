@@ -74,25 +74,65 @@ def _load_personality_spec(archetype: str) -> str:
     return text
 
 
-def _build_system_prompt(archetype: str, seat: int) -> str:
-    """Build the system prompt for an LLM poker agent."""
+def _build_system_prompt(archetype: str, seat: int, phase31: bool = False) -> str:
+    """Build the system prompt for an LLM poker agent.
+
+    phase31=False: original Phase 3 prompt (one-word answer, no CoT, no memory)
+    phase31=True : Phase 3.1 prompt with chain-of-thought + memory + adaptive
+                   notes scaffolding (memory and notes are filled in by the
+                   user message at decision time, not the system prompt).
+    """
     personality = _load_personality_spec(archetype)
-    return f"""{personality}
-
----
-
-You are playing Limit Texas Hold'em at an 8-player table. You are seat {seat}.
+    base_rules = f"""You are playing Limit Texas Hold'em at an 8-player table. You are seat {seat}.
 
 RULES:
 - Small blind = 1, Big blind = 2
 - Small bet = 2 (preflop/flop), Big bet = 4 (turn/river)
 - Bet cap = 4 per round (1 bet + 3 raises)
-- You must respond with EXACTLY ONE of: FOLD, CHECK, CALL, BET, RAISE
+- Legal actions: FOLD, CHECK, CALL, BET, RAISE
 - When cost_to_call = 0: you can CHECK or BET
 - When cost_to_call > 0: you can FOLD, CALL, or RAISE
-- RAISE is only legal if bet_count < bet_cap (4)
+- RAISE is only legal if bet_count < bet_cap (4)"""
+
+    if not phase31:
+        return f"""{personality}
+
+---
+
+{base_rules}
 
 RESPOND WITH ONLY THE ACTION NAME. No explanation. Just one word: FOLD, CHECK, CALL, BET, or RAISE."""
+
+    # Phase 3.1: CoT scaffolding (memory and adaptive notes are injected
+    # per-call into the user message, not baked into the system prompt,
+    # so the system prompt stays cacheable).
+    return f"""{personality}
+
+---
+
+{base_rules}
+
+RESPONSE FORMAT (THINK STEP BY STEP):
+You will receive context including:
+  * the current game state
+  * a summary of past hands you've played, with notes on each opponent
+  * your own evolving strategy notes (if any)
+
+Reason about the spot in 2-4 short sentences, considering:
+  - Your hand strength and equity vs the opponents' likely ranges
+  - What you have observed about EACH active opponent (per the notes)
+  - Whether your current strategy is working — should you adjust?
+  - What action best serves your archetype's character
+
+Then on a NEW LINE, output exactly:
+  ACTION: <FOLD|CHECK|CALL|BET|RAISE>
+
+Example:
+  Sentinel here. K-J offsuit is just outside my standard range, but with two
+  limpers in front and pot odds of 5:1, the implied odds favor a call. Wall
+  has been calling everything (per my notes) so I cannot bluff them off; this
+  is a value-only spot.
+  ACTION: CALL"""
 
 
 # ---------------------------------------------------------------------------
@@ -104,8 +144,17 @@ def _build_decision_prompt(
     hole_cards: list,
     hand_strength: str,
     archetype: str,
+    opponent_memory: Optional[Dict[int, str]] = None,
+    strategy_notes: Optional[str] = None,
 ) -> str:
-    """Build the user message describing the current game state."""
+    """Build the user message describing the current game state.
+
+    For Phase 3.1, callers may pass opponent_memory (a dict
+    seat -> textual summary of recent observations) and strategy_notes
+    (a string the agent has previously written about its own evolving
+    strategy). These are appended to the user message — NOT the system
+    prompt — so the cacheable portion stays stable.
+    """
     hole_str = _cards_str(hole_cards) if hole_cards else "unknown"
     community_str = _cards_str(game_state.community_cards)
 
@@ -115,7 +164,7 @@ def _build_decision_prompt(
         action_lines.append(f"  Seat {a.seat} ({a.archetype}): {a.action_type.value}")
     actions_str = "\n".join(action_lines) if action_lines else "  (none yet)"
 
-    return f"""Street: {game_state.betting_round}
+    base = f"""Street: {game_state.betting_round}
 Your hole cards: {hole_str}
 Community cards: {community_str}
 Hand strength: {hand_strength}
@@ -130,9 +179,87 @@ Players remaining: {game_state.num_active_players}
 Your position: {game_state.player_position} (0=dealer)
 
 Actions this round:
-{actions_str}
+{actions_str}"""
 
-Your action:"""
+    # Phase 3.1 augmentations
+    if opponent_memory:
+        memory_lines = ["", "Notes on each opponent (from recent hands):"]
+        for seat in sorted(opponent_memory.keys()):
+            note = opponent_memory[seat]
+            if note:
+                memory_lines.append(f"  Seat {seat}: {note}")
+        base += "\n" + "\n".join(memory_lines)
+
+    if strategy_notes:
+        base += f"\n\nYour own strategy notes:\n  {strategy_notes}"
+
+    base += "\n\nYour action:"
+    return base
+
+
+def _parse_phase31_action(text: str) -> Optional[ActionType]:
+    """Parse a Phase 3.1 CoT response.
+
+    Phase 3.1 prompts ask for reasoning followed by a final line:
+      ACTION: <FOLD|CHECK|CALL|BET|RAISE>
+
+    Falls back to the baseline _parse_action if the explicit ACTION:
+    line is not found.
+    """
+    if not text:
+        return None
+    # Look for an "ACTION: <word>" line near the end
+    for line in reversed(text.strip().splitlines()):
+        line_lower = line.strip().lower()
+        if line_lower.startswith("action:"):
+            after = line_lower.split(":", 1)[1].strip()
+            for word in ["raise", "call", "bet", "check", "fold"]:
+                if word in after:
+                    return _ACTION_MAP[word]
+    # Fall back to scanning the whole response
+    return _parse_action(text)
+
+
+def _build_strategy_update_prompt(
+    archetype: str,
+    hand_id: int,
+    profit_this_hand: int,
+    actions_taken: List[str],
+    showdown_result: Optional[str],
+    current_notes: Optional[str],
+) -> str:
+    """Build the user message asking the LLM to update its strategy notes
+    after a hand. Phase 3.1 only.
+    """
+    actions_str = ", ".join(actions_taken) if actions_taken else "none"
+    sd = showdown_result or "no showdown"
+    cur = current_notes or "(none yet — first hand)"
+    return f"""You just finished hand #{hand_id}.
+Profit this hand: {profit_this_hand:+d} chips.
+Actions you took: {actions_str}.
+Showdown: {sd}.
+
+Your current strategy notes:
+  {cur}
+
+Reflect briefly on what worked and what did not. Then update or replace your
+strategy notes (1-3 sentences total). The notes should be specific, in
+character with your archetype, and actionable for the next hand.
+
+Output format:
+  REASONING: <one or two sentences>
+  NOTES: <updated strategy notes>"""
+
+
+def _parse_strategy_notes(text: str) -> Optional[str]:
+    """Extract the updated strategy notes from a Phase 3.1 update response."""
+    if not text:
+        return None
+    for line in text.strip().splitlines():
+        s = line.strip()
+        if s.lower().startswith("notes:"):
+            return s.split(":", 1)[1].strip()
+    return None
 
 
 # ---------------------------------------------------------------------------
@@ -206,8 +333,13 @@ def _call_llm(
     system_prompt: str,
     user_message: str,
     max_retries: int = 1,
+    max_output_tokens: int = 16,
 ) -> str:
-    """Call the LLM and return the raw text response."""
+    """Call the LLM and return the raw text response.
+
+    max_output_tokens: 16 for one-word answers (Phase 3 baseline), ~256 for
+    Phase 3.1 chain-of-thought responses.
+    """
     last_error = None
     for attempt in range(max_retries + 1):
         try:
@@ -219,7 +351,7 @@ def _call_llm(
                 # because it changes every call.
                 response = client.messages.create(
                     model=model,
-                    max_tokens=16,
+                    max_tokens=max_output_tokens,
                     system=[
                         {
                             "type": "text",
@@ -250,7 +382,7 @@ def _call_llm(
                 # OpenAI-compatible (Ollama)
                 response = client.chat.completions.create(
                     model=model,
-                    max_tokens=16,
+                    max_tokens=max_output_tokens,
                     messages=[
                         {"role": "system", "content": system_prompt},
                         {"role": "user", "content": user_message},
@@ -287,17 +419,28 @@ class LLMChatAgent(BaseAgent):
         model: str,
         provider: str = "ollama",
         rng: Optional[np.random.Generator] = None,
+        phase31: bool = False,
     ) -> None:
         super().__init__(name=name, archetype=archetype, seat=seat, rng=rng)
         self._client = client
         self._model = model
         self._provider = provider
-        self._system_prompt = _build_system_prompt(archetype, seat)
+        self._phase31 = phase31
+        self._system_prompt = _build_system_prompt(archetype, seat, phase31=phase31)
 
         # Stats
         self.llm_calls: int = 0
         self.llm_failures: int = 0
         self.llm_total_time: float = 0.0
+
+        # Phase 3.1 state
+        self._opponent_memory: Dict[int, str] = {}
+        self._strategy_notes: Optional[str] = None
+        # Track this-hand actions for the post-hand reflection
+        self._actions_this_hand: List[str] = []
+        self._stack_at_hand_start: int = 200
+        # Per-opponent recent action log: seat -> list of (hand_id, action) tuples
+        self._opp_action_log: Dict[int, List] = {}
 
     def decide_action(self, game_state: GameState) -> ActionType:
         import sys
@@ -323,7 +466,9 @@ class LLMChatAgent(BaseAgent):
 
         # Build prompt and call LLM
         user_msg = _build_decision_prompt(
-            game_state, self.hole_cards, hs, self.archetype
+            game_state, self.hole_cards, hs, self.archetype,
+            opponent_memory=(self._opponent_memory if self._phase31 else None),
+            strategy_notes=(self._strategy_notes if self._phase31 else None),
         )
 
         print(f"    {self.name} calling LLM...", end="", flush=True)
@@ -332,11 +477,16 @@ class LLMChatAgent(BaseAgent):
             response = _call_llm(
                 self._client, self._provider, self._model,
                 self._system_prompt, user_msg,
+                max_output_tokens=(256 if self._phase31 else 16),
             )
             self.llm_calls += 1
             elapsed = time.time() - t0
-            action = _parse_action(response)
-            print(f" -> {response.strip()!r} ({elapsed:.1f}s)", flush=True)
+            if self._phase31:
+                action = _parse_phase31_action(response)
+            else:
+                action = _parse_action(response)
+            display_resp = response.strip().replace("\n", " | ")[:80]
+            print(f" -> {display_resp!r} ({elapsed:.1f}s)", flush=True)
         except RuntimeError as e:
             self.llm_failures += 1
             elapsed = time.time() - t0
@@ -372,6 +522,94 @@ class LLMChatAgent(BaseAgent):
     def get_params(self, betting_round: str, game_state: GameState) -> dict:
         return {}
 
+    # ---------- Phase 3.1 hooks (no-op when phase31=False) ----------
+
+    def on_hand_start(self, hand_id: int) -> None:
+        super().on_hand_start(hand_id)
+        if self._phase31:
+            self._actions_this_hand = []
+            self._stack_at_hand_start = self.stack
+
+    def observe_action(self, record) -> None:
+        super().observe_action(record)
+        if not self._phase31:
+            return
+        # Track our own actions for the post-hand reflection
+        if record.seat == self.seat:
+            self._actions_this_hand.append(record.action_type.value)
+            return
+        # Track per-opponent recent actions for memory updates
+        log = self._opp_action_log.setdefault(record.seat, [])
+        log.append((record.hand_id, record.betting_round,
+                    record.action_type.value))
+        # Cap log length so the prompt stays bounded
+        if len(log) > 30:
+            del log[: len(log) - 30]
+
+    def on_hand_end(self, hand_id: int) -> None:
+        super().on_hand_end(hand_id)
+        if not self._phase31:
+            return
+        # Compute profit this hand from stack delta (rebuy-aware: if we
+        # rebought, the runner has already topped up the stack, so the
+        # signal is noisy on rebuy hands -- accept that for simplicity).
+        profit = self.stack - self._stack_at_hand_start
+        # Refresh the per-opponent memory from the action log every 10 hands
+        # to keep API costs bounded.
+        if hand_id % 10 == 0:
+            self._refresh_opponent_memory()
+        # Trigger an adaptive-spec update every 25 hands -- one extra LLM
+        # call per agent per 25 hands.
+        if hand_id % 25 == 0 and hand_id > 0:
+            self._update_strategy_notes(hand_id, profit)
+
+    def _refresh_opponent_memory(self) -> None:
+        """Build a short textual summary per opponent from the recent
+        action log. Cheap (no LLM call) — just counts.
+        """
+        for seat, log in self._opp_action_log.items():
+            if not log:
+                continue
+            recent = log[-20:]
+            counts = {"fold": 0, "check": 0, "call": 0, "bet": 0, "raise": 0}
+            for _, _, act in recent:
+                if act in counts:
+                    counts[act] += 1
+            total = max(sum(counts.values()), 1)
+            parts = []
+            if counts["raise"] + counts["bet"] > 0:
+                parts.append(f"aggressive {counts['raise']+counts['bet']}/{total}")
+            if counts["fold"] > 0:
+                parts.append(f"folded {counts['fold']}/{total}")
+            if counts["call"] > 0:
+                parts.append(f"called {counts['call']}/{total}")
+            self._opponent_memory[seat] = ", ".join(parts) if parts else "no recent action"
+
+    def _update_strategy_notes(self, hand_id: int, profit: int) -> None:
+        """Make one extra LLM call asking the agent to reflect on its
+        recent play and update its strategy notes.
+        """
+        prompt = _build_strategy_update_prompt(
+            archetype=self.archetype,
+            hand_id=hand_id,
+            profit_this_hand=profit,
+            actions_taken=self._actions_this_hand,
+            showdown_result=None,
+            current_notes=self._strategy_notes,
+        )
+        try:
+            response = _call_llm(
+                self._client, self._provider, self._model,
+                self._system_prompt, prompt,
+                max_output_tokens=128,
+            )
+            self.llm_calls += 1
+            new_notes = _parse_strategy_notes(response)
+            if new_notes:
+                self._strategy_notes = new_notes
+        except RuntimeError:
+            self.llm_failures += 1
+
 
 # ---------------------------------------------------------------------------
 # LLMChatJudge — adds grievance tracking on top of LLMChatAgent
@@ -389,10 +627,12 @@ class LLMChatJudge(LLMChatAgent):
     def __init__(self, seat: int, client: Any, model: str,
                  provider: str = "ollama",
                  name: str = "LLM-Judge",
-                 rng: Optional[np.random.Generator] = None) -> None:
+                 rng: Optional[np.random.Generator] = None,
+                 phase31: bool = False) -> None:
         super().__init__(
             seat=seat, name=name, archetype="judge",
             client=client, model=model, provider=provider, rng=rng,
+            phase31=phase31,
         )
         self.grievance: Dict[int, int] = {}
         self.triggered: Dict[int, bool] = {}

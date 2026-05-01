@@ -56,16 +56,19 @@ ARCHETYPES = [
 ]
 
 
-def build_chat_roster(client: Any, model: str, provider: str) -> List:
+def build_chat_roster(client: Any, model: str, provider: str,
+                      phase31: bool = False) -> List:
     """Build the 8-seat roster where every agent calls the LLM."""
     agents = []
     for seat, name, archetype in ARCHETYPES:
         agents.append(LLMChatAgent(
             seat=seat, name=name, archetype=archetype,
             client=client, model=model, provider=provider,
+            phase31=phase31,
         ))
     agents.append(LLMChatJudge(
         seat=7, client=client, model=model, provider=provider,
+        phase31=phase31,
     ))
     return agents
 
@@ -113,9 +116,10 @@ def run_one_seed(
     provider: str,
     logger: SQLiteLogger,
     label: str,
+    phase31: bool = False,
 ) -> Dict[str, Any]:
     print("  Building roster...", flush=True)
-    agents = build_chat_roster(client, model, provider)
+    agents = build_chat_roster(client, model, provider, phase31=phase31)
     num_seats = len(agents)
     starting_stack = SIMULATION["starting_stack"]
 
@@ -265,6 +269,13 @@ def main(argv: List[str] = None) -> int:
         "--ollama-url", default="http://localhost:11434/v1",
         help="Ollama base URL (default: http://localhost:11434/v1).",
     )
+    parser.add_argument(
+        "--phase31", action="store_true", default=False,
+        help="Enable Phase 3.1 features: chain-of-thought prompts, "
+             "persistent per-opponent memory, and adaptive strategy "
+             "notes. Increases per-call cost ~1.5-2x but targets "
+             "the four behavioral metrics that Phase 3 missed.",
+    )
     args = parser.parse_args(argv)
 
     seeds = [int(s.strip()) for s in args.seeds.split(",") if s.strip()]
@@ -291,6 +302,7 @@ def main(argv: List[str] = None) -> int:
             seed=seed, num_hands=args.hands,
             client=client, model=args.model, provider=args.provider,
             logger=logger, label=label,
+            phase31=args.phase31,
         )
         summaries.append(summary)
 
