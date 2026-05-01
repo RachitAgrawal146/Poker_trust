@@ -112,27 +112,21 @@ RESPOND WITH ONLY THE ACTION NAME. No explanation. Just one word: FOLD, CHECK, C
 
 {base_rules}
 
-RESPONSE FORMAT (THINK STEP BY STEP):
-You will receive context including:
-  * the current game state
-  * a summary of past hands you've played, with notes on each opponent
-  * your own evolving strategy notes (if any)
+RESPONSE FORMAT (THINK STEP BY STEP, BUT BRIEFLY):
+You will receive the current game state, optional notes on each opponent,
+and your own evolving strategy notes (if any).
 
-Reason about the spot in 2-4 short sentences, considering:
-  - Your hand strength and equity vs the opponents' likely ranges
-  - What you have observed about EACH active opponent (per the notes)
-  - Whether your current strategy is working — should you adjust?
-  - What action best serves your archetype's character
+Reason in AT MOST 2 SHORT SENTENCES (no markdown, no headers, no lists).
+Cover only the most relevant of: hand equity, opponent reads, archetype fit.
 
 Then on a NEW LINE, output exactly:
   ACTION: <FOLD|CHECK|CALL|BET|RAISE>
 
 Example:
-  Sentinel here. K-J offsuit is just outside my standard range, but with two
-  limpers in front and pot odds of 5:1, the implied odds favor a call. Wall
-  has been calling everything (per my notes) so I cannot bluff them off; this
-  is a value-only spot.
-  ACTION: CALL"""
+  K-J off, two limpers, getting 5:1 — implied odds make this a peel. Wall calls everything per my notes, so this is value-only.
+  ACTION: CALL
+
+DO NOT use markdown. DO NOT write more than 2 sentences. The ACTION: line is mandatory."""
 
 
 # ---------------------------------------------------------------------------
@@ -477,7 +471,7 @@ class LLMChatAgent(BaseAgent):
             response = _call_llm(
                 self._client, self._provider, self._model,
                 self._system_prompt, user_msg,
-                max_output_tokens=(256 if self._phase31 else 16),
+                max_output_tokens=(96 if self._phase31 else 16),
             )
             self.llm_calls += 1
             elapsed = time.time() - t0
