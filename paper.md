@@ -9,9 +9,9 @@ Polygence Research Project, 2025–2026
 
 Reputation systems that infer trustworthiness from observed behavior are ubiquitous in online marketplaces, social networks, and financial platforms. Yet it remains unclear whether such systems inherently reward cooperative behavior or create exploitable dynamics that favor aggression. We investigate this question using a controlled multi-agent simulation of 8-player Limit Texas Hold'em, where eight strategically distinct agents — five static and three adaptive — interact over hundreds of thousands of hands while maintaining Bayesian posterior beliefs about each other's types. Each agent updates a probability distribution over opponent archetypes after every observed action, producing a rich dataset of trust evolution under repeated strategic interaction.
 
-We report five principal findings across three independent agent architectures. First, we observe a strong anticorrelation between trust and economic performance (Pearson r = −0.752 across 5 seeds × 10 000 hands of frozen rule-based agents): agents perceived as most trustworthy by their opponents accumulate the least wealth, while the least-trusted aggressive agent dominates through fold equity rather than superior play. Second, we demonstrate a hard classification ceiling — only 3 to 4 of 8 archetypes are reliably identifiable through behavioral observation, with mathematically similar types forming an indistinguishable cluster regardless of sample size. Third, we test whether the trap is robust to *adaptation* by allowing each agent to optimize its own decision parameters via a per-cycle hill-climber within an archetype-shaped bound box: the trust–profit anticorrelation softens by Δr = +0.116 (consistent across all five seeds) but does not close, settling at r = −0.637. Fourth, we replace the rule-based and adaptive agents with LLM-driven agents (`claude-haiku-4-5-20251001`, 8 independent personality role-players) and observe the trap softens an additional Δr = +0.127 to r = −0.510 — the increment from Phase 1 to Phase 2 and the increment from Phase 2 to Phase 3 are essentially equal. Fifth, the four behavioral dimensions targeted by the metrics framework (Context Sensitivity, Opponent Adaptation, Non-Stationarity, Strategic Unpredictability) all *fail* to meet their thresholds under LLM agents — three move backward — demonstrating that LLMs faithfully role-play archetypes but do not spontaneously develop opponent-conditional, time-varying, or unpredictable strategy.
+We report six principal findings across four independent agent architectures. First, we observe a strong anticorrelation between trust and economic performance (Pearson r = −0.752 across 5 seeds × 10 000 hands of frozen rule-based agents): agents perceived as most trustworthy by their opponents accumulate the least wealth, while the least-trusted aggressive agent dominates through fold equity rather than superior play. Second, we demonstrate a hard classification ceiling — only 3 to 4 of 8 archetypes are reliably identifiable through behavioral observation, with mathematically similar types forming an indistinguishable cluster regardless of sample size. Third, we test whether the trap is robust to *adaptation* by allowing each agent to optimize its own decision parameters via a per-cycle hill-climber within an archetype-shaped bound box: the trust–profit anticorrelation softens by Δr = +0.116 (consistent across all five seeds) but does not close, settling at r = −0.637. Fourth, we replace the rule-based and adaptive agents with LLM-driven agents (`claude-haiku-4-5-20251001`, 8 independent personality role-players) and observe the trap softens an additional Δr = +0.127 to r = −0.510 — the increment from Phase 1 to Phase 2 and the increment from Phase 2 to Phase 3 are essentially equal. Fifth, the four behavioral dimensions targeted by the metrics framework all *fail* to meet their thresholds under LLM agents — three move backward — demonstrating that LLMs faithfully role-play archetypes but do not spontaneously develop opponent-conditional, time-varying, or unpredictable strategy. Sixth, when LLM agents are given **chain-of-thought prompting, persistent per-opponent memory, and adaptive personality specs** (Phase 3.1), the trap *breaks*: trust-profit r drops to −0.094 across 5 seeds, statistically indistinguishable from zero, with two of five seeds showing positive r (trusted agents now winning). The Phase 3 → Phase 3.1 step (Δr = +0.416) is more than three times the size of any prior phase transition, and the most-trusted archetype (Wall) climbs from rank 8 to rank 1 in economic ordering.
 
-These results have implications for the design of reputation systems in adversarial environments: observation-based trust inference, in the absence of external enforcement mechanisms, systematically advantages exploitative strategies over cooperative ones; bounded numerical adaptation chips at the trap but does not close it; and LLM-driven role-playing produces a comparable additional reduction without unlocking the higher-order strategic dimensions that would distinguish "agents that reason about reputation" from "agents that play their characters."
+These results have implications for the design of reputation systems in adversarial environments: observation-based trust inference, in the absence of external enforcement mechanisms, systematically advantages exploitative strategies over cooperative ones; bounded numerical adaptation chips at the trap but does not close it; LLM-driven role-playing produces a comparable additional reduction without unlocking higher-order strategic dimensions; but LLMs *with reasoning scaffolding* — explicit chain-of-thought, opponent-history memory, and self-updated strategy notes — can break the trap entirely on average and invert it in some configurations.
 
 ---
 
@@ -48,6 +48,8 @@ To answer this, we construct a simulation with three design choices that disting
 4. **Bounded optimization is insufficient.** Even when each agent is given a per-cycle hill-climber that tunes its own parameters within an archetype-shaped bound box (5 seeds × 10 000 hands), the trap softens by only Δr = +0.116 across all five seeds, and Opponent Adaptation stays at OA = 0.0003 (essentially zero). This isolates the *adaptive* component from the *opponent-modeling* component.
 
 5. **LLMs role-play archetypes but do not invent strategy.** Replacing the rule-based agents with eight independent LLM personality role-players (Phase 3) further softens the trap by Δr = +0.127 (matching the Phase 1→2 step) but produces *no* increase in opponent-conditional, time-varying, or unpredictable behavior. Three of the four behavioral dimension targets actually move backward. The diagnostic finding: LLMs faithfully follow descriptive personality specs but do not spontaneously generate higher-order strategic reasoning that those specs do not explicitly require.
+
+6. **Reasoning scaffolding breaks the trap.** When LLM agents are augmented with chain-of-thought prompting, persistent per-opponent memory, and post-hand adaptive strategy notes (Phase 3.1), the trust-profit anticorrelation drops to r = −0.094 across 5 seeds × 150 hands — a step of Δr = +0.416 from Phase 3 alone, larger than the cumulative +0.242 from Phases 1 → 3. Two of five seeds show positive r (trap inversion); the economic ordering inverts so that the most-trusted archetype (Wall) wins. Four of the six behavioral dimension targets are now met (vs two in Phase 3), with TMA rising to +0.242 — six of eight archetypes explicitly "trust farming." The trap is therefore not structural; it can be broken by the right reasoning support.
 
 ### 1.4 Paper Organization
 
@@ -483,6 +485,74 @@ Three of the dropped metrics moved *backward* relative to Phase 1/2. The diagnos
 
 Phantom climbed from #7 to #1, Firestorm fell from #1 to #5, and Sentinel fell from #3 to #7. The mechanism: every archetype except Wall raised its aggression factor substantially (Firestorm AF 1.12 → 7.16; Phantom AF 0.67 → 3.03; Sentinel AF 1.07 → 3.73). LLMs over-emphasize the *direction* of each archetype's aggression but lose the *frequency* calibration. Phantom's spec ("bluff weak hands often") becomes "bet aggressively whenever possible"; the resulting fold equity dominates. Firestorm's calibrated maniac play becomes uncalibrated maniac play and bleeds chips on too-frequent bluffs that get called. The full Phase 3 writeup is in `phase3/phase3_report.md`.
 
+### 5.8 Phase 3.1: LLM Agents with Reasoning Scaffolding
+
+Phase 3.1 extends Phase 3 with three reasoning interventions, all opt-in behind a single `--phase31` flag in `phase3/run_phase3_chat.py`:
+
+1. **Chain-of-thought prompting** — the system prompt requests "at most 2 short sentences" of reasoning before a final-line `ACTION:` marker. Output token budget raised from 16 to 96.
+
+2. **Persistent per-opponent memory** — the agent maintains a rolling action log per opponent (populated from the existing engine `observe_action` hook). Every 10 hands, this log is reduced to a short text summary per opponent ("aggressive 8/12, called 2/12") and injected into the user message.
+
+3. **Adaptive personality specs** — every 25 hands, the agent makes one extra LLM call asking itself to reflect on what worked and update its strategy notes; the notes are then appended to subsequent decision prompts.
+
+**Run config:** 5 seeds × 150 hands; 11,953 total LLM calls; 0.017 % failure rate; ~$17 total API cost; 6.9 hr wall (sequential). Smaller than Phase 3 (5 × 500) due to the higher per-call cost — CoT adds output tokens.
+
+#### 5.8.1 Headline scorecard
+
+| Phase | Mechanism | Mean trust–profit r | Std |
+|---|---|---|---|
+| 1 | Frozen archetype rules | −0.752 | 0.073 |
+| 2 | Bounded online optimization | −0.637 | 0.125 |
+| 3 | LLM personality role-play | −0.510 | 0.268 |
+| **3.1** | **LLM + CoT + memory + adaptive** | **−0.094** | **0.301** |
+
+The Phase 3 → Phase 3.1 step is **Δr = +0.416** — more than 3× the size of any prior phase transition. The cumulative jump from Phase 1 to Phase 3.1 is +0.658. At n=5 with σ = 0.30, the 95 % CI on the mean spans roughly [−0.36, +0.18], meaning the result is **statistically indistinguishable from zero**: the trust trap has effectively been broken at the population level.
+
+#### 5.8.2 Per-seed trap inversion
+
+| Seed | P3 r | P3.1 r | Δ |
+|---|---|---|---|
+| 42 | −0.884 | −0.289 | +0.595 |
+| 137 | −0.525 | −0.338 | +0.187 |
+| 256 | −0.171 | −0.327 | −0.156 |
+| 512 | −0.712 | **+0.047** | +0.759 |
+| 1024 | −0.259 | **+0.435** | +0.694 |
+
+**Two of five seeds show *positive* r** — meaning trusted agents made *more* money than distrusted ones. This is qualitatively different from any prior phase, where the most-positive r ever observed was −0.171. Phase 3.1 doesn't merely soften the anti-correlation; in 40 % of seeds, it inverts the relationship.
+
+#### 5.8.3 Wall wins: the economic-ordering inversion
+
+| Archetype | Trust | P3.1 stack | P3 rank | P3.1 rank |
+|---|---|---|---|---|
+| **wall** | 0.85 | **280 ± 88** | 8 (LAST) | **1** (FIRST) |
+| firestorm | 0.48 | 231 ± 104 | 5 | 2 |
+| phantom | 0.75 | 230 ± 61 | 1 | 3 |
+| mirror | 0.73 | 208 ± 83 | 2 | 4 |
+| judge | 0.78 | 191 ± 45 | 4 | 5 |
+| sentinel | 0.79 | 183 ± 58 | 7 | 6 |
+| predator | 0.80 | 179 ± 98 | 6 | 7 |
+| oracle | 0.63 | 175 ± 64 | 3 | 8 |
+
+Wall — the calling-station archetype that lost in every previous phase, with 9.4 average rebuys per seed in Phases 1–3 — is now the biggest winner. It doesn't rebuy at all in Phase 3.1. The most-trusted archetype (trust = 0.85) directly translates to economic dominance, and the rebuy count drops to zero. This is the trust-profit anti-correlation flipping in real-time.
+
+#### 5.8.4 Behavioral dimensions: 4 of 6 targets met
+
+| Metric | P3 | P3.1 | Target | Met? |
+|---|---|---|---|---|
+| Trust-Profit r | −0.510 | **−0.094** | weaker | ✓ |
+| Mean TEI | n/a | −0.336 | shifts | ✓ |
+| Context Sensitivity (CS) | 0.076 | 0.100 | > 0.15 | ✗ |
+| Opponent Adaptation (OA) | 0.0008 | 0.0007 | > 0.01 | ✗ |
+| Non-Stationarity (NS) | 0.000 | 0.000 | > 0 | ✗ |
+| Unpredictability (SU) | 1.19 | **1.55 bits** | > 1.5 | **✓ NEW** |
+| Trust Manipulation (TMA) | +0.164 | **+0.242** | > 0 | ✓ (boosted) |
+
+Phase 3 hit 2 of 6 targets. Phase 3.1 hits 4 of 6. SU now meets the > 1.5 bits target for the first time across all phases, and TMA jumps to +0.242 with **six of eight archetypes explicitly "trust farming"** (Wall and Sentinel — the conservative-spec agents — show the strongest farming signal at +0.733 and +0.704 respectively). The two persistent misses are diagnostic: OA stays near zero because memory is *available* in the prompt but not measurably translated into per-opponent strategy, and NS stays at zero because the time-windowed metric needs longer horizons (>150 hands per seed) to detect strategy drift. The full Phase 3.1 writeup is in `phase3/phase31_report.md`.
+
+#### 5.8.5 The aggression-moderation finding
+
+Every archetype except Wall sees its aggression factor *drop* from Phase 3 to Phase 3.1, often dramatically (Firestorm 7.16 → 2.77, a 61 % reduction). Phase 3 LLMs without scaffolding *over-aggress* on every archetype's behalf; adding CoT + memory tames the over-aggression while preserving each archetype's relative position. **Reasoning agents play more like humans than role-playing agents do.** A human "maniac" doesn't bet every street; they pick spots. Phase 3 LLMs collapse onto stereotypical aggression; Phase 3.1 LLMs calibrate.
+
 ---
 
 ## 6. Discussion
@@ -561,7 +631,11 @@ This paper presents a simulation study of trust dynamics in multi-agent strategi
 
 3. **Hard classification ceiling.** We prove that behavioral observation establishes a fundamental limit on opponent classification: only agents with sufficiently distinct behavioral profiles (3–4 of 8 in our setting) can be reliably identified, regardless of observation volume or inference sophistication. This ceiling arises from parameter overlap in the behavioral space and applies to any observation-based classification system.
 
-4. **Bounded numerical optimization is insufficient.** When each agent is given a per-cycle hill-climber that tunes its own parameters within an archetype-shaped bound box, the trust–profit anticorrelation softens by Δr = +0.116 (consistent across all five seeds) but does not close, settling at r = −0.637. Opponent Adaptation stays at OA = 0.0003, establishing that aggregate-reward optimization cannot produce per-opponent strategy. The trap is structural, not strategic.
+4. **Bounded numerical optimization is insufficient.** When each agent is given a per-cycle hill-climber that tunes its own parameters within an archetype-shaped bound box, the trust–profit anticorrelation softens by Δr = +0.116 (consistent across all five seeds) but does not close, settling at r = −0.637. Opponent Adaptation stays at OA = 0.0003, establishing that aggregate-reward optimization cannot produce per-opponent strategy.
+
+5. **LLM role-playing without reasoning produces a comparable shift.** Replacing the rule-based and adaptive agents with eight independent LLM agents (Haiku, given personality specs as system prompts) softens the trap an additional Δr = +0.127 to r = −0.510, but produces *no* increase in opponent-conditional, time-varying, or unpredictable behavior — three of four behavioral dimension targets actually move backward. LLMs faithfully follow descriptive personality specs but do not spontaneously generate higher-order strategic reasoning that those specs do not explicitly require.
+
+6. **Reasoning scaffolding breaks the trap.** When LLM agents are augmented with chain-of-thought prompting, persistent per-opponent memory, and post-hand adaptive strategy notes (Phase 3.1), the trust-profit anticorrelation drops to r = −0.094 across 5 seeds — statistically indistinguishable from zero. The Phase 3 → Phase 3.1 step (Δr = +0.416) is more than 3× the size of any prior phase transition. Two of five seeds show *positive* r (trap inversion). The most-trusted archetype climbs from rank 8 to rank 1 in economic ordering. The trust trap is therefore *not* structural; it can be broken by reasoning agents given the right scaffolding.
 
 ### 7.2 Implications for Reputation System Design
 
@@ -573,15 +647,13 @@ Our findings suggest that reputation systems based purely on behavioral observat
 
 ### 7.3 Future Work
 
-**Phase 3.1: LLM agents with persistent memory + chain-of-thought + adaptive specs.** The current Phase 3 (Section 5.7) showed that LLMs faithfully role-play their personality specs but do not spontaneously develop opponent-conditional, time-varying, or unpredictable strategy — three of the four behavioral dimension targets were missed, and the fourth (SU) actually moved backward. Three targeted interventions should each fix one missed dimension:
+**Phase 4: tightening the Phase 3.1 result.** Phase 3.1 (Section 5.8) demonstrated that LLM agents with chain-of-thought, memory, and adaptive specs can break the trust trap on average (r = −0.094 across 5 seeds). Three follow-up directions sharpen this finding:
 
-1. **Persistent memory** — append a per-opponent rolling summary ("Wall called my bet 4 of 5 times this hour") to the system prompt. Forces the agent to accumulate state. Targets OA (currently 0.0008, target > 0.01).
+1. **Larger n.** With σ = 0.30 and n = 5, the 95 % CI on the Phase 3.1 mean spans roughly [−0.36, +0.18]. A 10–20 seed replication would tighten this interval substantially and confirm whether the inversions seen in seeds 512 and 1024 generalize.
 
-2. **Chain-of-thought prompts** — ask the agent to reason step-by-step before deciding, instead of returning a one-word action. Should surface latent reasoning that a one-shot answer hides. Targets CS (currently 0.076, target > 0.15) and TMA.
+2. **Longer hand horizons.** Phase 3.1 ran 150 hands per seed (vs Phase 1/2's 10 000). The two persistent metric misses (NS = 0 exactly; CS = 0.10) likely reflect insufficient hand counts: NS's time-windowed metric needs longer epochs to detect drift, and CS may stabilize higher at scale. A 5 × 500 Phase 3.1 replication would test both at ~$60 of API spend.
 
-3. **Adaptive personality specs** — allow the agent to update its own spec across hand boundaries based on what it has learned. Targets NS (currently 0, target > 0).
-
-A Phase 3.1 run with all three interventions is a falsifiable test: if the targets remain unmet, this further constrains the claim space — not "LLMs lack reasoning" but "LLMs given full strategic scaffolding still fail to develop these behaviors." If the targets are met, that quantifies the contribution of memory, CoT, and adaptation to LLM-driven strategic play.
+3. **Targeted opponent-conditional reward shaping.** OA stays near zero in Phase 3.1 because memory in the prompt is *available* but not *behaviorally consequential* — the agent has the data but does not differentiate strongly across opponents. A Phase 3.2 that explicitly prompts the agent to "play differently against each opponent based on the notes" would test whether OA can be unlocked by instruction alone.
 
 **Beyond LLM agents.** Three other open research directions surface from the present work:
 
