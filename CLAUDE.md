@@ -27,8 +27,9 @@ is the four-tier ladder of trust-profit r values:
   Phase 3.1 (LLM + CoT + memory + adaptive) r = -0.094 (trap broken)
 
 Detailed reports in `phase1/phase1_report.md`,
-`phase2/adaptive/phase2_report.md`, `phase3/phase3_report.md`,
-`phase3/phase31_report.md`. Cross-phase scorecards in
+`phase2/adaptive/phase2_report.md`, and `phase3/phase3_report.md`
+(the latter covers both the Phase 3 baseline and the Phase 3.1
+reasoning-scaffolding follow-up). Cross-phase scorecards in
 `reports/phase31_long_scorecard.txt` (the most recent / most complete).
 The Polygence paper draft is at `paper.md` (Markdown source) and
 `paper/paper.tex` (Pandoc-converted LaTeX for Overleaf).

@@ -547,7 +547,7 @@ Wall — the calling-station archetype that lost in every previous phase, with 9
 | Unpredictability (SU) | 1.19 | **1.55 bits** | > 1.5 | **✓ NEW** |
 | Trust Manipulation (TMA) | +0.164 | **+0.242** | > 0 | ✓ (boosted) |
 
-Phase 3 hit 2 of 6 targets. Phase 3.1 hits 4 of 6. SU now meets the > 1.5 bits target for the first time across all phases, and TMA jumps to +0.242 with **six of eight archetypes explicitly "trust farming"** (Wall and Sentinel — the conservative-spec agents — show the strongest farming signal at +0.733 and +0.704 respectively). The two persistent misses are diagnostic: OA stays near zero because memory is *available* in the prompt but not measurably translated into per-opponent strategy, and NS stays at zero because the time-windowed metric needs longer horizons (>150 hands per seed) to detect strategy drift. The full Phase 3.1 writeup is in `phase3/phase31_report.md`.
+Phase 3 hit 2 of 6 targets. Phase 3.1 hits 4 of 6. SU now meets the > 1.5 bits target for the first time across all phases, and TMA jumps to +0.242 with **six of eight archetypes explicitly "trust farming"** (Wall and Sentinel — the conservative-spec agents — show the strongest farming signal at +0.733 and +0.704 respectively). The two persistent misses are diagnostic: OA stays near zero because memory is *available* in the prompt but not measurably translated into per-opponent strategy, and NS stays at zero because the time-windowed metric needs longer horizons (>150 hands per seed) to detect strategy drift. The full Phase 3 + 3.1 writeup is in `phase3/phase3_report.md`.
 
 #### 5.8.5 The aggression-moderation finding
 

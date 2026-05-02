@@ -35,7 +35,8 @@ single `--phase31` flag in `phase3/run_phase3_chat.py`:
 exercising every new code path with mock client (no API spend).
 
 **Artifacts:** `reports/phase31_long_scorecard.txt`,
-`phase3/phase31_report.md`, `phase31_stats.json`, `phase31_long_audit.json`
+`phase3/phase3_report.md` (Phase 3.1 sub-section appended to the
+combined report), `phase31_stats.json`, `phase31_long_audit.json`
 
 ## [Phase 3 Complete] &mdash; 2026-04-29
 

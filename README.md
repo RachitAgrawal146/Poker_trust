@@ -27,8 +27,8 @@ This README is self-contained, but a 30-minute review of the project naturally g
 1. **This README** (you are here) — research question, four-phase ladder, key findings, layout
 2. **`paper.md`** — full Polygence research paper draft (~720 lines, 7 sections + references). Sections 5.7 and 5.8 cover Phase 3 and the trap-breaking Phase 3.1 result respectively; Section 7 is the conclusion + future work. Also available as `paper/paper.tex` for Overleaf.
 3. **`reports/phase31_long_scorecard.txt`** — 6-table cross-phase scorecard with all four phases' per-seed r values, behavioral dimensions, economic ordering inversion, and TMA breakdown. **The single best one-page summary of the project's quantitative findings.**
-4. **`phase3/phase31_report.md`** — paper-style writeup of Phase 3.1 (the headline result). Self-contained; explains the three reasoning interventions, the trap-breaking r = −0.094 finding, the Wall-wins economic inversion, and honest limitations.
-5. *(optional)* `phase2/adaptive/phase2_report.md` and `phase3/phase3_report.md` — the same paper-style writeups for the two intermediate phases. Useful if the mentor wants to understand *why* each tier moves r by ~0.12–0.42 instead of asking "and the others did what?"
+4. **`phase3/phase3_report.md`** — paper-style writeup covering both the Phase 3 baseline (LLM role-play, r = −0.510) and the Phase 3.1 trap-breaking result (r = −0.094 with CoT + memory + adaptive specs). Self-contained; explains the three reasoning interventions, the trap-breaking finding, the Wall-wins economic inversion, and honest limitations.
+5. *(optional)* `phase2/adaptive/phase2_report.md` — same paper-style writeup for the Phase 2 hill-climbing tier. Useful if the mentor wants to understand *why* each tier moves r by ~0.12–0.42 instead of asking "and the others did what?"
 6. *(optional, deeper dive)* `phase2/adaptive/PHASE2_REDESIGN_PLAN.md` — design briefing for the Phase 2 redesign that replaced the original imitation-based Phase 2; explains *why* the canonical Phase 2 was rebuilt as bounded optimization rather than ML imitation.
 
 If the mentor wants to *reproduce* anything, the **Quick Start** section below has every command. If they want to *audit* code correctness, `phase3/validate_phase31.py` runs a 50-check unit suite without spending API credit.
@@ -62,7 +62,7 @@ If the mentor wants to *reproduce* anything, the **Quick Start** section below h
 - **Wall (most trusted) wins** — climbs from rank 8 to rank 1 in economic ordering, with zero rebuys.
 - 4 of 6 behavioral targets met (vs Phase 3's 2/6); SU now > 1.5 bits, TMA boosted to +0.242 with 6 of 8 archetypes "trust farming."
 - Cost: $17 for 11,953 LLM calls.
-- Full report: [`phase3/phase31_report.md`](phase3/phase31_report.md)
+- Full report (covers both Phase 3 and Phase 3.1): [`phase3/phase3_report.md`](phase3/phase3_report.md)
 
 ---
 
@@ -152,8 +152,7 @@ Poker_trust/
 │
 ├── phase3/                   # ── PHASE 3 + 3.1 ─────────────────────────────
 │   ├── README.md
-│   ├── phase3_report.md      # Phase 3 baseline writeup
-│   ├── phase31_report.md     # Phase 3.1 reasoning-scaffolding writeup
+│   ├── phase3_report.md      # Combined Phase 3 + 3.1 writeup
 │   ├── personality_specs/    # 8 archetype system prompts
 │   ├── llm_chat_agent.py     # LLMChatAgent + LLMChatJudge (with --phase31 mode)
 │   ├── run_phase3_chat.py    # API-backed runner (--provider anthropic|ollama|claude-cli)
@@ -215,8 +214,7 @@ Poker_trust/
 | [`phase1/phase1_report.md`](phase1/phase1_report.md) | 1 | 943 | Phase 1 frozen-archetype documentation |
 | [`phase2/adaptive/phase2_report.md`](phase2/adaptive/phase2_report.md) | 2 | 512 | Phase 2 adaptive (bounded hill-climbing) |
 | [`phase2/_imitation_archive/phase2_report.md`](phase2/_imitation_archive/phase2_report.md) | 2 (archived) | — | Original ML-imitation Phase 2 |
-| [`phase3/phase3_report.md`](phase3/phase3_report.md) | 3 | — | LLM personality role-play baseline |
-| [`phase3/phase31_report.md`](phase3/phase31_report.md) | 3.1 | — | LLM with CoT + memory + adaptive specs |
+| [`phase3/phase3_report.md`](phase3/phase3_report.md) | 3 + 3.1 | — | LLM role-play baseline AND reasoning-scaffolding follow-up (combined) |
 | [`reports/phase2_scorecard_long.txt`](reports/phase2_scorecard_long.txt) | 1 vs 2 | — | 7-table cross-phase scorecard |
 | [`reports/phase31_long_scorecard.txt`](reports/phase31_long_scorecard.txt) | 1/2/3/3.1 | — | Cross-phase scorecard with all four tiers |
 | [`paper.md`](paper.md) | All | 719 | Polygence research paper (Markdown source) |
