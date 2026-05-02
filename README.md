@@ -20,6 +20,21 @@ Every phase reuses the **same game engine**, **same trust posterior**, and
 
 ---
 
+## For mentor review — suggested reading order
+
+This README is self-contained, but a 30-minute review of the project naturally goes:
+
+1. **This README** (you are here) — research question, four-phase ladder, key findings, layout
+2. **`paper.md`** — full Polygence research paper draft (~720 lines, 7 sections + references). Sections 5.7 and 5.8 cover Phase 3 and the trap-breaking Phase 3.1 result respectively; Section 7 is the conclusion + future work. Also available as `paper/paper.tex` for Overleaf.
+3. **`reports/phase31_long_scorecard.txt`** — 6-table cross-phase scorecard with all four phases' per-seed r values, behavioral dimensions, economic ordering inversion, and TMA breakdown. **The single best one-page summary of the project's quantitative findings.**
+4. **`phase3/phase31_report.md`** — paper-style writeup of Phase 3.1 (the headline result). Self-contained; explains the three reasoning interventions, the trap-breaking r = −0.094 finding, the Wall-wins economic inversion, and honest limitations.
+5. *(optional)* `phase2/adaptive/phase2_report.md` and `phase3/phase3_report.md` — the same paper-style writeups for the two intermediate phases. Useful if the mentor wants to understand *why* each tier moves r by ~0.12–0.42 instead of asking "and the others did what?"
+6. *(optional, deeper dive)* `phase2/adaptive/PHASE2_REDESIGN_PLAN.md` — design briefing for the Phase 2 redesign that replaced the original imitation-based Phase 2; explains *why* the canonical Phase 2 was rebuilt as bounded optimization rather than ML imitation.
+
+If the mentor wants to *reproduce* anything, the **Quick Start** section below has every command. If they want to *audit* code correctness, `phase3/validate_phase31.py` runs a 50-check unit suite without spending API credit.
+
+---
+
 ## Key Findings
 
 ### Phase 1 — frozen rule-based agents (5 seeds × 10 000 hands)
