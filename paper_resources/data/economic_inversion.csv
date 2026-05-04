@@ -1,0 +1,9 @@
+archetype,rank_P3,rank_P31,delta
+wall,8,1,+7
+firestorm,5,2,+3
+phantom,1,3,-2
+mirror,2,4,-2
+judge,4,5,-1
+sentinel,7,6,+1
+predator,6,7,-1
+oracle,3,8,-5
