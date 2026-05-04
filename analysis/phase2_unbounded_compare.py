@@ -123,7 +123,8 @@ def extract_unbounded_summary(db_path: Path) -> Dict:
 # Figure 7: bounded vs unbounded comparison
 # ---------------------------------------------------------------------------
 
-def fig_bounded_vs_unbounded(summary: Dict, outdir: Path) -> None:
+def fig_bounded_vs_unbounded(summary: Dict, outdir: Path,
+                             tag: str = "") -> None:
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4.8))
 
     # Left: per-seed r
@@ -177,14 +178,16 @@ def fig_bounded_vs_unbounded(summary: Dict, outdir: Path) -> None:
         fontsize=13, fontweight="bold",
     )
     fig.tight_layout(rect=(0, 0, 1, 0.94))
-    _save(fig, outdir, "07_phase2_bounded_vs_unbounded.png")
+    suffix = f"_{tag}" if tag else ""
+    _save(fig, outdir, f"07_phase2_bounded_vs_unbounded{suffix}.png")
 
 
 # ---------------------------------------------------------------------------
 # Figure 10: param drift (where did each archetype end up?)
 # ---------------------------------------------------------------------------
 
-def fig_param_drift(traj_path: Path, outdir: Path) -> None:
+def fig_param_drift(traj_path: Path, outdir: Path,
+                    tag: str = "") -> None:
     if not traj_path.exists():
         print(f"  skipping fig 10: {traj_path} missing")
         return
@@ -243,7 +246,8 @@ def fig_param_drift(traj_path: Path, outdir: Path) -> None:
              "to drift toward br=0 or br=1; the question is whether they converge.",
              ha="center", fontsize=9, color="#555", style="italic")
     fig.tight_layout(rect=(0, 0.03, 1, 0.96))
-    _save(fig, outdir, "10_param_drift_unbounded.png")
+    suffix = f"_{tag}" if tag else ""
+    _save(fig, outdir, f"10_param_drift_unbounded{suffix}.png")
 
 
 # ---------------------------------------------------------------------------
@@ -471,6 +475,11 @@ def main() -> int:
         "--outdir", default="paper_resources",
         help="Where to write the new figures + notes + CSV.",
     )
+    parser.add_argument(
+        "--tag", default=None,
+        help="Suffix for output filenames (e.g. 'aggressive'). "
+             "Default: no suffix (canonical 'unbounded' filenames).",
+    )
     args = parser.parse_args()
     _setup_style()
 
@@ -492,13 +501,16 @@ def main() -> int:
     summary = extract_unbounded_summary(db_path)
     print(f"  {len(summary['per_seed'])} seeds extracted")
 
-    fig_bounded_vs_unbounded(summary, figdir)
-    fig_param_drift(_REPO_ROOT / args.trajectories, figdir)
-    write_csv_summary(summary, datadir / "phase2_unbounded_summary.csv")
+    suffix = f"_{args.tag}" if args.tag else ""
+    fig_bounded_vs_unbounded(summary, figdir, args.tag or "")
+    fig_param_drift(_REPO_ROOT / args.trajectories, figdir, args.tag or "")
+    write_csv_summary(summary,
+                      datadir / f"phase2_unbounded_summary{suffix}.csv")
     write_phase2_unbounded_note(summary,
-                                notedir / "phase2_unbounded_writeup.md")
+                                notedir / f"phase2_unbounded_writeup{suffix}.md")
     write_scorecard(summary,
-                    _REPO_ROOT / "reports" / "phase2_unbounded_scorecard.txt")
+                    _REPO_ROOT / "reports"
+                    / f"phase2_unbounded_scorecard{suffix}.txt")
     print("done.")
     return 0
 

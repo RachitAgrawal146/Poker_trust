@@ -51,8 +51,15 @@ R_BY_PHASE = {
 
 # Phase 2 unbounded sub-experiment (NOT counted as a separate phase in
 # the four-tier ladder; rendered alongside the other phases by
-# fig_five_tier_ladder).
-P2_UNBOUNDED_R = [-0.791, -0.676, -0.932, -0.717, -0.779]
+# fig_five_tier_ladder). Two variants:
+#   weak: delta=0.03 (default HC). Agents barely moved; trap deepened.
+#   aggressive: delta=0.15. Agents moved 11x more; trap roughly unchanged
+#               from bounded but per-seed variance exploded.
+# AGGRESSIVE is the canonical "did they converge to Nash" test — used in
+# the five-tier ladder figure and the paper.
+P2_UNBOUNDED_R_AGGRESSIVE = [-0.354, -0.700, -0.344, -0.887, -0.759]
+P2_UNBOUNDED_R_WEAK = [-0.791, -0.676, -0.932, -0.717, -0.779]
+P2_UNBOUNDED_R = P2_UNBOUNDED_R_AGGRESSIVE  # canonical
 
 # Ordering used for slopes / line plots
 PHASE_ORDER = list(R_BY_PHASE.keys())
@@ -187,9 +194,10 @@ def fig_five_tier_ladder(outdir: Path) -> None:
     ax.set_ylim(-1.05, 0.30)
 
     fig.text(0.99, -0.02,
-             "Phase 2* (unbounded HC, [0,1] freedom) DEEPENS the trap to r = -0.779 — "
-             "below even Phase 1.\n"
-             "Adaptive freedom alone is not enough; reasoning capacity is required to break the trap.",
+             "Phase 2* (aggressive unbounded HC, [0,1] freedom) sits at r = -0.609 with "
+             "high per-seed variance (σ = 0.221).\n"
+             "Agents move 11x more than weak HC but DIVERGE rather than converge — "
+             "the trust trap is robust to optimization strength.",
              ha="right", va="top", fontsize=8.5, color="#555", style="italic")
     fig.tight_layout()
     _save(fig, outdir, "01b_five_tier_ladder_with_unbounded.png")
