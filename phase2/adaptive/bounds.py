@@ -42,7 +42,11 @@ from typing import Dict, Tuple
 
 from archetype_params import ARCHETYPE_PARAMS
 
-__all__ = ["ARCHETYPE_BOUNDS", "verify_bounds_cover_initial_values"]
+__all__ = [
+    "ARCHETYPE_BOUNDS",
+    "make_unbounded_bounds",
+    "verify_bounds_cover_initial_values",
+]
 
 
 Bound = Tuple[float, float]
@@ -580,6 +584,47 @@ def verify_bounds_cover_initial_values() -> None:
     _check_archetype("mirror_default",    "mirror_default",    _MIRROR)
     _check_archetype("judge_cooperative", "judge_cooperative", _JUDGE_COOPERATIVE)
     _check_archetype("judge_retaliatory", "judge_retaliatory", _JUDGE_RETALIATORY)
+
+
+# ---------------------------------------------------------------------------
+# Unbounded variant — every (round, metric) collapses to the full [0, 1]
+# probability range. Used by run_adaptive.py --unbounded for the
+# "convergence-without-personality" experiment.
+# ---------------------------------------------------------------------------
+
+def make_unbounded_bounds() -> Dict[str, object]:
+    """Return a bounds registry shaped exactly like ``ARCHETYPE_BOUNDS``
+    but with every ``(lo, hi)`` collapsed to ``(0.0, 1.0)``.
+
+    Identity-locking metrics (Wall.br, Sentinel.br, etc.) lose their
+    floors and ceilings — every archetype is free to drift toward any
+    point in the legal probability space. Phase 1 starting values are
+    preserved on each agent so all eight begin from their canonical
+    personalities; the hill-climber decides whether to stay, drift, or
+    converge.
+    """
+    free: Bound = (0.0, 1.0)
+    free_round: RoundBounds = {key: free for key in _REQUIRED_KEYS}
+    free_archetype: ArchetypeBounds = {
+        round_name: dict(free_round) for round_name in _ROUNDS
+    }
+
+    def _fresh() -> ArchetypeBounds:
+        return {round_name: dict(free_round) for round_name in _ROUNDS}
+
+    return {
+        "oracle":            _fresh(),
+        "sentinel":          _fresh(),
+        "firestorm":         _fresh(),
+        "wall":              _fresh(),
+        "phantom":           _fresh(),
+        "predator_baseline": _fresh(),
+        "mirror_default":    _fresh(),
+        "judge": {
+            "pre_trigger":  _fresh(),
+            "post_trigger": _fresh(),
+        },
+    }
 
 
 if __name__ == "__main__":

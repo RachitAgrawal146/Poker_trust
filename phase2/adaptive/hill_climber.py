@@ -91,6 +91,7 @@ class HillClimber:
         min_delta: float = 0.005,
         decay_rate: float = 0.995,
         rng: Optional[np.random.Generator] = None,
+        bounds: Optional[Dict[str, Any]] = None,
     ) -> None:
         if eval_window < 1:
             raise ValueError("eval_window must be >= 1")
@@ -105,6 +106,7 @@ class HillClimber:
         self.min_delta = float(min_delta)
         self.decay_rate = float(decay_rate)
         self.rng = rng if rng is not None else np.random.default_rng()
+        self.bounds = bounds if bounds is not None else ARCHETYPE_BOUNDS
 
         # Snapshot of the params we last measured a baseline against. If a
         # trial perturbation is rejected, the agent's params revert to this.
@@ -211,7 +213,7 @@ class HillClimber:
             metric = _METRIC_KEYS[int(self.rng.integers(0, len(_METRIC_KEYS)))]
             sign = 1.0 if self.rng.random() < 0.5 else -1.0
             signed_delta = sign * self.delta
-            lo, hi = ARCHETYPE_BOUNDS["judge"][state_key][round_name][metric]
+            lo, hi = self.bounds["judge"][state_key][round_name][metric]
             live = self.agent.get_live_params()  # {pre_trigger:..., post_trigger:...}
             old = float(live[state_key][round_name][metric])
             new = max(lo, min(hi, old + signed_delta))
@@ -223,7 +225,7 @@ class HillClimber:
             metric = _METRIC_KEYS[int(self.rng.integers(0, len(_METRIC_KEYS)))]
             sign = 1.0 if self.rng.random() < 0.5 else -1.0
             signed_delta = sign * self.delta
-            lo, hi = ARCHETYPE_BOUNDS[arch_key][round_name][metric]
+            lo, hi = self.bounds[arch_key][round_name][metric]
             live = self.agent.get_live_params()  # flat per-round dict
             old = float(live[round_name][metric])
             new = max(lo, min(hi, old + signed_delta))

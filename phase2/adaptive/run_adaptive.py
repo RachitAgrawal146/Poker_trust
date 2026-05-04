@@ -47,7 +47,11 @@ from data.sqlite_logger import SQLiteLogger
 from engine.table import Table
 
 from phase2.adaptive.adaptive_agent import AdaptiveAgent, AdaptiveJudge
-from phase2.adaptive.bounds import verify_bounds_cover_initial_values
+from phase2.adaptive.bounds import (
+    ARCHETYPE_BOUNDS,
+    make_unbounded_bounds,
+    verify_bounds_cover_initial_values,
+)
 from phase2.adaptive.hill_climber import HillClimber
 
 __all__ = ["build_adaptive_roster", "run_one_seed", "main"]
@@ -126,6 +130,7 @@ def run_one_seed(
     decay_rate: float,
     logger: SQLiteLogger,
     label: str,
+    unbounded: bool = False,
 ) -> Dict[str, Any]:
     agents = build_adaptive_roster()
     num_seats = len(agents)
@@ -135,6 +140,8 @@ def run_one_seed(
         seed=seed, num_hands=num_hands, label=label, agents=agents,
     )
     table = Table(agents, seed=seed, logger=logger, run_id=run_id)
+
+    bounds = make_unbounded_bounds() if unbounded else ARCHETYPE_BOUNDS
 
     # One HillClimber per agent; seed each climber's RNG deterministically
     # off the global seed + the agent's seat so different seeds produce
@@ -150,6 +157,7 @@ def run_one_seed(
                 min_delta=min_delta,
                 decay_rate=decay_rate,
                 rng=hc_rng,
+                bounds=bounds,
             )
         )
 
@@ -312,18 +320,28 @@ def main(argv: List[str] = None) -> int:
         "--label", default=None,
         help="Free-form run label.",
     )
+    parser.add_argument(
+        "--unbounded", action="store_true", default=False,
+        help="Replace ARCHETYPE_BOUNDS with full [0, 1] freedom on every "
+             "(round, metric). Tests whether agents converge to a common "
+             "equilibrium when the personality cage is removed.",
+    )
     args = parser.parse_args(argv)
 
-    # Validate bounds before doing anything expensive.
-    verify_bounds_cover_initial_values()
+    # Validate bounds before doing anything expensive (skip when unbounded —
+    # the [0,1] box trivially covers every Phase 1 starting value).
+    if not args.unbounded:
+        verify_bounds_cover_initial_values()
 
     seeds = [int(s.strip()) for s in args.seeds.split(",") if s.strip()]
+    suffix = "-unbounded" if args.unbounded else ""
     label = (
         args.label
-        or f"phase2-adaptive-{args.hands}h-eval{args.eval_window}-d{args.delta}"
+        or f"phase2-adaptive{suffix}-{args.hands}h-eval{args.eval_window}-d{args.delta}"
     )
 
-    print("Phase 2 (adaptive) -- bounded online hill-climbing", flush=True)
+    mode = "UNBOUNDED [0, 1]" if args.unbounded else "bounded (per-archetype)"
+    print(f"Phase 2 (adaptive) -- online hill-climbing  mode={mode}", flush=True)
     print(f"  Seeds:      {seeds}", flush=True)
     print(f"  Hands/seed: {args.hands}", flush=True)
     print(f"  Eval window: {args.eval_window}  delta={args.delta}  "
@@ -344,6 +362,7 @@ def main(argv: List[str] = None) -> int:
             decay_rate=args.decay_rate,
             logger=logger,
             label=label,
+            unbounded=args.unbounded,
         )
         summaries.append(summary)
 
