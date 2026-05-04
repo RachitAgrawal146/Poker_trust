@@ -39,12 +39,17 @@ paper_resources/
 │   ├── per_seed_stacks_p31.csv
 │   └── phase2_unbounded_summary.csv  Per-seed r delta from new run
 ├── interesting_hands/                (curated hand transcripts for the paper)
-│   ├── _highlights.txt               Biggest pots from every seed
-│   ├── phase2_unbounded_seed_42.txt
+│   ├── EVOLUTION_STORY.md            Narrative arc through all four phases
+│   ├── p2-unbounded_story.txt        Story-arc hands extracted from P2-unbounded
+│   ├── _highlights.txt               Biggest pots per seed (raw)
+│   ├── phase2_unbounded_seed_42.txt  Per-seed exhaustive dumps (raw)
 │   ├── phase2_unbounded_seed_137.txt
 │   ├── phase2_unbounded_seed_256.txt
 │   ├── phase2_unbounded_seed_512.txt
 │   └── phase2_unbounded_seed_1024.txt
+│
+│   To populate p1/p2-bounded/p3/p3.1 story files, run on Windows:
+│       python3 analysis/extract_story_hands.py --db <sqlite> --phase <tag>
 └── notes/                            (paper-section drafts not yet in paper.md)
     ├── societal_implications.md      Real-world parallels (eBay, AI alignment, etc.)
     ├── future_work_expanded.md       Detailed roadmap (Phase 4, multi-LLM, etc.)
