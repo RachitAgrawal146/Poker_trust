@@ -1,9 +1,9 @@
 # The Evolution of the Trust Trap, in Eight Hands
 
 > A guided tour through the four-tier ladder of this project, told as
-> a sequence of representative hands. Each hand is a single,
-> human-readable transcript that illustrates one specific moment in
-> the project's narrative arc.
+> a sequence of hands that were *actually played* in the canonical
+> simulations. Each hand is referenced by its hand ID and source
+> phase so the reader can pull the full transcript on demand.
 >
 > **The arc has four acts.** Act 1 establishes the trap (Phase 1).
 > Act 2 shows that numerical adaptation cannot escape it (Phases 2
@@ -11,20 +11,36 @@
 > character cannot escape it (Phase 3). Act 4 shows what does break
 > it: reasoning scaffolding (Phase 3.1).
 
-## How to use this document
+## Cross-phase money-quote moment
 
-Each hand has:
-- **Slot ID** — a stable label (e.g. `A1.1`) used by `extract_story_hands.py`
-- **Phase** — which run produced this hand
-- **Selection** — the SQL fingerprint that picks the hand
-- **Transcript** — either inlined here (if the SQLite is on the
-  server) or a reference to the per-phase output file
+| | Phase 3 hand #67 | Phase 3.1 hand #146 |
+|---|---|---|
+| **Wall's hole cards** | 2♠ 5♣ (rank 6749, trash) | K♥ Q♥ (rank 872, top pair) |
+| **Wall's actions** | check / call × 4 streets | check, call, call, **bet** |
+| **Result** | Wall loses 35 chips to Firestorm's J-J | Wall **wins** 32 chips from Firestorm's 8-Q |
+| **Firestorm's response on river** | raise (canonical aggression) | check, then **call** Wall's bet |
 
-Extracted transcripts live in `paper_resources/interesting_hands/`:
-- `p2-unbounded_story.txt` — extracted on this server (full transcripts)
-- `p1_story.txt`, `p2-bounded_story.txt`, `p3_story.txt`, `p31_story.txt`
-  — produced by running `extract_story_hands.py` on the corresponding
-  Windows-side SQLites (see "Extraction" at the end)
+Same archetype, same opponent, exactly two phases apart. **The
+inversion is visible in a single hand.**
+
+## File layout
+
+Per-phase story files (one transcript per slot, all extracted by
+`analysis/extract_story_hands.py`):
+
+| File | Phase | Run scale | Slots populated |
+|---|---|---|---|
+| `p1_story.txt`           | Phase 1 (frozen)    | 5 × 10,000 | 8/8 |
+| `p2-bounded_story.txt`   | Phase 2 bounded HC  | 5 × 10,000 | 8/8 |
+| `p2-unbounded_story.txt` | Phase 2 unbounded   | 5 × 10,000 | 8/8 |
+| `p3_story.txt`           | Phase 3 LLM         | 5 × 500    | 8/8 |
+| `p31_story.txt`          | Phase 3.1 LLM+CoT   | 5 × 150    | **7/8 (no A1.2)** |
+
+**P3.1 has no `Wall pays off Firestorm` hand.** This is itself a
+finding: by Phase 3.1, Wall has stopped matching the SQL
+fingerprint that picks out the trap-microcosm dynamic. The
+search returns no hands. The trap has dissolved at the very level
+of "is there an obvious example to point at?".
 
 ---
 
@@ -32,48 +48,63 @@ Extracted transcripts live in `paper_resources/interesting_hands/`:
 
 ### Slot A1.1 — Firestorm's biggest walkover
 
-> *Phase 1 / 5 seeds × 10,000 hands / canonical run.*
->
-> **The dynamic:** Firestorm bets aggressively preflop. Seven other
-> agents fold. Firestorm wins the pot uncontested. This is **fold
-> equity in raw form** — Firestorm's economic dominance comes not
-> from winning showdowns but from preventing them.
+| Phase | Hand ID | Final pot | Notes |
+|---|---|---|---|
+| **P1**           | #2343 | 140 | seven folds, Firestorm uncontested |
+| P2-bounded       | #1471 | 105 | smaller because adaptive defenders fold less |
+| P2-unbounded agg | varies | varies | similar dynamic to P2-bounded |
+| P3 (LLM)         | #274  | 34  | smaller pots in 500-hand window |
+| P3.1 (LLM+CoT)   | #103  | 78  | still happens but smaller |
 
-This hand is the visible edge of the iceberg. With 87.1% fold
-equity, Firestorm collects ~31% of all walkover pots in Phase 1.
-The agents that drop below 0.40 trust are precisely the agents that
-extract chips.
+> **The dynamic.** Firestorm bets aggressively preflop. Most agents
+> fold. Pot collected uncontested. This is **fold equity in raw
+> form** — Firestorm's economic dominance comes from preventing
+> showdowns, not winning them.
+
+The best transcript to cite is **P1 hand #2343** (140-chip pot,
+walkover to S2). With 87.1% fold equity in Phase 1, Firestorm
+collects ~31% of all walkover pots in the run.
 
 ### Slot A1.2 — Wall pays off Firestorm
 
-> *Phase 1.*
->
-> **The dynamic:** Firestorm bets on every street with a weak hand.
-> Wall — the calling station — calls all the way down. At showdown,
-> Firestorm's hand is genuinely weak; Wall's hand is moderate. But
-> because Wall is positionally last and tends to peel cheaply, the
-> chips that Wall paid into the pot exceed the pot Wall wins.
+| Phase | Hand ID | Final pot | Wall's hole cards | Outcome |
+|---|---|---|---|---|
+| **P1**           | #7128 | 77  | (P1 calling-station play) | Wall loses |
+| P2-bounded       | #7879 | 101 | similar | Wall loses |
+| P2-unbounded agg | varies | — | similar | Wall loses |
+| **P3 (LLM)**     | **#67** | **110** | **2♠ 5♣** (rank 6749) | **Wall loses 35 chips** |
+| P3.1 (LLM+CoT)   | **none** | — | — | **does not occur** |
 
-This is **the trust trap in microcosm**. Wall's reputation profile
-(trust = 0.962, perfect classification accuracy) is paid for in
-chips, hand by hand. There is no single moment where Wall makes a
-"bad" decision — every call is locally rational given Wall's
-pot-odds-only logic. The aggregate cost is what makes it a trap.
+> **The dynamic.** Firestorm bets multiple streets. Wall — the
+> calling station — calls all the way down with a hand it knows
+> can't win. At showdown, Wall pays for the privilege of having
+> "called". This is **the trust trap in microcosm.**
+>
+> P3 hand #67 is the most rhetorically powerful version because the
+> LLM Wall does this with **2♠ 5♣** — the worst kind of hand —
+> and the call is patently mechanical: the LLM is following its
+> "calling station" personality literally, with no situational
+> awareness.
+>
+> P3.1 *cannot* produce a hand matching this fingerprint. The
+> reasoning scaffolding has eliminated the dynamic from the data.
 
 ### Slot A1.3 — First trust collapse
 
-> *Phase 1, hand index varies by seed (~150–250).*
->
-> **The dynamic:** the first hand on which Oracle's posterior over
-> Firestorm crosses below 0.40. By this point, Oracle has watched
-> Firestorm bet weak hands at showdown enough times that the
-> Bayesian posterior has shifted from the initial uniform prior to
-> a near-certain `firestorm` classification.
+| Phase | Hand ID | Notes |
+|---|---|---|
+| **P1**           | #7    | Oracle's posterior of Firestorm crosses below 0.40 by hand 7 |
+| P2-bounded       | #21   | similar — adaptation doesn't stop the inference |
+| P2-unbounded agg | varies | similar |
+| P3 (LLM)         | #22   | LLMs identify the bluffer essentially as fast |
+| P3.1 (LLM+CoT)   | #31   | similar onset |
 
-This is the moment **the trust system has done its job**. Oracle now
-"knows" Firestorm is a maniac with high confidence — and yet
-Firestorm continues to dominate the table economically. The trust
-system's accuracy is exactly *not* the bottleneck on the trap.
+> **The dynamic.** The trust system identifies Firestorm as a
+> bluffer within the first ~30 hands, with high confidence. **The
+> trust system's accuracy is not the bottleneck on the trap** —
+> Oracle "knows" Firestorm is a maniac with high confidence, and
+> Firestorm continues to dominate economically anyway. The trap
+> persists *because of* accurate trust inference, not despite it.
 
 ---
 
@@ -81,183 +112,183 @@ system's accuracy is exactly *not* the bottleneck on the trap.
 
 ### Slot A2.1 — Late-game adapted hand (Phase 2 bounded)
 
-> *Phase 2 bounded, hand index ≥ 7000.*
+| Phase | Hand ID | Final pot | Notes |
+|---|---|---|---|
+| P1               | #8206 | 146 | reference: Firestorm losing in late-game |
+| **P2-bounded**   | #7854 | 131 | the comparison case — adapted opponents |
+| P2-unbounded agg | varies | — | similar dynamic |
+
+The bounded P2 hand at #7854 (131-chip pot, Firestorm involved
+in a late showdown) shows what adaptation *can* do — slightly
+narrow Firestorm's edge — and what it cannot — overturn the
+ordering.
+
+### Slot A2.2 — Phase 2 unbounded (the falsified-convergence experiment)
+
+> Documented separately in
+> `paper_resources/notes/phase2_unbounded_writeup_aggressive.md`
+> (canonical) with figures
+> `07_phase2_bounded_vs_unbounded_aggressive.png`,
+> `11_nash_convergence_spread_aggressive.png`,
+> `13_nash_convergence_pca_aggressive.png`.
 >
-> **The dynamic:** by the late game, every agent has had ~35 hill-
-> climber cycles. Adaptation has nudged each agent's parameters
-> within their archetype-shaped bound boxes. Look for a hand where
-> Firestorm bet aggressively but lost the showdown — these are
-> rarer in late game than early game, but visible.
+> **The headline.** Even with aggressive hill-climbing
+> (delta = 0.15, 100 cycles per agent, 11× more parameter drift),
+> agents do **not** converge. Cluster spread *grows* from 5.8 to
+> 7.7. Mean trust-profit r is roughly unchanged from bounded P2
+> (−0.609 vs −0.637). Firestorm still dominates economically
+> (6,512 chips, 6× the next archetype).
 
-Phase 2's effect is real (Δr = +0.115) but small. Looking at this
-hand alongside A1.1 and A1.2 should make the gap visceral: yes,
-adaptation has done *something*, but Firestorm still has the largest
-stack and Wall is still going broke.
-
-### Slot A2.2 — Phase 2 UNBOUNDED, biggest pot of seed 42 (extracted)
-
-> **Phase 2 unbounded** / 5 seeds × 10,000 hands / runs_phase2_unbounded.sqlite.
->
-> **The dynamic:** with bounds removed, every agent's hill-climber
-> can drift its parameters anywhere in [0, 1]^36. The hypothesis
-> from Arpit (mentor meeting 2026-04-30) was that economically-
-> motivated agents would converge to a Nash-equilibrium / Oracle
-> profile. The data falsifies this:
-> - **Firestorm's mean stack: 7,861 chips** (40× starting)
-> - **Wall's mean stack: 195 chips** (zero growth, 30 rebuys)
-> - Trust-profit r drops to **−0.779** (deeper than Phase 1)
-
-Why this matters: the trap is not a parameter-space limitation. With
-full freedom of [0, 1]^36, agents *still* preserve their archetype
-identity, because the trust posterior is computed against Phase 1's
-likelihood tables and rewards canonical archetype play. The
-*reputation system itself* is the binding constraint.
-
-The extracted hand transcript is in
-`paper_resources/interesting_hands/p2-unbounded_story.txt` (slot A1.1).
-Hand 1471 of seed 42, final pot 105 chips, Firestorm walkover after
-4-bet on the turn forced Wall and Oracle out.
+This is the falsification of "if they all maximize, they converge
+to Nash". Numerical optimization at any tested scale fails to
+break the trap — only Phase 3.1's reasoning scaffolding does.
 
 ---
 
 ## Act 3 — LLM Personalities Without Reasoning (Phase 3)
 
-### Slot A3.1 — LLM Wall mechanically calls down
+### Slot A3.1 — Phantom bluff caught
 
-> *Phase 3 / 5 seeds × 500 hands / Anthropic Haiku via API.*
->
-> **The dynamic:** the LLM playing Wall reads its personality spec
-> ("you are the calling station; rarely fold; almost never raise")
-> and follows it literally. Even when the hand state should suggest
-> a fold (multiple bets, bad pot odds, weak hand), the LLM calls.
+| Phase | Hand ID | Final pot |
+|---|---|---|
+| P1               | #62  | 13  |
+| P2-bounded       | #53  | 31  |
+| P3 (LLM)         | #15  | 39  |
+| P3.1 (LLM+CoT)   | #12  | 72  |
 
-Phase 3's surprise is that giving the agents natural language did
-**not** unlock strategic adaptation. The LLM is faithful to its
-personality but does not reason about the game state — it produces
-the *form* of the archetype without the *cognition*. Trust-profit r
-softens only by Δ = +0.127, comparable to Phase 2.
+> **The dynamic.** Phantom bluffs the river with a weak hand and
+> gets called by an honest opponent. The LLM Phantom in P3 produces
+> the *form* of a bluff (river bet on weak cards) without the
+> *cognition* (no reading of the calling-history-against-bluffs the
+> opponent has shown). This is consistent with Phase 3's broader
+> finding: LLMs follow personality specs faithfully but do not
+> reason about game state.
 
-### Slot A3.2 — Phantom bluff caught
+### Slot A3.2 — LLM Wall mechanically calls down (= Slot A1.2 in P3)
 
-> *Phase 3, late game.*
->
-> **The dynamic:** the LLM playing Phantom delivers a confident river
-> bet on a weak hand. Some opponent calls; Phantom loses the showdown.
-
-In Phase 3, Phantom occasionally pulls off bluffs (just like in Phase
-1) but the LLM doesn't *vary* the bluff frequency or sizing in
-response to opponents — it produces Phantom-as-personality, not
-Phantom-as-strategist.
+P3 hand #67 doubles as the strongest A3-tier evidence: LLM Wall
+calls down a 4-bet pot with **2♠ 5♣**. No reasoning agent — even a
+calling station — should call a 4-bet preflop with these cards.
+The LLM is producing personality, not strategy.
 
 ---
 
 ## Act 4 — Reasoning Breaks the Trap (Phase 3.1)
 
-### Slot A4.1 — Wall value-bets against Firestorm
+### Slot A4.1 — Wall value-bets against Firestorm  ★ THE INVERSION MOMENT
 
-> *Phase 3.1, late game (hand ≥ 100).*
+| Phase | Hand ID | Wall's hole cards | Wall's river action | Outcome |
+|---|---|---|---|---|
+| P1               | #9970 | (raised once, accidental) | bet | one of the rare P1 Wall raises |
+| P2-bounded       | #9996 | similar accidents | bet | ditto |
+| P3 (LLM)         | #448  | (LLM following spec) | bet | rare event in P3 |
+| **P3.1 (LLM+CoT)** | **#146** | **K♥ Q♥** (rank 872) | **bet** | **Wall WINS 32 chips from Firestorm** |
+
+> **The dynamic.** P3.1 hand #146 is the inversion moment in
+> microcosm:
 >
-> **The dynamic:** Wall, augmented with chain-of-thought + per-opponent
-> memory + adaptive strategy notes, **bets** with a strong hand —
-> something canonical Wall almost never does. The CoT trace shows
-> Wall reasoning: *"Firestorm has bet every street regardless of
-> board; my pair is likely good; raise to extract."*
-
-This is the **trap-inversion moment**. Wall (highest trust, 0.85)
-goes from rank-8-of-8 in Phase 3 to **rank-1-of-8 in Phase 3.1**
-because moments like this start happening. The cooperative archetype
-stops being a calling station and starts using its trust as
-strategic camouflage.
-
-### Slot A4.2 — Sentinel "trust farming"
-
-> *Phase 3.1, mid-game (hand ≥ 75).*
+> - Firestorm raises preflop, c-bets flop, c-bets turn — canonical
+>   aggression.
+> - Wall calls each street, *gathering information*.
+> - Firestorm **checks** the river — a tell that Firestorm doesn't
+>   have a strong hand by river.
+> - Wall **bets** the river with K♥ Q♥ (top pair, good kicker).
+> - Firestorm calls with 8c Qc (rank 6075, much weaker).
+> - **Wall wins 32 chips from Firestorm.**
 >
-> **The dynamic:** Sentinel's adaptive strategy notes (visible in the
-> agent state) explicitly say things like "build trust by playing
-> tight early, then pressure when opponents fold to me". Mid-game,
-> Sentinel raises into a multi-way pot and gets credit (folds) from
-> opponents who classify it as `sentinel` and weight its raises as
-> value bets.
+> This is precisely the kind of move canonical Wall (and LLM-spec
+> Wall in P3) would never make. The reasoning scaffolding lets
+> Wall exploit Firestorm's exposed weakness while the trust system
+> still classifies Wall as a passive caller.
 
-Sentinel's TMA score (Trust Manipulation Awareness) is **+0.704** in
-Phase 3.1 — the second-highest of all archetypes. The agent has
-explicitly learned to *use its reputation* as an asset.
+This is **the single most important hand in the project** for
+illustrating what reasoning scaffolding does. Use it as the
+opening or closing hand of a talk.
 
-### Slot A4.3 — Trap-inverted hand (positive-r seed)
+### Slot A4.2 — Sentinel late aggression
 
-> *Phase 3.1, seed 512 or seed 1024.*
+| Phase | Hand ID | Final pot | Notes |
+|---|---|---|---|
+| P1               | #6236 | 170 | rare P1 Sentinel raise |
+| P2-bounded       | #7234 | 160 | similar |
+| P3 (LLM)         | #251  | 144 | LLM Sentinel raises in character |
+| **P3.1 (LLM+CoT)** | **#85**  | **51** (walkover) | **Sentinel raises and everyone folds** |
+
+> **The dynamic.** Sentinel — the second-most-trusted archetype —
+> raises into a pot mid-game. In Phase 3.1, every other agent
+> folds. Sentinel collects an uncontested walkover.
 >
-> **The dynamic:** in two of five seeds, the trust-profit r flips to
-> **positive** (+0.047, +0.435). Look for a hand from these seeds
-> where the most-trusted agent (Wall) wins a large pot through a
-> deliberate strategic move — not a fluke.
+> This is the **trust farming** dynamic in microcosm. Sentinel's
+> reputation as a tight value-bettor means its raise is
+> automatically read as "value", and opponents fold. Sentinel's
+> Phase 3.1 TMA score (Trust Manipulation Awareness) = +0.704 —
+> the second-highest of all archetypes — captures this empirically.
 
-Two of five seeds inverting the trap is a small-N result, but the
-*existence* of trap inversion under this scaffolding is the strongest
-single piece of evidence in the paper that the trap is not a
-structural property of multi-agent reputation systems.
+### Slot A4.3 — Trap-inverted hand from positive-r seed
+
+> Best extracted from seed 512 (r = +0.047) or seed 1024 (r = +0.435).
+> See `paper_resources/data/per_seed_stacks_p31.csv` for which
+> archetype won that seed; in seeds 512 and 1024, Wall and Sentinel
+> are at or near the top.
+>
+> The current `extract_story_hands.py --seed N` flag pulls from a
+> specific seed if you want to populate this slot specifically.
 
 ---
 
-## Bonus — A_x: Biggest pot of every run
+## Bonus — "Biggest pot of the run" per phase
 
-For each phase, `extract_story_hands.py` also dumps the single largest
-pot of the run as a "spectacle" hand. These are useful as visual
-hooks for talks/demos even if they don't carry narrative weight.
+| Phase | Hand ID | Final pot |
+|---|---|---|
+| P1               | #5651 | 170 |
+| P2-bounded       | #2949 | 171 |
+| P3               | #221  | 153 |
+| P3.1             | #92   | 147 |
+
+Useful as visual hooks for talks/demos even without specific
+narrative weight.
 
 ---
-
-## Extraction
-
-To populate the per-phase story files from the canonical SQLites:
-
-```bash
-# Phase 1 (canonical 5 × 10000 frozen-rules dataset)
-python3 analysis/extract_story_hands.py \
-    --db runs_phase1_long.sqlite --phase P1
-
-# Phase 2 bounded (canonical 5 × 10000 hill-climbing)
-python3 analysis/extract_story_hands.py \
-    --db runs_phase2_long.sqlite --phase P2-bounded
-
-# Phase 2 UNBOUNDED (already on server; transcripts inlined above)
-python3 analysis/extract_story_hands.py \
-    --db runs_phase2_unbounded.sqlite --phase P2-unbounded
-
-# Phase 3 (5 × 500 LLM personalities)
-python3 analysis/extract_story_hands.py \
-    --db runs_phase3_long.sqlite --phase P3
-
-# Phase 3.1 (5 × 150 LLM + reasoning)
-python3 analysis/extract_story_hands.py \
-    --db runs_phase31_long.sqlite --phase P3.1
-```
-
-Each command writes to
-`paper_resources/interesting_hands/<phase>_story.txt`.
-
-The Phase 2 unbounded story file is already populated on the server.
-Phase 1, Phase 2 bounded, Phase 3, and Phase 3.1 require the
-corresponding SQLite, which lives on the user's Windows machine
-(LFS-tracked, gitignored). On Windows, run the same commands above
-inside the repo root after pulling.
 
 ## Mapping to paper sections
 
-| Slot | Best paper home |
-|---|---|
-| A1.1 Firestorm walkover     | §5.3 Firestorm Dominance Mechanism |
-| A1.2 Wall pays off Firestorm | §5.2 Phase 1 Trust-Profit Anticorrelation |
-| A1.3 Trust collapse          | §5.1 Phase 1 Behavioral Profiles |
-| A2.1 Late-game adapted       | §5.5 Phase 2 Bounded Optimization Results |
-| A2.2 Phase 2 unbounded       | §5.5 Phase 2 (the new sub-experiment) |
-| A3.1 LLM Wall mechanical     | §5.7 Phase 3 LLM Personality Role-Players |
-| A3.2 Phantom bluff caught    | §5.7 Phase 3 |
-| A4.1 Wall value-bets         | §5.8 Phase 3.1 (the inversion moment) |
-| A4.2 Sentinel trust-farming  | §5.8 Phase 3.1 (TMA discussion) |
-| A4.3 Trap-inverted hand      | §5.8 Phase 3.1 |
+| Slot | Best paper home | Strongest evidence |
+|---|---|---|
+| A1.1 Firestorm walkover     | §5.3 Firestorm Dominance Mechanism | P1 #2343 |
+| A1.2 Wall pays off Firestorm | §5.2 Phase 1 Trust-Profit Anticorrelation | **P3 #67** (most powerful — LLM Wall calls 4-bet with 2-5o) |
+| A1.3 Trust collapse          | §5.1 Phase 1 Behavioral Profiles | P1 #7 |
+| A2.1 Late-game adapted       | §5.5 Phase 2 Bounded | P2-bounded #7854 |
+| A2.2 Phase 2 unbounded       | §5.5 Phase 2 (the new sub-experiment) | full writeup separately |
+| A3.1 LLM mechanical          | §5.7 Phase 3 LLM | P3 #67 (same as A1.2 — strongest LLM-spec-as-personality evidence) |
+| A4.1 Wall value-bets         | §5.8 Phase 3.1 (the inversion moment) | **P3.1 #146** — THE money hand |
+| A4.2 Sentinel trust-farming  | §5.8 Phase 3.1 (TMA discussion) | P3.1 #85 |
+| A4.3 Trap-inverted hand      | §5.8 Phase 3.1 (variance discussion) | extract from seed 512 or 1024 |
 
-For an appendix-style paper, slots A1.2, A2.2, A4.1, and A4.3 are the
-four most important: they are the trap, the falsified hypothesis, the
-inversion, and the proof of inversion respectively.
+For an appendix-style paper, the **two most important hands** are:
+
+1. **P3 hand #67** — the trap, in 30 actions, with LLM Wall calling 4-bets with 2-5o
+2. **P3.1 hand #146** — the inversion, in 17 actions, with LLM Wall value-betting K-Q against a checking Firestorm
+
+These two hands are 79 hands apart in completely different runs, yet
+together they tell the entire story of the project.
+
+---
+
+## Extraction reference
+
+To regenerate any of the per-phase story files:
+
+```bash
+python3 analysis/extract_story_hands.py --db <sqlite> --phase <tag>
+```
+
+Where `<tag>` is one of `P1`, `P2-bounded`, `P2-unbounded`, `P3`, `P3.1`.
+
+To extract a specific seed (for slot A4.3):
+
+```bash
+python3 analysis/extract_story_hands.py --db runs_phase31_long.sqlite --phase P3.1-seed512 --seed 512
+```
+
+The script handles the LLM-prefixed agent names (e.g.
+`LLM-Firestorm`) transparently.
