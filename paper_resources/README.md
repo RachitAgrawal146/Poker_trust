@@ -12,15 +12,17 @@ sections that can be slotted into `paper.md` or `paper/paper.tex`.
 paper_resources/
 ├── README.md                         (you are here — index of assets)
 ├── figures/                          (publication-ready PNGs, 180 dpi)
-│   ├── 01_four_tier_ladder.png       Headline: 4-tier r ladder
+│   ├── 01_four_tier_ladder.png       Headline: 4-tier r ladder (canonical)
+│   ├── 01b_five_tier_ladder_with_unbounded.png   Augmented w/ Phase 2 unbounded
 │   ├── 02_per_seed_ladder.png        Per-seed dot plot showing variance
 │   ├── 03_economic_inversion.png     Wall 8 → 1, Oracle 3 → 8
 │   ├── 04_behavioral_shift.png       VPIP/PFR/AF P1 vs P3.1
 │   ├── 05_trust_vs_stack.png         Pooled scatter, P3 vs P3.1
 │   ├── 06_tma_by_archetype.png       Trust-farming by archetype
-│   ├── 07_phase2_bounded_vs_unbounded.png  (added once unbounded run completes)
-│   ├── 08_stack_trajectories_p2_unbounded.png  (added once data arrives)
-│   └── 09_param_drift_unbounded.png  (added once data arrives)
+│   ├── 07_phase2_bounded_vs_unbounded.png   Per-seed r delta + econ ordering
+│   ├── 08_stack_trajectories_phase2_unbounded.png   Firestorm runs away
+│   ├── 09_trust_evolution_phase2_unbounded.png      Trust per archetype/hand
+│   └── 10_param_drift_unbounded.png  Preflop bluff rates barely move
 ├── tables/                           (LaTeX `tabular` snippets)
 │   ├── headline_ladder.tex
 │   ├── per_archetype_p31.tex
@@ -34,13 +36,30 @@ paper_resources/
 │   ├── tma_by_archetype.csv
 │   ├── economic_inversion.csv
 │   ├── per_seed_stacks_p3.csv
-│   └── per_seed_stacks_p31.csv
+│   ├── per_seed_stacks_p31.csv
+│   └── phase2_unbounded_summary.csv  Per-seed r delta from new run
 ├── interesting_hands/                (curated hand transcripts for the paper)
-│   └── (populated once Phase 2 unbounded sqlite is available)
+│   ├── _highlights.txt               Biggest pots from every seed
+│   ├── phase2_unbounded_seed_42.txt
+│   ├── phase2_unbounded_seed_137.txt
+│   ├── phase2_unbounded_seed_256.txt
+│   ├── phase2_unbounded_seed_512.txt
+│   └── phase2_unbounded_seed_1024.txt
 └── notes/                            (paper-section drafts not yet in paper.md)
     ├── societal_implications.md      Real-world parallels (eBay, AI alignment, etc.)
-    └── future_work_expanded.md       Detailed roadmap (Phase 4, multi-LLM, etc.)
+    ├── future_work_expanded.md       Detailed roadmap (Phase 4, multi-LLM, etc.)
+    └── phase2_unbounded_writeup.md   New §5.5 + §6.3 prose for the unbounded result
 ```
+
+## NEW: Phase 2 unbounded sub-experiment (this session)
+
+Removing personality bounds from the hill-climber **deepens** the
+trap (r = -0.779 vs bounded -0.637). This refutes the "agents
+converge to Oracle" hypothesis and sharpens the paper's central
+argument: the trust trap is not a parameter-space limitation — it
+is the stationary trust model itself. Full prose draft is in
+`notes/phase2_unbounded_writeup.md`. Headline numbers are in
+`reports/phase2_unbounded_scorecard.txt`.
 
 ## Headline result (the figure to lead with)
 
@@ -100,7 +119,12 @@ after the simulation runs but is gitignored (LFS-tracked).
 | `figures/04_behavioral_shift.png`     | §5.7 Phase 3, §5.8 Phase 3.1 |
 | `figures/05_trust_vs_stack.png`       | §5.2 Phase 1, §5.8 Phase 3.1 |
 | `figures/06_tma_by_archetype.png`     | §5.8 Phase 3.1 (TMA discussion) |
+| `figures/01b_five_tier_ladder_with_unbounded.png` | (new) §5.5 Phase 2, §6.3 Discussion |
 | `figures/07_phase2_bounded_vs_unbounded.png` | (new) §5.5 Phase 2 |
+| `figures/08_stack_trajectories_phase2_unbounded.png` | (new) §5.5 Phase 2 |
+| `figures/09_trust_evolution_phase2_unbounded.png` | (new) §5.5 Phase 2 |
+| `figures/10_param_drift_unbounded.png` | (new) §6.3 Discussion |
+| `notes/phase2_unbounded_writeup.md`   | (new) §5.5 + §6.3 |
 | `tables/headline_ladder.tex`          | §1 / §5 (lead table) |
 | `tables/per_archetype_p31.tex`        | §5.8 |
 | `tables/behavioral_shift_p1_p31.tex`  | §5.7, §5.8 |

@@ -49,6 +49,11 @@ R_BY_PHASE = {
     "Phase 3.1\nLLM + reasoning":   [-0.289, -0.338, -0.327, +0.047, +0.435],
 }
 
+# Phase 2 unbounded sub-experiment (NOT counted as a separate phase in
+# the four-tier ladder; rendered alongside the other phases by
+# fig_five_tier_ladder).
+P2_UNBOUNDED_R = [-0.791, -0.676, -0.932, -0.717, -0.779]
+
 # Ordering used for slopes / line plots
 PHASE_ORDER = list(R_BY_PHASE.keys())
 
@@ -140,6 +145,54 @@ def fig_four_tier_ladder(outdir: Path) -> None:
 
     fig.tight_layout()
     _save(fig, outdir, "01_four_tier_ladder.png")
+
+
+# ---------------------------------------------------------------------------
+# Figure 1b: five-bar ladder including Phase 2 unbounded sub-experiment
+# ---------------------------------------------------------------------------
+
+def fig_five_tier_ladder(outdir: Path) -> None:
+    labels = ["Phase 1\nFrozen rules",
+              "Phase 2\nBounded HC",
+              "Phase 2*\nUnbounded HC",
+              "Phase 3\nLLM\npersonalities",
+              "Phase 3.1\nLLM\n+ reasoning"]
+    rs_lists = [
+        R_BY_PHASE["Phase 1\nFrozen rules"],
+        R_BY_PHASE["Phase 2\nHill-climbing"],
+        P2_UNBOUNDED_R,
+        R_BY_PHASE["Phase 3\nLLM personalities"],
+        R_BY_PHASE["Phase 3.1\nLLM + reasoning"],
+    ]
+    means = [float(np.mean(rs)) for rs in rs_lists]
+    stds = [float(np.std(rs)) for rs in rs_lists]
+    colors = ["#8B0000", "#C0392B", "#600000",  # P2-unbounded gets darker red
+              "#E67E22", "#1B9E77"]
+
+    fig, ax = plt.subplots(figsize=(10.0, 5.2))
+    ax.bar(range(len(labels)), means, yerr=stds, color=colors,
+           edgecolor="black", linewidth=0.8, capsize=6,
+           error_kw={"linewidth": 1.0, "ecolor": "#222"})
+    ax.axhline(0, color="black", linewidth=0.8)
+    for i, (m, s) in enumerate(zip(means, stds)):
+        offset = -0.10 if m < 0 else 0.05
+        ax.text(i, m + offset, f"r = {m:+.3f}\n(σ = {s:.3f})",
+                ha="center", va="top" if m < 0 else "bottom",
+                fontsize=9.5, fontweight="bold")
+    ax.set_xticks(range(len(labels)))
+    ax.set_xticklabels(labels, fontsize=9.5)
+    ax.set_ylabel("Trust-profit Pearson r (mean across 5 seeds)")
+    ax.set_title("Trust-Profit r With the Unbounded Sub-Experiment",
+                 fontsize=12)
+    ax.set_ylim(-1.05, 0.30)
+
+    fig.text(0.99, -0.02,
+             "Phase 2* (unbounded HC, [0,1] freedom) DEEPENS the trap to r = -0.779 — "
+             "below even Phase 1.\n"
+             "Adaptive freedom alone is not enough; reasoning capacity is required to break the trap.",
+             ha="right", va="top", fontsize=8.5, color="#555", style="italic")
+    fig.tight_layout()
+    _save(fig, outdir, "01b_five_tier_ladder_with_unbounded.png")
 
 
 # ---------------------------------------------------------------------------
@@ -450,6 +503,7 @@ def main(argv=None) -> int:
 
     figures = [
         (1, fig_four_tier_ladder),
+        (11, fig_five_tier_ladder),  # the "1b" augmented variant
         (2, fig_per_seed_ladder),
         (3, fig_economic_inversion),
         (4, fig_behavioral_shift),
