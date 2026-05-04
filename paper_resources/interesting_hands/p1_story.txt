@@ -1,0 +1,446 @@
+================================================================================
+  EVOLUTION-STORY HANDS  --  P1
+  Source: runs_phase1_long.sqlite
+================================================================================
+
+  ----- seed 42 (run_id=1) -----
+
+  >>> A1.1  Firestorm walkover
+      Expected dynamics: fold equity wins -- nobody calls Firestorm's aggression
+
+================================================================================
+  HAND #2343 — A1.1  Firestorm walkover
+================================================================================
+  Dealer=S6  SB=S7  BB=S0  Final Pot=140  WALKOVER to S2
+
+  ACTIONS:
+  Seq  Seat      Archetype       Round     Action   Amt       Pot       Stack  Bets
+  ---  --------  --------------  --------  ------  ----  --------  ----------  ----
+    1  S1        sentinel        preflop   call       2    3->  5   605-> 603     1
+    2  S2        firestorm       preflop   call       2    5->  7  1088->1086     1
+    3  S3        wall            preflop   call       2    7->  9   263-> 261     1
+    4  S4        phantom         preflop   call       2    9-> 11    91->  89     1
+    5  S5        predator        preflop   raise      4   11-> 15   524-> 520     2
+    6  S6        mirror          preflop   fold       0   15-> 15   287-> 287     2
+    7  S7        judge           preflop   raise      5   15-> 20   502-> 497     3
+    8  S0        oracle          preflop   call       4   20-> 24   637-> 633     3
+    9  S1        sentinel        preflop   fold       0   24-> 24   603-> 603     3
+   10  S2        firestorm       preflop   call       4   24-> 28  1086->1082     3
+   11  S3        wall            preflop   call       4   28-> 32   261-> 257     3
+   12  S4        phantom         preflop   call       4   32-> 36    89->  85     3
+   13  S5        predator        preflop   call       2   36-> 38   520-> 518     3
+   14  S7        judge           flop      check      0   38-> 38   497-> 497     0
+   15  S0        oracle          flop      bet        2   38-> 40   633-> 631     1
+   16  S2        firestorm       flop      raise      4   40-> 44  1082->1078     2
+   17  S3        wall            flop      call       4   44-> 48   257-> 253     2
+   18  S4        phantom         flop      call       4   48-> 52    85->  81     2
+   19  S5        predator        flop      raise      6   52-> 58   518-> 512     3
+   20  S7        judge           flop      fold       0   58-> 58   497-> 497     3
+   21  S0        oracle          flop      fold       0   58-> 58   631-> 631     3
+   22  S2        firestorm       flop      call       2   58-> 60  1078->1076     3
+   23  S3        wall            flop      call       2   60-> 62   253-> 251     3
+   24  S4        phantom         flop      raise      4   62-> 66    81->  77     4
+   25  S5        predator        flop      call       2   66-> 68   512-> 510     4
+   26  S2        firestorm       flop      call       2   68-> 70  1076->1074     4
+   27  S3        wall            flop      call       2   70-> 72   251-> 249     4
+   28  S2        firestorm       turn      bet        4   72-> 76  1074->1070     1
+   29  S3        wall            turn      call       4   76-> 80   249-> 245     1
+   30  S4        phantom         turn      raise      8   80-> 88    77->  69     2
+   31  S5        predator        turn      call       8   88-> 96   510-> 502     2
+   32  S2        firestorm       turn      raise      8   96->104  1070->1062     3
+   33  S3        wall            turn      fold       0  104->104   245-> 245     3
+   34  S4        phantom         turn      raise      8  104->112    69->  61     4
+   35  S5        predator        turn      call       8  112->120   502-> 494     4
+   36  S2        firestorm       turn      call       4  120->124  1062->1058     4
+   37  S2        firestorm       river     check      0  124->124  1058->1058     0
+   38  S4        phantom         river     bet        4  124->128    61->  57     1
+   39  S5        predator        river     call       4  128->132   494-> 490     1
+   40  S2        firestorm       river     raise      8  132->140  1058->1050     2
+   41  S4        phantom         river     fold       0  140->140    57->  57     2
+   42  S5        predator        river     fold       0  140->140   490-> 490     2
+
+  TRUST SNAPSHOT (selected):
+    S0->S2: trust=0.375  H=0.01  top=firestorm p=0.999
+    S2->S7: trust=0.838  H=2.47  top=mirror_default p=0.241
+    S3->S2: trust=0.375  H=0.01  top=firestorm p=1.000
+    S5->S2: trust=0.375  H=0.01  top=firestorm p=0.999
+    S5->S3: trust=0.962  H=0.00  top=wall p=1.000
+    S6->S2: trust=0.375  H=0.01  top=firestorm p=0.999
+    S7->S2: trust=0.375  H=0.01  top=firestorm p=0.999
+
+  >>> A1.2  Wall pays off Firestorm
+      Expected dynamics: the trap in microcosm: trustworthy player loses to bluffer
+
+================================================================================
+  HAND #7128 — A1.2  Wall pays off Firestorm
+================================================================================
+  Dealer=S7  SB=S0  BB=S1  Final Pot=77  SHOWDOWN
+
+  ACTIONS:
+  Seq  Seat      Archetype       Round     Action   Amt       Pot       Stack  Bets
+  ---  --------  --------------  --------  ------  ----  --------  ----------  ----
+    1  S2        firestorm       preflop   call       2    3->  5  4760->4758     1
+    2  S3        wall            preflop   call       2    5->  7    60->  58     1
+    3  S4        phantom         preflop   call       2    7->  9   193-> 191     1
+    4  S5        predator        preflop   call       2    9-> 11   199-> 197     1
+    5  S6        mirror          preflop   call       2   11-> 13  1085->1083     1
+    6  S7        judge           preflop   fold       0   13-> 13   480-> 480     1
+    7  S0        oracle          preflop   fold       0   13-> 13  1474->1474     1
+    8  S1        sentinel        preflop   check      0   13-> 13  1346->1346     1
+    9  S1        sentinel        flop      check      0   13-> 13  1346->1346     0
+   10  S2        firestorm       flop      check      0   13-> 13  4758->4758     0
+   11  S3        wall            flop      check      0   13-> 13    58->  58     0
+   12  S4        phantom         flop      check      0   13-> 13   191-> 191     0
+   13  S5        predator        flop      bet        2   13-> 15   197-> 195     1
+   14  S6        mirror          flop      fold       0   15-> 15  1083->1083     1
+   15  S1        sentinel        flop      fold       0   15-> 15  1346->1346     1
+   16  S2        firestorm       flop      raise      4   15-> 19  4758->4754     2
+   17  S3        wall            flop      call       4   19-> 23    58->  54     2
+   18  S4        phantom         flop      fold       0   23-> 23   191-> 191     2
+   19  S5        predator        flop      raise      4   23-> 27   195-> 191     3
+   20  S2        firestorm       flop      raise      4   27-> 31  4754->4750     4
+   21  S3        wall            flop      call       4   31-> 35    54->  50     4
+   22  S5        predator        flop      call       2   35-> 37   191-> 189     4
+   23  S2        firestorm       turn      bet        4   37-> 41  4750->4746     1
+   24  S3        wall            turn      call       4   41-> 45    50->  46     1
+   25  S5        predator        turn      raise      8   45-> 53   189-> 181     2
+   26  S2        firestorm       turn      raise      8   53-> 61  4746->4738     3
+   27  S3        wall            turn      call       8   61-> 69    46->  38     3
+   28  S5        predator        turn      fold       0   69-> 69   181-> 181     3
+   29  S2        firestorm       river     bet        4   69-> 73  4738->4734     1
+   30  S3        wall            river     call       4   73-> 77    38->  34     1
+
+  SHOWDOWN:
+    S2 (firestorm   )  Kh 9h         rank= 3620  WINNER  pot_won=77
+    S3 (wall        )  Kc 8c         rank= 3626          pot_won=0
+
+  TRUST SNAPSHOT (selected):
+    S0->S2: trust=0.375  H=0.00  top=firestorm p=1.000
+    S2->S7: trust=0.818  H=2.50  top=predator_baseline p=0.220
+    S3->S2: trust=0.375  H=0.00  top=firestorm p=1.000
+    S5->S2: trust=0.375  H=0.00  top=firestorm p=1.000
+    S5->S3: trust=0.962  H=0.00  top=wall p=1.000
+    S6->S2: trust=0.375  H=0.00  top=firestorm p=1.000
+    S7->S2: trust=0.375  H=0.00  top=firestorm p=1.000
+
+  >>> A1.3  First trust collapse
+      Expected dynamics: Oracle's posterior of Firestorm crosses below 0.40
+
+================================================================================
+  HAND #7 — A1.3  First trust collapse
+================================================================================
+  Dealer=S6  SB=S7  BB=S0  Final Pot=41  SHOWDOWN
+
+  ACTIONS:
+  Seq  Seat      Archetype       Round     Action   Amt       Pot       Stack  Bets
+  ---  --------  --------------  --------  ------  ----  --------  ----------  ----
+    1  S1        sentinel        preflop   fold       0    3->  3   197-> 197     1
+    2  S2        firestorm       preflop   call       2    3->  5   188-> 186     1
+    3  S3        wall            preflop   fold       0    5->  5   226-> 226     1
+    4  S4        phantom         preflop   call       2    5->  7   176-> 174     1
+    5  S5        predator        preflop   fold       0    7->  7   197-> 197     1
+    6  S6        mirror          preflop   raise      4    7-> 11   226-> 222     2
+    7  S7        judge           preflop   fold       0   11-> 11   195-> 195     2
+    8  S0        oracle          preflop   fold       0   11-> 11   192-> 192     2
+    9  S2        firestorm       preflop   call       2   11-> 13   186-> 184     2
+   10  S4        phantom         preflop   fold       0   13-> 13   174-> 174     2
+   11  S2        firestorm       flop      bet        2   13-> 15   184-> 182     1
+   12  S6        mirror          flop      raise      4   15-> 19   222-> 218     2
+   13  S2        firestorm       flop      raise      4   19-> 23   182-> 178     3
+   14  S6        mirror          flop      call       2   23-> 25   218-> 216     3
+   15  S2        firestorm       turn      check      0   25-> 25   178-> 178     0
+   16  S6        mirror          turn      bet        4   25-> 29   216-> 212     1
+   17  S2        firestorm       turn      call       4   29-> 33   178-> 174     1
+   18  S2        firestorm       river     bet        4   33-> 37   174-> 170     1
+   19  S6        mirror          river     call       4   37-> 41   212-> 208     1
+
+  SHOWDOWN:
+    S6 (mirror      )  Ks Kh         rank= 2644  WINNER  pot_won=41
+    S2 (firestorm   )  6c 9d         rank= 3106          pot_won=0
+
+  TRUST SNAPSHOT (selected):
+    S0->S2: trust=0.377  H=0.12  top=firestorm p=0.986
+    S2->S7: trust=0.783  H=2.63  top=predator_baseline p=0.180
+    S3->S2: trust=0.377  H=0.11  top=firestorm p=0.987
+    S5->S2: trust=0.377  H=0.12  top=firestorm p=0.986
+    S5->S3: trust=0.930  H=1.17  top=wall p=0.820
+    S6->S2: trust=0.376  H=0.06  top=firestorm p=0.994
+    S7->S2: trust=0.377  H=0.11  top=firestorm p=0.987
+
+  >>> A2.1  Late-game adapted hand
+      Expected dynamics: after thousands of hands, Firestorm sometimes loses
+
+================================================================================
+  HAND #8206 — A2.1  Late-game adapted hand
+================================================================================
+  Dealer=S5  SB=S6  BB=S7  Final Pot=146  SHOWDOWN
+
+  ACTIONS:
+  Seq  Seat      Archetype       Round     Action   Amt       Pot       Stack  Bets
+  ---  --------  --------------  --------  ------  ----  --------  ----------  ----
+    1  S0        oracle          preflop   fold       0    3->  3  1298->1298     1
+    2  S1        sentinel        preflop   call       2    3->  5  1344->1342     1
+    3  S2        firestorm       preflop   call       2    5->  7  6119->6117     1
+    4  S3        wall            preflop   call       2    7->  9   204-> 202     1
+    5  S4        phantom         preflop   fold       0    9->  9    91->  91     1
+    6  S5        predator        preflop   fold       0    9->  9   127-> 127     1
+    7  S6        mirror          preflop   call       1    9-> 10  1617->1616     1
+    8  S7        judge           preflop   check      0   10-> 10   397-> 397     1
+    9  S6        mirror          flop      bet        2   10-> 12  1616->1614     1
+   10  S7        judge           flop      raise      4   12-> 16   397-> 393     2
+   11  S1        sentinel        flop      fold       0   16-> 16  1342->1342     2
+   12  S2        firestorm       flop      raise      6   16-> 22  6117->6111     3
+   13  S3        wall            flop      call       6   22-> 28   202-> 196     3
+   14  S6        mirror          flop      call       4   28-> 32  1614->1610     3
+   15  S7        judge           flop      raise      4   32-> 36   393-> 389     4
+   16  S2        firestorm       flop      call       2   36-> 38  6111->6109     4
+   17  S3        wall            flop      call       2   38-> 40   196-> 194     4
+   18  S6        mirror          flop      call       2   40-> 42  1610->1608     4
+   19  S6        mirror          turn      check      0   42-> 42  1608->1608     0
+   20  S7        judge           turn      bet        4   42-> 46   389-> 385     1
+   21  S2        firestorm       turn      raise      8   46-> 54  6109->6101     2
+   22  S3        wall            turn      call       8   54-> 62   194-> 186     2
+   23  S6        mirror          turn      raise     12   62-> 74  1608->1596     3
+   24  S7        judge           turn      raise     12   74-> 86   385-> 373     4
+   25  S2        firestorm       turn      call       8   86-> 94  6101->6093     4
+   26  S3        wall            turn      fold       0   94-> 94   186-> 186     4
+   27  S6        mirror          turn      call       4   94-> 98  1596->1592     4
+   28  S6        mirror          river     bet        4   98->102  1592->1588     1
+   29  S7        judge           river     raise      8  102->110   373-> 365     2
+   30  S2        firestorm       river     raise     12  110->122  6093->6081     3
+   31  S6        mirror          river     call       8  122->130  1588->1580     3
+   32  S7        judge           river     raise      8  130->138   365-> 357     4
+   33  S2        firestorm       river     call       4  138->142  6081->6077     4
+   34  S6        mirror          river     call       4  142->146  1580->1576     4
+
+  SHOWDOWN:
+    S7 (judge       )  8d 2c         rank= 3150  WINNER  pot_won=146
+    S2 (firestorm   )  Ah 3s         rank= 3391          pot_won=0
+    S6 (mirror      )  Qc Jc         rank= 3776          pot_won=0
+
+  TRUST SNAPSHOT (selected):
+    S0->S2: trust=0.375  H=0.00  top=firestorm p=1.000
+    S2->S7: trust=0.738  H=1.82  top=oracle p=0.601
+    S3->S2: trust=0.375  H=0.00  top=firestorm p=1.000
+    S5->S2: trust=0.375  H=0.00  top=firestorm p=1.000
+    S5->S3: trust=0.962  H=0.00  top=wall p=1.000
+    S6->S2: trust=0.375  H=0.00  top=firestorm p=1.000
+    S7->S2: trust=0.375  H=0.00  top=firestorm p=1.000
+
+  >>> A3.1  Phantom bluff caught
+      Expected dynamics: deception works -- but not always
+
+================================================================================
+  HAND #62 — A3.1  Phantom bluff caught
+================================================================================
+  Dealer=S5  SB=S6  BB=S7  Final Pot=13  SHOWDOWN
+
+  ACTIONS:
+  Seq  Seat      Archetype       Round     Action   Amt       Pot       Stack  Bets
+  ---  --------  --------------  --------  ------  ----  --------  ----------  ----
+    1  S0        oracle          preflop   fold       0    3->  3   180-> 180     1
+    2  S1        sentinel        preflop   fold       0    3->  3   185-> 185     1
+    3  S2        firestorm       preflop   fold       0    3->  3   156-> 156     1
+    4  S3        wall            preflop   fold       0    3->  3   296-> 296     1
+    5  S4        phantom         preflop   call       2    3->  5   127-> 125     1
+    6  S5        predator        preflop   fold       0    5->  5   179-> 179     1
+    7  S6        mirror          preflop   fold       0    5->  5   229-> 229     1
+    8  S7        judge           preflop   check      0    5->  5   245-> 245     1
+    9  S7        judge           flop      check      0    5->  5   245-> 245     0
+   10  S4        phantom         flop      check      0    5->  5   125-> 125     0
+   11  S7        judge           turn      check      0    5->  5   245-> 245     0
+   12  S4        phantom         turn      bet        4    5->  9   125-> 121     1
+   13  S7        judge           turn      call       4    9-> 13   245-> 241     1
+   14  S7        judge           river     check      0   13-> 13   241-> 241     0
+   15  S4        phantom         river     check      0   13-> 13   121-> 121     0
+
+  SHOWDOWN:
+    S7 (judge       )  Ah Qc         rank= 4658  WINNER  pot_won=13
+    S4 (phantom     )  Jc 3h         rank= 4789          pot_won=0
+
+  TRUST SNAPSHOT (selected):
+    S0->S2: trust=0.554  H=1.54  top=phantom p=0.651
+    S2->S7: trust=0.891  H=2.10  top=mirror_default p=0.335
+    S3->S2: trust=0.543  H=1.34  top=phantom p=0.705
+    S5->S2: trust=0.560  H=1.52  top=phantom p=0.649
+    S5->S3: trust=0.962  H=0.00  top=wall p=1.000
+    S6->S2: trust=0.559  H=1.55  top=phantom p=0.644
+    S7->S2: trust=0.548  H=1.51  top=phantom p=0.659
+
+  >>> A4.1  Wall value-betting
+      Expected dynamics: P3.1: trustworthy agent extracts value instead of being exploited
+
+================================================================================
+  HAND #9970 — A4.1  Wall value-betting
+================================================================================
+  Dealer=S1  SB=S2  BB=S3  Final Pot=64  SHOWDOWN
+
+  ACTIONS:
+  Seq  Seat      Archetype       Round     Action   Amt       Pot       Stack  Bets
+  ---  --------  --------------  --------  ------  ----  --------  ----------  ----
+    1  S4        phantom         preflop   call       2    3->  5   248-> 246     1
+    2  S5        predator        preflop   call       2    5->  7   112-> 110     1
+    3  S6        mirror          preflop   fold       0    7->  7  1295->1295     1
+    4  S7        judge           preflop   raise      4    7-> 11  1043->1039     2
+    5  S0        oracle          preflop   fold       0   11-> 11  2003->2003     2
+    6  S1        sentinel        preflop   fold       0   11-> 11  1198->1198     2
+    7  S2        firestorm       preflop   call       3   11-> 14  6990->6987     2
+    8  S3        wall            preflop   call       2   14-> 16   108-> 106     2
+    9  S4        phantom         preflop   call       2   16-> 18   246-> 244     2
+   10  S5        predator        preflop   fold       0   18-> 18   110-> 110     2
+   11  S2        firestorm       flop      bet        2   18-> 20  6987->6985     1
+   12  S3        wall            flop      raise      4   20-> 24   106-> 102     2
+   13  S4        phantom         flop      fold       0   24-> 24   244-> 244     2
+   14  S7        judge           flop      raise      6   24-> 30  1039->1033     3
+   15  S2        firestorm       flop      call       4   30-> 34  6985->6981     3
+   16  S3        wall            flop      call       2   34-> 36   102-> 100     3
+   17  S2        firestorm       turn      check      0   36-> 36  6981->6981     0
+   18  S3        wall            turn      check      0   36-> 36   100-> 100     0
+   19  S7        judge           turn      bet        4   36-> 40  1033->1029     1
+   20  S2        firestorm       turn      raise      8   40-> 48  6981->6973     2
+   21  S3        wall            turn      call       8   48-> 56   100->  92     2
+   22  S7        judge           turn      fold       0   56-> 56  1029->1029     2
+   23  S2        firestorm       river     bet        4   56-> 60  6973->6969     1
+   24  S3        wall            river     call       4   60-> 64    92->  88     1
+
+  SHOWDOWN:
+    S3 (wall        )  9h Qc         rank= 1601  WINNER  pot_won=64
+    S2 (firestorm   )  Js 5d         rank= 2832          pot_won=0
+
+  TRUST SNAPSHOT (selected):
+    S0->S2: trust=0.375  H=0.01  top=firestorm p=1.000
+    S2->S7: trust=0.764  H=2.21  top=oracle p=0.430
+    S3->S2: trust=0.375  H=0.01  top=firestorm p=0.999
+    S5->S2: trust=0.375  H=0.01  top=firestorm p=0.999
+    S5->S3: trust=0.962  H=0.00  top=wall p=1.000
+    S6->S2: trust=0.375  H=0.01  top=firestorm p=0.999
+    S7->S2: trust=0.375  H=0.01  top=firestorm p=0.999
+
+  >>> A4.2  Sentinel late aggression
+      Expected dynamics: P3.1: trust-farming -- early cooperation, late exploitation
+
+================================================================================
+  HAND #6236 — A4.2  Sentinel late aggression
+================================================================================
+  Dealer=S3  SB=S4  BB=S5  Final Pot=170  SHOWDOWN
+
+  ACTIONS:
+  Seq  Seat      Archetype       Round     Action   Amt       Pot       Stack  Bets
+  ---  --------  --------------  --------  ------  ----  --------  ----------  ----
+    1  S6        mirror          preflop   fold       0    3->  3   838-> 838     1
+    2  S7        judge           preflop   fold       0    3->  3   462-> 462     1
+    3  S0        oracle          preflop   call       2    3->  5  1592->1590     1
+    4  S1        sentinel        preflop   call       2    5->  7  1237->1235     1
+    5  S2        firestorm       preflop   call       2    7->  9  3918->3916     1
+    6  S3        wall            preflop   call       2    9-> 11   150-> 148     1
+    7  S4        phantom         preflop   call       1   11-> 12   182-> 181     1
+    8  S5        predator        preflop   check      0   12-> 12   218-> 218     1
+    9  S4        phantom         flop      bet        2   12-> 14   181-> 179     1
+   10  S5        predator        flop      raise      4   14-> 18   218-> 214     2
+   11  S0        oracle          flop      call       4   18-> 22  1590->1586     2
+   12  S1        sentinel        flop      raise      6   22-> 28  1235->1229     3
+   13  S2        firestorm       flop      raise      8   28-> 36  3916->3908     4
+   14  S3        wall            flop      fold       0   36-> 36   148-> 148     4
+   15  S4        phantom         flop      fold       0   36-> 36   179-> 179     4
+   16  S5        predator        flop      call       4   36-> 40   214-> 210     4
+   17  S0        oracle          flop      call       4   40-> 44  1586->1582     4
+   18  S1        sentinel        flop      call       2   44-> 46  1229->1227     4
+   19  S5        predator        turn      bet        4   46-> 50   210-> 206     1
+   20  S0        oracle          turn      call       4   50-> 54  1582->1578     1
+   21  S1        sentinel        turn      call       4   54-> 58  1227->1223     1
+   22  S2        firestorm       turn      raise      8   58-> 66  3908->3900     2
+   23  S5        predator        turn      raise      8   66-> 74   206-> 198     3
+   24  S0        oracle          turn      raise     12   74-> 86  1578->1566     4
+   25  S1        sentinel        turn      call      12   86-> 98  1223->1211     4
+   26  S2        firestorm       turn      call       8   98->106  3900->3892     4
+   27  S5        predator        turn      call       4  106->110   198-> 194     4
+   28  S5        predator        river     bet        4  110->114   194-> 190     1
+   29  S0        oracle          river     raise      8  114->122  1566->1558     2
+   30  S1        sentinel        river     call       8  122->130  1211->1203     2
+   31  S2        firestorm       river     raise     12  130->142  3892->3880     3
+   32  S5        predator        river     call       8  142->150   190-> 182     3
+   33  S0        oracle          river     call       4  150->154  1558->1554     3
+   34  S1        sentinel        river     raise      8  154->162  1203->1195     4
+   35  S2        firestorm       river     call       4  162->166  3880->3876     4
+   36  S5        predator        river     call       4  166->170   182-> 178     4
+   37  S0        oracle          river     fold       0  170->170  1554->1554     4
+
+  SHOWDOWN:
+    S5 (predator    )  3h Ad         rank= 2336  WINNER  pot_won=170
+    S2 (firestorm   )  Ts 3s         rank= 2349          pot_won=0
+    S1 (sentinel    )  8c 8h         rank= 3140          pot_won=0
+
+  TRUST SNAPSHOT (selected):
+    S0->S2: trust=0.394  H=0.49  top=firestorm p=0.926
+    S2->S7: trust=0.844  H=2.42  top=mirror_default p=0.237
+    S3->S2: trust=0.396  H=0.60  top=firestorm p=0.901
+    S5->S2: trust=0.392  H=0.46  top=firestorm p=0.931
+    S5->S3: trust=0.962  H=0.00  top=wall p=1.000
+    S6->S2: trust=0.412  H=0.87  top=firestorm p=0.840
+    S7->S2: trust=0.407  H=0.79  top=firestorm p=0.861
+
+  >>> A_x  Biggest pot of the run
+      Expected dynamics: a context-free spectacle hand, useful regardless of phase
+
+================================================================================
+  HAND #5651 — A_x  Biggest pot of the run
+================================================================================
+  Dealer=S2  SB=S3  BB=S4  Final Pot=170  SHOWDOWN
+
+  ACTIONS:
+  Seq  Seat      Archetype       Round     Action   Amt       Pot       Stack  Bets
+  ---  --------  --------------  --------  ------  ----  --------  ----------  ----
+    1  S5        predator        preflop   fold       0    3->  3   281-> 281     1
+    2  S6        mirror          preflop   raise      4    3->  7   947-> 943     2
+    3  S7        judge           preflop   call       4    7-> 11   271-> 267     2
+    4  S0        oracle          preflop   fold       0   11-> 11  1366->1366     2
+    5  S1        sentinel        preflop   fold       0   11-> 11  1393->1393     2
+    6  S2        firestorm       preflop   call       4   11-> 15  3453->3449     2
+    7  S3        wall            preflop   call       3   15-> 18   115-> 112     2
+    8  S4        phantom         preflop   fold       0   18-> 18   171-> 171     2
+    9  S3        wall            flop      check      0   18-> 18   112-> 112     0
+   10  S6        mirror          flop      bet        2   18-> 20   943-> 941     1
+   11  S7        judge           flop      raise      4   20-> 24   267-> 263     2
+   12  S2        firestorm       flop      call       4   24-> 28  3449->3445     2
+   13  S3        wall            flop      call       4   28-> 32   112-> 108     2
+   14  S6        mirror          flop      raise      4   32-> 36   941-> 937     3
+   15  S7        judge           flop      raise      4   36-> 40   263-> 259     4
+   16  S2        firestorm       flop      call       4   40-> 44  3445->3441     4
+   17  S3        wall            flop      call       4   44-> 48   108-> 104     4
+   18  S6        mirror          flop      call       2   48-> 50   937-> 935     4
+   19  S3        wall            turn      bet        4   50-> 54   104-> 100     1
+   20  S6        mirror          turn      raise      8   54-> 62   935-> 927     2
+   21  S7        judge           turn      raise     12   62-> 74   259-> 247     3
+   22  S2        firestorm       turn      raise     16   74-> 90  3441->3425     4
+   23  S3        wall            turn      call      12   90->102   100->  88     4
+   24  S6        mirror          turn      call       8  102->110   927-> 919     4
+   25  S7        judge           turn      call       4  110->114   247-> 243     4
+   26  S3        wall            river     check      0  114->114    88->  88     0
+   27  S6        mirror          river     bet        4  114->118   919-> 915     1
+   28  S7        judge           river     call       4  118->122   243-> 239     1
+   29  S2        firestorm       river     raise      8  122->130  3425->3417     2
+   30  S3        wall            river     call       8  130->138    88->  80     2
+   31  S6        mirror          river     raise      8  138->146   915-> 907     3
+   32  S7        judge           river     call       8  146->154   239-> 231     3
+   33  S2        firestorm       river     fold       0  154->154  3417->3417     3
+   34  S3        wall            river     raise      8  154->162    80->  72     4
+   35  S6        mirror          river     call       4  162->166   907-> 903     4
+   36  S7        judge           river     call       4  166->170   231-> 227     4
+
+  SHOWDOWN:
+    S7 (judge       )  Jh Th         rank= 2833  WINNER  pot_won=170
+    S6 (mirror      )  Kc Ks         rank= 3601          pot_won=0
+    S3 (wall        )  9d Qc         rank= 3866          pot_won=0
+
+  TRUST SNAPSHOT (selected):
+    S0->S2: trust=0.375  H=0.01  top=firestorm p=0.999
+    S2->S7: trust=0.730  H=1.67  top=oracle p=0.621
+    S3->S2: trust=0.375  H=0.01  top=firestorm p=0.999
+    S5->S2: trust=0.375  H=0.02  top=firestorm p=0.998
+    S5->S3: trust=0.962  H=0.00  top=wall p=1.000
+    S6->S2: trust=0.375  H=0.02  top=firestorm p=0.998
+    S7->S2: trust=0.375  H=0.02  top=firestorm p=0.999
+
+================================================================================
+  END P1
+================================================================================
