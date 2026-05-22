@@ -78,7 +78,7 @@ Drop-in `tabular` blocks for `\input{}` in Overleaf:
 - `tma_by_archetype.tex` — Trust Manipulation Awareness per archetype
 - `economic_inversion.tex` — Wall 8→1 economic-ordering shift table
 
-## Data (12 CSVs)
+## Data (13 CSVs)
 
 Every figure and table traces back to one of these CSVs. Open in
 Excel / Python / a Polygence reviewer's spreadsheet if asked for raw
@@ -95,6 +95,7 @@ numbers.
 | `per_seed_stacks_p31.csv` | Per-seed stacks for Phase 3.1 |
 | `phase2_unbounded_summary.csv` | Phase 2\* weak HC summary |
 | `phase2_unbounded_summary_aggressive.csv` | Phase 2\* aggressive HC summary (canonical) |
+| `r_bootstrap_ci.csv` | Per-phase mean-r t-interval + bootstrap CI, per-seed Fisher-z CI (from `analysis/bootstrap_ci.py`) |
 | `nash_convergence_baseline.csv` | Cluster spread + drift, weak HC |
 | `nash_convergence_aggressive.csv` | Cluster spread + drift, aggressive HC |
 | `unbounded_archetype_drift.csv` | L1-distance-to-canonical for each agent |

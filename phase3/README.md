@@ -14,7 +14,7 @@ phase3/
     phantom.md, predator.md, mirror.md, judge.md
   llm_chat_agent.py      # LLMChatAgent + LLMChatJudge classes
   run_phase3_chat.py     # Simulation runner (--provider, --model, --hands)
-  dealer.py              # Game integrity layer (action validation, chip audits)
+  dealer.py              # Post-hoc audit layer (chip conservation, anomaly detection)
   __init__.py
   README.md
 ```
@@ -26,7 +26,16 @@ phase3/
    community cards, hand strength, pot size, cost to call, position,
    actions this round
 3. The LLM responds with one word: FOLD, CHECK, CALL, BET, or RAISE
-4. The Dealer validates the action and substitutes a legal default if needed
+4. Action legality is enforced in two layers:
+   (a) `LLMChatAgent.decide_action` proactively fixes the most common
+       LLM mistakes (e.g. CHECK with cost_to_call &gt; 0 → CALL or FOLD)
+       before returning to the engine
+   (b) `engine.game.Hand` coerces any remaining illegal actions to a
+       legal default (CHECK when cost_to_call == 0, otherwise FOLD)
+   The `Dealer` class is a **post-hoc audit** wrapper — it watches the
+   game from the side, tracks chip conservation and per-agent
+   behavioral drift, and writes a `dealer_audit.json` at end of run,
+   but it does **not** sit on the decision hot path.
 5. All trust/observation/stats machinery from Phase 1 BaseAgent is inherited
 
 ## Running

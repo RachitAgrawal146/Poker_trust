@@ -4,6 +4,32 @@ All notable changes to this project. Organized by stage, in build
 order rather than reverse-chronological, because the research
 milestones are easier to reason about that way.
 
+## [Publication-readiness pass] &mdash; 2026-05-22 (later)
+
+Four-track parallel re-audit (engine + agents + Phase 3 + analysis).
+Engine, agents, and analysis layers cleared as publication-ready.
+Two follow-up items closed here.
+
+- `tests/test_engine_sidepot.py` (new): five targeted unit tests of
+  the `engine/game.py::_showdown` side-pot algorithm. Constructs each
+  scenario explicitly (three-way all-in at three levels, short stack
+  with the best hand, folded chips cascading into lower side pots,
+  single contribution level, tied hands with odd-chip remainder).
+  18/18 assertions pass. Includes an explicit regression guard against
+  the pre-fix behavior (the short stack with the best hand collecting
+  the full pot).
+- `phase3/dealer.py`, `phase3/README.md`, `phase3/llm_chat_agent.py`:
+  documentation updated to match what the canonical Phase 3 runner
+  actually does. The `Dealer` class is a **post-hoc audit layer**
+  (chip conservation, anomaly detection, end-of-run JSON dump) and is
+  *not* on the decision hot path; action legality is enforced in two
+  layers (`LLMChatAgent.decide_action` proactive fix +
+  `engine.game.Hand` coercion). The audit-mode `validate_action` hook
+  is preserved but is no longer documented as the active path.
+- `paper_resources/README.md`: data table now lists 13 CSVs (was 12);
+  `r_bootstrap_ci.csv` is documented as backing the headline-r
+  confidence-interval claim.
+
 ## [Repo finalization] &mdash; 2026-05-22
 
 - Paper artifacts moved out of the repo. `paper.md` and `paper/` are

@@ -505,7 +505,10 @@ class LLMChatAgent(BaseAgent):
             self.llm_failures += 1
             return ActionType.CHECK if game_state.cost_to_call == 0 else ActionType.FOLD
 
-        # Basic legality fix (the Dealer also validates, but do a quick fix here)
+        # Proactive legality fix. The engine will coerce any remaining
+        # illegal action to a legal default (CHECK if cost_to_call == 0
+        # else FOLD); this block just prevents the most common LLM
+        # mistakes from showing up as FOLDs in the action log.
         if game_state.cost_to_call == 0:
             if action in (ActionType.FOLD, ActionType.CALL):
                 action = ActionType.CHECK

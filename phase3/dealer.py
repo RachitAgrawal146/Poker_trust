@@ -1,34 +1,40 @@
 """
-Phase 3 — Dealer (Game Integrity Layer)
+Phase 3 — Dealer (Post-Hoc Audit Layer)
 
-The Dealer wraps the game engine and provides three layers of protection:
+The Dealer is a **post-hoc audit** wrapper around the game engine — it
+watches the game from the side, accumulates findings, and saves a
+``dealer_audit.json`` at end of run. It is **not** on the decision hot
+path: action legality is enforced by ``LLMChatAgent.decide_action`` (a
+proactive fix for common LLM mistakes) and by the engine itself (which
+coerces any remaining illegal action to CHECK or FOLD). The
+``validate_action`` method below exists as an audit-mode hook for runs
+that want a per-action legality trace, but the canonical Phase 3 runner
+``run_phase3_chat.py`` does not call it — the two-layer validation
+described above is sufficient for the published results.
 
-1. **Pre-action validation**: Before every action is executed, the Dealer
-   checks legality (valid action type for the current state, chip sufficiency,
-   bet cap compliance). Illegal actions are substituted with a legal default
-   (CHECK when cost_to_call==0, FOLD otherwise).
+What the Dealer actually does in the canonical runner:
 
-2. **Post-hand audits**: After every hand, the Dealer verifies chip
+1. **Post-hand audits**: After every hand, the Dealer verifies chip
    conservation (total chips in play match starting total + rebuys) and
    that every showdown has at least one declared winner. (Hand-rank
    verification — *the* winner has *the* best hand — is delegated to
    the engine, which uses ``treys.Evaluator`` deterministically.)
 
-3. **Rolling anomaly detection**: Tracks per-agent VPIP and AF in a sliding
-   window, comparing against the personality spec targets. Flags agents whose
-   behavior drifts beyond tolerance from their spec.
+2. **Rolling anomaly detection**: Tracks per-agent VPIP and AF in a
+   sliding window, comparing against the personality spec targets.
+   Flags agents whose behavior drifts beyond tolerance from their spec.
 
-All findings are accumulated and saved to dealer_audit.json at the end of a
-simulation run.
+3. **End-of-run JSON dump**: Aggregated findings are saved to
+   ``dealer_audit.json`` for offline review.
 
-Usage::
+Usage (audit-mode only — not used by the canonical runner)::
 
     dealer = Dealer(agents, specs)
-    # Called by the simulation runner on every action
+    # Optional per-action legality trace (canonical runner does not call this)
     validated_action = dealer.validate_action(agent, game_state, proposed_action)
-    # Called after every hand
+    # Called after every hand by run_phase3_chat.py
     dealer.post_hand_audit(hand, agents)
-    # Called at end of run
+    # Called at end of run by run_phase3_chat.py
     dealer.save_audit("dealer_audit.json")
 """
 
