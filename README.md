@@ -47,7 +47,6 @@ If the mentor wants to *reproduce* anything, the **Quick Start** section below h
 ### Phase 2 — bounded online optimization (5 seeds × 10 000 hands)
 - Each agent runs a per-cycle hill-climber that tunes its own decision parameters within an archetype-shaped bound box. **Trust–profit r softens to −0.637** (Δr = +0.116, consistent across all 5 seeds).
 - **Opponent Adaptation stays at OA = 0.0003** — bounded numerical optimization on aggregate reward cannot produce per-opponent strategy.
-- The earlier ML-imitation Phase 2 (which reproduced Phase 1 by construction) is preserved at [`phase2/_imitation_archive/`](phase2/_imitation_archive/).
 - Full report: [`phase2/adaptive/phase2_report.md`](phase2/adaptive/phase2_report.md)
 
 ### Phase 3 — LLM personality role-players (5 seeds × 500 hands)
@@ -148,8 +147,8 @@ Poker_trust/
 │   │   ├── phase2_comparison.py     # Phase 1 vs Phase 2 scorecard
 │   │   ├── param_trajectories.json  # Per-agent param history
 │   │   └── optimization_log.json    # Per-cycle hill-climber log
-│   └── _imitation_archive/   # ARCHIVED: original imitation-based Phase 2
-│       └── ml/, run_ml_sim.py, requirements_ml.txt, README.md
+│   └── (the earlier ML-imitation Phase 2 was removed in May 2026 once
+│        the adaptive redesign superseded it — see docs/CHANGELOG.md)
 │
 ├── phase3/                   # ── PHASE 3 + 3.1 ─────────────────────────────
 │   ├── README.md
@@ -216,7 +215,6 @@ Poker_trust/
 |--------|-------|-------|---------|
 | [`phase1/phase1_report.md`](phase1/phase1_report.md) | 1 | 943 | Phase 1 frozen-archetype documentation |
 | [`phase2/adaptive/phase2_report.md`](phase2/adaptive/phase2_report.md) | 2 | 512 | Phase 2 adaptive (bounded hill-climbing) |
-| [`phase2/_imitation_archive/phase2_report.md`](phase2/_imitation_archive/phase2_report.md) | 2 (archived) | — | Original ML-imitation Phase 2 |
 | [`phase3/phase3_report.md`](phase3/phase3_report.md) | 3 + 3.1 | — | LLM role-play baseline AND reasoning-scaffolding follow-up (combined) |
 | [`reports/phase2_scorecard_long.txt`](reports/phase2_scorecard_long.txt) | 1 vs 2 | — | 7-table cross-phase scorecard |
 | [`reports/phase31_long_scorecard.txt`](reports/phase31_long_scorecard.txt) | 1/2/3/3.1 | — | Cross-phase scorecard with all four tiers |

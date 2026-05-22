@@ -158,8 +158,9 @@ docs/
   DesignCues            # dark-editorial design system
 
 analysis/
-  analyze_runs.py       # 9-section standard report
-  deep_analysis.py      # 31-section deep analysis + scorecard
+  deep_analysis.py      # 31-section deep analysis + scorecard (the canonical
+                        # analysis script — supersedes the earlier
+                        # 9-section analyze_runs.py, which was removed)
 
 tests/
   test_trust_model.py   # Unit tests for trust primitives (run with

@@ -53,7 +53,7 @@ reference; superseded by the canonical files above.
 | `metrics_scorecard.txt` | Phase 1 6-dimension scorecard (historical baseline, r = -0.837) |
 | `deep_analysis_v3_*.txt` | Phase 1 31-section deep analysis dumps |
 | `comparison_final.txt` | Pre-redesign Phase 1 vs imitation-Phase 2 comparison |
-| `ml_deep_analysis_final.txt` | Imitation-based Phase 2 (now in `phase2/_imitation_archive/`) |
+| `ml_deep_analysis_final.txt` | Imitation-based Phase 2 (the source code was superseded by `phase2/adaptive/` and removed in May 2026; this dump remains as a historical baseline) |
 | `phase3_scorecard.txt` | Phase 3 50-hand pilot scorecard (superseded by `phase3_long_scorecard.txt`) |
 | `dealer_audit*.json` | Old Phase 3 dealer audit dumps |
 | `interesting_hands.txt` / `interesting_hands_narrative.md` | Pre-Phase-3 hand-narrative tooling output |

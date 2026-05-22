@@ -151,9 +151,9 @@ def s03_behavior(db, R):
         SELECT archetype,
                AVG(vpip_count*100.0/hands_dealt) AS vpip,
                AVG(pfr_count*100.0/hands_dealt) AS pfr,
-               AVG((bets+raises)*1.0/CASE WHEN calls>0 THEN calls ELSE 1 END) AS af,
+               AVG((bets+raises)*1.0/NULLIF(calls,0)) AS af,
                AVG(showdowns*100.0/hands_dealt) AS sd_pct,
-               AVG(showdowns_won*100.0/CASE WHEN showdowns>0 THEN showdowns ELSE 1 END) AS sd_win
+               AVG(showdowns_won*100.0/NULLIF(showdowns,0)) AS sd_win
         FROM agent_stats GROUP BY archetype ORDER BY vpip DESC
     """)
     data = []

@@ -32,12 +32,13 @@ Limit Hold'em rules implemented:
   earliest seat in showdown order (deterministic, reproducible).
 
 Short-stack / all-in handling: if an agent cannot fully cover the required
-call, they put in what they have and continue as effectively all-in. Side
-pots are NOT implemented yet (they'll come when rebuy logic stabilizes in
-Stage 3+); for now the whole pot is awarded to the best hand at showdown,
-with a short stack contributing what it has. This is adequate for the
-200-chip starting stacks and 48-chip-per-hand ceiling imposed by the bet
-cap.
+call, they put in what they have and continue as effectively all-in. At
+showdown the pot is broken into side pots by per-seat hand contribution
+level (``hand_contribution[seat]``); each side pot is awarded to the
+best hand among the seats eligible at that level (i.e. seats that
+contributed at least that much). Folded players' contributions count
+toward the lowest side pots they could match — chip-conserving for
+every starting stack and bet sizing the simulation supports.
 """
 
 from __future__ import annotations
@@ -483,27 +484,62 @@ class Hand:
     def _showdown(self) -> None:
         self.final_pot = self.pot
         contenders: List[int] = [s for s in self.active if s not in self.folded]
-        # treys: lower rank = better hand.
-        ranked: List[Tuple[int, int]] = []
-        for seat in contenders:
-            rank = _EVAL.evaluate(self.community_cards, self.hole_cards[seat])
-            ranked.append((seat, rank))
-        ranked.sort(key=lambda x: x[1])
-        best_rank = ranked[0][1]
-        winners = [seat for seat, rank in ranked if rank == best_rank]
 
-        # Split pot, remainder to earliest (leftmost of dealer) winner.
-        per_winner = self.pot // len(winners)
-        remainder = self.pot - per_winner * len(winners)
+        # treys: lower rank = better hand. Evaluate every contender once.
+        rank_by_seat: Dict[int, int] = {}
+        for seat in contenders:
+            rank_by_seat[seat] = _EVAL.evaluate(
+                self.community_cards, self.hole_cards[seat]
+            )
+
+        # Build side pots from the distinct contender contribution levels.
+        # For each level L_k (ascending), the side pot at that level is the
+        # sum over ALL seats (folded included) of the chips they contributed
+        # between L_{k-1} and L_k. Eligible to win it: contenders whose
+        # hand_contribution >= L_k.
+        contender_levels = sorted({
+            self.hand_contribution[s] for s in contenders
+        })
+        side_pots: List[Tuple[int, List[int]]] = []
+        prev_level = 0
+        for level in contender_levels:
+            pot_amount = 0
+            for seat in self._all_seats:
+                contrib = self.hand_contribution[seat]
+                pot_amount += max(
+                    0,
+                    min(contrib, level) - min(contrib, prev_level),
+                )
+            eligible = [
+                s for s in contenders if self.hand_contribution[s] >= level
+            ]
+            if pot_amount > 0 and eligible:
+                side_pots.append((pot_amount, eligible))
+            prev_level = level
+
+        # Award each side pot. Ties split, remainder to the earliest seat
+        # clockwise from the dealer (deterministic, reproducible).
         order = self._order_from((self.table.dealer_button + 1) % NUM_PLAYERS)
-        winners_ordered = [s for s in order if s in winners]
-        winnings: Dict[int, int] = {s: per_winner for s in winners}
-        if remainder > 0 and winners_ordered:
-            winnings[winners_ordered[0]] += remainder
+        winnings: Dict[int, int] = {s: 0 for s in contenders}
+        for pot_amount, eligible in side_pots:
+            best_rank = min(rank_by_seat[s] for s in eligible)
+            pot_winners = [s for s in eligible if rank_by_seat[s] == best_rank]
+            per_winner = pot_amount // len(pot_winners)
+            remainder = pot_amount - per_winner * len(pot_winners)
+            for s in pot_winners:
+                winnings[s] += per_winner
+            if remainder > 0:
+                first_winner = next((s for s in order if s in pot_winners), None)
+                if first_winner is not None:
+                    winnings[first_winner] += remainder
 
         for seat, amt in winnings.items():
-            self.table.seats[seat].stack += amt
+            if amt > 0:
+                self.table.seats[seat].stack += amt
 
+        overall_winners = {s for s in contenders if winnings[s] > 0}
+
+        ranked = sorted(rank_by_seat.items(), key=lambda x: x[1])
         self.showdown_data = []
         for seat, rank in ranked:
             won_amt = winnings.get(seat, 0)
@@ -513,7 +549,7 @@ class Hand:
                 "archetype": self.table.seats[seat].archetype,
                 "hole_cards": list(self.hole_cards[seat]),
                 "hand_rank": rank,
-                "won": seat in winners,
+                "won": seat in overall_winners,
                 "pot_won": won_amt,
             }
             self.showdown_data.append(entry)

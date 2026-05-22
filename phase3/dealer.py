@@ -10,7 +10,9 @@ The Dealer wraps the game engine and provides three layers of protection:
 
 2. **Post-hand audits**: After every hand, the Dealer verifies chip
    conservation (total chips in play match starting total + rebuys) and
-   showdown correctness (winner has the best hand).
+   that every showdown has at least one declared winner. (Hand-rank
+   verification — *the* winner has *the* best hand — is delegated to
+   the engine, which uses ``treys.Evaluator`` deterministically.)
 
 3. **Rolling anomaly detection**: Tracks per-agent VPIP and AF in a sliding
    window, comparing against the personality spec targets. Flags agents whose

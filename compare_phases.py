@@ -56,7 +56,7 @@ def _behavioral_profile(db) -> Dict[str, Dict[str, float]]:
         SELECT archetype,
                AVG(vpip_count*100.0/hands_dealt) AS vpip,
                AVG(pfr_count*100.0/hands_dealt) AS pfr,
-               AVG((bets+raises)*1.0/CASE WHEN calls>0 THEN calls ELSE 1 END) AS af,
+               AVG((bets+raises)*1.0/NULLIF(calls,0)) AS af,
                AVG(showdowns*100.0/hands_dealt) AS sd_pct,
                AVG(final_stack) AS mean_stack,
                AVG(rebuys) AS mean_rebuys

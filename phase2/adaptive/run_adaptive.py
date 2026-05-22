@@ -6,8 +6,8 @@ AdaptiveJudge), wires one HillClimber per agent, and plays the
 canonical 3-seed x 5000-hand research run. The trust model is left
 unchanged from Phase 1 -- it imports the static archetype likelihood
 tables, so as agents adapt their reputation grows increasingly
-miscalibrated. Schema is identical to Phase 1's so analyze_runs.py /
-deep_analysis.py work without modification.
+miscalibrated. Schema is identical to Phase 1's so analysis/deep_analysis.py
+works without modification.
 
 Outputs:
   --db <path>                 -- SQLite (default: runs_phase2_adaptive.sqlite)

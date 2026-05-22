@@ -171,7 +171,7 @@ def write_actions_csv(hands, agents, output_path: str, run_id: str) -> int:
     _ensure_dir(output_path)
     n_rows = 0
     seats = list(range(len(agents)))
-    with open(output_path, "w", newline="") as f:
+    with open(output_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
         writer.writerow(ACTIONS_HEADER)
         for hand in hands:
@@ -214,7 +214,7 @@ def write_hands_csv(hands, agents, output_path: str, run_id: str) -> int:
     """
     _ensure_dir(output_path)
     n_rows = 0
-    with open(output_path, "w", newline="") as f:
+    with open(output_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
         writer.writerow(HANDS_HEADER)
         for hand in hands:
@@ -242,7 +242,7 @@ def write_agent_stats_csv(agents, run_id: str, output_path: str) -> int:
     """One row per seat summarizing end-of-run behavioral stats."""
     _ensure_dir(output_path)
     n_rows = 0
-    with open(output_path, "w", newline="") as f:
+    with open(output_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
         writer.writerow(AGENT_STATS_HEADER)
         for a in sorted(agents, key=lambda x: x.seat):

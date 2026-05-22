@@ -175,14 +175,35 @@ def run_one_seed(
     table = Table(agents, seed=seed, logger=logger, run_id=run_id)
 
     started = time.time()
-    for i in range(1, num_hands + 1):
-        table.play_hand()
-        if i % 100 == 0 or i == num_hands:
-            _print_progress(seed, i, num_hands, started)
-    sys.stdout.write("\n")
-    sys.stdout.flush()
+    hands_played = 0
+    interrupted = False
+    try:
+        for i in range(1, num_hands + 1):
+            table.play_hand()
+            hands_played = i
+            if i % 100 == 0 or i == num_hands:
+                _print_progress(seed, i, num_hands, started)
+    except KeyboardInterrupt:
+        interrupted = True
+        print(
+            f"\n  Interrupted at hand {hands_played}/{num_hands} "
+            f"(seed={seed}). Flushing agent stats before re-raising.",
+            file=sys.stderr,
+        )
+    finally:
+        sys.stdout.write("\n")
+        sys.stdout.flush()
+        # Always flush agent_stats so a partial run is still queryable.
+        try:
+            logger.log_agent_stats(run_id, table)
+        except Exception as flush_err:  # noqa: BLE001
+            print(
+                f"  WARNING: log_agent_stats failed: {flush_err}",
+                file=sys.stderr,
+            )
 
-    logger.log_agent_stats(run_id, table)
+    if interrupted:
+        raise KeyboardInterrupt
 
     # Print Judge grievance summary for this seed (if Judge is present).
     for a in agents:

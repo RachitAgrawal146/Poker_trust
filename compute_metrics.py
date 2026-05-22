@@ -326,15 +326,18 @@ def compute_trust_manipulation(conn, run_id):
         trust_vals = [r[1] for r in trust_rows]
 
         # Compute rolling trust change (delta over last `window` snapshots)
-        # and rolling aggression change (delta over next `window` snapshots)
+        # and rolling aggression change (delta over next `window` snapshots).
+        # Past and future windows are disjoint around index i (past is
+        # [i-w, i), future is (i, i+w]) so a single hand is never counted on
+        # both sides of the delta.
         delta_trust = []
         delta_agg = []
 
         for i in range(window, len(trust_hands) - window):
             dt = trust_vals[i] - trust_vals[i - window]
 
-            # Aggression in next window hands
-            future_hands = trust_hands[i:i + window]
+            # Aggression in next window hands (strictly after i).
+            future_hands = trust_hands[i + 1:i + window + 1]
             agg_sum = sum(hand_agg[h][0] for h in future_hands)
             total_sum = sum(hand_agg[h][1] for h in future_hands)
             past_hands = trust_hands[i - window:i]

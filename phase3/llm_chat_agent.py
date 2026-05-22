@@ -269,16 +269,24 @@ _ACTION_MAP = {
 }
 
 
+_ACTION_WORD_RE = re.compile(r"\b(raise|call|bet|check|fold)\b")
+
+
 def _parse_action(text: str) -> Optional[ActionType]:
-    """Parse an LLM response into an ActionType."""
+    """Parse an LLM response into an ActionType.
+
+    Word-boundary match — earlier substring-precedence logic returned
+    CALL for inputs like "I won't call, I bet" because "call" appears
+    before "bet" in the priority list, even though the agent's actual
+    decision was BET. We now find ALL action words with \\b anchors
+    and prefer the LAST one (the final-line ACTION: marker convention).
+    """
     cleaned = text.strip().lower()
-    # Try direct match first
     if cleaned in _ACTION_MAP:
         return _ACTION_MAP[cleaned]
-    # Try to find an action word anywhere in the response
-    for word in ["raise", "call", "bet", "check", "fold"]:
-        if word in cleaned:
-            return _ACTION_MAP[word]
+    matches = _ACTION_WORD_RE.findall(cleaned)
+    if matches:
+        return _ACTION_MAP[matches[-1]]
     return None
 
 
@@ -346,6 +354,7 @@ def _call_llm(
                 response = client.messages.create(
                     model=model,
                     max_tokens=max_output_tokens,
+                    temperature=0.0,
                     system=[
                         {
                             "type": "text",

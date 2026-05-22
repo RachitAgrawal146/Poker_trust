@@ -40,15 +40,13 @@ back out the marginal call rate per bucket. The continuation rate
 sticky is this opponent when I bet at them?" — which is exactly the
 quantity the Mirror wants to reciprocate.
 
-Why ``weak_call`` is also mirrored from ``observed_cr``: the preflop hand
-distribution is heavily skewed toward Weak (preflop_lookup classifies ~80%
-of 169 holdings as Weak). If the Mirror only copied ``cr`` (which applies
-to Medium hands, ~12% of starting hands), its observed VPIP would barely
-move — the spec's "Mirror reflects the table's aggression" promise would
-be invisible in aggregate stats. Copying ``observed_cr`` into
-``weak_call`` too is the minimal additional change that lets the Mirror's
-stickiness track the opponent's continuation rate across its whole
-facing-a-bet policy, not just the 12 % medium slice.
+Why ``weak_call`` is NOT mirrored: copying the opponent's continuation
+rate into ``weak_call`` makes the Mirror call with junk at the target's
+rate (~55% for a Wall), producing VPIP ~60% and AF ~0.4 — far outside
+the spec's intent. The Mirror is meant to reciprocate AGGRESSION
+(br/vbr initiation), not PASSIVITY (calling with nothing), so
+``weak_call`` stays at the Mirror's TAG default and only the aggression
+metrics (``_MIRROR_KEYS``) are blended.
 """
 
 from __future__ import annotations

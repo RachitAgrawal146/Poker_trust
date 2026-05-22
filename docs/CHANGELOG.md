@@ -17,6 +17,53 @@ milestones are easier to reason about that way.
   duplicate of the canonical `docs/Claude_Code_Implementation_Prompt.md`).
 - Added `docs/DesignStatement.md` &mdash; opinionated north-star brief
   complementing the token-level `docs/DesignCues`.
+- Removed `phase2/_imitation_archive/` (the original ML-imitation Phase 2)
+  along with `agents/ml_agent.py`. The archive was superseded by
+  `phase2/adaptive/` and its ML training/eval scripts had broken
+  internal imports (`from phase2.ml.X` references after the rename to
+  `phase2._imitation_archive.ml.X`), so it could not actually be run.
+  The headline number it produced (r = &minus;0.825 vs Phase 1&apos;s
+  &minus;0.837, ~1.4&nbsp;% reproduction) is preserved in
+  `phase2/adaptive/phase2_report.md` as a sanity-check baseline.
+- Removed `analysis/analyze_runs.py` &mdash; the 487-line 9-section
+  standard report. `analysis/deep_analysis.py` (1524 lines, 31 sections)
+  is the superset and the canonical analysis script.
+- Engine: implemented proper side-pot accounting in `engine/game.py`.
+  Previously, a short-stacked player who could only call part of a
+  required bet still collected the full pot at showdown; the engine now
+  builds side pots by contribution level and awards each separately.
+  This is a chip-EV correctness fix; historical Phase 1 and Phase 2
+  scorecards no longer reproduce byte-for-byte and would need a fresh
+  run to match.
+- Bug fixes from the May 2026 audit pass:
+  - `compare_phases.py`, `analysis/deep_analysis.py`: aggression factor
+    SQL now uses `NULLIF(calls, 0)` instead of `CASE WHEN calls&gt;0
+    THEN calls ELSE 1 END`, so AF is `NULL` (not raw bet+raise count)
+    when a player never calls.
+  - `compute_metrics.py::compute_trust_manipulation`: past and future
+    windows around index `i` are now disjoint (future starts at
+    `i+1`), removing an off-by-one that contaminated the TMA delta.
+  - `phase3/llm_chat_agent.py`: pinned `temperature=0.0` on the
+    Anthropic client path (was using the SDK default of 1.0).
+  - `phase3/llm_chat_agent.py::_parse_action`: switched from
+    substring-priority matching (which returned CALL for inputs like
+    "I won&apos;t call, I bet") to word-boundary regex + last-match
+    preference, matching the final-line `ACTION:` convention.
+  - `phase3/dealer.py`: docstring of `post_hand_audit` corrected to
+    match what the audit actually checks (only the &quot;at least one
+    winner&quot; invariant; hand-rank verification is delegated to
+    `treys.Evaluator`).
+  - `agents/mirror.py`: stale docstring about `weak_call` being
+    mirrored removed; the code (correctly) does *not* blend it.
+  - `data/csv_exporter.py`, `data/visualizer_export.py`: added
+    `encoding=&quot;utf-8&quot;` to all `open()` calls (Windows
+    cp1252 risk).
+- Added `analysis/bootstrap_ci.py` &mdash; per-phase mean-r CIs via
+  t-interval and 10 000-resample bootstrap, with per-seed Fisher-z
+  intervals on the underlying 8-archetype correlations.
+- `phase1/run_sim.py`: SQLite logger now wrapped in `try/finally` so
+  a mid-run `KeyboardInterrupt` or exception still marks the run row
+  finalized with the partial hand count.
 
 ## [Phase 2* unbounded sub-experiment] &mdash; 2026-05-04
 
