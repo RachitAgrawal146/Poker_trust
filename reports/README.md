@@ -1,8 +1,8 @@
 # reports/
 
-Generated scorecards and audit dumps for every phase. The four canonical
-reports below are the ones referenced in `paper.md`, `README.md`, and
-each phase's `*_report.md`. Historical artifacts from earlier
+Generated scorecards and audit dumps for every phase. The canonical
+reports below are referenced from `README.md`, `paper_resources/`,
+and each phase's `*_report.md`. Historical artifacts from earlier
 iterations are preserved in `_legacy/`.
 
 ## Canonical reports

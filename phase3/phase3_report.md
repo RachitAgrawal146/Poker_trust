@@ -389,7 +389,7 @@ Six honest constraints, applying to either or both sub-phases:
 
 ## 6. Implications for the paper
 
-Five points worth foregrounding in the writeup (paper.md §5.7 + §5.8):
+Five points worth foregrounding in the paper's Phase 3 / 3.1 results sections:
 
 1. **The four-tier ladder.** Phase 1 → 2 → 3 → 3.1 reads as
    −0.75 → −0.64 → −0.51 → −0.09. Each tier of intelligence chips a

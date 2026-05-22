@@ -1,8 +1,8 @@
 # Future Work — Detailed Roadmap
 
-> Expansion of paper.md Section 7.3. Each direction lists motivation,
-> concrete experimental design, expected cost (where applicable), and
-> the falsifiable claim it would test.
+> Reference material for the paper's Future Work section. Each
+> direction lists motivation, concrete experimental design, expected
+> cost (where applicable), and the falsifiable claim it would test.
 
 ## A. Tightening the Phase 3.1 result (lowest risk, highest value)
 

@@ -31,8 +31,9 @@ Detailed reports in `phase1/phase1_report.md`,
 (the latter covers both the Phase 3 baseline and the Phase 3.1
 reasoning-scaffolding follow-up). Cross-phase scorecards in
 `reports/phase31_long_scorecard.txt` (the most recent / most complete).
-The Polygence paper draft is at `paper.md` (Markdown source) and
-`paper/paper.tex` (Pandoc-converted LaTeX for Overleaf).
+The Polygence paper itself is written externally (Overleaf); supporting
+materials — figures, LaTeX tables, CSV data, story hands, and topical
+notes — live in `paper_resources/`. See `paper_resources/README.md`.
 
 All 12 Phase 1 stages are complete. The canonical Phase 1 dataset is produced
 by `run_sim.py` with 5 seeds × 10 000 hands at Stage 6.

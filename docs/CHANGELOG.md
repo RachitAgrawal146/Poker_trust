@@ -4,6 +4,54 @@ All notable changes to this project. Organized by stage, in build
 order rather than reverse-chronological, because the research
 milestones are easier to reason about that way.
 
+## [Repo finalization] &mdash; 2026-05-22
+
+- Paper artifacts moved out of the repo. `paper.md` and `paper/` are
+  deleted; the paper itself is now written externally (Overleaf).
+  Supporting materials &mdash; figures, LaTeX tables, CSV data, story
+  hands, topical notes &mdash; live in `paper_resources/`.
+- Stale Phase 3 file-I/O orchestration removed: `file_io_agent.py`,
+  `run_phase3_fileio.py`, `orchestrate.py`, `SESSION_PROMPT*.md`. The
+  canonical Phase 3 runner is `phase3/run_phase3_chat.py`.
+- Removed redundant `docs/Implementation Doc.pdf` (4.2 MB image-encoded
+  duplicate of the canonical `docs/Claude_Code_Implementation_Prompt.md`).
+- Added `docs/DesignStatement.md` &mdash; opinionated north-star brief
+  complementing the token-level `docs/DesignCues`.
+
+## [Phase 2* unbounded sub-experiment] &mdash; 2026-05-04
+
+Tests Arpit's "do economically-motivated agents converge to a
+Nash-equilibrium profile if given full parameter freedom?" hypothesis.
+
+- `phase2/adaptive/bounds.py::make_unbounded_bounds()` &mdash; helper
+  that returns `(0.0, 1.0)` on every (round, metric) slot.
+- `phase2/adaptive/hill_climber.py` &mdash; accepts a `bounds=`
+  parameter so the optimizer can run unconstrained.
+- `phase2/adaptive/run_adaptive.py` &mdash; new `--unbounded` flag.
+
+**Result (5 seeds × 10 000 hands, aggressive HC: &delta;=0.15,
+eval_window=50):**
+- Mean trust&ndash;profit r = &minus;0.609 &plusmn; 0.221 (essentially
+  equal to bounded P2 at &minus;0.637)
+- Cluster spread (mean pairwise L1 between all 8 agents in 36-dim
+  parameter space) *grew* from 5.82 to 7.5+ on every seed
+- Mean convergence index = 1.324 &mdash; agents diverge, not converge
+- Mean per-agent drift = 3.4 L1 (11&times; the bounded run); agents
+  moved, just not toward each other
+- Economic ordering preserved: Firestorm 6 512 chips (6&times; next),
+  Wall 179 chips with 28 rebuys
+
+A weak-HC variant at r = &minus;0.779 is preserved as a methodology
+footnote (`reports/phase2_unbounded_scorecard.txt`,
+`paper_resources/notes/phase2_unbounded_writeup.md`). The aggressive
+variant is canonical
+(`reports/phase2_unbounded_scorecard_aggressive.txt`,
+`paper_resources/notes/phase2_unbounded_writeup_aggressive.md`).
+
+**Implication:** the bound boxes were not the binding constraint. The
+stationary trust posterior itself is. See
+`paper_resources/notes/nash_convergence_aggressive.md`.
+
 ## [Phase 3.1 Complete] &mdash; 2026-05-01
 
 ### Phase 3.1 &mdash; LLM agents with reasoning scaffolding
@@ -55,9 +103,6 @@ CALL BET RAISE` per decision.
 - `phase3/run_phase3_chat.py` — runner with `--provider` and `--model`
   flags. Supports prompt caching (commit `230d6ab`) for ~38% cost
   reduction
-- `phase3/file_io_agent.py` + `phase3/run_phase3_fileio.py` +
-  `phase3/orchestrate.py` — alternative file-IPC mode where Claude
-  Code itself acts as the LLM (no API key required)
 - `phase3/dealer.py` — game-integrity layer that validates LLM actions
   and substitutes a legal default if the LLM emits something illegal
 

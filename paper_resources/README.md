@@ -1,157 +1,206 @@
 # Paper Resources
 
-Curated assets for the Polygence research paper *"The Trust Trap: When
-Reputation Systems Reward Exploitation in Multi-Agent Strategic
-Interaction."* Everything in this folder is paper-ready: figures are
-publication-quality PNGs, tables are CSV + LaTeX, and notes are draft
-sections that can be slotted into `paper.md` or `paper/paper.tex`.
+Materials for writing the Polygence research paper externally
+(Overleaf). The paper itself is **not** in this repo — only the
+assets needed to write it: publication-ready figures, LaTeX table
+snippets, CSV data, curated hand transcripts, and topical writeups.
 
-## Quick navigation
+The headline argument the paper has to defend is a **five-tier
+ladder** of trust–profit Pearson r across agent architectures:
+
+```
+Phase 1 (frozen rule-based)              r = -0.752 ± 0.073
+Phase 2 (bounded hill-climbing)          r = -0.637 ± 0.125
+Phase 2* (unbounded HC, aggressive)      r = -0.609 ± 0.221   ← Nash falsification
+Phase 3 (LLM personality role-play)      r = -0.510 ± 0.268
+Phase 3.1 (LLM + CoT + memory + adaptive) r = -0.094 ± 0.301  ← trap broken
+```
+
+(A weak-HC unbounded variant at r = −0.779 is preserved as a
+methodology footnote — see `notes/phase2_unbounded_writeup.md`.)
+
+## Folder layout
 
 ```
 paper_resources/
 ├── README.md                         (you are here — index of assets)
 ├── figures/                          (publication-ready PNGs, 180 dpi)
-│   ├── 01_four_tier_ladder.png       Headline: 4-tier r ladder (canonical)
-│   ├── 01b_five_tier_ladder_with_unbounded.png   Augmented w/ Phase 2 unbounded
-│   ├── 02_per_seed_ladder.png        Per-seed dot plot showing variance
-│   ├── 03_economic_inversion.png     Wall 8 → 1, Oracle 3 → 8
-│   ├── 04_behavioral_shift.png       VPIP/PFR/AF P1 vs P3.1
-│   ├── 05_trust_vs_stack.png         Pooled scatter, P3 vs P3.1
-│   ├── 06_tma_by_archetype.png       Trust-farming by archetype
-│   ├── 07_phase2_bounded_vs_unbounded.png   Per-seed r delta + econ ordering
-│   ├── 08_stack_trajectories_phase2_unbounded.png   Firestorm runs away
-│   ├── 09_trust_evolution_phase2_unbounded.png      Trust per archetype/hand
-│   └── 10_param_drift_unbounded.png  Preflop bluff rates barely move
 ├── tables/                           (LaTeX `tabular` snippets)
-│   ├── headline_ladder.tex
-│   ├── per_archetype_p31.tex
-│   ├── behavioral_shift_p1_p31.tex
-│   ├── tma_by_archetype.tex
-│   └── economic_inversion.tex
-├── data/                             (CSVs — the source data behind every table)
-│   ├── headline_ladder.csv
-│   ├── per_archetype_p31.csv
-│   ├── behavioral_shift_p1_p31.csv
-│   ├── tma_by_archetype.csv
-│   ├── economic_inversion.csv
-│   ├── per_seed_stacks_p3.csv
-│   ├── per_seed_stacks_p31.csv
-│   └── phase2_unbounded_summary.csv  Per-seed r delta from new run
-├── interesting_hands/                (curated hand transcripts for the paper)
-│   ├── EVOLUTION_STORY.md            Narrative arc through all four phases
-│   ├── p2-unbounded_story.txt        Story-arc hands extracted from P2-unbounded
-│   ├── _highlights.txt               Biggest pots per seed (raw)
-│   ├── phase2_unbounded_seed_42.txt  Per-seed exhaustive dumps (raw)
-│   ├── phase2_unbounded_seed_137.txt
-│   ├── phase2_unbounded_seed_256.txt
-│   ├── phase2_unbounded_seed_512.txt
-│   └── phase2_unbounded_seed_1024.txt
-│
-│   To populate p1/p2-bounded/p3/p3.1 story files, run on Windows:
-│       python3 analysis/extract_story_hands.py --db <sqlite> --phase <tag>
-└── notes/                            (paper-section drafts not yet in paper.md)
-    ├── societal_implications.md      Real-world parallels (eBay, AI alignment, etc.)
-    ├── future_work_expanded.md       Detailed roadmap (Phase 4, multi-LLM, etc.)
-    └── phase2_unbounded_writeup.md   New §5.5 + §6.3 prose for the unbounded result
+├── data/                             (CSV source data behind every table)
+├── interesting_hands/                (curated hand transcripts per phase)
+└── notes/                            (topical writeups — methodology, discussion, future work)
 ```
 
-## NEW: Phase 2 unbounded sub-experiment (this session)
+## Figures (20 PNGs)
 
-Removing personality bounds from the hill-climber **deepens** the
-trap (r = -0.779 vs bounded -0.637). This refutes the "agents
-converge to Oracle" hypothesis and sharpens the paper's central
-argument: the trust trap is not a parameter-space limitation — it
-is the stationary trust model itself. Full prose draft is in
-`notes/phase2_unbounded_writeup.md`. Headline numbers are in
-`reports/phase2_unbounded_scorecard.txt`.
+Headline / cross-phase:
 
-## Headline result (the figure to lead with)
+| File | Use for |
+|---|---|
+| `01_four_tier_ladder.png` | Headline 4-tier r ladder (backward compatible) |
+| `01b_five_tier_ladder_with_unbounded.png` | **Five-tier ladder including Phase 2\*** (preferred) |
+| `02_per_seed_ladder.png` | Per-seed dot plot showing variance growth across phases |
+| `03_economic_inversion.png` | Wall 8→1, Oracle 3→8: most-trusted wins in P3.1 |
+| `04_behavioral_shift.png` | VPIP/PFR/AF shifts P1 vs P3.1 |
+| `05_trust_vs_stack.png` | Pooled trust-vs-stack scatter |
+| `06_tma_by_archetype.png` | Trust Manipulation Awareness per archetype |
 
-`figures/01_four_tier_ladder.png` — bar chart of mean trust-profit r
-across the four agent architectures:
+Phase 2 unbounded sub-experiment:
 
-```
-Phase 1 (frozen rules)              r = -0.752 ± 0.073
-Phase 2 (hill-climbing)             r = -0.637 ± 0.125
-Phase 3 (LLM personality role-play) r = -0.510 ± 0.268
-Phase 3.1 (LLM + reasoning)         r = -0.094 ± 0.301   ← trap broken
-```
+| File | Use for |
+|---|---|
+| `07_phase2_bounded_vs_unbounded.png` | Per-seed r delta + economic ordering (weak HC) |
+| `07_phase2_bounded_vs_unbounded_aggressive.png` | Same, aggressive HC (canonical) |
+| `08_stack_trajectories_phase2_unbounded.png` | Firestorm runs away while Wall hemorrhages |
+| `09_trust_evolution_phase2_unbounded.png` | Per-archetype trust over 10 000 hands |
+| `10_param_drift_unbounded.png` | Preflop bluff-rate drift (weak HC — agents barely move) |
+| `10_param_drift_unbounded_aggressive.png` | Aggressive HC — 11× more drift |
 
-The Phase 3 → Phase 3.1 step (Δr = +0.416) is **larger than all three
-prior phase transitions combined**. Two of five Phase 3.1 seeds show
-*positive* r, meaning trusted agents made more money than distrusted
-ones — a complete inversion of the trap.
+Nash convergence test (per Arpit's 2026-04-30 question):
 
-## How to regenerate everything
+| File | Use for |
+|---|---|
+| `11_nash_convergence_spread_baseline.png` | Weak HC: cluster spread per seed |
+| `11_nash_convergence_spread_aggressive.png` | Aggressive HC: cluster spread grows on every seed |
+| `12_nash_convergence_drift_baseline.png` | Per-agent L1 drift, weak HC |
+| `12_nash_convergence_drift_aggressive.png` | Per-agent L1 drift, aggressive HC |
+| `13_nash_convergence_pca_baseline.png` | 2D PCA trajectory, weak HC |
+| `13_nash_convergence_pca_aggressive.png` | 2D PCA trajectory, aggressive HC |
+| `14_nash_convergence_compare.png` | Weak vs aggressive side-by-side (use this one figure) |
 
-From the repo root:
+## Tables (5 LaTeX snippets)
+
+Drop-in `tabular` blocks for `\input{}` in Overleaf:
+
+- `headline_ladder.tex` — the five-tier r table
+- `per_archetype_p31.tex` — Phase 3.1 per-archetype stack / trust / rebuys
+- `behavioral_shift_p1_p31.tex` — VPIP/PFR/AF Phase 1 vs Phase 3.1
+- `tma_by_archetype.tex` — Trust Manipulation Awareness per archetype
+- `economic_inversion.tex` — Wall 8→1 economic-ordering shift table
+
+## Data (12 CSVs)
+
+Every figure and table traces back to one of these CSVs. Open in
+Excel / Python / a Polygence reviewer's spreadsheet if asked for raw
+numbers.
+
+| File | Backs |
+|---|---|
+| `headline_ladder.csv` | `headline_ladder.tex`, figures 01 / 01b / 02 |
+| `per_archetype_p31.csv` | `per_archetype_p31.tex`, figure 06 |
+| `behavioral_shift_p1_p31.csv` | `behavioral_shift_p1_p31.tex`, figure 04 |
+| `tma_by_archetype.csv` | `tma_by_archetype.tex`, figure 06 |
+| `economic_inversion.csv` | `economic_inversion.tex`, figure 03 |
+| `per_seed_stacks_p3.csv` | Per-seed stacks for Phase 3 |
+| `per_seed_stacks_p31.csv` | Per-seed stacks for Phase 3.1 |
+| `phase2_unbounded_summary.csv` | Phase 2\* weak HC summary |
+| `phase2_unbounded_summary_aggressive.csv` | Phase 2\* aggressive HC summary (canonical) |
+| `nash_convergence_baseline.csv` | Cluster spread + drift, weak HC |
+| `nash_convergence_aggressive.csv` | Cluster spread + drift, aggressive HC |
+| `unbounded_archetype_drift.csv` | L1-distance-to-canonical for each agent |
+
+## Interesting hands (one transcript file per phase)
+
+`EVOLUTION_STORY.md` is the narrative arc: an 8-slot story-hand
+catalogue (A1.1 walkover, A1.2 Wall pays off Firestorm, etc.) plus
+the slot-to-paper-section mapping. The per-phase story files
+contain the actual transcripts:
+
+- `p1_story.txt` — Phase 1 (8 slots × 5 seeds = up to 40 hands)
+- `p2-bounded_story.txt` — Phase 2 bounded HC
+- `p2-unbounded_story.txt` — Phase 2\* unbounded
+- `p3_story.txt` — Phase 3 LLM (hand #67 = "the trap": Wall calls down with 2♠5♣)
+- `p31_story.txt` — Phase 3.1 LLM + reasoning (hand #146 = "the inversion": Wall value-bets Firestorm with K♥Q♥)
+
+`_highlights.txt` plus `phase2_unbounded_seed_*.txt` are the raw
+biggest-pot dumps per seed (useful as a backup if a specific story
+hand isn't compelling enough for the paper).
+
+The **two "money quote" hands** for talks and paper figures:
+- **P3 hand #67** — Wall (2♠5♣, rank 6749) calls a 4-bet pot all the way down, loses 35 chips to Firestorm's J♥J♦. Pure trap.
+- **P3.1 hand #146** — Wall (K♥Q♥, rank 872) calls Firestorm's flop + turn bets, bets the river when Firestorm checks, gets called by Q-high. Wall wins 32 chips from Firestorm. Trap inverted.
+
+## Notes (topical writeups, draft material)
+
+These are **draft prose** the user can selectively quote, paraphrase,
+or use as fact-check references when writing the paper externally.
+Each note covers one self-contained topic.
+
+| File | Topic |
+|---|---|
+| `phase2_unbounded_writeup_aggressive.md` | **Canonical** Phase 2\* writeup — methodology, results, Nash falsification |
+| `phase2_unbounded_writeup.md` | Weak-HC variant — preserved as methodology footnote |
+| `nash_convergence_aggressive.md` | Cluster-spread numbers + interpretation guide |
+| `nash_convergence_baseline.md` | Same for the weak run (reference only) |
+| `unbounded_archetype_drift.md` | L1 distance to canonical archetype: agents stay closest to themselves on every seed |
+| `societal_implications.md` | Real-world parallels (eBay, AI alignment, HFT) — extends §7.2 |
+| `future_work_expanded.md` | Detailed Phase 4 roadmap (n=20 replication, multi-LLM, no-limit) — extends §7.3 |
+| `mentor_walkthrough.md` | 30-min script for the next Arpit meeting (6 beats × 5 min) |
+
+## Suggested paper outline (where to use each asset)
+
+Each row is a likely paper section and the assets that support it.
+Use as a checklist when writing in Overleaf; nothing here is binding.
+
+| Likely section | Lead figure | Tables | Notes |
+|---|---|---|---|
+| Abstract / §1 Contributions | `01b_five_tier_ladder_with_unbounded.png` | `headline_ladder.tex` | — |
+| §3 Methodology (Phase 2\*) | — | — | `phase2_unbounded_writeup_aggressive.md` |
+| §5 Phase 1 results | `05_trust_vs_stack.png` | — | — |
+| §5 Phase 2 (bounded + unbounded) | `07_*_aggressive.png`, `10_*_aggressive.png` | — | `phase2_unbounded_writeup_aggressive.md`, `unbounded_archetype_drift.md` |
+| §5 Phase 3 results | `04_behavioral_shift.png`, P3 #67 transcript | `behavioral_shift_p1_p31.tex` | — |
+| §5 Phase 3.1 results | `03_economic_inversion.png`, P3.1 #146 transcript | `per_archetype_p31.tex`, `tma_by_archetype.tex`, `economic_inversion.tex` | — |
+| §6 Discussion (Nash falsification) | `14_nash_convergence_compare.png` | — | `nash_convergence_aggressive.md` |
+| §7 Implications | — | — | `societal_implications.md` |
+| §7 Future work | — | — | `future_work_expanded.md` |
+
+## Regenerating the assets
+
+All scripts live in `analysis/`. The master rebuild script is
+`analysis/make_all_paper_resources.sh`. Individual steps:
 
 ```bash
-# (1) Static figures (six PNGs, ~5 sec) — works without any SQLite
+# (1) Static figures + tables (no SQLite needed; ~5 sec)
 python3 analysis/make_paper_figures.py
-
-# (2) Static tables (CSVs + LaTeX, ~1 sec) — works without any SQLite
 python3 analysis/make_paper_tables.py
 
-# (3) Phase 2 unbounded comparison (figures 07 + 10, scorecard, writeup)
+# (2) Phase 2 unbounded comparison (figures 07 + 10, writeup, scorecard)
 python3 analysis/phase2_unbounded_compare.py \
-        --db runs_phase2_unbounded.sqlite
+        --db runs_phase2_unbounded_aggressive.sqlite --tag aggressive
+
+# (3) Nash convergence figures + CSV (11 + 12 + 13)
+python3 analysis/nash_convergence.py \
+        --trajectories phase2/adaptive/param_trajectories_unbounded_aggressive.json \
+        --tag aggressive
+python3 analysis/nash_convergence_compare.py    # produces figure 14
 
 # (4) Per-hand trajectory figures (08 + 09)
 python3 analysis/make_trajectory_figures.py \
         --db runs_phase2_unbounded.sqlite --tag phase2_unbounded
 
-# (5) Curated interesting hands per seed
-python3 analysis/curate_interesting_hands.py \
-        --db runs_phase2_unbounded.sqlite
+# (5) Story-hand transcripts per phase (one command per SQLite)
+python3 analysis/extract_story_hands.py --db <phase>.sqlite --phase <tag>
 ```
 
-Steps (1) and (2) work entirely from the JSON dumps at the repo root
-(`phase3_stats.json`, `phase31_stats.json`) and the canonical
-scorecards under `reports/`, so they re-run anywhere with no
-dependencies on the heavy SQLite databases. Steps (3)-(5) require
-the unbounded SQLite (~12 MB), which lives in this repo's working tree
-after the simulation runs but is gitignored (LFS-tracked).
-
-## Mapping to paper sections
-
-| Asset | Paper.md section |
-|---|---|
-| `figures/01_four_tier_ladder.png`     | §1.3 Contributions, §5.8 Phase 3.1 results |
-| `figures/02_per_seed_ladder.png`      | §5.8 Phase 3.1, §6.5 Limitations |
-| `figures/03_economic_inversion.png`   | §5.8 Phase 3.1 |
-| `figures/04_behavioral_shift.png`     | §5.7 Phase 3, §5.8 Phase 3.1 |
-| `figures/05_trust_vs_stack.png`       | §5.2 Phase 1, §5.8 Phase 3.1 |
-| `figures/06_tma_by_archetype.png`     | §5.8 Phase 3.1 (TMA discussion) |
-| `figures/01b_five_tier_ladder_with_unbounded.png` | (new) §5.5 Phase 2, §6.3 Discussion |
-| `figures/07_phase2_bounded_vs_unbounded.png` | (new) §5.5 Phase 2 |
-| `figures/08_stack_trajectories_phase2_unbounded.png` | (new) §5.5 Phase 2 |
-| `figures/09_trust_evolution_phase2_unbounded.png` | (new) §5.5 Phase 2 |
-| `figures/10_param_drift_unbounded.png` | (new) §6.3 Discussion |
-| `notes/phase2_unbounded_writeup.md`   | (new) §5.5 + §6.3 |
-| `tables/headline_ladder.tex`          | §1 / §5 (lead table) |
-| `tables/per_archetype_p31.tex`        | §5.8 |
-| `tables/behavioral_shift_p1_p31.tex`  | §5.7, §5.8 |
-| `tables/tma_by_archetype.tex`         | §5.8 |
-| `tables/economic_inversion.tex`       | §5.8 |
-| `notes/societal_implications.md`      | (extends §7.2 Implications) |
-| `notes/future_work_expanded.md`       | (extends §7.3 Future Work) |
+Steps (1) work entirely from JSON dumps at the repo root and
+canonical scorecards under `reports/`. Steps (2)–(5) require the
+corresponding SQLite (LFS-tracked on the user's Windows machine).
 
 ## Provenance
 
-All numerical values trace back to one of three sources:
+All numerical values trace back to one of these sources:
 
-1. **`phase3_stats.json`** — per-seed JSON dumped from
-   `runs_phase3_long.sqlite` via `extract_phase3_stats.py`.
-2. **`phase31_stats.json`** — same, for Phase 3.1.
-3. **`reports/phase31_long_scorecard.txt`** — the canonical scorecard
-   tying together P1, P2, P3, and P3.1 headline numbers.
+1. `phase3_stats.json` / `phase31_stats.json` — per-seed JSON dumped
+   from `runs_phase3_long.sqlite` / `runs_phase31_long.sqlite` via
+   `extract_phase3_stats.py`.
+2. `reports/phase31_long_scorecard.txt` — canonical cross-phase
+   scorecard (P1, P2, P3, P3.1).
+3. `reports/phase2_unbounded_scorecard_aggressive.txt` — canonical
+   Phase 2\* unbounded scorecard.
+4. Per-archetype L1 drift, cluster spreads, and convergence indices
+   come from `phase2/adaptive/param_trajectories_unbounded_aggressive.json`.
 
-Phase 1 and Phase 2 (bounded) detailed numbers live in the lean
-`runs_phase{1,2}_*.sqlite` databases on the user's Windows machine and
-are not on the server. The headline summaries are reproduced verbatim
-from the scorecards.
-
-Phase 2 unbounded is a new run produced this session; `runs_phase2_unbounded.sqlite`
-is generated by `python3 phase2/adaptive/run_adaptive.py --unbounded`.
+Phase 1 and Phase 2 (bounded) detailed numbers live in the
+`runs_phase{1,2}_*.sqlite` databases on the user's Windows machine
+(LFS-tracked, gitignored on the server). The headline summaries are
+reproduced verbatim from the scorecards under `reports/`.

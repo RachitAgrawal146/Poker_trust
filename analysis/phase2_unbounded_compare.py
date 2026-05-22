@@ -361,9 +361,8 @@ def write_phase2_unbounded_note(summary: Dict, path: Path) -> None:
     body = f"""# Phase 2 Unbounded — Writeup Notes
 
 > Generated automatically from `runs_phase2_unbounded.sqlite` by
-> `analysis/phase2_unbounded_compare.py`. This is draft prose for the
-> paper's §5.5 (Phase 2 Results) — manually edit before pasting into
-> `paper.md`.
+> `analysis/phase2_unbounded_compare.py`. Reference material for the
+> Phase 2 / §6.3 sections of the externally-written paper.
 
 ## Motivation (mentor meeting, 2026-04-30)
 

@@ -25,11 +25,12 @@ Every phase reuses the **same game engine**, **same trust posterior**, and
 This README is self-contained, but a 30-minute review of the project naturally goes:
 
 1. **This README** (you are here) — research question, four-phase ladder, key findings, layout
-2. **`paper.md`** — full Polygence research paper draft (~720 lines, 7 sections + references). Sections 5.7 and 5.8 cover Phase 3 and the trap-breaking Phase 3.1 result respectively; Section 7 is the conclusion + future work. Also available as `paper/paper.tex` for Overleaf.
-3. **`reports/phase31_long_scorecard.txt`** — 6-table cross-phase scorecard with all four phases' per-seed r values, behavioral dimensions, economic ordering inversion, and TMA breakdown. **The single best one-page summary of the project's quantitative findings.**
-4. **`phase3/phase3_report.md`** — paper-style writeup covering both the Phase 3 baseline (LLM role-play, r = −0.510) and the Phase 3.1 trap-breaking result (r = −0.094 with CoT + memory + adaptive specs). Self-contained; explains the three reasoning interventions, the trap-breaking finding, the Wall-wins economic inversion, and honest limitations.
-5. *(optional)* `phase2/adaptive/phase2_report.md` — same paper-style writeup for the Phase 2 hill-climbing tier. Useful if the mentor wants to understand *why* each tier moves r by ~0.12–0.42 instead of asking "and the others did what?"
-6. *(optional, deeper dive)* `phase2/adaptive/PHASE2_REDESIGN_PLAN.md` — design briefing for the Phase 2 redesign that replaced the original imitation-based Phase 2; explains *why* the canonical Phase 2 was rebuilt as bounded optimization rather than ML imitation.
+2. **`reports/phase31_long_scorecard.txt`** — 6-table cross-phase scorecard with all four phases' per-seed r values, behavioral dimensions, economic ordering inversion, and TMA breakdown. **The single best one-page summary of the project's quantitative findings.**
+3. **`phase3/phase3_report.md`** — paper-style writeup covering both the Phase 3 baseline (LLM role-play, r = −0.510) and the Phase 3.1 trap-breaking result (r = −0.094 with CoT + memory + adaptive specs). Self-contained; explains the three reasoning interventions, the trap-breaking finding, the Wall-wins economic inversion, and honest limitations.
+4. *(optional)* `phase2/adaptive/phase2_report.md` — same paper-style writeup for the Phase 2 hill-climbing tier. Useful if the mentor wants to understand *why* each tier moves r by ~0.12–0.42 instead of asking "and the others did what?"
+5. *(optional, deeper dive)* `phase2/adaptive/PHASE2_REDESIGN_PLAN.md` — design briefing for the Phase 2 redesign that replaced the original imitation-based Phase 2; explains *why* the canonical Phase 2 was rebuilt as bounded optimization rather than ML imitation.
+
+The Polygence research paper is written externally (Overleaf); the supporting materials — figures, LaTeX tables, CSV data, story-hand transcripts, and topical notes — live in [`paper_resources/`](paper_resources/). See [`paper_resources/README.md`](paper_resources/README.md) for the index.
 
 If the mentor wants to *reproduce* anything, the **Quick Start** section below has every command. If they want to *audit* code correctness, `phase3/validate_phase31.py` runs a 50-check unit suite without spending API credit.
 
@@ -156,9 +157,6 @@ Poker_trust/
 │   ├── personality_specs/    # 8 archetype system prompts
 │   ├── llm_chat_agent.py     # LLMChatAgent + LLMChatJudge (with --phase31 mode)
 │   ├── run_phase3_chat.py    # API-backed runner (--provider anthropic|ollama|claude-cli)
-│   ├── file_io_agent.py      # File-IPC mode (use Claude Code as the LLM)
-│   ├── run_phase3_fileio.py  # File-IPC runner
-│   ├── orchestrate.py        # File-IPC orchestrator
 │   ├── dealer.py             # Game-integrity layer
 │   └── validate_phase31.py   # 50-check unit suite for Phase 3.1
 │
@@ -180,20 +178,25 @@ Poker_trust/
 ├── compute_metrics.py        # 6-dimension scorecard generator
 ├── extract_phase3_stats.py   # Per-seed JSON extractor for Phase 3 / 3.1
 │
-├── ── PAPER ────────────────────────────────────────────────────
+├── ── PAPER MATERIALS ────────────────────────────────────────────
 │
-├── paper.md                  # Polygence research paper (Markdown source)
-├── paper/paper.tex           # Pandoc-converted LaTeX (for Overleaf)
-├── paper/paper_starter.tex   # Minimal LaTeX skeleton (alternative)
+├── paper_resources/          # Everything needed to write the paper externally (Overleaf)
+│   ├── README.md             # Index: what each file is and how to regenerate
+│   ├── figures/              # PNG figures (180 dpi, ready to \includegraphics)
+│   ├── tables/               # LaTeX tabular snippets
+│   ├── data/                 # CSV source data for every figure/table
+│   ├── interesting_hands/    # Categorized per-phase story hands + EVOLUTION_STORY.md
+│   └── notes/                # Topical writeups, Nash convergence analysis, mentor walkthrough
 │
 ├── ── GENERATED OUTPUT ───────────────────────────────────────
 │
 ├── reports/                  # All scorecards, audits, analysis dumps
-│   ├── phase2_scorecard.txt        # Phase 2 lean (3 × 5000)
-│   ├── phase2_scorecard_long.txt   # Phase 2 canonical (5 × 10000)
-│   ├── phase3_scorecard.txt        # Phase 3 50-hand pilot (legacy)
-│   ├── phase3_long_scorecard.txt   # Phase 3 canonical (5 × 500)
-│   └── phase31_long_scorecard.txt  # Phase 3.1 canonical (5 × 150)
+│   ├── phase2_scorecard.txt              # Phase 2 lean (3 × 5000)
+│   ├── phase2_scorecard_long.txt         # Phase 2 canonical (5 × 10000)
+│   ├── phase2_unbounded_scorecard.txt              # Phase 2* unbounded weak HC (footnote)
+│   ├── phase2_unbounded_scorecard_aggressive.txt   # Phase 2* unbounded aggressive (canonical)
+│   ├── phase3_long_scorecard.txt         # Phase 3 canonical (5 × 500)
+│   └── phase31_long_scorecard.txt        # Phase 3.1 canonical (5 × 150)
 └── research_data/            # LFS chunks of runs_v3.sqlite (500k Phase 1 hands)
 │
 ├── docs/                     # Design docs, specs, schema reference
@@ -217,7 +220,8 @@ Poker_trust/
 | [`phase3/phase3_report.md`](phase3/phase3_report.md) | 3 + 3.1 | — | LLM role-play baseline AND reasoning-scaffolding follow-up (combined) |
 | [`reports/phase2_scorecard_long.txt`](reports/phase2_scorecard_long.txt) | 1 vs 2 | — | 7-table cross-phase scorecard |
 | [`reports/phase31_long_scorecard.txt`](reports/phase31_long_scorecard.txt) | 1/2/3/3.1 | — | Cross-phase scorecard with all four tiers |
-| [`paper.md`](paper.md) | All | 719 | Polygence research paper (Markdown source) |
+| [`reports/phase2_unbounded_scorecard_aggressive.txt`](reports/phase2_unbounded_scorecard_aggressive.txt) | 2* | — | Phase 2 unbounded HC sub-experiment (Nash falsification) |
+| [`paper_resources/README.md`](paper_resources/README.md) | All | — | Paper-writing materials index (figures, tables, data, notes) |
 | [`docs/schema.md`](docs/schema.md) | Shared | — | SQLite schema + research query cookbook |
 | [`docs/worked_examples.md`](docs/worked_examples.md) | Shared | — | Hand walkthrough + Bayesian update |
 | [`docs/stage5_identifiability.md`](docs/stage5_identifiability.md) | Phase 1 | — | Proof of classification ceiling |

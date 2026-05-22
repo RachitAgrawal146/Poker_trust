@@ -1,9 +1,10 @@
 # Phase 2 Unbounded (Aggressive HC) — Writeup Notes
 
-> Draft prose for paper.md §5.5 (Phase 2 Results) and §6.3
-> (Discussion). This is the **canonical** Phase 2 unbounded result —
-> the version that properly tests Arpit's "do agents converge to
-> Nash?" hypothesis with sufficient optimizer budget.
+> Reference material for the Phase 2 (§5.5) and Discussion (§6.3)
+> sections of the externally-written paper. This is the **canonical**
+> Phase 2 unbounded result — the version that properly tests Arpit's
+> "do agents converge to Nash?" hypothesis with sufficient optimizer
+> budget.
 
 ## Methodology note: why the aggressive run is canonical
 

@@ -212,8 +212,8 @@ If Arpit wants to see a specific item:
 > the convergence falsification, the cross-phase narrative — needs
 > to be slotted into Sections 5.5, 6.3, and an appendix.
 >
-> Beyond that, the three Phase 4 directions in `paper.md` Section
-> 7.3:
+> Beyond that, the three Phase 4 directions captured in
+> `paper_resources/notes/future_work_expanded.md`:
 >
 > 1. **n = 20 seed replication** of Phase 3.1 — tightens the 95% CI
 >    on r from [-0.36, +0.18] to something we can talk about with
