@@ -35,9 +35,24 @@ if str(_REPO_ROOT) not in sys.path:
 
 # ---------------------------------------------------------------------------
 # Canonical per-seed Pearson r between mean trust score (final hand) and
-# final stack across 5 seeds (42, 137, 256, 512, 1024). Lifted from the
-# scorecard table headlined "TRUST-PROFIT R LADDER ACROSS FOUR PHASES"
-# (reports/phase31_long_scorecard.txt).
+# final stack across 5 seeds (42, 137, 256, 512, 1024).
+#
+# PROVENANCE — these values are lifted from canonical scorecards:
+#   Phase 1, Phase 2 (bounded), Phase 3, Phase 3.1:
+#       reports/phase31_long_scorecard.txt (the "TRUST-PROFIT R LADDER
+#       ACROSS FOUR PHASES" table)
+#   Phase 2* unbounded (aggressive):
+#       reports/phase2_unbounded_scorecard_aggressive.txt
+#   Phase 2* unbounded (weak HC, methodology footnote):
+#       reports/phase2_unbounded_scorecard.txt
+#
+# Last reconciled against the scorecards on 2026-05-22 at commit
+# `57cca9a1`. To re-derive these numbers programmatically from the
+# canonical SQLite databases, run `compute_metrics.py` on each phase's
+# `runs_phase*.sqlite` and read the per-seed `r` column out of the
+# scorecard output. The 95% CIs that the paper cites are computed in
+# `analysis/bootstrap_ci.py`, which takes these same per-seed r values
+# as input.
 # ---------------------------------------------------------------------------
 
 SEEDS = [42, 137, 256, 512, 1024]
@@ -49,14 +64,12 @@ R_BY_PHASE = {
     "Phase 3.1\nLLM + reasoning":   [-0.289, -0.338, -0.327, +0.047, +0.435],
 }
 
-# Phase 2 unbounded sub-experiment (NOT counted as a separate phase in
-# the four-tier ladder; rendered alongside the other phases by
-# fig_five_tier_ladder). Two variants:
-#   weak: delta=0.03 (default HC). Agents barely moved; trap deepened.
-#   aggressive: delta=0.15. Agents moved 11x more; trap roughly unchanged
-#               from bounded but per-seed variance exploded.
-# AGGRESSIVE is the canonical "did they converge to Nash" test — used in
-# the five-tier ladder figure and the paper.
+# Phase 2* unbounded sub-experiment (rendered alongside the other phases
+# by fig_five_tier_ladder but NOT counted as a separate phase in the
+# four-tier ladder). AGGRESSIVE is the canonical "did they converge to
+# Nash?" test referenced in the paper; WEAK is preserved as a
+# methodology footnote (HC delta too small to give the optimizer real
+# budget — see paper_resources/notes/phase2_unbounded_writeup.md).
 P2_UNBOUNDED_R_AGGRESSIVE = [-0.354, -0.700, -0.344, -0.887, -0.759]
 P2_UNBOUNDED_R_WEAK = [-0.791, -0.676, -0.932, -0.717, -0.779]
 P2_UNBOUNDED_R = P2_UNBOUNDED_R_AGGRESSIVE  # canonical

@@ -15,8 +15,11 @@ levels of uncertainty matter:
 
 Source values come from `reports/phase*_long_scorecard.txt` and
 `phase3_stats.json` / `phase31_stats.json`. They are the canonical
-5-seed-x-N-hand scorecard numbers; if the underlying simulations are
-re-run, regenerate this file by reading the scorecards.
+5-seed-x-N-hand scorecard numbers and match the same per-seed array
+defined in `analysis/make_paper_figures.py::R_BY_PHASE`. Last
+reconciled against the scorecards on 2026-05-22 at commit `57cca9a1`.
+If the underlying simulations are re-run, update both modules in
+lockstep.
 
 Usage::
 

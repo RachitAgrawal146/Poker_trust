@@ -136,6 +136,7 @@ Each note covers one self-contained topic.
 | `societal_implications.md` | Real-world parallels (eBay, AI alignment, HFT) — extends §7.2 |
 | `future_work_expanded.md` | Detailed Phase 4 roadmap (n=20 replication, multi-LLM, no-limit) — extends §7.3 |
 | `mentor_walkthrough.md` | 30-min script for the next Arpit meeting (6 beats × 5 min) |
+| `methods_disclosures.md` | Methods-section checklist (LLM temperature disclosure, CI derivation, engine side-pot change) |
 
 ## Suggested paper outline (where to use each asset)
 
