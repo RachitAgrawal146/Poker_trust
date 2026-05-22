@@ -15,9 +15,12 @@
 
 **Artifacts:** `reports/phase3_long_scorecard.txt`,
 `reports/phase31_long_scorecard.txt`,
-`runs_phase3_long.sqlite` and `runs_phase31_long.sqlite` (gitignored,
-on user's local machine), `phase3_long_audit.json`,
-`phase31_long_audit.json`, `phase3_stats.json`, `phase31_stats.json`
+`research_data/runs_phase3_long.sqlite` and
+`research_data/runs_phase31_long.sqlite` (LFS-tracked),
+`reports/phase3_long_audit.json`,
+`reports/phase31_long_audit.json`,
+`paper_resources/data/phase3_stats.json`,
+`paper_resources/data/phase31_stats.json`.
 
 ---
 

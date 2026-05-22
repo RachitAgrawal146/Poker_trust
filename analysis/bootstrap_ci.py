@@ -44,8 +44,9 @@ import numpy as np
 #
 # Phase 1 / Phase 2 / Phase 2* numbers come from the matched 5×10 000
 # runs whose scorecards live under `reports/`. Phase 3 / Phase 3.1
-# numbers come from the per-seed dumps in `phase3_stats.json` and
-# `phase31_stats.json` at the repo root.
+# numbers come from the per-seed dumps at
+# `paper_resources/data/phase3_stats.json` and
+# `paper_resources/data/phase31_stats.json`.
 # ----------------------------------------------------------------------
 
 SEEDS = [42, 137, 256, 512, 1024]

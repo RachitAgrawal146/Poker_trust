@@ -6,17 +6,18 @@
 #   pip install anthropic   (for Claude)
 #   OR: ollama pull llama3.1:8b   (for local, free)
 #
-# Usage:
+# Usage (invoke from the repo root):
 #   # Free local (Ollama)
-#   ./run_phase3_scorecard.sh ollama llama3.1:8b 100
+#   bash analysis/run_phase3_scorecard.sh ollama llama3.1:8b 100
 #
 #   # Claude Haiku (fast, ~$0.05 for 100 hands)
-#   ./run_phase3_scorecard.sh anthropic claude-haiku-4-5-20251001 100
+#   bash analysis/run_phase3_scorecard.sh anthropic claude-haiku-4-5-20251001 100
 #
 #   # Claude Sonnet (higher quality, ~$0.50 for 100 hands)
-#   ./run_phase3_scorecard.sh anthropic claude-sonnet-4-6-20250514 100
+#   bash analysis/run_phase3_scorecard.sh anthropic claude-sonnet-4-6-20250514 100
 
 set -e
+cd "$(dirname "$0")/.."
 
 PROVIDER="${1:-ollama}"
 MODEL="${2:-llama3.1:8b}"
@@ -48,7 +49,7 @@ echo ""
 
 # Step 2: Compute metrics scorecard
 echo ">>> Step 2/2: Computing metrics scorecard..."
-python3 compute_metrics.py --db "$DB"
+python3 analysis/compute_metrics.py --db "$DB"
 
 echo ""
 echo "=============================================="

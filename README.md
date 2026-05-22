@@ -18,21 +18,15 @@ over cooperation, or is the trap dynamic dependent on agent capability?**
 Every phase reuses the **same game engine**, **same trust posterior**, and
 **same metrics framework**. Only the agent's `decide_action` changes.
 
----
-
-## For mentor review — suggested reading order
-
-This README is self-contained, but a 30-minute review of the project naturally goes:
-
-1. **This README** (you are here) — research question, four-phase ladder, key findings, layout
-2. **`reports/phase31_long_scorecard.txt`** — 6-table cross-phase scorecard with all four phases' per-seed r values, behavioral dimensions, economic ordering inversion, and TMA breakdown. **The single best one-page summary of the project's quantitative findings.**
-3. **`phase3/phase3_report.md`** — paper-style writeup covering both the Phase 3 baseline (LLM role-play, r = −0.510) and the Phase 3.1 trap-breaking result (r = −0.094 with CoT + memory + adaptive specs). Self-contained; explains the three reasoning interventions, the trap-breaking finding, the Wall-wins economic inversion, and honest limitations.
-4. *(optional)* `phase2/adaptive/phase2_report.md` — same paper-style writeup for the Phase 2 hill-climbing tier. Useful if the mentor wants to understand *why* each tier moves r by ~0.12–0.42 instead of asking "and the others did what?"
-5. *(optional, deeper dive)* `phase2/adaptive/PHASE2_REDESIGN_PLAN.md` — design briefing for the Phase 2 redesign that replaced the original imitation-based Phase 2; explains *why* the canonical Phase 2 was rebuilt as bounded optimization rather than ML imitation.
-
-The Polygence research paper is written externally (Overleaf); the supporting materials — figures, LaTeX tables, CSV data, story-hand transcripts, and topical notes — live in [`paper_resources/`](paper_resources/). See [`paper_resources/README.md`](paper_resources/README.md) for the index.
-
-If the mentor wants to *reproduce* anything, the **Quick Start** section below has every command. If they want to *audit* code correctness, `phase3/validate_phase31.py` runs a 50-check unit suite without spending API credit.
+The Polygence research paper is written externally (Overleaf); supporting
+materials — figures, LaTeX tables, CSV data, story-hand transcripts, and
+topical notes — live in [`paper_resources/`](paper_resources/). See
+[`paper_resources/README.md`](paper_resources/README.md) for the index. The
+single best one-page summary of the quantitative findings is
+[`reports/phase31_long_scorecard.txt`](reports/phase31_long_scorecard.txt);
+the closest thing to a written-up draft of the results lives in
+[`phase3/phase3_report.md`](phase3/phase3_report.md) (Phase 3 + 3.1
+combined) and [`phase2/adaptive/phase2_report.md`](phase2/adaptive/phase2_report.md).
 
 ---
 
@@ -102,7 +96,11 @@ python phase3/run_phase3_chat.py --provider anthropic \
 # Tests + validation
 python phase1/run_tests.py --stage all       # Phase 1/2 stage tests
 python phase3/validate_phase31.py            # Phase 3.1 unit-level checks (50 assertions)
-python tests/test_trust_model.py             # Trust posterior unit tests
+python tests/test_trust_model.py             # Trust posterior unit tests (27)
+python tests/test_engine_sidepot.py          # Side-pot algorithm unit tests (18)
+
+# Headline CIs on the trust-profit r ladder
+python analysis/bootstrap_ci.py              # Mean-r CIs + per-seed Fisher-z
 ```
 
 ## The Eight Archetypes
@@ -165,17 +163,17 @@ Poker_trust/
 ├── agents/                   # All archetype agent classes (BaseAgent + 8 archetypes)
 ├── trust/bayesian_model.py   # Posterior updates, decay, trust, entropy
 ├── data/                     # SQLite logger + CSV exporter + visualizer JSON
-├── analysis/                 # 9-section standard report, 31-section deep analysis
+├── analysis/                 # All analysis scripts (deep_analysis, bootstrap_ci,
+│                             #   compute_metrics, compare_phases, extract_phase3_stats,
+│                             #   make_paper_figures / _tables, nash_convergence, etc.)
 ├── visualizer/poker_table.html  # 1927-line single-file viewer
-├── tests/test_trust_model.py    # 27 unit tests for trust primitives
+├── tests/                    # test_trust_model.py + test_engine_sidepot.py
 │
-├── ── SHARED CONFIG ──────────────────────────────────────────
+├── ── SHARED CONFIG (must stay at repo root for `from config import …`) ──
 │
 ├── config.py                 # All simulation parameters
 ├── archetype_params.py       # Per-round probability tables (DO NOT MODIFY)
 ├── preflop_lookup.py         # 169-hand preflop bucketing (DO NOT MODIFY)
-├── compute_metrics.py        # 6-dimension scorecard generator
-├── extract_phase3_stats.py   # Per-seed JSON extractor for Phase 3 / 3.1
 │
 ├── ── PAPER MATERIALS ────────────────────────────────────────────
 │
@@ -183,20 +181,22 @@ Poker_trust/
 │   ├── README.md             # Index: what each file is and how to regenerate
 │   ├── figures/              # PNG figures (180 dpi, ready to \includegraphics)
 │   ├── tables/               # LaTeX tabular snippets
-│   ├── data/                 # CSV source data for every figure/table
+│   ├── data/                 # CSV source data + phase3_stats.json / phase31_stats.json
 │   ├── interesting_hands/    # Categorized per-phase story hands + EVOLUTION_STORY.md
-│   └── notes/                # Topical writeups, Nash convergence analysis, mentor walkthrough
+│   └── notes/                # Topical writeups, Nash convergence, methods checklist
 │
 ├── ── GENERATED OUTPUT ───────────────────────────────────────
 │
-├── reports/                  # All scorecards, audits, analysis dumps
+├── reports/                  # All scorecards + per-run dealer audit dumps
 │   ├── phase2_scorecard.txt              # Phase 2 lean (3 × 5000)
 │   ├── phase2_scorecard_long.txt         # Phase 2 canonical (5 × 10000)
 │   ├── phase2_unbounded_scorecard.txt              # Phase 2* unbounded weak HC (footnote)
 │   ├── phase2_unbounded_scorecard_aggressive.txt   # Phase 2* unbounded aggressive (canonical)
 │   ├── phase3_long_scorecard.txt         # Phase 3 canonical (5 × 500)
-│   └── phase31_long_scorecard.txt        # Phase 3.1 canonical (5 × 150)
-└── research_data/            # LFS chunks of runs_v3.sqlite (500k Phase 1 hands)
+│   ├── phase31_long_scorecard.txt        # Phase 3.1 canonical (5 × 150)
+│   ├── phase3_long_audit.json            # Phase 3 dealer audit dump
+│   └── phase31_long_audit.json           # Phase 3.1 dealer audit dump
+├── research_data/            # LFS-tracked SQLite databases + chunks
 │
 ├── docs/                     # Design docs, specs, schema reference
 ├── CLAUDE.md                 # Project memory for Claude Code sessions

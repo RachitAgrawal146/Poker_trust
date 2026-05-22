@@ -31,12 +31,12 @@ Phase 3 / 3.1 scorecards:
 
 ```
 # Per-seed JSON (small, no LFS issue)
-python extract_phase3_stats.py --db runs_phase3_long.sqlite   --out phase3_stats.json
-python extract_phase3_stats.py --db runs_phase31_long.sqlite  --out phase31_stats.json
+python analysis/extract_phase3_stats.py --db research_data/runs_phase3_long.sqlite   --out paper_resources/data/phase3_stats.json
+python analysis/extract_phase3_stats.py --db research_data/runs_phase31_long.sqlite  --out paper_resources/data/phase31_stats.json
 
 # Six-dimension behavioral scorecard (Phase 1 baseline format)
-PYTHONIOENCODING=utf-8 python compute_metrics.py --db runs_phase3_long.sqlite   > reports/phase3_long_scorecard.txt
-PYTHONIOENCODING=utf-8 python compute_metrics.py --db runs_phase31_long.sqlite  > reports/phase31_long_scorecard.txt
+PYTHONIOENCODING=utf-8 python analysis/compute_metrics.py --db research_data/runs_phase3_long.sqlite   > reports/phase3_long_scorecard.txt
+PYTHONIOENCODING=utf-8 python analysis/compute_metrics.py --db research_data/runs_phase31_long.sqlite  > reports/phase31_long_scorecard.txt
 ```
 
 ## `_legacy/` — historical artifacts (do not cite in the paper)

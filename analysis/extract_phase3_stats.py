@@ -2,7 +2,9 @@
 dump as JSON for cross-phase comparison.
 
 Usage:
-    python3 extract_phase3_stats.py --db runs_phase3_long.sqlite --out phase3_stats.json
+    python3 analysis/extract_phase3_stats.py \\
+        --db research_data/runs_phase3_long.sqlite \\
+        --out paper_resources/data/phase3_stats.json
 """
 from __future__ import annotations
 
@@ -12,7 +14,7 @@ import sqlite3
 import sys
 from pathlib import Path
 
-_REPO_ROOT = Path(__file__).resolve().parent
+_REPO_ROOT = Path(__file__).resolve().parent.parent
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
@@ -21,11 +23,13 @@ import numpy as np
 ARCHETYPES = ["oracle", "sentinel", "firestorm", "wall",
               "phantom", "predator", "mirror", "judge"]
 
+_DEFAULT_OUT = _REPO_ROOT / "paper_resources" / "data" / "phase3_stats.json"
+
 
 def main() -> None:
     p = argparse.ArgumentParser()
     p.add_argument("--db", required=True)
-    p.add_argument("--out", default="phase3_stats.json")
+    p.add_argument("--out", default=str(_DEFAULT_OUT))
     args = p.parse_args()
 
     c = sqlite3.connect(args.db)

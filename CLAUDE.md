@@ -158,13 +158,27 @@ docs/
   DesignCues            # dark-editorial design system
 
 analysis/
-  deep_analysis.py      # 31-section deep analysis + scorecard (the canonical
-                        # analysis script — supersedes the earlier
-                        # 9-section analyze_runs.py, which was removed)
+  deep_analysis.py            # 31-section deep analysis + scorecard
+  compute_metrics.py          # 6-dimension metrics scorecard generator (CLI)
+  compare_phases.py           # Phase 1 vs Phase 2 side-by-side report (CLI)
+  extract_phase3_stats.py     # SQLite → JSON dumper for Phase 3 / 3.1 (CLI)
+  bootstrap_ci.py             # Per-phase mean-r CIs + per-seed Fisher-z (CLI)
+  make_paper_figures.py       # Regenerate paper_resources/figures/
+  make_paper_tables.py        # Regenerate paper_resources/tables/ + CSVs
+  make_trajectory_figures.py  # Per-hand stack/trust trajectories
+  nash_convergence.py         # Cluster spread + drift + PCA visualization
+  nash_convergence_compare.py # Weak-vs-aggressive HC side-by-side
+  phase2_unbounded_compare.py # Phase 2* unbounded writeup + figures
+  unbounded_archetype_drift.py# L1 distance to canonical archetype per agent
+  find_interesting_hands.py   # SQL fingerprinting of story hands
+  curate_interesting_hands.py # Thicker wrapper around find_interesting_hands
+  extract_story_hands.py      # Phase-agnostic cross-phase story extractor
+  make_all_paper_resources.sh # Master regenerate script
+  run_phase3_scorecard.sh     # One-shot Phase 3 run + metrics scorecard
 
 tests/
-  test_trust_model.py   # Unit tests for trust primitives (run with
-                        # python3 -m pytest tests/ OR just import it)
+  test_trust_model.py   # 27 unit tests for trust primitives
+  test_engine_sidepot.py# 18 unit tests for the side-pot algorithm
 ```
 
 ## Running tests

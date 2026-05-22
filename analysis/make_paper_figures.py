@@ -407,8 +407,8 @@ def fig_behavioral_shift(outdir: Path) -> None:
 def fig_trust_vs_stack(outdir: Path) -> None:
     fig, axes = plt.subplots(1, 2, figsize=(11.0, 4.8), sharey=False)
 
-    p3_path = _REPO_ROOT / "phase3_stats.json"
-    p31_path = _REPO_ROOT / "phase31_stats.json"
+    p3_path = _REPO_ROOT / "paper_resources" / "data" / "phase3_stats.json"
+    p31_path = _REPO_ROOT / "paper_resources" / "data" / "phase31_stats.json"
     if not p3_path.exists() or not p31_path.exists():
         print(f"  skipping fig 5: {p3_path} or {p31_path} missing")
         plt.close(fig)

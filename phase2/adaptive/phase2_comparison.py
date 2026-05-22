@@ -38,7 +38,7 @@ _REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
-from compute_metrics import (
+from analysis.compute_metrics import (
     compute_context_sensitivity as _slow_cs,  # noqa: F401 (kept for parity)
     compute_nonstationarity,
     compute_opponent_adaptation as _slow_oa,  # noqa: F401

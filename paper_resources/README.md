@@ -192,9 +192,11 @@ corresponding SQLite (LFS-tracked on the user's Windows machine).
 
 All numerical values trace back to one of these sources:
 
-1. `phase3_stats.json` / `phase31_stats.json` — per-seed JSON dumped
-   from `runs_phase3_long.sqlite` / `runs_phase31_long.sqlite` via
-   `extract_phase3_stats.py`.
+1. `paper_resources/data/phase3_stats.json` /
+   `paper_resources/data/phase31_stats.json` — per-seed JSON dumped
+   from `research_data/runs_phase3_long.sqlite` /
+   `research_data/runs_phase31_long.sqlite` via
+   `analysis/extract_phase3_stats.py`.
 2. `reports/phase31_long_scorecard.txt` — canonical cross-phase
    scorecard (P1, P2, P3, P3.1).
 3. `reports/phase2_unbounded_scorecard_aggressive.txt` — canonical

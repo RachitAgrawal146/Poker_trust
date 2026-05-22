@@ -103,11 +103,11 @@ to measure whether LLM agents produce richer strategic behavior:
 
 ```bash
 # One-step: run simulation + scorecard
-./run_phase3_scorecard.sh ollama llama3.1:8b 100
+bash analysis/run_phase3_scorecard.sh ollama llama3.1:8b 100
 
 # Or manually:
 python phase3/run_phase3_chat.py --provider ollama --model llama3.1:8b --hands 500 --db phase3_run.sqlite
-python compute_metrics.py --db phase3_run.sqlite
+python analysis/compute_metrics.py --db phase3_run.sqlite
 ```
 
 Compare output against Phase 1 baselines in `docs/metrics_framework.md`:

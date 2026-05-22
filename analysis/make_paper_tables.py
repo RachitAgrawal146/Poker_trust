@@ -266,7 +266,7 @@ def table_per_seed_stacks(data_dir: Path, tex_dir: Path) -> None:
     """Emit a CSV of per-seed final stacks per archetype for both P3 and P3.1."""
     for phase, json_name in [("P3", "phase3_stats.json"),
                              ("P3.1", "phase31_stats.json")]:
-        path = _REPO_ROOT / json_name
+        path = _REPO_ROOT / "paper_resources" / "data" / json_name
         if not path.exists():
             print(f"  skipping {phase} per-seed stacks: {path} missing")
             continue

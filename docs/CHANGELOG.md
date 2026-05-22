@@ -4,6 +4,51 @@ All notable changes to this project. Organized by stage, in build
 order rather than reverse-chronological, because the research
 milestones are easier to reason about that way.
 
+## [Root layout cleanup] &mdash; 2026-05-22 (final)
+
+Reduced repo-root entries from 16 to 7 (5 ignoring dotfiles). Removed
+the &quot;For mentor review&quot; section from the README. The root now
+contains only artifacts that *must* be there for the existing import
+patterns: `config.py`, `archetype_params.py`, `preflop_lookup.py`,
+plus `CLAUDE.md` and `README.md`.
+
+Moves (all preserve git history via `git mv`):
+- `compute_metrics.py`  &rarr; `analysis/compute_metrics.py`
+- `compare_phases.py`   &rarr; `analysis/compare_phases.py`
+- `extract_phase3_stats.py` &rarr; `analysis/extract_phase3_stats.py`
+- `run_phase3_scorecard.sh` &rarr; `analysis/run_phase3_scorecard.sh`
+- `phase3_stats.json`   &rarr; `paper_resources/data/phase3_stats.json`
+- `phase31_stats.json`  &rarr; `paper_resources/data/phase31_stats.json`
+- `phase3_long_audit.json`  &rarr; `reports/phase3_long_audit.json`
+- `phase31_long_audit.json` &rarr; `reports/phase31_long_audit.json`
+- `runs_phase3_long.sqlite` (LFS pointer) &rarr;
+  `research_data/runs_phase3_long.sqlite` &mdash; consolidates with the
+  existing `research_data/runs_v3.sqlite.part_*` LFS pointers.
+
+Code reference updates:
+- `phase2/adaptive/phase2_comparison.py`: `from compute_metrics import &hellip;`
+  &rarr; `from analysis.compute_metrics import &hellip;`
+- `analysis/make_paper_figures.py` and `make_paper_tables.py`: stats
+  JSON paths now resolve to `paper_resources/data/&hellip;`.
+- `analysis/extract_phase3_stats.py`: default `--out` now points at
+  `paper_resources/data/phase3_stats.json`.
+- `analysis/run_phase3_scorecard.sh`: `cd`s to repo root and invokes
+  `python3 analysis/compute_metrics.py`.
+
+Doc updates: README.md, CLAUDE.md, paper_resources/README.md,
+reports/README.md, phase3/README.md, phase3/phase3_report.md all
+point at the new paths.
+
+Verification:
+- 27/27 trust model tests
+- 18/18 side-pot tests
+- `make_paper_figures.py` and `make_paper_tables.py` regenerate
+  cleanly with the new JSON paths
+- `analysis/compute_metrics.py`, `compare_phases.py`,
+  `extract_phase3_stats.py` all import OK from their new location
+- `phase2/adaptive/phase2_comparison.py` (the only cross-module
+  consumer of `compute_metrics`) imports OK
+
 ## [Publication-readiness pass] &mdash; 2026-05-22 (later)
 
 Four-track parallel re-audit (engine + agents + Phase 3 + analysis).
@@ -62,11 +107,11 @@ Two follow-up items closed here.
   scorecards no longer reproduce byte-for-byte and would need a fresh
   run to match.
 - Bug fixes from the May 2026 audit pass:
-  - `compare_phases.py`, `analysis/deep_analysis.py`: aggression factor
+  - `analysis/compare_phases.py`, `analysis/deep_analysis.py`: aggression factor
     SQL now uses `NULLIF(calls, 0)` instead of `CASE WHEN calls&gt;0
     THEN calls ELSE 1 END`, so AF is `NULL` (not raw bet+raise count)
     when a player never calls.
-  - `compute_metrics.py::compute_trust_manipulation`: past and future
+  - `analysis/compute_metrics.py::compute_trust_manipulation`: past and future
     windows around index `i` are now disjoint (future starts at
     `i+1`), removing an off-by-one that contaminated the TMA delta.
   - `phase3/llm_chat_agent.py`: pinned `temperature=0.0` on the
