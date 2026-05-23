@@ -1,9 +1,13 @@
 # Paper Resources
 
-Materials for writing the Polygence research paper externally
-(Overleaf). The paper itself is **not** in this repo — only the
-assets needed to write it: publication-ready figures, LaTeX table
-snippets, CSV data, curated hand transcripts, and topical writeups.
+Materials for writing the Polygence research paper. The skeleton LaTeX
+manuscript is in [`manuscript/main.tex`](manuscript/main.tex) — every
+section, figure, table, and boxed hand-example placed, captions
+drafted, `% PROSE:` markers showing what to write. The prose itself is
+the author's to fill in.
+
+Supporting assets (figures, LaTeX tables, CSV data, hand transcripts,
+topical writeups) live in the subfolders below.
 
 The headline argument the paper has to defend is a **five-tier
 ladder** of trust–profit Pearson r across agent architectures:
@@ -24,12 +28,38 @@ methodology footnote — see `notes/phase2_unbounded_writeup.md`.)
 ```
 paper_resources/
 ├── README.md                         (you are here — index of assets)
+├── manuscript/                       (LaTeX scaffold; compile via pdflatex)
+│   ├── main.tex                      Master document with every figure, table,
+│   │                                 and boxed hand placed; PROSE markers
+│   │                                 indicate where to write
+│   └── references.bib                Bibliography stub with key references
 ├── figures/                          (publication-ready PNGs, 180 dpi)
 ├── tables/                           (LaTeX `tabular` snippets)
 ├── data/                             (CSV source data behind every table)
 ├── interesting_hands/                (curated hand transcripts per phase)
 └── notes/                            (topical writeups — methodology, discussion, future work)
 ```
+
+## How to use the manuscript scaffold
+
+In Overleaf, create a new project from `manuscript/main.tex` and
+upload `manuscript/references.bib` plus the entire `figures/` and
+`tables/` directories alongside `main.tex`. Adjust `\graphicspath{}`
+in the preamble if you organize them differently. Then:
+
+1. Compile once with the recipe `pdflatex → bibtex → pdflatex → pdflatex`
+   (Overleaf's default).
+2. Search `main.tex` for `% PROSE:` to find every spot that needs
+   writing. Each marker has a bullet-list outline of the paragraph's
+   intent.
+3. Read [`notes/PROJECT_ORIENTATION.md`](notes/PROJECT_ORIENTATION.md)
+   first — it's a ground-up explanation of every component the paper
+   discusses.
+4. Keep [`notes/ARPIT_MEETING_FAQ.md`](notes/ARPIT_MEETING_FAQ.md)
+   open during writing for the anticipated questions and prepared
+   answers.
+5. When you cite something, add the entry to `references.bib` and
+   `\citep{key}` in the prose.
 
 ## Figures (20 PNGs)
 
@@ -138,6 +168,8 @@ Each note covers one self-contained topic.
 | `future_work_expanded.md` | Detailed Phase 4 roadmap (n=20 replication, multi-LLM, no-limit) — extends §7.3 |
 | `mentor_walkthrough.md` | 30-min script for the next Arpit meeting (6 beats × 5 min) |
 | `methods_disclosures.md` | Methods-section checklist (LLM temperature disclosure, CI derivation, engine side-pot change) |
+| `PROJECT_ORIENTATION.md` | **Read first.** Ground-up explanation of the whole project (assume zero memory): research question, 8 archetypes, Bayesian trust model, the four phases, metrics, money-quote hands, real-world parallels, cheat-sheet numbers |
+| `ARPIT_MEETING_FAQ.md` | Anticipated mentor questions with prepared answers. Quick-recall flashcards at the bottom |
 
 ## Suggested paper outline (where to use each asset)
 

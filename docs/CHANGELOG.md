@@ -4,6 +4,34 @@ All notable changes to this project. Organized by stage, in build
 order rather than reverse-chronological, because the research
 milestones are easier to reason about that way.
 
+## [Paper-writing scaffold + onboarding docs] &mdash; 2026-05-23
+
+Three deliverables added in preparation for the next mentor meeting
+and the actual paper-writing pass:
+
+- `paper_resources/manuscript/main.tex` &mdash; LaTeX scaffold with
+  every section, subsection, figure, table, math equation, and boxed
+  hand-example pre-placed. Each section carries a `% PROSE:` marker
+  block describing what paragraphs to write (the prose itself is the
+  author&apos;s). Compiles via standard
+  `pdflatex \rightarrow bibtex \rightarrow pdflatex^{\times 2}`
+  pipeline; produces a 12-page draft with all figures embedded.
+- `paper_resources/manuscript/references.bib` &mdash; bibliography
+  stub with the load-bearing citations (Axelrod, Nowak, Resnick &amp;
+  Zeckhauser, Bowling et al., Brown &amp; Sandholm, Bolton et al.,
+  Park et al., etc.).
+- `paper_resources/notes/PROJECT_ORIENTATION.md` &mdash; ground-up
+  project documentation (~600 lines) written assuming the reader
+  remembers nothing. Covers the research question, all eight
+  archetypes, the full Bayesian trust-model math, every phase&apos;s
+  setup and headline numbers, the metrics framework, the two
+  &quot;money quote&quot; hands, real-world parallels, and a
+  cheat-sheet of numbers to memorize.
+- `paper_resources/notes/ARPIT_MEETING_FAQ.md` &mdash; 32 anticipated
+  mentor questions with prepared answers, grouped by topic (headline
+  finding, statistical rigor, Nash falsification, methodology, trap
+  mechanism, limitations, future work) plus quick-recall flashcards.
+
 ## [Root layout cleanup] &mdash; 2026-05-22 (final)
 
 Reduced repo-root entries from 16 to 7 (5 ignoring dotfiles). Removed

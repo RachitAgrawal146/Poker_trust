@@ -1,0 +1,15 @@
+# LaTeX build artifacts — regenerable from main.tex
+*.aux
+*.log
+*.out
+*.toc
+*.lof
+*.lot
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.synctex.gz
+
+# Compiled PDF — regenerable; uncomment if you want to commit a sample
+main.pdf
