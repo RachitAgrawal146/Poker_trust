@@ -241,9 +241,8 @@
       trust and final stack falls along a four-tier ladder
       ($\rtp = -0.752 \pm 0.073$; $-0.637 \pm 0.125$;
       $-0.510 \pm 0.268$; $-0.094 \pm 0.301$); the 95\% bootstrap
-      interval for the final tier is $[-0.32, +0.20]$, which is
-      consistent with both a fully neutralized relationship and a
-      moderate residual negative correlation. A sub-experiment with
+      interval for the final tier is $[-0.32, +0.20]$, consistent
+      with substantial but not necessarily complete attenuation. A sub-experiment with
       unbounded hill-climbing at $11\times$ greater parameter drift
       shifts the correlation by only $+0.028$, evidence against
       the hypothesis that the trap is a bound-box artifact in this
@@ -333,12 +332,14 @@ full unit hypercube and $11\times$ more parameter drift fails to
 close the trap and yields divergent rather than convergent
 trajectories in 36-dimensional parameter space---preliminary
 evidence that the trap is not a bound-box artifact in this
-simulation. \textit{Third}, by stipulating three archetypes with
-identical mean parameters we construct a controlled demonstration
-of the identifiability floor that any observation-based
-classifier faces in the presence of indistinguishable types; the
-extent to which this floor binds in realistic type spaces is
-left to future work.
+simulation. \textit{Third}, we provide a controlled testbed in which
+inter-archetype distance is an explicit design variable; in the
+present paper we set that distance to zero for three archetypes as
+a sanity check, which establishes the trivial identifiability floor
+at $\log_2(3)$ bits. How rapidly classification accuracy degrades
+as the distance shrinks toward zero in more realistic type spaces
+is a methodological direction the present testbed is designed to
+support but does not itself answer.
 
 % =============================================================================
 \section{Background}
@@ -357,35 +358,45 @@ multi-agent settings with richer action spaces---a point we return
 to in the discussion when we report that our Tit-for-Tat analogue
 (\arch{Mirror}) finishes sixth of eight in economic ordering.
 
-\subsection{Bayesian opponent modeling}
+\subsection{Bayesian opponent modeling and exploitation}
 Bayesian opponent modeling in poker has a long history, beginning
-with Billings et al.\ on the Loki and Poki systems \citep{billings1998opponent} and
-continuing through the solution of heads-up limit Hold'em
-\citep{bowling2015heads} and the superhuman performance of Libratus
-and Pluribus in no-limit Hold'em
-\citep{brown2018superhuman,brown2019superhuman}. This body of work is concerned
-with optimal play against a single opponent or in heads-up zero-sum
-settings. Our work uses poker as a controlled testbed for how the
-underlying type-inference machinery interacts with multi-agent
-reputation dynamics, not as a benchmark to solve.
+with Billings et al.\ on the Loki and Poki systems
+\citep{billings1998opponent}, formalized as Bayesian type inference
+by Southey et al.\ \citep{southey2005bayes}, and extended to the
+question of \textit{safe} opponent exploitation by Ganzfried and
+Sandholm \citep{ganzfried2015safe}. Parallel work on Nash-
+equilibrium computation produced the solution of heads-up limit
+Hold'em \citep{bowling2015heads} and the superhuman performance of
+Libratus and Pluribus in no-limit Hold'em
+\citep{brown2018superhuman,brown2019superhuman}. This body of work
+is concerned with optimal or safely-exploitative play against a
+single opponent or in heads-up zero-sum settings. Our work uses
+poker as a controlled testbed for how the underlying type-inference
+machinery interacts with multi-agent reputation dynamics, rather
+than as a benchmark to solve.
 
 \subsection{Reputation in economics}
 Reputation in economics has been studied empirically by Resnick and
 Zeckhauser \citep{resnick2002trust} and Bolton, Katok, and Ockenfels
-\citep{bolton2004effective}, who document what is sometimes called the
-\textit{transparency paradox}: agents with perfect, easily-readable
-reputations earn lower margins because buyers correctly infer that
-they will never risk those reputations. Our simulation provides a
-controlled generative analogue of this empirical phenomenon.
+\citep{bolton2004effective}, who document what is sometimes called
+the \textit{transparency paradox}: agents with perfect, easily-
+readable reputations earn lower margins because buyers correctly
+infer that they will never risk those reputations. A parallel
+mechanism in financial market microstructure---adverse selection
+against predictable market-makers \citep{glosten1985bid}---produces
+the same general pattern, though through information asymmetry
+rather than reputation per se. Our simulation provides a controlled
+generative analogue of these empirical findings.
 
 \subsection{LLM agents in strategic settings}
-A more recent line of work asks whether large language models behave
-strategically when deployed as agents in adversarial settings
-\citep{park2023generative}. The open question is whether LLMs invent strategy
-when given a description of strategy or merely imitate the textual
-form of that description. Our contrast between Phase 3 (LLM with
-personality spec only) and Phase 3.1 (LLM with reasoning
-scaffolding) is designed to test this distinction.
+A more recent line of work asks whether large language models
+behave strategically when deployed as agents in adversarial or
+benchmark settings \citep{park2023generative,liu2024agentbench}.
+A core open question is whether LLMs invent strategy when given a
+description of strategy or merely imitate the textual form of that
+description. Our contrast between Phase 3 (LLM with personality
+spec only) and Phase 3.1 (LLM with reasoning scaffolding) is
+designed to test this distinction directly.
 
 \subsection{Poker as a testbed}
 Poker is a canonical incomplete-information domain \citep{vonneumann1944theory,harsanyi1967games}
@@ -579,10 +590,16 @@ eight archetypes ($n = 8$ paired observations per seed). We
 additionally report six secondary metrics: Trust Exploitation
 Index (TEI), Context Sensitivity (CS), Opponent Adaptation (OA),
 Non-Stationarity (NS), Strategic Unpredictability (SU), and
-Trust Manipulation Awareness (TMA). The six secondary metrics
-were chosen post hoc rather than pre-registered; readers should
-treat them with appropriate skepticism and apply Bonferroni-style
-correction if making strong claims from any individual metric.
+Trust Manipulation Awareness (TMA). TMA is the correlation between
+an agent's rolling trust delta and its rolling aggression delta;
+positive values capture the pattern of \textit{building} trust
+through cooperative early play and subsequently \textit{exploiting}
+that trust with higher aggression, an interaction we refer to as
+``trust farming'' in the captions and discussion. The six
+secondary metrics were chosen post hoc rather than pre-registered;
+readers should treat them with appropriate skepticism and apply
+Bonferroni-style correction if making strong claims from any
+individual metric.
 Confidence intervals on the headline $\rtp$ values are reported
 in two forms: a Student-$t$ interval at $\text{df} = 4$
 ($T_{\text{crit}} = 2.776$) and a non-parametric percentile
@@ -746,7 +763,7 @@ rises from ${\sim}100$--$200$ chips in Phases 1--3 to 280 in
 Phase 3.1; rebuy count drops from ${\sim}9.4$ per seed to 0,
 consistent with the rank-order claim above. The full per-archetype
 economic ordering is shown in Fig.~\ref{fig:economic-inversion}
-and Tables~\ref{tab:archetype-p31}, \ref{tab:econ-inversion}.
+and Table~\ref{tab:archetype-p31}.
 
 \begin{figure*}[!t]
   \centering
@@ -762,7 +779,9 @@ and Tables~\ref{tab:archetype-p31}, \ref{tab:econ-inversion}.
 
 \input{../tables/per_archetype_p31.tex}
 
-\input{../tables/economic_inversion.tex}
+% Table 4 (economic_inversion.tex) cut as redundant with Table 3's
+% Rank P3 / Rank P3.1 / Delta columns. The full per-archetype table
+% above carries the rank-shift information.
 
 Four of six secondary metric targets are met in Phase 3.1 (vs.\
 two of six in Phase 3). Strategic Unpredictability rises from

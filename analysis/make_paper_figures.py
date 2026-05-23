@@ -132,35 +132,50 @@ def _save(fig: plt.Figure, outdir: Path, name: str) -> None:
 # ---------------------------------------------------------------------------
 
 def fig_four_tier_ladder(outdir: Path) -> None:
-    means = [np.mean(R_BY_PHASE[p]) for p in PHASE_ORDER]
-    stds = [np.std(R_BY_PHASE[p]) for p in PHASE_ORDER]
+    means = [float(np.mean(R_BY_PHASE[p])) for p in PHASE_ORDER]
     colors = [PHASE_COLORS[p] for p in PHASE_ORDER]
+    # Bootstrap percentile CI on the mean (10,000 resamples, fixed seed).
+    rng = np.random.default_rng(137)
+    ci_lo, ci_hi = [], []
+    for p in PHASE_ORDER:
+        arr = np.asarray(R_BY_PHASE[p], dtype=float)
+        idx = rng.integers(0, len(arr), size=(10_000, len(arr)))
+        boots = arr[idx].mean(axis=1)
+        lo, hi = np.percentile(boots, [2.5, 97.5])
+        ci_lo.append(float(lo))
+        ci_hi.append(float(hi))
+    err_lo = [m - lo for m, lo in zip(means, ci_lo)]
+    err_hi = [hi - m for m, hi in zip(means, ci_hi)]
 
     fig, ax = plt.subplots(figsize=(8.5, 5.0))
-    bars = ax.bar(
-        range(len(PHASE_ORDER)), means, yerr=stds,
+    ax.bar(
+        range(len(PHASE_ORDER)), means,
+        yerr=[err_lo, err_hi],
         color=colors, edgecolor="black", linewidth=0.8,
         capsize=6, error_kw={"linewidth": 1.0, "ecolor": "#222"},
     )
     ax.axhline(0, color="black", linewidth=0.8, linestyle="-")
     ax.axhline(-1.0, color="grey", linewidth=0.4, linestyle=":")
 
-    for i, (m, s) in enumerate(zip(means, stds)):
+    for i, (m, lo, hi) in enumerate(zip(means, ci_lo, ci_hi)):
         offset = -0.10 if m < 0 else 0.05
-        ax.text(i, m + offset, f"r = {m:+.3f}\n(σ = {s:.3f})",
+        ax.text(i, m + offset,
+                f"r = {m:+.3f}\n95% CI [{lo:+.2f}, {hi:+.2f}]",
                 ha="center", va="top" if m < 0 else "bottom",
-                fontsize=10, fontweight="bold")
+                fontsize=9.5, fontweight="bold")
 
     ax.set_xticks(range(len(PHASE_ORDER)))
     ax.set_xticklabels(PHASE_ORDER, fontsize=10)
     ax.set_ylabel("Trust-profit Pearson r\n(mean across 5 seeds)", fontsize=11)
-    ax.set_title("The Four-Tier Trap Ladder: Reasoning Breaks the Anti-Correlation",
+    ax.set_title("Trust-Profit r Across Four Agent Architectures",
                  fontsize=12)
-    ax.set_ylim(-1.05, 0.30)
+    ax.set_ylim(-1.05, 0.40)
 
     fig.text(0.99, -0.02,
-             "Lower (more negative) = more anti-correlation between trust and profit.\n"
-             "Phase 3.1 (r = -0.094) is statistically indistinguishable from zero at n=5.",
+             "Error bars: 95% percentile bootstrap CI on the mean "
+             "(10,000 resamples, n=5 seeds).\n"
+             "Phase 3.1 CI contains zero AND moderate negative correlations; "
+             "n=20 replication needed.",
              ha="right", va="top", fontsize=8.5, color="#555", style="italic")
 
     fig.tight_layout()
@@ -185,32 +200,44 @@ def fig_five_tier_ladder(outdir: Path) -> None:
         R_BY_PHASE["Phase 3.1\nLLM + reasoning"],
     ]
     means = [float(np.mean(rs)) for rs in rs_lists]
-    stds = [float(np.std(rs)) for rs in rs_lists]
+    # Bootstrap percentile CI on the mean (10,000 resamples, fixed seed).
+    rng = np.random.default_rng(137)
+    ci_lo, ci_hi = [], []
+    for rs in rs_lists:
+        arr = np.asarray(rs, dtype=float)
+        idx = rng.integers(0, len(arr), size=(10_000, len(arr)))
+        boots = arr[idx].mean(axis=1)
+        lo, hi = np.percentile(boots, [2.5, 97.5])
+        ci_lo.append(float(lo))
+        ci_hi.append(float(hi))
+    err_lo = [m - lo for m, lo in zip(means, ci_lo)]
+    err_hi = [hi - m for m, hi in zip(means, ci_hi)]
     colors = ["#8B0000", "#C0392B", "#600000",  # P2-unbounded gets darker red
               "#E67E22", "#1B9E77"]
 
     fig, ax = plt.subplots(figsize=(10.0, 5.2))
-    ax.bar(range(len(labels)), means, yerr=stds, color=colors,
+    ax.bar(range(len(labels)), means,
+           yerr=[err_lo, err_hi],
+           color=colors,
            edgecolor="black", linewidth=0.8, capsize=6,
            error_kw={"linewidth": 1.0, "ecolor": "#222"})
     ax.axhline(0, color="black", linewidth=0.8)
-    for i, (m, s) in enumerate(zip(means, stds)):
+    for i, (m, lo, hi) in enumerate(zip(means, ci_lo, ci_hi)):
         offset = -0.10 if m < 0 else 0.05
-        ax.text(i, m + offset, f"r = {m:+.3f}\n(σ = {s:.3f})",
+        ax.text(i, m + offset,
+                f"r = {m:+.3f}\n95% CI [{lo:+.2f}, {hi:+.2f}]",
                 ha="center", va="top" if m < 0 else "bottom",
-                fontsize=9.5, fontweight="bold")
+                fontsize=9.0, fontweight="bold")
     ax.set_xticks(range(len(labels)))
     ax.set_xticklabels(labels, fontsize=9.5)
     ax.set_ylabel("Trust-profit Pearson r (mean across 5 seeds)")
-    ax.set_title("Trust-Profit r With the Unbounded Sub-Experiment",
+    ax.set_title("Trust-Profit r Across Five Agent Architectures",
                  fontsize=12)
-    ax.set_ylim(-1.05, 0.30)
+    ax.set_ylim(-1.05, 0.45)
 
     fig.text(0.99, -0.02,
-             "Phase 2* (aggressive unbounded HC, [0,1] freedom) sits at r = -0.609 with "
-             "high per-seed variance (σ = 0.221).\n"
-             "Agents move 11x more than weak HC but DIVERGE rather than converge — "
-             "the trust trap is robust to optimization strength.",
+             "Error bars: 95% percentile bootstrap CI on the mean (10,000 resamples, n=5 seeds).\n"
+             "Phase 3.1 CI [-0.32, +0.20] contains zero AND moderate negative correlations.",
              ha="right", va="top", fontsize=8.5, color="#555", style="italic")
     fig.tight_layout()
     _save(fig, outdir, "01b_five_tier_ladder_with_unbounded.png")
