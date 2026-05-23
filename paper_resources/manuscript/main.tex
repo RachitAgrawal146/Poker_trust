@@ -222,35 +222,38 @@
       \vspace{4pt}\noindent{\sffamily\bfseries\fontsize{10}{12}\selectfont ABSTRACT\par}\vspace{4pt}
       \sffamily\bfseries\fontsize{9.5}{13}\selectfont
       Reputation systems that infer trustworthiness from observed
-      behavior are ubiquitous in online marketplaces, social
-      networks, and financial platforms, yet whether such systems
-      inherently reward cooperative behavior or create exploitable
-      dynamics that favor aggression remains an open question. We
-      investigate this question in a controlled simulation of
-      8-player Limit Texas Hold'em poker in which every agent
-      maintains a Bayesian posterior over the archetype of every
-      other agent and updates it after each observed action. We
-      deploy four progressively more capable agent architectures
-      against the same game environment and trust posterior: frozen
-      rule-based archetypes, bounded online hill-climbing,
-      large-language-model role-players, and language models
-      augmented with chain-of-thought, per-opponent memory, and
-      self-updated strategy notes. Across 5 random seeds per phase,
-      the Pearson correlation between trust and economic performance
-      forms a four-tier ladder: $-0.752$, $-0.637$, $-0.510$, and
-      $-0.094$. The final tier is statistically indistinguishable
-      from zero; in two of five seeds the relationship inverts to a
-      positive correlation, and the most-trusted archetype climbs
-      from last to first in chip ordering. A sub-experiment that
-      strips the hill-climber of its archetype bounds and increases
-      its step size fivefold falsifies the hypothesis that the trap
-      is a bound-box artifact: agents diverge in 36-dimensional
-      parameter space rather than converging to a common profile.
-      We conclude that observation-based reputation inherently
-      rewards exploitation in the absence of external enforcement,
-      but that the dynamic is not structural at the level of agent
-      capability---it dissolves once agents can reason about the
-      reputation system itself.
+      behavior are widespread in online marketplaces, social
+      networks, and financial platforms, where prior empirical work
+      \citep{resnick2002trust,bolton2004effective} documents a
+      \textit{transparency paradox}: agents with perfectly visible
+      cooperative records sometimes earn lower returns than agents
+      with imperfect records. We provide a controlled generative
+      test of this dynamic in a simulation of 8-player fixed-limit
+      Texas Hold'em poker in which every agent maintains a
+      categorical posterior over the archetype of every other
+      agent and updates it after each observed action. We deploy
+      four agent architectures against the same game environment
+      and posterior: frozen rule-based archetypes, bounded online
+      hill-climbing, large-language-model role-players, and
+      language models augmented with chain-of-thought,
+      per-opponent memory, and self-updated strategy notes. Across
+      5 random seeds per phase, the Pearson correlation between
+      trust and final stack falls along a four-tier ladder
+      ($\rtp = -0.752 \pm 0.073$; $-0.637 \pm 0.125$;
+      $-0.510 \pm 0.268$; $-0.094 \pm 0.301$); the 95\% bootstrap
+      interval for the final tier is $[-0.32, +0.20]$, which is
+      consistent with both a fully neutralized relationship and a
+      moderate residual negative correlation. A sub-experiment with
+      unbounded hill-climbing at $11\times$ greater parameter drift
+      shifts the correlation by only $+0.028$, evidence against
+      the hypothesis that the trap is a bound-box artifact in this
+      simulation. We interpret the results as preliminary evidence
+      that, in our zero-sum testbed, observation-based reputation
+      rewards exploitation under simple agent policies and that
+      reasoning scaffolds substantially attenuate the effect;
+      whether the attenuation reflects a structural property of
+      reasoning or a small-sample artifact of the Phase 3.1 run
+      ($n=5$ seeds, 150 hands/seed) is left to a larger replication.
       \vspace{4pt}
     \end{minipage}}
     \vspace{18pt}
@@ -276,26 +279,25 @@ history, a social network ranks contributors by past engagement. The
 mechanism now mediates the default operating dynamic of most digital
 commerce.
 
-A critical question is whether these observation-based systems
-inherently reward the behavior they are designed to detect. If
-trustworthy behavior produces high trust scores and high trust
-scores produce better outcomes, the system functions as intended.
-But if trustworthy behavior is \textit{costly}---if its
-predictability becomes a strategic liability that opponents can
-exploit---then reputation systems may inadvertently penalize the
-cooperative behavior they are meant to incentivize. The empirical
-record is suggestive but observational: eBay sellers with perfect
-feedback scores earn lower margins than sellers with slightly
-imperfect records \textit{(1)}, predictable market-makers face
-adverse selection, and content moderation systems struggle with the
-moderate middle of the behavioral distribution.
+A long-standing empirical question is whether these
+observation-based systems reward the behavior they are designed to
+detect. Prior work documents a \textit{transparency paradox} in
+several real-world domains \citep{resnick2002trust,
+bolton2004effective}: eBay sellers with perfect feedback scores
+sometimes earn lower margins than sellers with slightly imperfect
+records, predictable market-makers face adverse selection, and
+content moderation systems struggle with the moderate middle of the
+behavioral distribution. These results are observational, drawn
+from datasets in which agent design is not under the experimenter's
+control. We complement that literature with a controlled
+generative test in which agent capability is the manipulated
+variable and the reputation system itself is held fixed.
 
-This paper investigates the question in a controlled, generative
-setting. We construct an 8-player Limit Texas Hold'em simulation in
-which every agent maintains a Bayesian posterior over the type of
-every other agent, deploy four progressively more capable agent
-architectures against the same fixed environment, and measure the
-correlation between trust and economic performance.
+We construct an 8-player Limit Texas Hold'em simulation in which
+every agent maintains a categorical posterior over the type of
+every other agent, deploy four agent architectures against the
+same fixed environment, and measure the correlation between trust
+and economic performance.
 
 \begin{figure*}[!t]
   \centering
@@ -313,27 +315,30 @@ correlation between trust and economic performance.
 
 \input{../tables/headline_ladder.tex}
 
-The research question is whether, in repeated strategic
-interactions with incomplete information, observation-based trust
-inference inherently rewards exploitation over cooperation, and
-whether the dynamic is a structural property of the interaction
-system or an artifact of agent design.
+Our research question is whether, in our zero-sum testbed,
+observation-based trust inference rewards exploitation over
+cooperation, and whether the size of this effect depends on agent
+architecture.
 
-The contributions of the paper are six. \textit{First}, we
-demonstrate a strong negative correlation between trust and
-economic performance under frozen rule-based agents
-($\rtp = -0.752$). \textit{Second}, the correlation persists under
-bounded online optimization. \textit{Third}, it persists under
-unbounded optimization with $11\times$ more parameter drift,
-falsifying the hypothesis that the trap is a bound-box artifact.
-\textit{Fourth}, language-model agents given personality specs
-faithfully role-play those specs but do not spontaneously develop
-opponent-conditional or unpredictable strategy. \textit{Fifth},
-language models augmented with chain-of-thought, per-opponent
-memory, and self-updated strategy notes break the correlation to
-$\rtp = -0.094$, statistically indistinguishable from zero.
-\textit{Sixth}, we identify an information-theoretic classification
-ceiling that limits any observation-based reputation system.
+The contributions of the paper are three.
+\textit{First}, we report a controlled trust--profit ladder
+across four agent architectures: $\rtp$ falls from $-0.752$ under
+frozen rule-based agents to $-0.094$ under language-model agents
+augmented with reasoning scaffolds (Sec.~\ref{sec:results}). The
+phase ladder is robust across all five seeds in rank order but
+the absolute size of the Phase 3.1 effect carries wide uncertainty
+($n=5$, 150 hands/seed). \textit{Second}, a sub-experiment
+(Phase~2$^{*}$) in which the bounded hill-climber is given the
+full unit hypercube and $11\times$ more parameter drift fails to
+close the trap and yields divergent rather than convergent
+trajectories in 36-dimensional parameter space---preliminary
+evidence that the trap is not a bound-box artifact in this
+simulation. \textit{Third}, by stipulating three archetypes with
+identical mean parameters we construct a controlled demonstration
+of the identifiability floor that any observation-based
+classifier faces in the presence of indistinguishable types; the
+extent to which this floor binds in realistic type spaces is
+left to future work.
 
 % =============================================================================
 \section{Background}
@@ -342,9 +347,9 @@ ceiling that limits any observation-based reputation system.
 \subsection{Cooperation in repeated games}
 Research on cooperation in repeated games has been dominated by the
 Iterated Prisoner's Dilemma (IPD) and its evolutionary
-generalizations. Axelrod's tournaments \textit{(4)} established that
+generalizations. Axelrod's tournaments \citep{axelrod1984evolution} established that
 Tit-for-Tat is robust in pairwise interactions, and Nowak's five
-rules \textit{(5)} formalize the conditions under which cooperative
+rules \citep{nowak2006five} formalize the conditions under which cooperative
 strategies invade defector populations. These findings rest on
 pairwise interaction and on payoff structures that concentrate
 defection costs on the defector. Neither property is preserved in
@@ -354,10 +359,11 @@ to in the discussion when we report that our Tit-for-Tat analogue
 
 \subsection{Bayesian opponent modeling}
 Bayesian opponent modeling in poker has a long history, beginning
-with Billings et al.\ on the Loki and Poki systems \textit{(6)} and
+with Billings et al.\ on the Loki and Poki systems \citep{billings1998opponent} and
 continuing through the solution of heads-up limit Hold'em
-\textit{(7)} and the superhuman performance of Libratus and Pluribus
-in no-limit Hold'em \textit{(8, 9)}. This body of work is concerned
+\citep{bowling2015heads} and the superhuman performance of Libratus
+and Pluribus in no-limit Hold'em
+\citep{brown2018superhuman,brown2019superhuman}. This body of work is concerned
 with optimal play against a single opponent or in heads-up zero-sum
 settings. Our work uses poker as a controlled testbed for how the
 underlying type-inference machinery interacts with multi-agent
@@ -365,8 +371,8 @@ reputation dynamics, not as a benchmark to solve.
 
 \subsection{Reputation in economics}
 Reputation in economics has been studied empirically by Resnick and
-Zeckhauser \textit{(1)} and Bolton, Katok, and Ockenfels
-\textit{(10)}, who document what is sometimes called the
+Zeckhauser \citep{resnick2002trust} and Bolton, Katok, and Ockenfels
+\citep{bolton2004effective}, who document what is sometimes called the
 \textit{transparency paradox}: agents with perfect, easily-readable
 reputations earn lower margins because buyers correctly infer that
 they will never risk those reputations. Our simulation provides a
@@ -375,14 +381,14 @@ controlled generative analogue of this empirical phenomenon.
 \subsection{LLM agents in strategic settings}
 A more recent line of work asks whether large language models behave
 strategically when deployed as agents in adversarial settings
-\textit{(11)}. The open question is whether LLMs invent strategy
+\citep{park2023generative}. The open question is whether LLMs invent strategy
 when given a description of strategy or merely imitate the textual
 form of that description. Our contrast between Phase 3 (LLM with
 personality spec only) and Phase 3.1 (LLM with reasoning
 scaffolding) is designed to test this distinction.
 
 \subsection{Poker as a testbed}
-Poker is a canonical incomplete-information domain \textit{(2, 3)}
+Poker is a canonical incomplete-information domain \citep{vonneumann1944theory,harsanyi1967games}
 combining four properties that isolate trust dynamics from
 confounders: stochastic hidden information, sequential decisions
 with public state, a rich action space, and explicit chip-
@@ -474,10 +480,10 @@ the paper we use the colored bold form of each archetype's name
 \arch{Phantom}, \arch{Predator}, \arch{Mirror}, \arch{Judge}) so
 that the reader can track which agent is being discussed.
 
-\subsection{Bayesian trust model}
-Every agent maintains a length-8 categorical posterior over the
+\subsection{Categorical posterior over types}
+Every agent maintains a length-8 categorical distribution over the
 archetype of every other seat. After agent $i$ observes seat $j$
-take action $a$ in betting round $r$, the posterior is updated as
+take action $a$ in betting round $r$, the distribution is updated as
 \begin{equation}
   p_{i\to j}(t)\,\propto\,
     \bigl[(1-\varepsilon)\,L(a\mid t,r)
@@ -488,7 +494,14 @@ take action $a$ in betting round $r$, the posterior is updated as
 where $L(a\mid t, r)$ is a precomputed likelihood that a type-$t$
 agent emits action $a$ in round $r$, $\mathcal{T}$ is the set of
 eight archetypes, and $\varepsilon = 0.05$ is a noise floor
-preventing any type from being fully eliminated. Between hands,
+preventing any type from being fully eliminated. We characterize
+Eq.~\ref{eq:posterior} as Bayes-flavoured rather than strictly
+Bayesian: the noise floor is embedded in the likelihood
+(equivalent to a uniform contamination model), the likelihood
+table is computed from each archetype's analytic policy and is
+therefore correctly specified by construction, and the
+between-hand shrinkage in Eq.~\ref{eq:decay} is a forgetting
+heuristic rather than a posterior update. Between hands,
 posteriors are shrunk toward the uniform prior:
 \begin{equation}
   p_{i\to j} \;\leftarrow\;
@@ -503,7 +516,19 @@ hands. The trust score, our primary dependent variable, is
     \sum_{t\in\mathcal{T}}\, p_{i\to j}(t)\, h(t),
   \label{eq:trust}
 \end{equation}
-where $h(t)\in[0,1]$ is the archetype's honesty score.
+where $h(t) = P(\text{bet}\mid\text{strong})\cdot
+(1-P(\text{bluff}\mid\text{weak}))$ is the archetype's honesty
+score. This functional form is one of several plausible
+definitions (alternatives include the mean of the two
+probabilities or an entropy-based measure); we report results
+under the product form throughout and note in the limitations
+that the trust--profit correlation is mechanically anchored on
+this choice. \textit{Three archetypes (\arch{Sentinel},
+\arch{Mirror} in its default state, \arch{Judge} in its
+cooperative state) are intentionally stipulated with identical
+mean parameters to provide a controlled demonstration of
+identifiability under indistinguishable types}; this is a design
+choice, not a finding.
 
 \subsection{Four agent architectures}
 The four phases differ only in the implementation of each agent's
@@ -526,38 +551,69 @@ $\delta = 0.15$ with a 50-hand evaluation window.
 
 \subsection{Experimental design}
 All four phases use the same five random seeds (42, 137, 256, 512,
-1024) and the same eight archetype assignments. Phases 1, 2, and
-2$^{*}$ each play 10\,000 hands per seed. Phase 3 plays 500 hands
-per seed (43\,943 total LLM calls, \$33.10). Phase 3.1 plays 150
-hands per seed (11\,953 calls, $\sim$\$17). The Phase 3 and Phase
-3.1 canonical datasets were generated under the Anthropic SDK's
-default sampling temperature of 1.0; the codebase now pins
-temperature to 0.0 for deterministic re-runs.
+1024) and the same eight archetype assignments. \textit{Hand counts
+differ across phases by an order of magnitude:} Phases 1, 2, and
+2$^{*}$ each play 10\,000 hands per seed; Phase 3 plays 500 hands
+per seed (43\,943 total LLM calls, \$33.10); Phase 3.1 plays 150
+hands per seed (11\,953 calls, ${\sim}\$17$). This asymmetry is
+imposed by API cost and is a known confound in cross-phase
+comparisons of per-seed $\rtp$: even under an identical underlying
+trust--profit relationship, the per-seed correlation in Phase 3.1
+would be measured on a noisier $n$ and would be attenuated in
+magnitude. The reported $\Delta\rtp$ between phases therefore mixes
+a capability effect with a statistical-power effect, an issue we
+address explicitly in the Discussion (\S\,Limitations) and which a
+hand-count-matched replication would resolve.
+
+\textit{Sampling temperature.} The canonical Phase 3 and Phase 3.1
+datasets were generated under the Anthropic SDK's default
+temperature of 1.0; the codebase now pins temperature to 0.0 for
+deterministic re-runs. Headline numbers throughout this paper are
+from the temperature-1.0 runs. The full disclosure of this
+methodological caveat is in the Limitations.
 
 \subsection{Metrics}
 The primary metric is the per-seed Pearson correlation $\rtp$
 between mean trust score (final hand) and final stack across the
-eight archetypes. We additionally report six secondary metrics:
-Trust Exploitation Index (TEI), Context Sensitivity (CS), Opponent
-Adaptation (OA), Non-Stationarity (NS), Strategic Unpredictability
-(SU), and Trust Manipulation Awareness (TMA). Confidence intervals
-on headline $\rtp$ values are reported in two forms: a Student-$t$
-interval at $\text{df}=4$ and a non-parametric percentile bootstrap
-with 10\,000 resamples.
+eight archetypes ($n = 8$ paired observations per seed). We
+additionally report six secondary metrics: Trust Exploitation
+Index (TEI), Context Sensitivity (CS), Opponent Adaptation (OA),
+Non-Stationarity (NS), Strategic Unpredictability (SU), and
+Trust Manipulation Awareness (TMA). The six secondary metrics
+were chosen post hoc rather than pre-registered; readers should
+treat them with appropriate skepticism and apply Bonferroni-style
+correction if making strong claims from any individual metric.
+Confidence intervals on the headline $\rtp$ values are reported
+in two forms: a Student-$t$ interval at $\text{df} = 4$
+($T_{\text{crit}} = 2.776$) and a non-parametric percentile
+bootstrap with 10\,000 resamples. The bootstrap on $n = 5$ seeds
+draws from at most $\binom{2n-1}{n} = 126$ distinct combinations,
+so the 10\,000 resamples densely cover the resampling space but do
+not buy additional statistical power beyond the five underlying
+observations.
 
 % =============================================================================
-\section{Results}
+\section{Results}\label{sec:results}
 % =============================================================================
 
 \subsection{The four-tier ladder}
 Across the four canonical agent architectures, the Pearson
-correlation between trust and stack follows the four-tier ladder of
-Fig.~\ref{fig:headline}, tabulated in Table~1. Phase 1 produces
-$\rtp = -0.752 \pm 0.073$; Phase 2 softens to $-0.637 \pm 0.125$;
-Phase 2$^{*}$ to $-0.609 \pm 0.221$; Phase 3 to $-0.510 \pm 0.268$;
-Phase 3.1 to $-0.094 \pm 0.301$. The 95\% Student-$t$ interval on
-the Phase 3.1 mean is $[-0.512, +0.323]$; the bootstrap interval is
-$[-0.324, +0.203]$. Both contain zero.
+correlation between trust and stack follows the four-tier ladder
+of Fig.~\ref{fig:headline}, tabulated in
+Table~\ref{tab:ladder}. Phase 1 produces $\rtp = -0.752 \pm 0.073$;
+Phase 2 softens to $-0.637 \pm 0.125$; Phase 2$^{*}$ to $-0.609 \pm
+0.221$; Phase 3 to $-0.510 \pm 0.268$; Phase 3.1 to $-0.094 \pm
+0.301$. The 95\% Student-$t$ interval on the Phase 3.1 mean is
+$[-0.512, +0.323]$; the bootstrap interval is $[-0.324, +0.203]$.
+Both intervals contain zero \textit{and} a moderate negative
+correlation in the same range as the bounded Phase 2 effect; the
+present data are therefore consistent with substantial attenuation
+of the trust--profit correlation under reasoning scaffolds but do
+not, at $n=5$ seeds, establish that the correlation is zero. We
+report the rank ordering of the four phases (P1 $\to$ P2 $\to$
+P3 $\to$ P3.1 by absolute size of $\rtp$) as the most robust
+finding; the absolute size of each step carries the
+corresponding interval-level uncertainty.
 
 \subsection{Phase 1 numbers}
 Phase 1 produces $\rtp = -0.752$ averaged across the five canonical
@@ -662,7 +718,7 @@ $\{-0.884, -0.525, -0.171, -0.712, -0.259\}$. The shift from Phase
 2 ($\Delta\rtp = +0.127$) matches the Phase 1 $\to$ Phase 2 step in
 magnitude. Per-seed variance is roughly twice Phase 2's (0.268 vs
 0.125). Four of six behavioral-dimension targets are missed; three
-move \textit{backward} relative to Phases 1 and 2 (Table~2): CS
+move \textit{backward} relative to Phases 1 and 2 (Table~\ref{tab:behavioral-shift}): CS
 drops from $0.142$ to $0.076$, NS collapses to $0$, and SU falls
 from $1.88$ to $1.19$ bits.
 
@@ -670,15 +726,27 @@ from $1.88$ to $1.19$ bits.
 
 \subsection{Phase 3.1 numbers (LLM with reasoning scaffolding)}
 Phase 3.1 produces $\rtp = -0.094 \pm 0.301$ with per-seed values
-$\{-0.289, -0.338, -0.327, +0.047, +0.435\}$. The shift from Phase
-3 ($\Delta\rtp = +0.416$) is more than three times the size of any
-prior phase transition. Two of five seeds produce \textit{positive}
-per-seed correlations ($+0.047$ at seed 512 and $+0.435$ at seed
-1024); in no prior phase did any individual seed produce a positive
-$\rtp$. \arch{Wall}'s mean stack rises from $\sim$100--200 chips in
-Phases 1--3 to 280 in Phase 3.1; rebuy count drops from $\sim$9.4
-per seed to 0. The full per-archetype economic ordering is shown in
-Fig.~\ref{fig:economic-inversion} and Tables~3, 4.
+$\{-0.289, -0.338, -0.327, +0.047, +0.435\}$. The mean shift from
+Phase 3 ($\Delta\rtp = +0.416$) is the largest single step in the
+ladder, but the per-seed sample size ($n = 5$) and the 150-hand
+horizon impose substantial uncertainty: the 95\% bootstrap
+interval $[-0.32, +0.20]$ is wide enough to include moderate
+negative correlations of the kind we report under bounded Phase 2.
+Two of five seeds produce per-seed correlations greater than zero
+($+0.047$ at seed 512 and $+0.435$ at seed 1024); with $n = 8$
+archetype pairs per seed, the Fisher-$z$ interval on a per-seed
+$\rtp = +0.047$ spans roughly $[-0.7, +0.7]$, so individual
+positive seeds are not on their own evidence of inversion. The
+combined picture is most accurately summarized as: the trust--
+profit correlation under Phase 3.1 is attenuated relative to all
+prior phases at the rank-order level, but the present sample is
+underpowered to distinguish between full neutralization and a
+weakened but nonzero residual trap. \arch{Wall}'s mean stack
+rises from ${\sim}100$--$200$ chips in Phases 1--3 to 280 in
+Phase 3.1; rebuy count drops from ${\sim}9.4$ per seed to 0,
+consistent with the rank-order claim above. The full per-archetype
+economic ordering is shown in Fig.~\ref{fig:economic-inversion}
+and Tables~\ref{tab:archetype-p31}, \ref{tab:econ-inversion}.
 
 \begin{figure*}[!t]
   \centering
@@ -825,140 +893,218 @@ becomes a signal that opponents read and trade against. A low trust
 score creates strategic ambiguity that \arch{Firestorm} uses to
 dominate the table. The phenomenon parallels what economists
 studying eBay-style reputation systems have called the
-\textit{transparency paradox} \textit{(1)}.
+\textit{transparency paradox} \citep{resnick2002trust}.
 
-\subsection{Why aggression dominates in multi-agent settings}
+\subsection{Why aggression dominates in our multi-agent setting}
 \arch{Firestorm}'s dominance is at first glance inconsistent with
 canonical IPD findings, where Always-Defect is outperformed by
-Tit-for-Tat. The difference is structural: in our 8-player setting,
-the cost of \arch{Firestorm}'s frequent aggression is spread across
-seven simultaneous opponents, while in pairwise IPD a defector
-faces concentrated retaliation. \arch{Mirror}, our Tit-for-Tat
-analogue, finishes 6th of 8 in economic ordering---direct evidence
-that the canonical IPD result does not transfer to multi-agent
-settings with richer action spaces.
+Tit-for-Tat. A plausible mechanism in our setting is that
+\arch{Firestorm}'s aggression cost is spread across seven
+simultaneous opponents rather than concentrated as in pairwise
+IPD. \arch{Mirror}, our Tit-for-Tat analogue, finishes 6th of 8
+in economic ordering---suggestive but not definitive evidence
+about how the canonical IPD result generalizes (a single
+hand-crafted poker analogue is not a clean test of the IPD
+literature). We flag this as a direction for follow-up work
+rather than a conclusion.
 
-\subsection{The classification ceiling is structural}
-The finding that only 3--4 of 8 archetypes are reliably identifiable
-is not a limitation of our Bayesian model---it is a mathematical
-property of the archetype parameter space. Three archetypes
-(\arch{Sentinel}, \arch{Mirror}'s default, \arch{Judge}'s
-cooperative state) have byte-identical mean parameters under the
-spec; no observer can distinguish them regardless of algorithmic
-sophistication. The implication generalizes: any observation-based
-monitoring system---fraud detection, content moderation, credit
-scoring---will reliably classify extreme behavioral types and fail
-on the moderate middle. The ceiling is a property of the type
-space, not the inference algorithm.
+\subsection{Identifiability under indistinguishable types}
+By construction, three archetypes (\arch{Sentinel}, \arch{Mirror}'s
+default state, \arch{Judge}'s cooperative state) share byte-
+identical mean parameters; under our likelihood model, no
+observer can distinguish them regardless of algorithmic
+sophistication. We use this design choice to demonstrate the
+identifiability floor: when the type space contains genuinely
+indistinguishable members, classification accuracy is bounded
+below by the entropy of the uniform distribution over them. This
+is a definitional point, not an information-theoretic discovery
+about reputation systems in general. The interesting empirical
+question---how rapidly classification accuracy degrades as
+inter-archetype distance shrinks toward zero---requires varying
+that distance experimentally and is left to future work. Real-
+world monitoring systems (fraud detection, content moderation,
+credit scoring) face an analogous failure mode for moderately-
+behaved actors with overlapping behavioral profiles; we view that
+analogy as suggestive rather than as a direct implication of our
+result.
 
-\subsection{Why numerical optimization cannot escape the trap}
-The Phase 2 and Phase 2$^{*}$ results, taken together, refute two
-distinct hypotheses about the trap. The Phase 2 result
-($\Delta\rtp = +0.116$ with $\mathrm{OA}$ pinned at $0.0003$) shows
-that aggregate-reward optimization softens the trap but cannot
-produce per-opponent strategy by construction. The Phase 2$^{*}$
-result ($\Delta\rtp = +0.028$ with $11\times$ more parameter drift
-and divergent rather than convergent cluster dynamics) shows that
-the bound boxes are not the binding constraint.
+\subsection{Why numerical optimization did not escape the trap
+in our experiments}
+The Phase 2 and Phase 2$^{*}$ results, taken together, argue
+against two specific hypotheses about the trap. The Phase 2 result
+($\Delta\rtp = +0.116$ with $\mathrm{OA}$ pinned at $0.0003$)
+shows that aggregate-reward optimization softens the correlation
+but cannot produce per-opponent strategy by construction, since
+the hill-climber has no per-opponent parameter slot. The Phase
+2$^{*}$ result ($\Delta\rtp = +0.028$ with $11\times$ more parameter
+drift and divergent rather than convergent cluster dynamics) is
+evidence against the hypothesis that the bound boxes are the
+binding constraint, though Phase 2$^{*}$ varies three things at
+once (bounds removed, step size raised $5\times$, evaluation
+window shrunk $4\times$) and therefore does not cleanly isolate
+the parameter-space hypothesis.
 
-The non-convergence of Phase 2$^{*}$ has three structural causes.
-\textit{First}, the trust posterior is non-stationary inside each
-agent's optimization loop: with $\lambda = 0.95$, opponents take
-$\sim$70 hands to update their beliefs after an agent changes
-strategy, but the 50-hand evaluation window measures profit against
-\textit{stale} beliefs about the agent. The accept-reject signal is
-systematically contaminated by the lag. \textit{Second}, all eight
-agents climb simultaneously; each trial perturbation is evaluated
-against a joint behavior that is itself drifting, which violates the
-stationary-objective assumption local search depends on.
-\textit{Third}, axis-aligned coordinate descent in 36 dimensions is
-slow even with larger steps: joint optima---``raise more \textit{and}
-bluff more proportionally''---cannot be discovered by axis-aligned
-search.
+The non-convergence of Phase 2$^{*}$ has three plausible
+structural causes that we believe would survive any specific
+hill-climber implementation. \textit{First}, the trust posterior
+is non-stationary inside each agent's optimization loop: with
+$\lambda = 0.95$, opponents take ${\sim}70$ hands to update their
+beliefs after an agent changes strategy, but the 50-hand
+evaluation window measures profit against stale beliefs.
+\textit{Second}, all eight agents climb simultaneously, so each
+trial perturbation is evaluated against a joint behavior that is
+itself drifting. \textit{Third}, axis-aligned coordinate descent in
+36 dimensions is slow even with larger steps. A CMA-ES or
+REINFORCE optimizer with ${\sim}50\,000$ cycles would search more
+efficiently, but reasons one and two would survive any
+optimization substrate that respects the same observation contract.
 
-\subsection{Why language models alone do not break the trap}
+\subsection{Why language models alone did not break the trap
+in our experiments}
 Phase 3's result admits a specific interpretation. LLMs given
-personality specs faithfully role-play those specs without
+personality specs appear to role-play those specs without
 spontaneously inventing opponent-conditional, time-varying, or
 unpredictable strategy. The personality specs tell the agents
 \textit{what} to do but not \textit{how} to reason; absent
-reasoning support, the LLMs collapse onto a more stereotyped
-canonical interpretation of each archetype, becoming \textit{more}
-classifiable than the explicitly stochastic rule-based versions.
+reasoning support, the LLMs in our sample collapsed onto a more
+stereotyped canonical interpretation of each archetype. Three
+of four behavioral-dimension metrics moved \textit{backward}
+relative to Phases 1 and 2, consistent with this interpretation.
+The trust--profit softening in Phase 3 may therefore be produced
+by output stochasticity (temperature 1.0 in our canonical run)
+rather than by a structural change in agent behavior.
 
-\subsection{Why reasoning scaffolding breaks the trap}
-The Phase 3.1 result is evidence that the only intervention that
-breaks the trap operates at the level of agent reasoning about the
-reputation system itself. The chain-of-thought prompt allows the
-agent to express a one-step lookahead. The per-opponent memory
-gives that reasoning concrete data to condition on. The adaptive
+\subsection{Why reasoning scaffolding may have attenuated the
+trap in our experiments}
+The Phase 3.1 result is consistent with an interpretation in
+which agent reasoning about the reputation system itself
+attenuates the trust--profit correlation. The chain-of-thought
+prompt allows a one-step lookahead; the per-opponent memory gives
+that reasoning concrete data to condition on; the adaptive
 strategy notes let the agent update its prior on what is working
-against which opponent. All three scaffolds are required---ablating
-any one collapses the effect. The \arch{Wall} hand reproduced in
-Box~2 makes this concrete: \arch{Wall} reads \arch{Firestorm}'s
+against which opponent. We claim in the manuscript that all three
+scaffolds are required---this claim rests on an ablation reported
+in the supplementary validation suite, and we acknowledge the
+ablation deserves a dedicated main-text figure in a future
+revision. The \arch{Wall} hand reproduced in Box~2 illustrates the
+mechanism in a single hand: \arch{Wall} reads \arch{Firestorm}'s
 river check as a tell, recognizes that K-Q high beats
-\arch{Firestorm}'s bluffing range, and bets for value. This
-sequence is impossible for Phase 1 \arch{Wall}, unreliable for
-Phase 3 \arch{Wall}, and consistent for Phase 3.1 \arch{Wall}.
+\arch{Firestorm}'s bluffing range, and bets for value. This is a
+single illustrative case rather than confirmatory evidence about
+the rate of such reasoning moments; a distributional analysis
+across all Phase 3.1 hands is left to follow-up work.
 
-\subsection{Real-world implications}
-Three implications follow for the design of real-world reputation
-systems. \textit{Behavioral reputation alone is insufficient}:
-without external enforcement mechanisms, observation-based trust
-inference creates perverse incentives that reward exploitative
-strategies. \textit{Classification systems have inherent blind
-spots}: the identifiability ceiling guarantees that moderately-
-behaved actors are indistinguishable regardless of observation
-volume. \textit{Transparency itself can be costly}: system designs
-that increase the visibility of participant behavior may
-inadvertently harm cooperative actors by making their strategies
-predictable and exploitable.
+\subsection{Cross-domain implications (conjectural)}
+The mechanisms identified above suggest hypotheses for real-world
+reputation systems, but we emphasize that our testbed is a zero-
+sum game and the proposed mechanism (predictable cooperation is
+exploited via fold equity) has no direct analogue in positive-sum
+marketplace settings. With that caveat, three implications
+follow as conjectures for follow-up cross-domain work.
+\textit{Behavioral reputation may be insufficient} without
+external enforcement. \textit{Classification systems may have
+blind spots} for moderately-behaved actors with overlapping
+profiles. \textit{Transparency may be costly} when it makes
+cooperative strategies predictable. Each of these claims would
+require validation in a positive-sum domain to support more than
+analogical inference.
 
 \subsection{Limitations}
-Six design choices constrain generalizability. \textit{First}, our
-Phase 2 hill-climber uses bounded coordinate descent; CMA-ES,
-REINFORCE, or population-based training could produce different
-quantitative softening, though we do not believe they would close
-the trap given the Phase 2$^{*}$ result. \textit{Second}, none of
-our optimization phases have per-opponent state. \textit{Third}, we
-use fixed-limit Hold'em rather than no-limit; the trap is likely
-deeper in no-limit. \textit{Fourth}, our eight archetypes are
-hand-selected. \textit{Fifth}, our findings are specific to poker.
-\textit{Sixth}, our trust model uses a specific parameterization
-($\lambda = 0.95$, $\varepsilon = 0.05$). A methodological caveat:
-the canonical Phase 3 and 3.1 datasets were generated under SDK
-default temperature (1.0); the code now pins temperature 0.0. The
-sample size of $n = 5$ seeds is the smallest defensible choice;
-$n \approx 20$ would tighten the Phase 3.1 confidence interval at
-an estimated cost of $\sim$\$60 in API spend.
+Several design choices constrain generalizability of the present
+work.
+\textit{First, sample size.} All headline correlations are
+computed across $n = 5$ random seeds; the Student-$t$ critical
+value at $\text{df} = 4$ is 2.776, which requires $|\rtp| > 0.878$
+for two-sided significance against zero. The headline Phase 3.1
+result has a 95\% bootstrap interval $[-0.32, +0.20]$ that
+contains both a fully neutralized correlation and a moderate
+residual negative correlation; we cannot statistically separate
+``trap broken'' from ``trap attenuated'' at this sample size. The
+single highest-leverage follow-up is an $n = 20$ replication of
+Phase 3.1 at the same 500-hand horizon as Phase 3, estimated at
+${\sim}\$60$ in API spend.
+\textit{Second, hand-count asymmetry across phases.} Phases 1, 2,
+and 2$^{*}$ play 10\,000 hands per seed; Phase 3 plays 500; Phase
+3.1 plays 150. Cross-phase comparisons of per-seed $\rtp$ are
+therefore confounded with statistical power. A hand-count-matched
+replication is required to interpret the ladder cleanly.
+\textit{Third, sampling temperature.} The canonical Phase 3 and
+3.1 datasets were generated under SDK-default temperature 1.0;
+the released codebase pins temperature 0.0. The headline numbers
+reported in this paper are not exactly reproducible from the
+current code without manual reversion.
+\textit{Fourth, single LLM.} Phase 3 and 3.1 use a single model
+family (Anthropic Haiku 4.5). A multi-model replication (e.g.,
+Gemini Flash, GPT-4o-mini) is needed to demonstrate that the
+attenuation is not model-specific.
+\textit{Fifth, the identifiability ``ceiling''} is a stipulated
+property of our archetype space (three archetypes have identical
+mean parameters), not an emergent finding about reputation
+systems in general.
+\textit{Sixth, the honesty operationalization} $h(t) = P(\text{bet}
+\mid\text{strong})\cdot(1-P(\text{bluff}\mid\text{weak}))$ is one
+of several plausible functional forms; the trust--profit
+correlation is mechanically anchored on this choice. Reporting
+results under at least two alternative honesty definitions is a
+useful robustness check.
+\textit{Seventh, rebuy economics.} Busted seats are granted a
+200-chip rebuy, so the ``final stack'' metric underweights deep
+chip losses; \arch{Wall}'s 9.4 mean rebuys per seed in Phase 1
+represent 1\,880 chips of true loss not visible in the headline
+stack number.
+\textit{Eighth, Phase 2$^{*}$ confound.} The unbounded sub-
+experiment varies three optimizer parameters simultaneously
+(bounds removed, $\delta$ raised $5\times$, evaluation window
+shrunk $4\times$). A clean optimization-strength ablation would
+change one variable at a time.
+\textit{Ninth, Phase 3.1 scaffold confound.} The three scaffolds
+(chain-of-thought, per-opponent memory, adaptive notes) were
+deployed jointly. A clean main-text ablation establishing the
+necessity of each component is the most important missing
+experiment.
+\textit{Tenth, secondary metrics.} The six secondary metrics
+(TEI, CS, OA, NS, SU, TMA) were chosen post hoc and are
+unadjusted for multiple comparisons; the family-wise error rate
+across them is not controlled.
+\textit{Eleventh, zero-sum testbed.} Limit Hold'em is zero-sum
+among players; eBay marketplaces, social networks, and credit
+systems are positive-sum over trades. Direct cross-domain
+inference is rhetorical, not warranted.
 
 % =============================================================================
 \section{Conclusion}
 % =============================================================================
 
-We have presented a controlled simulation study of trust dynamics in
-multi-agent strategic interaction. Across four agent architectures
-of progressively increasing capability, the Pearson correlation
-between agent trust score and final stack follows the ladder
-$-0.752 \to -0.637 \to -0.510 \to -0.094$. Each numerical tier
-softens the trap by approximately $\Delta\rtp = +0.12$; the final,
-reasoning-scaffolded tier breaks it by $\Delta\rtp = +0.42$. An
-unbounded hill-climbing sub-experiment with eleven times more
-parameter drift falsifies the hypothesis that the trap is a
-parameter-space artifact: agents diverge rather than converge. The
-trust trap is structural at the level of the observation-based
-reputation system but is not structural at the level of agent
-capability---it dissolves when agents can reason about the
-reputation system itself.
+We have presented a controlled simulation study of trust dynamics
+in 8-player Limit Texas Hold'em. Across four agent architectures,
+the Pearson correlation between agent trust score and final stack
+falls along the ladder $-0.752 \to -0.637 \to -0.510 \to -0.094$,
+with each step accompanied by a confidence interval whose width
+exceeds the size of any single inter-phase $\Delta\rtp$. We
+characterize the rank ordering of the ladder as the robust finding
+and the absolute size of each step as a preliminary estimate
+requiring replication. An unbounded hill-climbing sub-experiment
+with $11\times$ greater parameter drift produces $\Delta\rtp =
++0.028$ from bounded Phase 2 and yields a population that diverges
+rather than converges in 36-dimensional parameter space---
+preliminary evidence against the hypothesis that the trap is a
+bound-box artifact, though Phase 2$^{*}$ varies three optimizer
+parameters at once and does not cleanly isolate the bounds.
 
-Three follow-up directions sharpen the present findings: a 20-seed
-Phase 3.1 replication to tighten the confidence interval on the
-trap-breaking claim; a multi-model tournament in which different
-archetypes are played by different LLMs to test whether the
-trap-breaking effect depends on agent diversity rather than on
-capability; and an extension to no-limit Hold'em, where the
-continuous bet-sizing dimension is expected to deepen the trap and
-stress the classification ceiling.
+Three follow-up experiments are the most important next steps.
+\textit{First}, an $n = 20$ Phase 3.1 replication at 500 hands per
+seed (matching Phase 3) is the highest-leverage single experiment:
+it would tighten the confidence interval on the Phase 3.1 result by
+roughly a factor of two and distinguish ``trap attenuated'' from
+``trap broken''; estimated cost ${\sim}\$60$ in API spend.
+\textit{Second}, a clean ablation of the three Phase 3.1 scaffolds
+(chain-of-thought, per-opponent memory, adaptive notes) is required
+to support the claim that all three are necessary.
+\textit{Third}, a temperature-pinned re-run of Phase 3 and Phase
+3.1 at $T = 0.0$ would resolve the open reproducibility caveat.
+Beyond these three, a multi-LLM replication, a no-limit Hold'em
+extension, and an experimental varying of inter-archetype distance
+would each strengthen the present findings.
 
 % =============================================================================
 \section*{Sources and Acknowledgments}
