@@ -1,10 +1,12 @@
-\begin{table}[ht]
+\begin{table*}[!ht]
 \centering
+\captionsetup{font={small,sf}}
 \small
+\setlength{\tabcolsep}{8pt}
 \begin{tabular}{lrrrrrrr}
-\hline
+\toprule
 Archetype & Trust & Stack & $\sigma$ & Rebuys & Rank P3 & Rank P3.1 & $\Delta$ \\
-\hline
+\midrule
 wall & 0.849 & 280 & 88 & 0.0 & 8 & 1 & +7 \\
 firestorm & 0.481 & 231 & 104 & 0.2 & 5 & 2 & +3 \\
 phantom & 0.748 & 230 & 61 & 0.2 & 1 & 3 & -2 \\
@@ -13,8 +15,12 @@ judge & 0.781 & 191 & 45 & 0.0 & 4 & 5 & -1 \\
 sentinel & 0.786 & 183 & 58 & 0.0 & 7 & 6 & +1 \\
 predator & 0.797 & 179 & 98 & 0.0 & 6 & 7 & -1 \\
 oracle & 0.625 & 175 & 64 & 0.0 & 3 & 8 & -5 \\
-\hline
+\bottomrule
 \end{tabular}
-\caption{Phase 3.1 economic outcomes by archetype (mean across 5 seeds, 150 hands each). Ranks are derived from final-stack ordering. Wall, the most-trusted archetype, climbs from rank 8 (Phase 3) to rank 1 (Phase 3.1), with zero rebuys.}
+\caption{\textbf{Phase 3.1 economic outcomes by archetype.}
+Means across 5 seeds, 150 hands per seed. Ranks derived from
+final-stack ordering. \arch{Wall}, the most-trusted archetype,
+climbs from rank 8 (Phase 3) to rank 1 (Phase 3.1), with zero
+rebuys.}
 \label{tab:archetype-p31}
-\end{table}
+\end{table*}

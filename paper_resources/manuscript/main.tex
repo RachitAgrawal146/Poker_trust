@@ -20,6 +20,9 @@
             columnsep=0.3in,
             headheight=14pt, headsep=14pt, footskip=24pt]{geometry}
 
+% Gray hairline divider between the two text columns on every page.
+\setlength{\columnseprule}{0.4pt}
+
 % --- ENCODING & FONTS --------------------------------------------------------
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -36,6 +39,11 @@
 \definecolor{scienceRed}{HTML}{C8102E}
 \definecolor{scienceRule}{HTML}{BBBBBB}
 \definecolor{darkGray}{HTML}{333333}
+
+% Colour the column-separator rule introduced above. xcolor defines
+% \columnseprulecolor; \providecommand keeps us safe if it changes.
+\providecommand{\columnseprulecolor}{}
+\renewcommand{\columnseprulecolor}{\color{gray!55}}
 
 % --- ARCHETYPE COLORS (one per character, "Evolution of Trust" palette) -----
 % Brand HEX codes sampled directly from the deck's character grid.
@@ -74,6 +82,9 @@
 \usepackage{array}
 \usepackage{tabularx}
 \usepackage{multirow}
+
+% Notes column for box-hand tables: ragged, small, wraps to box width.
+\newcolumntype{N}{>{\raggedright\arraybackslash\scriptsize}X}
 
 % --- SECTION HEADINGS --------------------------------------------------------
 \usepackage[explicit]{titlesec}
@@ -613,8 +624,15 @@ dimension. Adaptive archetypes additionally read live state
 (opponent posterior or grievance ledger) and are described by the
 rule that produces the policy rather than by fixed bounds.}
 \label{tab:bounds-comprehensive}
-\small
-\begin{tabular}{@{}lcccc>{\raggedright\arraybackslash}p{0.30\textwidth}@{}}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{@{}l
+  >{\raggedright\arraybackslash}p{0.135\textwidth}
+  >{\raggedright\arraybackslash}p{0.155\textwidth}
+  >{\raggedright\arraybackslash}p{0.155\textwidth}
+  c
+  >{\raggedright\arraybackslash}p{0.28\textwidth}@{}}
 \toprule
 Archetype & $P(\text{bet}|S)$ & $P(\text{bet}|W)$ & $P(\text{fold}|W)$ & $h$ & Adaptation rule \\
 \midrule
@@ -622,10 +640,10 @@ Archetype & $P(\text{bet}|S)$ & $P(\text{bet}|W)$ & $P(\text{fold}|W)$ & $h$ & A
 \arch{Sentinel}  & $[0.90, 1.00]$ & $[0.00, 0.10]$ & $[0.80, 0.95]$ & 0.92 & None --- tight value-bettor \\
 \arch{Firestorm} & $[0.85, 1.00]$ & $[0.45, 0.65]$ & $[0.00, 0.20]$ & 0.38 & None --- bets everything \\
 \arch{Wall}      & $[0.95, 1.00]$ & $[0.00, 0.05]$ & $[0.00, 0.05]$ & 0.96 & None --- calls all, folds none \\
-\arch{Phantom}   & $[0.30, 0.50]$ & $[0.60, 0.80]$ pre, $[0.05, 0.20]$ post & $[0.70, 0.90]$ post-flop after preflop bluff & 0.48 & Static but street-conditional \\
+\arch{Phantom}   & $[0.30, 0.50]$ & $[0.60, 0.80]$ pre; $[0.05, 0.20]$ post & $[0.70, 0.90]$ post-flop after preflop bluff & 0.48 & Static but street-conditional \\
 \arch{Predator}  & TAG default; exploit profile vs.\ target & $0.05$ default; $0.55$ vs.\ classified target & $0.65$ default; $0.30$ vs.\ classified target & 0.79 & Activates exploit profile when posterior on opponent $>0.60$ \\
 \arch{Mirror}    & $0.5\cdot\text{self}+0.5\cdot\text{target}$ & same blend & same blend & 0.78 & Re-targets at each hand to highest-VPIP opponent \\
-\arch{Judge}     & $[0.88, 0.98]$ coop; $[0.95, 1.00]$ retal. & $[0.02, 0.10]$ coop; $[0.30, 0.45]$ retal. & $[0.78, 0.92]$ coop; $[0.30, 0.50]$ retal. & 0.80 & Switches to retaliation after 5+ confirmed bluffs by an opponent \\
+\arch{Judge}     & $[0.88, 0.98]$ coop; $[0.95, 1.00]$ retal.\ & $[0.02, 0.10]$ coop; $[0.30, 0.45]$ retal.\ & $[0.78, 0.92]$ coop; $[0.30, 0.50]$ retal.\ & 0.80 & Switches to retaliation after $5{+}$ confirmed bluffs by an opponent \\
 \bottomrule
 \end{tabular}
 \end{table*}
@@ -822,8 +840,10 @@ table. Final pot 110 chips, showdown.
 
 \smallskip
 \noindent\textbf{Action sequence:}\par\nopagebreak
-\begin{center}
-\begin{tabular}{@{}rlllrrl@{}}
+\begingroup
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.1}
+\noindent\begin{tabularx}{\linewidth}{@{}r l l l r r N@{}}
 \toprule
 Seq & Seat & Round & Action & Amt & Pot & Notes \\
 \midrule
@@ -835,8 +855,8 @@ Seq & Seat & Round & Action & Amt & Pot & Notes \\
 17--23 & \ldots & turn  & \ldots &   & 74  & Same pattern \\
 24--30 & \ldots & river & \ldots &   & 110 & \arch{Wall} calls the final two raises \\
 \bottomrule
-\end{tabular}
-\end{center}
+\end{tabularx}
+\endgroup
 
 \smallskip
 \noindent\textbf{Showdown.}
@@ -1091,8 +1111,10 @@ $K\heartsuit\,Q\heartsuit$ -- rank 872, a strong hand. Final pot
 
 \smallskip
 \noindent\textbf{Action sequence:}\par\nopagebreak
-\begin{center}
-\begin{tabular}{@{}rlllrrl@{}}
+\begingroup
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.1}
+\noindent\begin{tabularx}{\linewidth}{@{}r l l l r r N@{}}
 \toprule
 Seq & Seat & Round & Action & Amt & Pot & Notes \\
 \midrule
@@ -1106,8 +1128,8 @@ Seq & Seat & Round & Action & Amt & Pot & Notes \\
 16 & \arch{Wall}      & river   & \textbf{bet}   & 4 & 28 & \textit{value bet against checked range} \\
 17 & \arch{Firestorm} & river   & call           & 4 & 32 &  \\
 \bottomrule
-\end{tabular}
-\end{center}
+\end{tabularx}
+\endgroup
 
 \smallskip
 \noindent\textbf{Showdown.}
