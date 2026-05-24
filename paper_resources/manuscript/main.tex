@@ -55,6 +55,7 @@
 % --- FIGURES, TABLES, CAPTIONS ----------------------------------------------
 \usepackage{graphicx}
 \usepackage{float}              % enables [H] placement for in-line figures
+\usepackage{placeins}           % \FloatBarrier to pin figures within sections
 \graphicspath{{../figures/}{./figures/}{./}}
 \usepackage{caption}
 \usepackage{subcaption}
@@ -751,254 +752,72 @@ observations.
 \section{Results}\label{sec:results}
 % =============================================================================
 
-\subsection{The four-tier ladder}
-Across the four canonical agent architectures, the Pearson
-correlation between trust and stack follows the four-tier ladder
-of Fig.~\ref{fig:headline}, tabulated in
-Table~\ref{tab:ladder}. Phase 1 produces $\rtp = -0.752 \pm 0.073$;
-Phase 2 softens to $-0.637 \pm 0.125$; Phase 2$^{*}$ to $-0.609 \pm
-0.221$; Phase 3 to $-0.510 \pm 0.268$; Phase 3.1 to $-0.094 \pm
-0.301$. The 95\% Student-$t$ interval on the Phase 3.1 mean is
-$[-0.512, +0.323]$; the bootstrap interval is $[-0.324, +0.203]$.
-Both intervals contain zero \textit{and} a moderate negative
-correlation in the same range as the bounded Phase 2 effect; the
-present data are therefore consistent with substantial attenuation
-of the trust--profit correlation under reasoning scaffolds but do
-not, at $n=5$ seeds, establish that the correlation is zero. We
-report the rank ordering of the four phases (P1 $\to$ P2 $\to$
-P3 $\to$ P3.1 by absolute size of $\rtp$) as the most robust
-finding; the absolute size of each step carries the
-corresponding interval-level uncertainty.
+We present results in order of agent capability: Phase 1
+(frozen rule-based agents) establishes the baseline trap; Phase 2
+(bounded hill-climbing) tests whether numerical adaptation can
+soften it; Phase 2$^{*}$ (unbounded hill-climbing) tests whether
+the bounds were the binding constraint; Phase 3 (LLM personality
+role-players) replaces the rule-based policies with a language
+model under a personality spec; and Phase 3.1 (LLM with reasoning
+scaffolding) augments that with chain-of-thought, per-opponent
+memory, and self-updated strategy notes. The four-tier headline
+ladder $-0.752 \to -0.637 \to -0.510 \to -0.094$ is summarized
+in Fig.~\ref{fig:headline} and Table~\ref{tab:ladder} above; the
+remainder of this section reports per-phase numbers, figures,
+and illustrative hands.
 
-\subsection{Phase 1 numbers}
-Phase 1 produces $\rtp = -0.752$ averaged across the five canonical
-seeds, with per-seed values $\{-0.774, -0.608, -0.792, -0.812,
--0.776\}$. \arch{Wall} (the most-trusted archetype, honesty 0.96)
-has the smallest mean stack and approximately 9.4 rebuys per seed.
-\arch{Firestorm} (the least-trusted, honesty 0.38) has the largest
-mean stack and zero rebuys. Of the pots \arch{Firestorm} wins,
-$87.1\%$ are walkovers\footnote{A \textit{walkover} (or
+% --------------------------------------------------------------- Phase 1
+\subsection{Phase 1: trust as a liability}
+
+Phase 1 produces $\rtp = -0.752$ across the five canonical seeds,
+with per-seed values $\{-0.774, -0.608, -0.792, -0.812, -0.776\}$.
+\arch{Wall} (the most-trusted archetype, honesty 0.96) has the
+smallest mean stack and approximately 9.4 rebuys per seed.
+\arch{Firestorm} (the least-trusted, honesty 0.38) has the
+largest mean stack and zero rebuys. Of the pots \arch{Firestorm}
+wins, $87.1\%$ are walkovers\footnote{A \textit{walkover} (or
 ``uncontested pot'') is a hand won without showdown---every other
 player folded before the cards had to be shown. It is the
 bread-and-butter outcome for aggressive players who win by making
-opponents fold rather than by holding the best hand.} in which
-all opponents fold before showdown;
-\arch{Firestorm}'s showdown win rate is only $38.5\%$, below the
-uniform $1/n$ rate. The trust--stack relationship is shown in
-Fig.~\ref{fig:trust-vs-stack}.
+opponents fold rather than by holding the best hand.}; its
+showdown win rate is only $38.5\%$, below the uniform $1/n$ rate.
+\arch{Firestorm} is not a strong poker player on the merits; it
+wins because it is hard to read. The trust--stack relationship
+appears in Fig.~\ref{fig:trust-vs-stack} (left panel).
 
-\begin{figure*}[!hb]
+\begin{figure}[H]
   \centering
-  \includegraphics[width=0.92\textwidth]{05_trust_vs_stack.png}
+  \includegraphics[width=\linewidth]{05_trust_vs_stack.png}
   \caption{\textbf{Trust versus final stack across phases.}
-  (\textbf{Left}) Phase 1: most-trusted archetypes cluster in the
-  low-stack region; \arch{Firestorm} (low trust) is the highest
-  earner. (\textbf{Right}) Phase 3.1: the relationship dissolves
-  and \arch{Wall} becomes the top earner. Each point is one
-  (archetype, seed) observation.}
+  (\textbf{Left}) Phase 1: the most-trusted archetypes cluster
+  in the low-stack region and \arch{Firestorm} (low trust) is
+  the highest earner. (\textbf{Right}) Phase 3.1: the
+  relationship dissolves and \arch{Wall} becomes the top earner.
+  Each point is one (archetype, seed) observation.}
   \label{fig:trust-vs-stack}
-\end{figure*}
+\end{figure}
 
-\subsection{Classification accuracy and the identifiability ceiling}
-The \arch{Predator} archetype, which reads its posterior to choose
-exploitation targets, classifies only 3 of 7 opponents reliably
-above the prespecified 0.60 confidence threshold after 1\,000
-hands: \arch{Wall} ($p = 1.00$), \arch{Firestorm} ($p \approx
-0.82$), and occasionally \arch{Phantom} ($p \approx 0.60$ in some
-seeds). The remaining four opponents fall below the threshold on
-every seed. Three of these (\arch{Sentinel}, \arch{Mirror} in its
-default state, \arch{Judge} in its cooperative state) have byte-
-identical mean parameters under the spec; the Bayesian posterior
-over them bottoms out at $\log_2(3) \approx 1.58$ bits regardless
-of observation volume.
-
-\subsection{Phase 2 numbers (bounded hill-climbing)}
-Phase 2 produces $\rtp = -0.637 \pm 0.125$ with per-seed values
-$\{-0.759, -0.424, -0.719, -0.717, -0.564\}$. The shift from Phase
-1 ($\Delta\rtp = +0.116$) is consistent across all five seeds
-(per-seed shifts $+0.015, +0.184, +0.073, +0.095, +0.212$). The
-Opponent Adaptation metric stays at $\mathrm{OA} = 0.0003$ in both
-Phase 1 and Phase 2. Mean per-agent L1 drift in parameter space is
-approximately 0.3 over 10\,000 hands.
-
-\begin{figure*}[!ht]
-  \centering
-  \includegraphics[width=0.92\textwidth]{07_phase2_bounded_vs_unbounded_aggressive.png}
-  \caption{\textbf{Bounded versus unbounded hill-climbing per
-  seed.} Bars compare bounded Phase 2 $\rtp$ (left of each pair)
-  to aggressive Phase 2$^{*}$ $\rtp$ (right) for the five canonical
-  seeds. Mean $\rtp$ shifts by only $+0.028$ when bounds are
-  removed and the optimizer step size is raised fivefold; per-seed
-  variance triples.}
-  \label{fig:p2-bounded-vs-unbounded}
-\end{figure*}
-
-\subsection{Phase 2$^{*}$ numbers (unbounded hill-climbing)}
-Phase 2$^{*}$ produces $\rtp = -0.609 \pm 0.221$ with per-seed
-values $\{-0.354, -0.700, -0.344, -0.887, -0.759\}$. The mean shift
-from bounded Phase 2 is $\Delta\rtp = +0.028$, well within the
-seed-to-seed standard deviation. Mean per-agent L1 drift is 3.4
-($11\times$ the bounded run). The mean pairwise L1 distance between
-the eight agents in 36-dim parameter space grows from an initial
-5.82 to $\geq 7.5$ on every seed; the mean ratio of final to initial
-cluster spread is 1.324. Fig.~\ref{fig:nash} plots cluster spread
-under both optimizer strengths; Fig.~\ref{fig:param-drift} shows
-per-archetype drift. \arch{Firestorm}'s mean stack remains $\sim
-6\times$ the next archetype; \arch{Wall} still incurs $\sim 28$
-rebuys per seed.
-
-\begin{figure*}[!ht]
-  \centering
-  \includegraphics[width=0.92\textwidth]{14_nash_convergence_compare.png}
-  \caption{\textbf{The 8-agent population diverges in parameter
-  space.} Mean pairwise L1 distance between all eight agents in
-  36-dim parameter space over 10\,000 hands of unbounded hill-
-  climbing. (\textbf{Left}) Weak HC ($\delta = 0.03$) leaves agents
-  essentially stationary. (\textbf{Right}) Aggressive HC ($\delta =
-  0.15$) drives the population apart on every seed. Convergence
-  index $> 1$ means agents are more dispersed at end-of-run than
-  at start.}
-  \label{fig:nash}
-\end{figure*}
-
-\begin{figure*}[!hb]
-  \centering
-  \includegraphics[width=0.92\textwidth]{10_param_drift_unbounded_aggressive.png}
-  \caption{\textbf{Per-archetype L1 drift from Phase 1 starting
-  parameters under aggressive unbounded hill-climbing.} Every
-  archetype moves significantly (mean drift 3.4), but no two
-  archetypes move toward the same target. Trajectories are
-  color-coded by archetype.}
-  \label{fig:param-drift}
-\end{figure*}
-
-\subsection{Phase 3 numbers (LLM personality role-players)}
-Phase 3 produces $\rtp = -0.510 \pm 0.268$ with per-seed values
-$\{-0.884, -0.525, -0.171, -0.712, -0.259\}$. The shift from Phase
-2 ($\Delta\rtp = +0.127$) matches the Phase 1 $\to$ Phase 2 step in
-magnitude. Per-seed variance is roughly twice Phase 2's (0.268 vs
-0.125). Four of six behavioral-dimension targets are missed;
-three move \textit{backward} relative to Phases 1 and 2
-(Table~\ref{tab:behavioral-shift} reports per-archetype
-VPIP\footnote{\textit{VPIP} (voluntarily put in pot) is the
-percentage of hands in which a player voluntarily put chips into
-the pot, excluding the forced blinds. High VPIP = loose, plays
-many hands; low VPIP = tight, plays few.},
-PFR\footnote{\textit{PFR} (preflop raise rate) is the percentage
-of hands in which a player raised before the flop. PFR
-$\le$ VPIP by definition; a large gap between the two indicates a
-passive caller, a small gap an aggressive raiser.}, and
-AF\footnote{\textit{Aggression factor (AF)} is the ratio
-(bets + raises)/calls. AF $> 2$ is aggressive; AF $< 1$ is
-passive. \arch{Wall}, our calling-station archetype, has the
-lowest AF in the population by construction.} fingerprints): CS
-drops from $0.142$ to $0.076$, NS collapses to $0$, and
-SU\footnote{\textit{Strategic Unpredictability} (SU) is the
-Shannon entropy in bits over each agent's action distribution.
-Higher SU = harder to predict.} falls from $1.88$ to $1.19$
-bits.
-
-\input{../tables/behavioral_shift_p1_p31.tex}
-
-\subsection{Phase 3.1 numbers (LLM with reasoning scaffolding)}
-Phase 3.1 produces $\rtp = -0.094 \pm 0.301$ with per-seed values
-$\{-0.289, -0.338, -0.327, +0.047, +0.435\}$. The mean shift from
-Phase 3 ($\Delta\rtp = +0.416$) is the largest single step in the
-ladder, but the per-seed sample size ($n = 5$) and the 150-hand
-horizon impose substantial uncertainty: the 95\% bootstrap
-interval $[-0.32, +0.20]$ is wide enough to include moderate
-negative correlations of the kind we report under bounded Phase 2.
-Two of five seeds produce per-seed correlations greater than zero
-($+0.047$ at seed 512 and $+0.435$ at seed 1024); with $n = 8$
-archetype pairs per seed, the Fisher-$z$ interval on a per-seed
-$\rtp = +0.047$ spans roughly $[-0.7, +0.7]$, so individual
-positive seeds are not on their own evidence of inversion. The
-combined picture is most accurately summarized as: the trust--
-profit correlation under Phase 3.1 is attenuated relative to all
-prior phases at the rank-order level, but the present sample is
-underpowered to distinguish between full neutralization and a
-weakened but nonzero residual trap. \arch{Wall}'s mean stack
-rises from ${\sim}100$--$200$ chips in Phases 1--3 to 280 in
-Phase 3.1; rebuy count drops from ${\sim}9.4$ per seed to 0,
-consistent with the rank-order claim above. The full per-archetype
-economic ordering is shown in Fig.~\ref{fig:economic-inversion}
-and Table~\ref{tab:archetype-p31}.
-
-\begin{figure*}[!ht]
-  \centering
-  \includegraphics[width=0.92\textwidth]{03_economic_inversion.png}
-  \caption{\textbf{Economic ordering inverts from Phase 3 to Phase
-  3.1.} \arch{Wall} (trust $\approx 0.85$, highest of any archetype)
-  was rank 8 of 8 in Phase 3 with $\sim 9$ rebuys per seed and
-  becomes rank 1 of 8 in Phase 3.1 with zero rebuys.
-  \arch{Firestorm} falls from rank 5 in Phase 3 to rank 2 in Phase
-  3.1.}
-  \label{fig:economic-inversion}
-\end{figure*}
-
-\input{../tables/per_archetype_p31.tex}
-
-% Table 4 (economic_inversion.tex) cut as redundant with Table 3's
-% Rank P3 / Rank P3.1 / Delta columns. The full per-archetype table
-% above carries the rank-shift information.
-
-Four of six secondary metric targets are met in Phase 3.1 (vs.\
-two of six in Phase 3). Strategic Unpredictability rises from
-$1.19$ to $1.55$ bits, crossing the $>1.5$ threshold for the first
-time across all phases. Trust Manipulation Awareness rises from
-$+0.164$ to $+0.242$, with six of eight archetypes showing positive
-TMA (Fig.~\ref{fig:tma}); \arch{Wall} and \arch{Sentinel} show the
-strongest signals at $+0.733$ and $+0.704$. OA ($0.0007$) and NS
-(still $0$) remain near zero across phases.
-
-\begin{figure*}[!ht]
-  \centering
-  \includegraphics[width=0.92\textwidth]{06_tma_by_archetype.png}
-  \caption{\textbf{Trust Manipulation Awareness (TMA) per archetype
-  in Phase 3.1.} Positive TMA indicates an agent's rolling trust
-  delta correlates with its rolling aggression delta---building
-  trust through cooperative early play, then leveraging it for
-  higher-aggression later moves. Six of eight archetypes show
-  positive TMA; \arch{Wall} ($+0.733$) and \arch{Sentinel}
-  ($+0.704$) are the strongest.}
-  \label{fig:tma}
-\end{figure*}
-
-\input{../tables/tma_by_archetype.tex}
-
-\subsection{Two illustrative hands}
-The dynamics behind the headline numbers are most concretely visible
-in two single hands drawn from the canonical Phase 3 and Phase 3.1
-runs. Box~1 reproduces Phase 3 hand \#67: \arch{Wall} holding
+The mechanism is also visible in a single representative hand.
+Box~1 reproduces hand \#67 from seed 42: \arch{Wall} is dealt
 $2\spadesuit\,5\clubsuit$ (hand rank\footnote{\textit{Hand rank}
 is taken from standard 7-card poker equity tables: rank 1 is the
 strongest possible hand and rank 7,462 is the weakest. Rank
-$\le 1{,}000$ is roughly ``top 15\% of hands.''} $6\,749$, the
-worst hand at the table) calls every street of a
+$\le 1{,}000$ is roughly ``top 15\% of hands.''} $6{,}749$, the
+worst hand at the table) and calls every street of a
 4-bet\footnote{\textit{3-bet} and \textit{4-bet} refer to
 successive re-raises. The big blind counts as the first bet; a
 raise is the 2-bet; a re-raise is the 3-bet; another re-raise is
 the 4-bet. Under our four-bet cap, no further raises are allowed
-in the same round.} pot and loses 35 chips.
-Box~2 reproduces Phase 3.1 hand \#146: \arch{Wall} holding
-$K\heartsuit\,Q\heartsuit$ (rank 872) calls a flop continuation
-bet\footnote{A \textit{continuation bet} (\textit{c-bet}) is a
-bet made on the flop by the player who took the lead in betting
-preflop, regardless of whether the flop helped that player's
-hand. It is the most common bluff line in modern poker.} and a
-turn barrel from \arch{Firestorm}, reads \arch{Firestorm}'s river
-check as a tell\footnote{A \textit{tell} is a behavioral signal
-that gives information about an opponent's hand. \arch{Wall}
-reads \arch{Firestorm}'s river check as a tell because the
-canonical \arch{Firestorm} policy bets every street with a real
-hand; a river check therefore signals that the bluff line has
-been abandoned.}, \textit{bets} the river for value, and wins 32
-chips.
+in the same round.} pot, paying 35 chips into a hand it had no
+chance to win. The illustrative hand we use here is drawn from
+the Phase 3 dataset so that we can show the trap holding even
+under a language-model implementation of \arch{Wall}; the same
+dynamic occurs more frequently in Phase 1.
 
-\begin{tcolorbox}[storyhand={Box~1.\quad Phase 3 hand \#67 \bbar 30 actions \bbar 110-chip pot}]
+\begin{tcolorbox}[storyhand={Box~1.\quad An instance of the trap (Phase 3 hand \#67, 30 actions, 110-chip pot)}]
 \scriptsize
 \textbf{Setup.} Seed 42, hand 67. \arch{Wall} (seat 3) is dealt
-$2\spadesuit\,5\clubsuit$ -- rank 6\,749, the worst hand at the
+$2\spadesuit\,5\clubsuit$ -- rank 6{,}749, the worst hand at the
 table. Final pot 110 chips, showdown.
 
 \smallskip
@@ -1030,7 +849,241 @@ Every observer's posterior puts $p = 1.000$ on \arch{Firestorm}
 being a firestorm and $p = 1.000$ on \arch{Wall} being a wall.}
 \end{tcolorbox}
 
-\begin{tcolorbox}[storyhand={Box~2.\quad Phase 3.1 hand \#146 \bbar 17 actions \bbar 32-chip pot}]
+\paragraph{Classification accuracy.}
+The \arch{Predator} archetype, which reads its posterior to
+choose exploitation targets, classifies only 3 of 7 opponents
+reliably above the prespecified 0.60 confidence threshold after
+1{,}000 hands: \arch{Wall} ($p = 1.00$), \arch{Firestorm}
+($p \approx 0.82$), and occasionally \arch{Phantom}
+($p \approx 0.60$ in some seeds). The remaining four opponents
+fall below the threshold on every seed. Three of these
+(\arch{Sentinel}, \arch{Mirror} in its default state,
+\arch{Judge} in its cooperative state) have byte-identical mean
+parameters under the spec; the posterior over them bottoms out
+at $\log_2(3) \approx 1.58$ bits regardless of observation
+volume---a direct consequence of our design choice rather than
+an emergent finding.
+
+\FloatBarrier
+
+% --------------------------------------------------------------- Phase 2
+\subsection{Phase 2: bounded hill-climbing softens but does not
+close the trap}
+
+Phase 2 produces $\rtp = -0.637 \pm 0.125$ with per-seed values
+$\{-0.759, -0.424, -0.719, -0.717, -0.564\}$. The shift from
+Phase 1 ($\Delta\rtp = +0.116$) is consistent across all five
+seeds (per-seed shifts $+0.015$, $+0.184$, $+0.073$, $+0.095$,
+$+0.212$). The Opponent Adaptation metric stays at
+$\mathrm{OA} = 0.0003$ in both Phase 1 and Phase 2: aggregate-
+reward optimization can drift parameters within the bound box
+but cannot, by construction, produce per-opponent strategy
+because the hill-climber has no per-opponent parameter slot.
+Mean per-agent L1\footnote{The \textit{$L_1$ distance} between
+two parameter vectors is the sum of absolute differences across
+all 36 (round, action) slots. Larger $L_1$ means the agent has
+moved further from its starting parameters.} drift in parameter
+space is approximately $0.3$ over $10{,}000$ hands, meaning the
+bounded agents stay close to their starting points. Phase 2's
+softening is real but its mechanism is local: the agents trim
+the worst-performing parts of their stationary policy without
+inventing anything qualitatively new.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{07_phase2_bounded_vs_unbounded_aggressive.png}
+  \caption{\textbf{Bounded versus unbounded hill-climbing per
+  seed.} Bars compare bounded Phase 2 $\rtp$ (left of each pair)
+  to aggressive Phase 2$^{*}$ $\rtp$ (right) for the five
+  canonical seeds. Mean $\rtp$ shifts by only $+0.028$ when
+  bounds are removed and the optimizer step size is raised
+  fivefold; per-seed variance triples.}
+  \label{fig:p2-bounded-vs-unbounded}
+\end{figure}
+
+\FloatBarrier
+
+% --------------------------------------------------------------- Phase 2*
+\subsection{Phase 2$^{*}$: unbounded hill-climbing fails the same way}
+
+Phase 2$^{*}$ produces $\rtp = -0.609 \pm 0.221$ with per-seed
+values $\{-0.354, -0.700, -0.344, -0.887, -0.759\}$. The mean
+shift from bounded Phase 2 is $\Delta\rtp = +0.028$, well within
+the seed-to-seed standard deviation. Mean per-agent L1 drift is
+$3.4$ ($11{\times}$ the bounded run), so the agents have moved
+substantially in parameter space; but the trap holds.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{14_nash_convergence_compare.png}
+  \caption{\textbf{The 8-agent population diverges in parameter
+  space.} Mean pairwise $L_1$ distance between all eight agents
+  in 36-dim parameter space over $10{,}000$ hands of unbounded
+  hill-climbing. (\textbf{Left}) Weak HC ($\delta = 0.03$)
+  leaves agents essentially stationary. (\textbf{Right})
+  Aggressive HC ($\delta = 0.15$) drives the population apart on
+  every seed. Convergence index $>1$ means agents are more
+  dispersed at end-of-run than at start.}
+  \label{fig:nash}
+\end{figure}
+
+The reason becomes visible in cluster-spread space. The mean
+pairwise $L_1$ distance between the eight agents in
+36-dimensional parameter space grows from an initial $5.82$ to
+$\ge 7.5$ on every seed; the mean ratio of final to initial
+cluster spread is $1.324$. The agents are moving 11 times
+harder than under bounded HC, but they are moving \textit{apart},
+not toward a common Nash-like profile.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{10_param_drift_unbounded_aggressive.png}
+  \caption{\textbf{Per-archetype $L_1$ drift from Phase 1 starting
+  parameters under aggressive unbounded hill-climbing.} Every
+  archetype moves significantly (mean drift $3.4$), but no two
+  archetypes move toward the same target. Trajectories are
+  color-coded by archetype.}
+  \label{fig:param-drift}
+\end{figure}
+
+\arch{Firestorm}'s mean stack remains ${\sim}6{\times}$ the next
+archetype; \arch{Wall} still incurs ${\sim}28$ rebuys per seed.
+The economic ordering does not change. We attribute the
+non-convergence to three structural causes that we believe would
+survive any specific optimizer choice---non-stationary feedback
+from the lagging trust posterior, multi-agent simultaneity, and
+axis-aligned coordinate descent in 36 dimensions---and we
+elaborate in the Discussion.
+
+\FloatBarrier
+
+% --------------------------------------------------------------- Phase 3
+\subsection{Phase 3: language models alone do not break the trap}
+
+Phase 3 produces $\rtp = -0.510 \pm 0.268$ with per-seed values
+$\{-0.884, -0.525, -0.171, -0.712, -0.259\}$. The shift from
+Phase 2 ($\Delta\rtp = +0.127$) matches the Phase 1 $\to$
+Phase 2 step in magnitude. Per-seed variance is roughly twice
+Phase 2's ($0.268$ vs $0.125$). Four of six behavioral-dimension
+targets are missed; three move \textit{backward} relative to
+Phases 1 and 2 (Table~\ref{tab:behavioral-shift} reports
+per-archetype VPIP\footnote{\textit{VPIP} (voluntarily put in
+pot) is the percentage of hands in which a player voluntarily
+put chips into the pot, excluding the forced blinds. High VPIP =
+loose; low VPIP = tight.},
+PFR\footnote{\textit{PFR} (preflop raise rate) is the percentage
+of hands in which a player raised before the flop. PFR $\le$
+VPIP by definition.}, and
+AF\footnote{\textit{Aggression factor (AF)} is the ratio
+$(\text{bets}+\text{raises})/\text{calls}$. AF $>2$ is
+aggressive; AF $<1$ is passive.} fingerprints): CS drops from
+$0.142$ to $0.076$, NS collapses to $0$, and
+SU\footnote{\textit{Strategic Unpredictability} (SU) is the
+Shannon entropy in bits over each agent's action distribution.
+Higher SU = harder to predict.} falls from $1.88$ to $1.19$
+bits.
+
+\input{../tables/behavioral_shift_p1_p31.tex}
+
+Personality specs tell the LLM \textit{what} to do but not
+\textit{how} to reason. Absent reasoning support, the LLMs in
+our sample collapse onto a more stereotyped canonical
+interpretation of each archetype, becoming \textit{more}
+classifiable than the explicitly stochastic rule-based versions.
+The softening from Phase 2 to Phase 3 is therefore not produced
+by the same mechanism as Phase 2's softening; it is mostly
+output stochasticity from sampling temperature 1.0.
+
+\FloatBarrier
+
+% --------------------------------------------------------------- Phase 3.1
+\subsection{Phase 3.1: reasoning scaffolding attenuates the trap}
+
+Phase 3.1 produces $\rtp = -0.094 \pm 0.301$ with per-seed values
+$\{-0.289, -0.338, -0.327, +0.047, +0.435\}$. The mean shift
+from Phase 3 ($\Delta\rtp = +0.416$) is the largest single step
+in the ladder, but the per-seed sample size ($n = 5$) and the
+150-hand horizon impose substantial uncertainty: the 95\%
+bootstrap interval $[-0.32, +0.20]$ is wide enough to include
+moderate negative correlations of the kind we report under
+bounded Phase 2. Two of five seeds produce per-seed correlations
+greater than zero ($+0.047$ at seed 512 and $+0.435$ at seed
+1024); with $n = 8$ archetype pairs per seed, the Fisher-$z$
+interval on a per-seed $\rtp = +0.047$ spans roughly
+$[-0.7, +0.7]$, so individual positive seeds are not on their
+own evidence of inversion. The combined picture is most
+accurately summarized as: the trust--profit correlation under
+Phase 3.1 is attenuated relative to all prior phases at the
+rank-order level, but the present sample is underpowered to
+distinguish between full neutralization and a weakened but
+nonzero residual trap.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{03_economic_inversion.png}
+  \caption{\textbf{Economic ordering inverts from Phase 3 to
+  Phase 3.1.} \arch{Wall} (trust $\approx 0.85$, highest of any
+  archetype) was rank 8 of 8 in Phase 3 with ${\sim}9$ rebuys
+  per seed and becomes rank 1 of 8 in Phase 3.1 with zero rebuys.
+  \arch{Firestorm} falls from rank 5 in Phase 3 to rank 2 in
+  Phase 3.1.}
+  \label{fig:economic-inversion}
+\end{figure}
+
+\arch{Wall}'s mean stack rises from ${\sim}100$--$200$ chips in
+Phases 1--3 to $280$ in Phase 3.1; rebuy count drops from
+${\sim}9.4$ per seed to zero, consistent with the rank-order
+claim above. The right panel of Fig.~\ref{fig:trust-vs-stack}
+(introduced earlier) shows the trust--stack scatter under
+Phase 3.1: the negative slope visible in the Phase 1 panel is
+gone. The full per-archetype economic ordering is in
+Table~\ref{tab:archetype-p31}.
+
+\input{../tables/per_archetype_p31.tex}
+
+Four of six secondary metric targets are met in Phase 3.1
+(vs.\ two of six in Phase 3). Strategic Unpredictability rises
+from $1.19$ to $1.55$ bits, crossing the $>1.5$ threshold for
+the first time across all phases. Trust Manipulation Awareness
+rises from $+0.164$ to $+0.242$, with six of eight archetypes
+showing positive TMA; \arch{Wall} and \arch{Sentinel} show the
+strongest signals at $+0.733$ and $+0.704$.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{06_tma_by_archetype.png}
+  \caption{\textbf{Trust Manipulation Awareness (TMA) per
+  archetype in Phase 3.1.} Positive TMA indicates an agent's
+  rolling trust delta correlates with its rolling aggression
+  delta---building trust through cooperative early play, then
+  leveraging it for higher-aggression later moves. Six of eight
+  archetypes show positive TMA; \arch{Wall} ($+0.733$) and
+  \arch{Sentinel} ($+0.704$) are the strongest.}
+  \label{fig:tma}
+\end{figure}
+
+\input{../tables/tma_by_archetype.tex}
+
+The mechanism behind these numbers is most concretely visible in
+a single hand. Box~2 reproduces Phase 3.1 hand \#146:
+\arch{Wall} holding $K\heartsuit\,Q\heartsuit$ (rank $872$) calls
+a flop continuation bet\footnote{A \textit{continuation bet}
+(\textit{c-bet}) is a bet made on the flop by the player who
+took the lead in betting preflop, regardless of whether the
+flop helped that player's hand. It is the most common bluff line
+in modern poker.} and a turn barrel from \arch{Firestorm}, reads
+\arch{Firestorm}'s river check as a tell\footnote{A
+\textit{tell} is a behavioral signal that gives information
+about an opponent's hand. \arch{Wall} reads \arch{Firestorm}'s
+river check as a tell because the canonical \arch{Firestorm}
+policy bets every street with a real hand; a river check
+therefore signals that the bluff line has been abandoned.},
+\textit{bets} the river for value, and wins 32 chips. Canonical
+\arch{Wall} never bets the river in any Phase 1, Phase 2, or
+Phase 3 dataset; Phase 3.1 \arch{Wall}, with reasoning
+scaffolding, does.
+
+\begin{tcolorbox}[storyhand={Box~2.\quad The inversion in a single hand (Phase 3.1 hand \#146, 17 actions, 32-chip pot)}]
 \scriptsize
 \textbf{Setup.} Seed 42, hand 146. \arch{Wall} (seat 3) is dealt
 $K\heartsuit\,Q\heartsuit$ -- rank 872, a strong hand. Final pot
@@ -1065,6 +1118,8 @@ Phase 2, or Phase 3 dataset; Phase 3.1 \arch{Wall}, augmented with
 chain-of-thought, per-opponent memory, and adaptive strategy
 notes, does.}
 \end{tcolorbox}
+
+\FloatBarrier
 
 % =============================================================================
 \section{Discussion}
