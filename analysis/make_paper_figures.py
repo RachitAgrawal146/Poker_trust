@@ -157,26 +157,12 @@ def fig_four_tier_ladder(outdir: Path) -> None:
     ax.axhline(0, color="black", linewidth=0.8, linestyle="-")
     ax.axhline(-1.0, color="grey", linewidth=0.4, linestyle=":")
 
-    for i, (m, lo, hi) in enumerate(zip(means, ci_lo, ci_hi)):
-        offset = -0.10 if m < 0 else 0.05
-        ax.text(i, m + offset,
-                f"r = {m:+.3f}\n95% CI [{lo:+.2f}, {hi:+.2f}]",
-                ha="center", va="top" if m < 0 else "bottom",
-                fontsize=9.5, fontweight="bold")
-
     ax.set_xticks(range(len(PHASE_ORDER)))
     ax.set_xticklabels(PHASE_ORDER, fontsize=10)
     ax.set_ylabel("Trust-profit Pearson r\n(mean across 5 seeds)", fontsize=11)
     ax.set_title("Trust-Profit r Across Four Agent Architectures",
                  fontsize=12)
     ax.set_ylim(-1.05, 0.40)
-
-    fig.text(0.99, -0.02,
-             "Error bars: 95% percentile bootstrap CI on the mean "
-             "(10,000 resamples, n=5 seeds).\n"
-             "Phase 3.1 CI contains zero AND moderate negative correlations; "
-             "n=20 replication needed.",
-             ha="right", va="top", fontsize=8.5, color="#555", style="italic")
 
     fig.tight_layout()
     _save(fig, outdir, "01_four_tier_ladder.png")
@@ -222,23 +208,12 @@ def fig_five_tier_ladder(outdir: Path) -> None:
            edgecolor="black", linewidth=0.8, capsize=6,
            error_kw={"linewidth": 1.0, "ecolor": "#222"})
     ax.axhline(0, color="black", linewidth=0.8)
-    for i, (m, lo, hi) in enumerate(zip(means, ci_lo, ci_hi)):
-        offset = -0.10 if m < 0 else 0.05
-        ax.text(i, m + offset,
-                f"r = {m:+.3f}\n95% CI [{lo:+.2f}, {hi:+.2f}]",
-                ha="center", va="top" if m < 0 else "bottom",
-                fontsize=9.0, fontweight="bold")
     ax.set_xticks(range(len(labels)))
     ax.set_xticklabels(labels, fontsize=9.5)
     ax.set_ylabel("Trust-profit Pearson r (mean across 5 seeds)")
     ax.set_title("Trust-Profit r Across Five Agent Architectures",
                  fontsize=12)
     ax.set_ylim(-1.05, 0.45)
-
-    fig.text(0.99, -0.02,
-             "Error bars: 95% percentile bootstrap CI on the mean (10,000 resamples, n=5 seeds).\n"
-             "Phase 3.1 CI [-0.32, +0.20] contains zero AND moderate negative correlations.",
-             ha="right", va="top", fontsize=8.5, color="#555", style="italic")
     fig.tight_layout()
     _save(fig, outdir, "01b_five_tier_ladder_with_unbounded.png")
 
@@ -263,8 +238,6 @@ def fig_per_seed_ladder(outdir: Path) -> None:
         # Mean as horizontal tick
         m = float(np.mean(rs))
         ax.hlines(m, i - 0.25, i + 0.25, color="black", linewidth=2.0, zorder=4)
-        ax.text(i + 0.30, m, f"mean = {m:+.3f}", va="center", ha="left",
-                fontsize=9, fontweight="bold")
 
     ax.axhline(0, color="black", linewidth=0.8)
     ax.set_xticks(x_positions)
@@ -505,11 +478,6 @@ def fig_tma_by_archetype(outdir: Path) -> None:
 
     ax.barh(range(len(archs)), vals, color=colors, edgecolor="black",
             linewidth=0.7, alpha=0.9)
-    for i, v in enumerate(vals):
-        offset = -0.02 if v < 0 else 0.02
-        ax.text(v + offset, i, f"{v:+.3f}",
-                va="center", ha="left" if v >= 0 else "right",
-                fontsize=10, fontweight="bold")
     ax.axvline(0, color="black", linewidth=0.8)
     ax.set_yticks(range(len(archs)))
     ax.set_yticklabels(archs, fontsize=10)

@@ -1,8 +1,8 @@
 % =============================================================================
-% main.tex — Polygence research paper, Science-style, IMRaD
+% main.tex — Research paper, Science-style, IMRaD
 %
 % Trust Dynamics in Multi-Agent Strategic Interaction
-% Rachit Agrawal — Polygence Research Program, 2025-2026
+% Rachit Agrawal — 2025-2026
 %
 % Section order:
 %   Abstract | Introduction | Background | Methodology | Results |
@@ -125,7 +125,7 @@
 
 \fancyfoot[L]{%
   \fontsize{8}{10}\selectfont\itshape
-  Agrawal, \textit{Polygence Research} (\the\year)}
+  Agrawal (\the\year)}
 \fancyfoot[R]{\fontsize{8}{10}\selectfont\thepage~of~\pageref{LastPage}}
 \renewcommand{\footrule}{%
   \kern-8pt{\color{scienceRed}\hrule width\headwidth height 0.7pt}\vskip 4pt}
@@ -138,7 +138,7 @@
   \fancyhead[L]{}
   \renewcommand{\headrule}{}
   \fancyfoot[L]{\fontsize{8}{10}\selectfont\itshape
-                Agrawal, \textit{Polygence Research} (\the\year)}
+                Agrawal (\the\year)}
   \fancyfoot[R]{\fontsize{8}{10}\selectfont\thepage~of~\pageref{LastPage}}
   \renewcommand{\footrule}{%
     \kern-8pt{\color{scienceRed}\hrule width\headwidth height 0.7pt}\vskip 4pt}}
@@ -185,18 +185,6 @@
 % A black vertical separator bar, used between items in lists/headers.
 \newcommand{\bbar}{\,\rule[-0.5pt]{0.5pt}{8pt}\,}
 
-% Archetype character card: image + colored name + role + honesty + blurb.
-% Use \archcard{filename}{Name}{role}{honesty}{description}.
-\newcommand{\archcard}[5]{%
-  \par\vspace{4pt}\noindent
-  \begin{minipage}[c]{0.24\linewidth}\centering
-    \includegraphics[width=\linewidth,height=0.85in,keepaspectratio]{archetypes/#1}%
-  \end{minipage}\hspace{6pt}%
-  \begin{minipage}[c]{\dimexpr0.74\linewidth-6pt\relax}\raggedright
-    {\sffamily\fontsize{10}{12}\selectfont\arch{#2}\bbar\textit{#3}\bbar honesty #4}\\[2pt]
-    \small #5
-  \end{minipage}\par\vspace{6pt}}
-
 \hyphenpenalty=200
 \tolerance=1500
 \emergencystretch=3em
@@ -226,7 +214,7 @@
     \vspace{4pt}
 
     \noindent{\fontsize{8.5}{10.5}\selectfont\itshape
-      \textsuperscript{1}Polygence Research Program, 2025--2026.
+      \textsuperscript{1}Independent research, 2025--2026.
       Correspondence: rachit.agrawal@sahyadrischool.org\par}
     \vspace{16pt}
 
@@ -281,78 +269,80 @@
 \section{Introduction}
 % =============================================================================
 
-Trust is hard to verify directly. When you buy something from a
-seller you have never met, when you lend money to a borrower whose
-finances you cannot inspect, or when you decide whether to
-believe a stranger on the internet, you do not have access to
-their intentions---you have only their past behavior, and you have
-to infer trustworthiness from that. Modern reputation systems
-automate the inference: eBay shows seller ratings, lending
-platforms show credit history, social networks rank contributors
-by past engagement. The promise is that visible behavior gets
-correctly classified and trustworthy actors are rewarded.
+Trust is the law that governs every interaction you have with the
+people around you --- every business deal, every bank loan, every
+purchase, and even relationships. In today's reputation system,
+Amazon shows product reviews, banks check credit scores, and
+Reddit prefers posts that get a lot of attention. Suppose you have
+two real estate developers. The first one is working on their
+first project. They are new in the market. The second one is an
+established firm with good reviews and good history. Who do you
+trust to build your dream home with your life's savings? So a
+visible reputation system seems like a win-win situation: it is
+easy for you to do the right thing, and the trusted agents are
+rewarded.
 
-But there is a problem with making behavior visible. Trustworthy
-actors are, almost by definition, predictable. They do the
-cooperative thing in the situations where the cooperative thing
-is expected. Once everyone knows that, opponents can plan around
-them. The pattern is well-documented in real marketplaces. eBay
-sellers with perfect feedback scores sometimes earn lower
-margins than sellers with slightly imperfect records, because
-buyers correctly infer that perfect-record sellers will never
-risk their reputation by deviating, and so any price the seller
-posts is the best price the seller is willing to take
-\citep{resnick2002trust,bolton2004effective}. Predictable
-market-makers in high-frequency trading face the same kind of
-disadvantage \citep{glosten1985bid}. Predictability is
-exploitable.
+But this transparency comes with a contradiction. A trusted agent
+is by definition almost predictable. When cooperation is expected
+and is right, they cooperate. And because everyone knows that in
+an overt environment, opponents can plan around them. That's
+obvious in the real world. eBay sellers with a perfect rating may
+have a lower profit margin than those with a slightly imperfect
+rating \citep{resnick2002trust,bolton2004effective}. The reason is
+the buyer knows the perfect-rated seller won't risk their
+reputation, so the posted price is already the lowest they'd go.
+So it is the seller's perfect past that sinks them. It's the same
+with market makers in high-frequency trading
+\citep{glosten1985bid}. Predictability can be exploited.
 
-We wanted to test this dynamic in a setting where we control
-everything---the rules, the agents, and the reputation system
-itself---so we could vary one piece at a time and watch what
-changes. Real economic data lets us observe correlations but not
-run controlled experiments on agent design. A simulation does.
-The question we wanted to answer is whether reputation systems
-that infer trust from behavior systematically reward exploitation,
-and whether the answer depends more on the design of the
-reputation system or on the design of the agents using it.
+We wanted to test this in a controlled environment where we could
+modify and choose each feature of the environment, like the rules,
+the agents and trust dynamics themselves, and see for ourselves
+how they would evolve over time. We can draw conclusions from real
+economic data, but we cannot run controlled experiments. We wanted
+to know whether reputation systems that infer trust from behaviour
+end up rewarding exploitation. Is the system's loss of trust
+economically optimal? Is the answer more dependent on the design
+of the trust system or the design of the characters themselves?
 
-Poker turns out to be a good place to ask this question. Every
-hand has hidden information (each player gets two private
-``hole'' cards\footnote{The two private cards each player is
-dealt at the start of every hand; only the player can see them.}
-no one else sees), public actions (every bet, call, or fold is
-visible to the table), an action space rich enough that both
-cooperative and exploitative strategies are available, and an
-explicit chip-denominated payoff. We use fixed-limit Texas
-Hold'em\footnote{Limit Texas Hold'em fixes the bet size on each
-round. In our setup, bets and raises on the first two rounds are
-2 chips; on the last two rounds they are 4 chips. No player can
-place more than four bets in a single round (the ``four-bet
+Poker turned out to be the perfect environment to try this out.
+Each hand is a set of interactions that can be directly mapped to
+real-life interactions --- there is some hidden information (a
+player's private ``hole''
+cards\footnote{The two private cards each player is
+dealt at the start of every hand; only the player can see them.}),
+public actions (bets, calls and folds visible to everyone at the
+table) and an action space large enough that both cooperative and
+exploitative strategies are possible. We worked with fixed-limit
+Texas Hold'em\footnote{Limit Texas Hold'em fixes the bet size on
+each round. In our setup, bets and raises on the first two rounds
+are 2 chips; on the last two rounds they are 4 chips. No player
+can place more than four bets in a single round (the ``four-bet
 cap''), which keeps the action space small and the math
-tractable.} because the bet sizes are fixed and the action space
-is small, which makes the inference math tractable. We use it as
-a behavioural microscope, not as a benchmark to solve.
+tractable.}, where both the bet sizes and action space are small
+enough to make the inference math tractable. We use it as a
+behavioural microscope, not as a benchmark to solve.
 
-Concretely, we build an 8-player simulation in which every agent
-keeps a running probability distribution over what kind of
-player each of the other seven is---a ``tight player who only
-bets with strong hands,'' a ``loose maniac who bets
-everything,'' and so on. After every observed action, the agent
-updates its distribution. We measure how trustworthy each agent
-looks under that distribution and how many chips each agent ends
-up with, and we report the Pearson
-correlation\footnote{The Pearson correlation coefficient
-measures the linear relationship between two paired variables on
-a scale of $-1$ (perfect negative) to $+1$ (perfect positive);
-$r = 0$ means no linear relationship, and $|r| \approx 0.5$ is
-conventionally a moderate effect.} between the two. Then we
-vary the kind of agent doing the playing---first frozen
-rule-based agents, then agents that try to optimize their own
-strategy locally, then language-model agents given a personality,
-and finally language-model agents given a personality plus tools
-to reason about their opponents. The game and the trust system
-stay the same; only the agents change.
+Specifically, we built an 8-player simulation in which every agent
+maintains a perception about the others with a probability
+distribution to understand whether the opponent is a ``tight
+player who only plays strong hands'' or a ``loose maniac who bets
+with a deuce-seven'' and so on. After every action, the agents
+update their belief systems. Trust is the honesty that we expect
+from an adversary, according to our level of confidence in their
+archetype. Then, we calculate the Pearson
+correlation\footnote{The Pearson correlation coefficient measures
+the linear relationship between two paired variables on a scale of
+$-1$ (perfect negative) to $+1$ (perfect positive); $r = 0$ means
+no linear relationship, and $|r| \approx 0.5$ is conventionally a
+moderate effect.} between the economic return (the chips earned)
+and the trust coefficient. We vary the nature of the agents as
+they become progressively more complex. They start off as frozen
+rule-based agents that do not evolve. Then we move on to ML agents
+that try to optimise their strategies locally. They then become
+language models with the ability to reason and retain context. The
+game and the trust system are the same, whereas only the agents
+change.
 
 \begin{figure*}[!ht]
   \centering
@@ -369,133 +359,125 @@ stay the same; only the agents change.
 
 \input{../tables/headline_ladder.tex}
 
-What we find is a four-tier ladder in the trust--profit
-correlation, falling from a strongly negative $-0.752$ under
-frozen agents to roughly zero under reasoning-augmented language
-models. We are careful not to over-claim. The ladder is the most
-robust thing we measure; the absolute size of each rung carries
-substantial uncertainty because we run only five seeds per phase.
-The single most important conclusion is the rank ordering: more
-capable, more reasoning-driven agents are progressively less hurt
-by being predictably cooperative, and the simplest fixed-rule
-cooperators are the most exploited.
+The trust--profit correlation evolves in four distinct phases,
+falling from a strongly negative $-0.752$ under frozen agents to
+roughly zero under the final LLM models that have context
+awareness and memory. The ladder is the most robust thing we
+measure (Fig.~\ref{fig:headline}, Table~\ref{tab:ladder}).
+Because we only run five seeds per phase, the absolute numbers
+carry uncertainty, but the rank ordering is robust. That ordering
+tells us that while the dumber rule-based agents are easily
+exploited, the smarter LLM models are able to escape this trap.
 
-The rest of the paper is organized as follows. Section~2 ties
-together three lines of prior work that converge on this
-question. Section~3 describes the game, the eight archetypes
-with explicit mathematical bounds for each, the trust posterior,
-and the four agent architectures. Section~4 reports results with
-figures and example hands woven into the discussion. Section~5
-discusses mechanisms in prose. Section~6 lists limitations.
-Section~7 concludes.
+The paper is organised as follows. In Section~2, we review three
+lines of previous research that converge on this topic. In
+Section~3 we describe the game, the eight archetypes and the
+mathematical bounds for each, the trust posterior, and the four
+agent architectures. The results, including figures and example
+hands in the analysis, are presented in Section~4. We describe the
+mechanisms in detail in Section~5. In Section~6 we discuss the
+limitations of our study. The final section, Section~7, is the
+conclusion.
 
 % =============================================================================
 \section{Background}
 % =============================================================================
 
-Three lines of prior work converge on the question this paper
-asks, and it is useful to walk through them in the order in which
-they bear on the design of our simulation.
+We have four different strands of work that came together to help
+us understand and answer our questions. We go through them in the
+order they bear on the design of our simulation.
 
-The first is the empirical economics of online reputation.
-Resnick and Zeckhauser's analysis of eBay
-\citep{resnick2002trust} was among the first to document, at
-scale, what later authors called the transparency paradox:
-sellers with perfect feedback scores sometimes earn lower margins
-than sellers with slightly imperfect records. The proposed
-mechanism is straightforward: a perfectly cooperative seller has
-the smallest deviation budget---any single negative review would
-be costly relative to a clean record---so buyers correctly infer
-that this seller will never risk the reputation by, say, offering
-a better price under the table or going above and beyond on
-returns. The buyer therefore has more bargaining leverage. Bolton,
-Katok, and Ockenfels \citep{bolton2004effective} later replicated
-this experimentally in controlled trust games; a related dynamic
-in financial market microstructure---adverse selection against
-predictable market-makers \citep{glosten1985bid}---produces the
-same general pattern through information asymmetry rather than
-reputation per se. The mechanism is observational but consistent:
-visible cooperation is exploitable when opponents can plan around
-it. What this literature can tell us is that the effect exists in
-the field. What it cannot tell us is whether the effect would
-persist if the cooperative actors were more sophisticated,
-because the experimenters do not get to redesign the population
-of sellers.
+The first line is empirical economics of online reputation
+systems. One of the first papers to study what would become known
+as the transparency paradox on a large scale was Resnick and
+Zeckhauser's study of eBay \citep{resnick2002trust}. Sellers with
+perfect feedback scores tend to earn lower profit margins than
+sellers with slightly imperfect records. The reason is simple: if
+a seller always cooperates, they don't move from the listed
+price --- negative reviews would threaten the seller's perfect
+record --- so buyers rightly conclude that this seller will never
+jeopardise the reputation by, say, offering a better price off the
+books or going above and beyond on returns. That leaves the buyer
+in the better bargaining position. Bolton, Katok and Ockenfels
+\citep{bolton2004effective} later tried to replicate this in
+controlled trust games. A similar dynamic in the microstructure of
+financial markets, adverse selection against predictable
+market-makers \citep{glosten1985bid}, produces the same
+qualitative pattern not by reputation per se but through
+information asymmetry. The mechanism is observational but
+consistent: visible cooperation can be exploited when opponents
+can act around it. It therefore provides evidence for the presence
+of this effect in real-world marketplaces. What it can't tell us
+is whether the effect would persist if the cooperative actors were
+smarter, since the experimenters can't reengineer the seller
+population.
 
-The second line is the theoretical and computational study of
-cooperation in repeated games. Axelrod's tournaments
-\citep{axelrod1984evolution} and Nowak's subsequent five rules
-for cooperation \citep{nowak2006five} showed that, in pairwise
-interactions with simple payoff structures, reciprocal strategies
-like Tit-for-Tat are robustly successful: an agent that
-cooperates by default and punishes defection one-for-one will, in
-the long run, do well against most opponents. This literature
-underwrites our intuition that cooperation is a competitive
-strategy. But two of its load-bearing assumptions break in our
-setting. The interactions are no longer pairwise---they are
-8-way---so the cost of a single agent's aggression is spread
-across seven simultaneous opponents rather than concentrated on
-one. And the action space is richer than Prisoner's Dilemma's
-cooperate/defect binary; poker allows folding, calling, raising,
-bluffing\footnote{A \textit{bluff} is a bet made with a weak hand
-intended to make opponents fold stronger hands; its inverse, a
-\textit{value bet}, is a bet with a strong hand intended to be
-called by weaker hands.}, and slow-playing, which gives
-aggressive types more degrees of freedom to extract value. We
-later report that our Tit-for-Tat analogue (\arch{Mirror}) finishes
-sixth of eight in economic ordering---a hint that the canonical
-IPD result does not generalize cleanly to multi-agent settings
-with richer actions, though we treat that observation as
+The second area is theory and computation of cooperation in games
+with repeated interactions. This was studied in the Prisoner's
+Dilemma in Axelrod's tournaments \citep{axelrod1984evolution} and
+Nowak's five rules for cooperation \citep{nowak2006five}. They
+demonstrated that reciprocal strategies like Tit-for-Tat are
+robustly successful in pairwise interactions with simple payoff
+structures, meaning an agent that cooperates by default and
+punishes defection one-for-one will do well in the long run
+against most opponents. Such a line of work validates our
+intuition that cooperation is a strategy of competition. But two
+of its assumptions do not hold in our setting. The interactions
+are no longer 1-1; they are 8-way, so the cost of one agent's
+aggression is spread across seven simultaneous opponents, rather
+than focused on one. And the action space is richer than the
+binary cooperate/defect of the Prisoner's Dilemma. Poker allows
+folding, calling, raising, bluffing\footnote{A \textit{bluff} is
+a bet made with a weak hand intended to make opponents fold
+stronger hands; its inverse, a \textit{value bet}, is a bet with
+a strong hand intended to be called by weaker hands.
+\textit{Fold equity} is the value an aggressor captures when
+opponents fold without reaching showdown.}, and slow-playing,
+which gives aggressive types more degrees of freedom to extract
+value. Our parallel Tit-for-Tat archetype (\arch{Mirror}) appears
+in sixth place of eight in stack ordering. This could be a sign
+that the results of Axelrod do not generalise fully to multi-agent
+environments with richer action spaces, but we consider this to be
 suggestive rather than conclusive.
 
-The third line is Bayesian opponent modeling in poker, which
-began with Billings et al.'s Loki and Poki bots
-\citep{billings1998opponent}, was formalized as Bayesian type
-inference by Southey et al.\ \citep{southey2005bayes}, was
-extended to safe opponent exploitation by Ganzfried and Sandholm
-\citep{ganzfried2015safe}, and continued through the solution of
-heads-up limit Hold'em by Bowling et al.\ \citep{bowling2015heads}
-and the superhuman performance of Libratus and Pluribus in
-heads-up and 6-player no-limit
-\citep{brown2018superhuman,brown2019superhuman}. That body of
-work is concerned with optimal or safely-exploitative play
-against one opponent or in zero-sum settings. Our concern is
-different. We are not trying to play well; we are trying to use
-the type-inference machinery that all of this work depends on as
-a controlled testbed for how reputation dynamics emerge when the
-inference is correct, transparent, and shared across many agents.
-The poker engine here is a microscope, not a competitor.
+The third line is Bayesian opponent modelling in poker. Billings
+et al.'s Loki and Poki bots \citep{billings1998opponent} are
+leading the pack. Later it was formalised by Southey et al.\
+\citep{southey2005bayes} as Bayesian type inference. Ganzfried and
+Sandholm \citep{ganzfried2015safe} generalised this to safe
+opponent exploitation. It goes on to Bowling et al.'s solution of
+heads-up limit Hold'em \citep{bowling2015heads} and the superhuman
+play of Libratus and Pluribus in heads-up and 6-player no-limit
+Hold'em \citep{brown2018superhuman,brown2019superhuman}. That work
+is about optimal or safely exploitative play, generally against a
+single opponent or in a zero-sum setting. It's not ours. We are
+not trying to play well but to borrow the type-inference machinery
+this literature uses as a controlled testbed for how reputation
+dynamics arise when inference is correct, transparent and shared
+across many agents. The poker engine here is a microscope, not a
+competitor.
 
-A more recent fourth line is relevant because two of our four
-phases use language models. A short body of work has begun to ask
-whether large language models behave strategically when deployed
-as agents in adversarial or partially-observable environments, or
+The fourth line is important because we use language models in two
+of our phases. A small body of literature has begun to ask whether
+large language models act strategically when they are deployed as
+agents in adversarial or partially observable environments or
 whether they merely reproduce the textual form of a strategy
-without inventing one. Park et al.'s generative-agent work
-\citep{park2023generative} and more recent benchmarks of LLMs in
+without inventing one. Work by Park et al.\ on generative agents
+\citep{park2023generative} and newer benchmarks of LLMs on
 negotiation and game-playing tasks \citep{liu2024agentbench}
-suggest the question is open. Our contrast between Phase 3
-(a language model given only a personality spec) and Phase 3.1
-(the same model given a personality spec plus
+suggests that the question remains open. We built Phase~3 (a
+language model with only a personality spec) and Phase~3.1 (the
+same model plus a personality spec plus
 chain-of-thought\footnote{\textit{Chain-of-thought prompting}
-asks a language model to produce a short, explicit reasoning
-trace before its final answer, instead of jumping straight to the
+asks a language model to produce a short, explicit reasoning trace
+before its final answer, instead of jumping straight to the
 answer. In our setting the reasoning trace is capped at two
 sentences and the model is then required to emit a final-line
-\texttt{ACTION:} marker.} reasoning, per-opponent memory, and
-self-updated strategy notes) is designed to probe this
-distinction directly.
+\texttt{ACTION:} marker.} reasoning, per-opponent memory and
+self-updated strategy notes) to directly test this distinction.
 
-Bringing these lines together: prior work establishes that
-observation-based reputation has a measurable cost in the field,
-that cooperation is competitive in pairwise repeated games but
-the picture is less clear in multi-agent settings, that Bayesian
-opponent modeling gives us the mathematical machinery to make this
-question tractable, and that language-model agents are a new and
-underexplored substrate for testing how the result depends on
-agent capability. The simulation we describe in the next section
-is the smallest controlled setup we could build that combines all
-four.
+In the next section we describe the smallest controlled set-up
+combining all four.
 
 % =============================================================================
 \section{Methodology}
@@ -535,79 +517,84 @@ agent's policy is a per-round table of action probabilities
 conditioned on hand-strength bucket; the parameters of the static
 archetypes are frozen across runs. Each archetype carries an
 \textit{honesty score} $h \in [0,1]$ defined as
-$P(\text{bet}\mid\text{strong})\cdot(1-P(\text{bluff}\mid\text{weak}))$,
-where a \textit{bluff}\footnote{A \textit{bluff} is a bet made with a weak
-hand intended to make opponents fold stronger hands. Its inverse, a
-\textit{value bet}, is a bet with a strong hand intended to be called by
-weaker hands. \textit{Fold equity} is the value an aggressor captures when
-opponents fold without reaching showdown.} is a bet with a weak hand and a
-value bet is its inverse with a strong hand; this scalar is what the trust
-score weights
-(Eq.~\ref{eq:trust}).
+$P(\text{bet}\mid\text{strong})\cdot(1-P(\text{bluff}\mid\text{weak}))$;
+this scalar is what the trust score weights (Eq.~\ref{eq:trust}).
+Each archetype's name is rendered in its brand color throughout,
+so the reader can track which agent is being discussed. Preflop
+bound ranges\footnote{Throughout the archetype descriptions,
+\textit{br} = bluff rate (probability of betting on a weak hand),
+\textit{vbr} = value-bet rate (probability of betting on a strong
+hand), and \textit{cr} = call rate facing a bet on a medium hand.
+Ranges are the archetype's Phase~2 hill-climbing bound boxes
+around its Phase~1 starting parameters.} are listed below; the
+full per-archetype policy bounds appear in
+Table~\ref{tab:bounds-comprehensive}.
 
-\archcard{oracle.png}{Oracle}{Nash-equilibrium baseline}{0.75}{%
-  Plays an approximately game-theory-optimal frequency profile; the
-  control archetype against which all adaptive agents are measured.\\[1pt]
-  {\scriptsize\sffamily\textcolor{darkGray}{Preflop bounds:\footnote{Across
-  this and the following seven cards, \textit{br} = bluff rate
-  (probability of betting on a weak hand), \textit{vbr} = value-bet
-  rate (probability of betting on a strong hand), and \textit{cr} =
-  call rate facing a bet on a medium hand. Ranges are the
-  archetype's Phase 2 hill-climbing bound boxes around its Phase 1
-  starting parameters.}
-  br $\in[.20,.45]$ \bbar vbr $\in[.80,1.00]$ \bbar cr $\in[.20,.50]$}}}
+\medskip
 
-\archcard{sentinel.png}{Sentinel}{Tight-aggressive (TAG)}{0.92}{%
-  The honest player; folds most hands and bets strongly when it
-  enters. Bets reliably signal strength and checks reliably signal
-  weakness.\\[1pt]
-  {\scriptsize\sffamily\textcolor{darkGray}{Preflop bounds:
-  br $\in[.02,.18]$ \bbar vbr $\in[.85,1.00]$ \bbar cr $\in[.25,.50]$}}}
+\noindent\arch{Oracle} \bbar \textit{Nash-equilibrium baseline}
+\bbar $h = 0.75$\\
+Plays an approximately game-theory-optimal frequency profile; the
+control archetype against which all adaptive agents are measured.\\
+{\scriptsize\sffamily\textcolor{darkGray}{%
+br $\in[.20,.45]$ \bbar vbr $\in[.80,1.00]$ \bbar cr $\in[.20,.50]$}}
 
-\archcard{firestorm.png}{Firestorm}{Loose-aggressive maniac}{0.38}{%
-  The exploiter; bets and raises constantly across all hand
-  strengths. Wins primarily through fold equity, not showdown skill.\\[1pt]
-  {\scriptsize\sffamily\textcolor{darkGray}{Preflop bounds:
-  br $\in[.40,.95]$ \bbar vbr $\in[.85,1.00]$ \bbar cr $\in[.45,.90]$}}}
+\medskip\noindent\arch{Sentinel} \bbar
+\textit{Tight-aggressive (TAG)} \bbar $h = 0.92$\\
+The honest player; folds most hands and bets strongly when it
+enters. Bets reliably signal strength and checks reliably signal
+weakness.\\
+{\scriptsize\sffamily\textcolor{darkGray}{%
+br $\in[.02,.18]$ \bbar vbr $\in[.85,1.00]$ \bbar cr $\in[.25,.50]$}}
 
-\archcard{wall.png}{Wall}{Calling station}{0.96}{%
-  Never folds, never bluffs; the most-trusted archetype because it
-  is the most predictable, and---in Phases 1 through 3---the lowest
-  economic performer for the same reason.\\[1pt]
-  {\scriptsize\sffamily\textcolor{darkGray}{Preflop bounds:
-  br $\in[.00,.05]$ \bbar vbr $\in[.40,.75]$ \bbar cr $\in[.65,.95]$}}}
+\medskip\noindent\arch{Firestorm} \bbar
+\textit{Loose-aggressive maniac} \bbar $h = 0.38$\\
+The exploiter; bets and raises constantly across all hand
+strengths. Wins primarily through fold equity, not showdown
+skill.\\
+{\scriptsize\sffamily\textcolor{darkGray}{%
+br $\in[.40,.95]$ \bbar vbr $\in[.85,1.00]$ \bbar cr $\in[.45,.90]$}}
 
-\archcard{phantom.png}{Phantom}{Deceiver}{0.48}{%
-  Bluffs aggressively early in a hand and folds to resistance.
-  Designed to sit in an ambiguous region of the archetype space.\\[1pt]
-  {\scriptsize\sffamily\textcolor{darkGray}{Preflop bounds:
-  br $\in[.35,.85]$ \bbar vbr $\in[.45,.85]$ \bbar cr $\in[.10,.45]$}}}
+\medskip\noindent\arch{Wall} \bbar
+\textit{Calling station} \bbar $h = 0.96$\\
+Never folds, never bluffs; the most-trusted archetype because it
+is the most predictable, and---in Phases 1 through 3---the lowest
+economic performer for the same reason.\\
+{\scriptsize\sffamily\textcolor{darkGray}{%
+br $\in[.00,.05]$ \bbar vbr $\in[.40,.75]$ \bbar cr $\in[.65,.95]$}}
 
-\archcard{predator.png}{Predator}{Exploits classified opponents}{0.79}{%
-  Reads its posterior and shifts toward exploitation against any
-  opponent classified above a $p=0.60$ confidence threshold;
-  otherwise falls back to a TAG baseline.\\[1pt]
-  {\scriptsize\sffamily\textcolor{darkGray}{Preflop bounds:
-  br $\in[.10,.40]$ \bbar vbr $\in[.75,1.00]$ \bbar cr $\in[.20,.50]$}}}
+\medskip\noindent\arch{Phantom} \bbar
+\textit{Deceiver} \bbar $h = 0.48$\\
+Bluffs aggressively early in a hand and folds to resistance.
+Designed to sit in an ambiguous region of the archetype space.\\
+{\scriptsize\sffamily\textcolor{darkGray}{%
+br $\in[.35,.85]$ \bbar vbr $\in[.45,.85]$ \bbar cr $\in[.10,.45]$}}
 
-\archcard{mirror.png}{Mirror}{Tit-for-tat}{0.78}{%
-  Copies the most-active opponent's frequencies into a blended
-  policy. The poker analogue of IPD Tit-for-Tat; in practice it does
-  not transfer cleanly to 8-player settings.\\[1pt]
-  {\scriptsize\sffamily\textcolor{darkGray}{Preflop bounds:
-  br $\in[.03,.25]$ \bbar vbr $\in[.75,1.00]$ \bbar cr $\in[.22,.52]$}}}
+\medskip\noindent\arch{Predator} \bbar
+\textit{Exploits classified opponents} \bbar $h = 0.79$\\
+Reads its posterior and shifts toward exploitation against any
+opponent classified above a $p=0.60$ confidence threshold;
+otherwise falls back to a TAG baseline.\\
+{\scriptsize\sffamily\textcolor{darkGray}{%
+br $\in[.10,.40]$ \bbar vbr $\in[.75,1.00]$ \bbar cr $\in[.20,.50]$}}
 
-\archcard{judge.jpg}{Judge}{Retaliates against bluffers}{0.80}{%
-  Maintains a per-opponent grievance ledger; triggers retaliatory
-  aggression against any opponent caught bluffing five or more times.
-  Models reputation-based punishment.\\[1pt]
-  {\scriptsize\sffamily\textcolor{darkGray}{Preflop bounds
-  (cooperative state): br $\in[.02,.18]$ \bbar vbr $\in[.85,1.00]$
-  \bbar cr $\in[.25,.50]$}}}
+\medskip\noindent\arch{Mirror} \bbar
+\textit{Tit-for-tat} \bbar $h = 0.78$\\
+Copies the most-active opponent's frequencies into a blended
+policy. The poker analogue of IPD Tit-for-Tat; in practice it does
+not transfer cleanly to 8-player settings.\\
+{\scriptsize\sffamily\textcolor{darkGray}{%
+br $\in[.03,.25]$ \bbar vbr $\in[.75,1.00]$ \bbar cr $\in[.22,.52]$}}
 
-\vspace{4pt}\noindent\textit{Notation.} Each archetype's name is
-rendered in its brand color throughout, so the reader can track
-which agent is being discussed.
+\medskip\noindent\arch{Judge} \bbar
+\textit{Retaliates against bluffers} \bbar $h = 0.80$\\
+Maintains a per-opponent grievance ledger; triggers retaliatory
+aggression against any opponent caught bluffing five or more times.
+Models reputation-based punishment.\\
+{\scriptsize\sffamily\textcolor{darkGray}{%
+Preflop bounds (cooperative state):
+br $\in[.02,.18]$ \bbar vbr $\in[.85,1.00]$
+\bbar cr $\in[.25,.50]$}}
 
 \begin{table*}[!ht]
 \centering
@@ -1374,109 +1361,14 @@ extension, and an experimental varying of inter-archetype distance
 would each strengthen the present findings.
 
 % =============================================================================
-\section*{Appendix: Mentor Checklist}
-% =============================================================================
-
-For mentor review, the changes requested have been addressed as
-follows.
-
-\begin{table*}[!ht]
-\centering
-\captionsetup{font={small,sf}}
-\caption{Mapping from mentor feedback to revision location.}
-\label{tab:mentor-checklist}
-\small
-\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.35\textwidth}>{\raggedright\arraybackslash}p{0.60\textwidth}@{}}
-\toprule
-\textbf{Mentor request} & \textbf{Where addressed} \\
-\midrule
-Plain-language Introduction & Section~1 rewritten with everyday
-analogies (eBay, lending, social media); poker-specific vocabulary
-deferred to first-use footnotes; lead paragraph carries no math. \\
-Background should have a flow, not random topics & Section~2
-restructured as a single narrative connecting four lines of prior
-work (reputation economics $\to$ IPD / cooperation $\to$ Bayesian
-opponent modeling $\to$ LLM agents), with explicit transitions
-between each. \\
-Mathematical bounds for each archetype & Section~3.2 plus
-Table~\ref{tab:bounds-comprehensive} (Table~A): per-archetype
-bounds on $P(\text{bet}|S)$, $P(\text{bet}|W)$,
-$P(\text{fold}|W)$, honesty, and adaptation rule. \\
-Footnotes for poker terms and complicated values & Footnotes
-distributed throughout the manuscript; first occurrence of every
-poker term (limit Hold'em, blinds, streets, showdown, side pot,
-hole cards, c-bet, 3-bet/4-bet, VPIP, PFR, AF, walkover, tell,
-bluff, value bet) and every statistical term (Pearson $r$,
-chain-of-thought, Strategic Unpredictability, etc.) carries an
-inline definition. \\
-Include graphs as you introduce & Every figure and box is placed
-inline at the paragraph that first references it. The two
-boxed hands (Box~1, Box~2) are no longer in floating
-environments; they render exactly where the text introduces them. \\
-Discussion needs to flow, not bullet points & Section~5 is six
-flowing paragraphs, each beginning with a topic sentence that
-ties back to the headline ladder. No bulleted lists. \\
-Page 7 has too many words & Each archetype card description was
-compressed from $\sim$30 to $\sim$18 words and the notation block
-trimmed to one sentence; the eight-card spread now flows across
-columns rather than crowding a single page. The 11-item
-Limitations list was compressed into the three-paragraph
-narrative in Section~6. \\
-More figures and hands & Existing 7 figures kept inline; new
-placeholder for a Phase~3.1 scaffold-ablation figure
-(Fig.~\ref{fig:ablation-placeholder}, pending experiment) and
-a new placeholder for an illustrative Phase~1 value-denial hand
-(Hand~3, pending extraction). \\
-\bottomrule
-\end{tabular}
-\end{table*}
-
-\begin{figure}[!ht]
-  \centering
-  \fbox{\begin{minipage}{0.9\linewidth}\vspace{4pt}\small
-  \textsc{Pending experiment.}\quad The ``all three scaffolds
-  required'' claim in Section~5 currently rests on the
-  supplementary validation suite. A clean main-text ablation
-  would compare Phase~3.1 trust--profit $\rtp$ under five
-  conditions: full scaffold (CoT + memory + notes); CoT only;
-  memory only; notes only; CoT + memory (no notes). At $n = 5$
-  seeds $\times$ 150 hands $\times$ 5 conditions, total API cost
-  is well under \$100. This figure will be inserted here when the
-  data are collected.
-  \vspace{4pt}\end{minipage}}
-  \caption{\textbf{Phase~3.1 scaffold ablation
-  (placeholder for pending experiment).}}
-  \label{fig:ablation-placeholder}
-\end{figure}
-
-\begin{figure}[!ht]
-  \centering
-  \fbox{\begin{minipage}{0.9\linewidth}\vspace{4pt}\small
-  \textsc{Pending hand extraction.}\quad A Phase~1 hand in which
-  \arch{Sentinel} raises preflop with a strong hand and the
-  entire table folds, denying \arch{Sentinel} any value from the
-  strong holding. Counterpart to Box~1: the same trap mechanism
-  (high trust $\to$ predictable bets $\to$ folded around) but from
-  the perspective of value denial rather than chip leakage. To
-  be inserted from a future extraction of the canonical Phase~1
-  SQLite database.
-  \vspace{4pt}\end{minipage}}
-  \caption{\textbf{Hand~3 (placeholder): Phase~1 value denial.}}
-  \label{fig:hand3-placeholder}
-\end{figure}
-
-% =============================================================================
 \section*{Sources and Acknowledgments}
 
 \subsection*{Acknowledgments}
-We thank A.~Bansal for mentorship through the Polygence research
-program and for the question, posed at our April 2026 meeting,
-that motivated the Phase 2$^{*}$ unbounded sub-experiment. We thank
-the Polygence team for the program structure and Anthropic for the
-API access that made Phases 3 and 3.1 feasible.
+We thank Anthropic for the API access that made Phases 3 and 3.1
+feasible.
 
-\paragraph*{Funding.} Polygence program fees and Anthropic API
-expenditure were self-funded by the author.
+\paragraph*{Funding.} Anthropic API expenditure was self-funded by
+the author.
 
 \paragraph*{Author contributions.} R.A.\ conceived the study,
 implemented the simulation, performed the analysis, and wrote the
