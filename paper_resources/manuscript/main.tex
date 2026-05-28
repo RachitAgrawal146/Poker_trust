@@ -269,80 +269,84 @@
 \section{Introduction}
 % =============================================================================
 
-Trust is the law that governs every interaction you have with the
-people around you --- every business deal, every bank loan, every
-purchase, and even relationships. In today's reputation system,
-Amazon shows product reviews, banks check credit scores, and
-Reddit prefers posts that get a lot of attention. Suppose you have
-two real estate developers. The first one is working on their
-first project. They are new in the market. The second one is an
-established firm with good reviews and good history. Who do you
-trust to build your dream home with your life's savings? So a
-visible reputation system seems like a win-win situation: it is
-easy for you to do the right thing, and the trusted agents are
-rewarded.
+Trust is a fundamental part of human society that is the foundation
+for human interactions that we have every day. Every business deal,
+every bank loan, every purchase, and even every relationship is
+built on trust. This is also reflected by modern-day systems, for
+example: Amazon shows product reviews, banks check credit scores
+before lending out loans, and Reddit ranks posts by community
+voting. Picture this: there are two real estate development firms.
+The first one is working on their first project; they are new in
+the market. The second one is an established firm with good
+reviews and a good history. Now, who would you trust with your
+life savings to build your dream home? You see, visible reputation
+systems seem like a win-win. It is easy for you to make the right
+decision while the trusted agents are rewarded.
 
-But this transparency comes with a contradiction. A trusted agent
-is by definition almost predictable. When cooperation is expected
-and is right, they cooperate. And because everyone knows that in
-an overt environment, opponents can plan around them. That's
-obvious in the real world. eBay sellers with a perfect rating may
-have a lower profit margin than those with a slightly imperfect
-rating \citep{resnick2002trust,bolton2004effective}. The reason is
-the buyer knows the perfect-rated seller won't risk their
-reputation, so the posted price is already the lowest they'd go.
-So it is the seller's perfect past that sinks them. It's the same
-with market makers in high-frequency trading
-\citep{glosten1985bid}. Predictability can be exploited.
+Here is the breaking point: this transparency comes with a
+contradiction. A trusted agent is almost by definition always
+predictable. When it is right to cooperate, they cooperate, and
+because everyone knows this in an open environment, the opponent
+can plan around them. This is what was observed in the real world:
+eBay sellers with a perfect rating earned lower profit margins than
+those with a slightly imperfect record
+\citep{resnick2002trust,bolton2004effective}. The reason was that
+buyers knew the perfect-rated seller would not risk their perfect
+score, so the listed price was the lowest they would go. Sellers
+with imperfect records were not bound by this. Predictability could
+be exploited \citep{glosten1985bid}.
 
-We wanted to test this in a controlled environment where we could
-modify and choose each feature of the environment, like the rules,
-the agents and trust dynamics themselves, and see for ourselves
-how they would evolve over time. We can draw conclusions from real
-economic data, but we cannot run controlled experiments. We wanted
-to know whether reputation systems that infer trust from behaviour
-end up rewarding exploitation. Is the system's loss of trust
-economically optimal? Is the answer more dependent on the design
+We wanted to answer this question but in a controlled environment
+where we tampered with each of the features, like the rules, the
+agents, and the trust dynamics between them, and saw for ourselves
+how they would affect the outcome. While we could draw conclusions
+from real economic data, we could not run controlled experiments on
+them; therefore, we settled on running computer simulations. We
+asked whether reputation systems that infer trust from behaviour
+ended up rewarding exploitation. Was the system's loss of trust
+economically optimal? Was the answer more dependent on the design
 of the trust system or the design of the characters themselves?
 
-Poker turned out to be the perfect environment to try this out.
-Each hand is a set of interactions that can be directly mapped to
-real-life interactions --- there is some hidden information (a
-player's private ``hole''
-cards\footnote{The two private cards each player is
-dealt at the start of every hand; only the player can see them.}),
-public actions (bets, calls and folds visible to everyone at the
-table) and an action space large enough that both cooperative and
-exploitative strategies are possible. We worked with fixed-limit
-Texas Hold'em\footnote{Limit Texas Hold'em fixes the bet size on
-each round. In our setup, bets and raises on the first two rounds
-are 2 chips; on the last two rounds they are 4 chips. No player
-can place more than four bets in a single round (the ``four-bet
+Poker turned out to be the perfect environment to try this. Each
+hand was a set of interactions that mapped directly to real-life
+interactions --- while there was some hidden information (for
+example, a player's private
+cards\footnote{The two private cards (``hole cards'') each player
+is dealt at the start of every hand; only the player can see
+them.}), public actions (bets, calls, and folds) were visible to
+everyone at the table. Fixed-limit Texas
+Hold'em\footnote{Limit Texas Hold'em fixes the bet size on each
+round. In our setup, bets and raises on the first two rounds are
+2 chips; on the last two rounds they are 4 chips. No player can
+place more than four bets in a single round (the ``four-bet
 cap''), which keeps the action space small and the math
-tractable.}, where both the bet sizes and action space are small
-enough to make the inference math tractable. We use it as a
-behavioural microscope, not as a benchmark to solve.
+tractable.} was the way to go, where both the bet sizes and action
+spaces were small enough to make the math tractable but also rich
+enough for these strategies to emerge. Please note that poker is
+only the behavioural microscope and not a benchmark to solve.
 
-Specifically, we built an 8-player simulation in which every agent
-maintains a perception about the others with a probability
+Specifically, we built a poker simulation using eight players in
+which each player embodied a distinct playing style. Each agent
+maintained a perception about the others with a probability
 distribution to understand whether the opponent is a ``tight
 player who only plays strong hands'' or a ``loose maniac who bets
-with a deuce-seven'' and so on. After every action, the agents
-update their belief systems. Trust is the honesty that we expect
-from an adversary, according to our level of confidence in their
-archetype. Then, we calculate the Pearson
+with a deuce-seven'', and so on. After every action, the agents
+updated their belief systems. Trust was the honesty we expected
+from an opponent according to our level of confidence in their
+archetype. We calculated the Pearson
 correlation\footnote{The Pearson correlation coefficient measures
 the linear relationship between two paired variables on a scale of
 $-1$ (perfect negative) to $+1$ (perfect positive); $r = 0$ means
 no linear relationship, and $|r| \approx 0.5$ is conventionally a
-moderate effect.} between the economic return (the chips earned)
-and the trust coefficient. We vary the nature of the agents as
-they become progressively more complex. They start off as frozen
-rule-based agents that do not evolve. Then we move on to ML agents
-that try to optimise their strategies locally. They then become
-language models with the ability to reason and retain context. The
-game and the trust system are the same, whereas only the agents
-change.
+moderate effect.} between the economic return earned and the trust
+coefficient. We varied the nature of the agents, starting
+relatively simple and becoming more complex. Phase~1 used frozen
+rule-based agents that did not evolve at all. Phase~2 used
+hill-climbing agents that tried to optimise strategies locally
+(with a variant Phase~2$^{*}$ also explored). Phase~3 used LLMs
+with distinct personalities, and Phase~3.1 used LLMs with the
+ability to reason and retain context. The game and the trust
+system were the same across phases; only the agents changed.
 
 \begin{figure*}[!ht]
   \centering
@@ -359,124 +363,121 @@ change.
 
 \input{../tables/headline_ladder.tex}
 
-The trust--profit correlation evolves in four distinct phases,
-falling from a strongly negative $-0.752$ under frozen agents to
-roughly zero under the final LLM models that have context
-awareness and memory. The ladder is the most robust thing we
-measure (Fig.~\ref{fig:headline}, Table~\ref{tab:ladder}).
-Because we only run five seeds per phase, the absolute numbers
-carry uncertainty, but the rank ordering is robust. That ordering
-tells us that while the dumber rule-based agents are easily
-exploited, the smarter LLM models are able to escape this trap.
+In accordance with the phases, the trust--profit correlation also
+evolved quite distinctly, falling from a strongly negative $-0.752$
+under frozen agents to roughly $0$ by the time we reached the LLM
+models that had context, awareness, and memory
+(Fig.~\ref{fig:headline}, Table~\ref{tab:ladder}). The ladder was
+the most robust thing we measured. Since we only ran 5 seeds per
+phase, the absolute numbers carried uncertainty, but the rank
+ordering we got was robust. The ordering revealed that the dumber
+rule-based agents were easily exploited; the smarter LLM models,
+however, were able to escape this trap.
 
-The paper is organised as follows. In Section~2, we review three
-lines of previous research that converge on this topic. In
-Section~3 we describe the game, the eight archetypes and the
-mathematical bounds for each, the trust posterior, and the four
-agent architectures. The results, including figures and example
-hands in the analysis, are presented in Section~4. We describe the
-mechanisms in detail in Section~5. In Section~6 we discuss the
-limitations of our study. The final section, Section~7, is the
-conclusion.
+The paper was organised as follows:
+\begin{itemize}\setlength{\itemsep}{2pt}\setlength{\parskip}{0pt}
+  \item Section~2: Review of the four lines of previous research
+  that converge on this topic.
+  \item Section~3: Description of the game; the archetypes,
+  including the mathematical bounds for each; the trust posterior;
+  and different agent architectures.
+  \item Section~4: Results, including figures and example hands in
+  the analysis.
+  \item Section~5: Mechanisms in detail.
+  \item Section~6: Shortcomings of our study.
+  \item Section~7: Conclusion.
+\end{itemize}
 
 % =============================================================================
 \section{Background}
 % =============================================================================
 
-We have four different strands of work that came together to help
-us understand and answer our questions. We go through them in the
-order they bear on the design of our simulation.
+There are four important predecessors that provide the background
+for this study. We'll go through them in the order they bear on the
+design of our simulation.
 
-The first line is empirical economics of online reputation
-systems. One of the first papers to study what would become known
-as the transparency paradox on a large scale was Resnick and
-Zeckhauser's study of eBay \citep{resnick2002trust}. Sellers with
-perfect feedback scores tend to earn lower profit margins than
-sellers with slightly imperfect records. The reason is simple: if
-a seller always cooperates, they don't move from the listed
-price --- negative reviews would threaten the seller's perfect
-record --- so buyers rightly conclude that this seller will never
-jeopardise the reputation by, say, offering a better price off the
-books or going above and beyond on returns. That leaves the buyer
-in the better bargaining position. Bolton, Katok and Ockenfels
-\citep{bolton2004effective} later tried to replicate this in
-controlled trust games. A similar dynamic in the microstructure of
-financial markets, adverse selection against predictable
-market-makers \citep{glosten1985bid}, produces the same
-qualitative pattern not by reputation per se but through
-information asymmetry. The mechanism is observational but
-consistent: visible cooperation can be exploited when opponents
-can act around it. It therefore provides evidence for the presence
-of this effect in real-world marketplaces. What it can't tell us
+Within the empirical economics of online reputation systems, one of
+the first papers to study what would become known as the
+Transparency Paradox on a large scale was Resnick and Zeckhauser's
+study of eBay \citep{resnick2002trust}. While sellers with perfect
+feedback scores tended to earn lower profit margins, sellers with
+slightly imperfect records did not. The reason for this is simple.
+If a seller always cooperates, they don't move from the listed
+price. Negative reviews would threaten the seller's perfect
+record, so buyers rightly conclude that this seller will never do
+anything that would pose a threat to their reputation by, say,
+offering a better price for the books or going above and beyond on
+returns. That leaves the buyer in the better bargaining position.
+Bolton, Katok and Ockenfels \citep{bolton2004effective} later tried
+to replicate this in games with controlled trust. A similar dynamic
+is reflected in the microstructures of financial markets. Adverse
+selection against predictable market makers \citep{glosten1985bid}
+produces the same qualitative patterns not by reputation per se but
+through information asymmetry. This mechanism is observational but
+consistent. Visible cooperation can be exploited when opponents can
+act around it. Therefore, it provides evidence for the presence of
+this effect in real-world marketplaces too. What it can't tell us
 is whether the effect would persist if the cooperative actors were
-smarter, since the experimenters can't reengineer the seller
-population.
+smarter, since these studies do not typically re-engineer the
+seller population.
 
-The second area is theory and computation of cooperation in games
-with repeated interactions. This was studied in the Prisoner's
-Dilemma in Axelrod's tournaments \citep{axelrod1984evolution} and
-Nowak's five rules for cooperation \citep{nowak2006five}. They
-demonstrated that reciprocal strategies like Tit-for-Tat are
-robustly successful in pairwise interactions with simple payoff
-structures, meaning an agent that cooperates by default and
-punishes defection one-for-one will do well in the long run
-against most opponents. Such a line of work validates our
-intuition that cooperation is a strategy of competition. But two
-of its assumptions do not hold in our setting. The interactions
-are no longer 1-1; they are 8-way, so the cost of one agent's
-aggression is spread across seven simultaneous opponents, rather
-than focused on one. And the action space is richer than the
-binary cooperate/defect of the Prisoner's Dilemma. Poker allows
-folding, calling, raising, bluffing\footnote{A \textit{bluff} is
-a bet made with a weak hand intended to make opponents fold
-stronger hands; its inverse, a \textit{value bet}, is a bet with
-a strong hand intended to be called by weaker hands.
-\textit{Fold equity} is the value an aggressor captures when
-opponents fold without reaching showdown.}, and slow-playing,
-which gives aggressive types more degrees of freedom to extract
-value. Our parallel Tit-for-Tat archetype (\arch{Mirror}) appears
-in sixth place of eight in stack ordering. This could be a sign
-that the results of Axelrod do not generalise fully to multi-agent
-environments with richer action spaces, but we consider this to be
-suggestive rather than conclusive.
+The next line of work is the computation of cooperation in games
+with repeated interactions. This was studied extensively by Axelrod
+through his tournaments in the Prisoner's Dilemma
+\citep{axelrod1984evolution} and Nowak's Five Rules for Cooperation
+\citep{nowak2006five}. They were able to demonstrate that the
+reciprocal strategies selected, like Tit-for-Tat, were robustly
+successful in one-on-one interactions with simple payoff
+structures, in which an agent that cooperates by default and
+punishes defections one-for-one does well in the long run against
+most opponents. This line of work validates our intuition that
+cooperation is a strategy of competition, but this falls apart due
+to two assumptions that do not hold true anymore in our setting.
+Firstly, the interactions are no longer one-on-one; they are
+eight-way. So the cost of one agent's aggression is spread across
+seven different opponents. Secondly, the action space is much
+richer than the Prisoner's Dilemma's binary. Poker allows folding,
+calling, raising, bluffing\footnote{A \textit{bluff} is a bet made
+with a weak hand intended to make opponents fold stronger hands;
+its inverse, a \textit{value bet}, is a bet with a strong hand
+intended to be called by weaker hands. \textit{Fold equity} is the
+value an aggressor captures when opponents fold without reaching
+showdown.}, and slow-playing, which gives many more degrees of
+freedom to extract value. The parallel for Tit-for-Tat in our case
+is the archetype \arch{Mirror}, which appears in sixth place in the
+stack size. This could be a sign that the results of Axelrod's
+tournament are not directly applicable to environments with
+multiple agents with richer action spaces. However, we consider
+this to be suggestive rather than conclusive.
 
-The third line is Bayesian opponent modelling in poker. Billings
-et al.'s Loki and Poki bots \citep{billings1998opponent} are
-leading the pack. Later it was formalised by Southey et al.\
-\citep{southey2005bayes} as Bayesian type inference. Ganzfried and
-Sandholm \citep{ganzfried2015safe} generalised this to safe
-opponent exploitation. It goes on to Bowling et al.'s solution of
-heads-up limit Hold'em \citep{bowling2015heads} and the superhuman
-play of Libratus and Pluribus in heads-up and 6-player no-limit
-Hold'em \citep{brown2018superhuman,brown2019superhuman}. That work
-is about optimal or safely exploitative play, generally against a
-single opponent or in a zero-sum setting. It's not ours. We are
-not trying to play well but to borrow the type-inference machinery
-this literature uses as a controlled testbed for how reputation
-dynamics arise when inference is correct, transparent and shared
-across many agents. The poker engine here is a microscope, not a
-competitor.
+The third line of work is the modelling of Bayesian opponents in
+poker, starting with Billings et al.'s Loki and Poki bots
+\citep{billings1998opponent}, only to be later formalised by
+Southey et al.\ \citep{southey2005bayes} as Bayesian type
+inference. This was later generalised by Ganzfried and Sandholm
+\citep{ganzfried2015safe}. Finally, Carnegie Mellon University's
+Superhuman bots, Libratus and Pluribus
+\citep{brown2018superhuman,brown2019superhuman}, show superhuman
+play in six-player no-limit Texas Hold'em. However, where that
+differs from our work is that it was inclined to find the optimal
+or safely exploitative play, trying to maximise profits. Whereas
+we are not trying to play well, we merely borrow the type
+inference machinery and use poker as a controlled testbed for
+studying how trust dynamics emerge when the inference is correct,
+transparent, and visible. The poker engine here is merely a
+microscope and not a competitor.
 
-The fourth line is important because we use language models in two
-of our phases. A small body of literature has begun to ask whether
-large language models act strategically when they are deployed as
-agents in adversarial or partially observable environments or
-whether they merely reproduce the textual form of a strategy
-without inventing one. Work by Park et al.\ on generative agents
-\citep{park2023generative} and newer benchmarks of LLMs on
-negotiation and game-playing tasks \citep{liu2024agentbench}
-suggests that the question remains open. We built Phase~3 (a
-language model with only a personality spec) and Phase~3.1 (the
-same model plus a personality spec plus
-chain-of-thought\footnote{\textit{Chain-of-thought prompting}
-asks a language model to produce a short, explicit reasoning trace
-before its final answer, instead of jumping straight to the
-answer. In our setting the reasoning trace is capped at two
-sentences and the model is then required to emit a final-line
-\texttt{ACTION:} marker.} reasoning, per-opponent memory and
-self-updated strategy notes) to directly test this distinction.
+The last and final line of work matters because two of our phases
+use large language models. A small but increasing number of
+studies question whether LLMs deployed as agents in competitive
+and observable settings actually act strategically or simply
+reproduce the textual form of a strategy. Park et al.'s generative
+agents \citep{park2023generative} and updated negotiation and
+game-playing benchmarks \citep{liu2024agentbench} suggest that the
+question is yet unanswered. Phases~3 and 3.1 are designed directly
+to test this.
 
-In the next section we describe the smallest controlled set-up
+In the next section, we describe the smallest controlled setup
 combining all four.
 
 % =============================================================================
