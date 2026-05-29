@@ -175,26 +175,6 @@
 % A black vertical separator bar, used between items in lists/headers.
 \newcommand{\bbar}{\,\rule[-0.5pt]{0.5pt}{8pt}\,}
 
-% Archetype character card: image + colored name + role + honesty + blurb.
-% Use \archcard{filename}{Name}{role}{honesty}{description}.
-\newcommand{\archcard}[5]{%
-  \par\vspace{4pt}\noindent
-  \begin{minipage}[c]{0.24\linewidth}\centering
-    \includegraphics[width=\linewidth,height=0.85in,keepaspectratio]{archetypes/#1}%
-  \end{minipage}\hspace{6pt}%
-  \begin{minipage}[c]{\dimexpr0.74\linewidth-6pt\relax}\raggedright
-    {\sffamily\fontsize{10}{12}\selectfont\arch{#2}\bbar\textit{#3}\bbar honesty #4}\\[2pt]
-    \small #5
-  \end{minipage}\par\vspace{6pt}}
-
-% Compact archetype portrait for the combined roster figure (Fig 2):
-% image + colored name. Use \archmug{filename}{Name}.
-\newcommand{\archmug}[2]{%
-  \begin{minipage}[t]{0.115\textwidth}\centering
-    \includegraphics[width=\linewidth,height=0.82in,keepaspectratio]{archetypes/#1}\\[2pt]
-    {\sffamily\scriptsize\arch{#2}}
-  \end{minipage}}
-
 % Compact archetype text entry (no portrait): colored name | role |
 % honesty, then description, then bound line.
 % Use \archentry{Name}{role}{honesty}{description}{bounds}.
@@ -434,7 +414,7 @@ cheating. If you cooperate, you give up a small immediate cost so
 that the other player receives a larger benefit; if you cheat, you
 keep your cost but the other player gets nothing. The other player
 faces the same choice at the same time. Figure~\ref{fig:pd}
-summarises the four outcomes using the framing of Nicky Case's
+shows the setup, in the framing of Nicky Case's
 \textit{Evolution of Trust} interactive: mutual cooperation yields
 $+2$ each, mutual cheating yields $0$ each, and unilateral
 cheating against a cooperator yields $+3$ to the defector and $-1$
@@ -445,35 +425,14 @@ everyone worse off than mutual cooperation would.
 
 \begin{figure}[t]
 \centering
-\begin{tikzpicture}[font=\sffamily]
-  % filled cells (lower-left to upper-right); row 1 = you cooperate, row 2 = you cheat
-  \fill[green!20]  (0,0)   rectangle (2.7,1.7);    % coop / coop
-  \fill[orange!18] (2.7,0) rectangle (5.4,1.7);    % coop / cheat (you exploited)
-  \fill[orange!18] (0,-1.7)   rectangle (2.7,0);   % cheat / coop (you exploit)
-  \fill[red!16]    (2.7,-1.7) rectangle (5.4,0);   % cheat / cheat
-  % grid
-  \draw[darkGray!55,line width=0.5pt] (0,-1.7) rectangle (5.4,1.7);
-  \draw[darkGray!55,line width=0.5pt] (2.7,-1.7) -- (2.7,1.7);
-  \draw[darkGray!55,line width=0.5pt] (0,0) -- (5.4,0);
-  % column headers
-  \node[font=\sffamily\bfseries\small] at (1.35,2.05) {They cooperate};
-  \node[font=\sffamily\bfseries\small] at (4.05,2.05) {They cheat};
-  % row headers
-  \node[font=\sffamily\bfseries\small,rotate=90] at (-0.45,0.85)  {You cooperate};
-  \node[font=\sffamily\bfseries\small,rotate=90] at (-0.45,-0.85) {You cheat};
-  % cell payoffs (you / them)
-  \node[align=center] at (1.35,0.85)  {{\large\textbf{+2} / \textbf{+2}}\\[3pt]\scriptsize mutual cooperation};
-  \node[align=center] at (4.05,0.85)  {{\large $-1$ / \textbf{+3}}\\[3pt]\scriptsize you are exploited};
-  \node[align=center] at (1.35,-0.85) {{\large \textbf{+3} / $-1$}\\[3pt]\scriptsize you exploit};
-  \node[align=center] at (4.05,-0.85) {{\large 0 / 0}\\[3pt]\scriptsize mutual cheating};
-\end{tikzpicture}
-\caption{\textbf{The Prisoner's Dilemma payoff matrix.} Cell
-colours indicate the joint outcome: mutual cooperation (green)
-gives the highest joint payoff, mutual cheating (pink) the lowest,
-and the off-diagonal cells are asymmetric exploit/exploited splits
-(payoffs are written as \emph{you\,/\,them}). Framing and payoff
-structure follow Nicky Case's \textit{Evolution of Trust}
-interactive.}
+\includegraphics[width=\linewidth]{00_game_of_trust.png}
+\caption{\textbf{The Prisoner's Dilemma, as a game of trust.} A
+screenshot of the cooperate/cheat setup from Nicky Case's
+\textit{Evolution of Trust} interactive: putting a coin in the
+machine costs you one coin but gives the other player three. Mutual
+cooperation therefore pays $+2$ each, mutual cheating $0$ each, and
+unilateral cheating against a cooperator pays $+3$ to the defector
+against $-1$ to the cooperator.}
 \label{fig:pd}
 \end{figure}
 
@@ -629,25 +588,6 @@ hill-climbing bound boxes around its Phase 1 starting parameters.}
 are listed below; the full per-archetype policy bounds appear in
 Table~\ref{tab:bounds-comprehensive}.
 
-\begin{figure*}[t]
-\centering
-\archmug{oracle.png}{Oracle}\hfill
-\archmug{sentinel.png}{Sentinel}\hfill
-\archmug{firestorm.png}{Firestorm}\hfill
-\archmug{wall.png}{Wall}\hfill
-\archmug{phantom.png}{Phantom}\hfill
-\archmug{predator.png}{Predator}\hfill
-\archmug{mirror.png}{Mirror}\hfill
-\archmug{judge.jpg}{Judge}
-\caption{\textbf{The eight archetypes seated at the table.} Every
-simulated hand pits all eight archetypes against each other in the
-same game; only the agent architecture (frozen rules,
-hill-climbing, LLM personality, or LLM with reasoning scaffolds)
-changes between phases. Brand colours are reused throughout the
-paper to identify each archetype on sight.}
-\label{fig:archetypes}
-\end{figure*}
-
 \archentry{Oracle}{Nash-equilibrium baseline}{0.75}{%
   Plays an approximately game-theory-optimal frequency profile; the
   control archetype against which all adaptive agents are
@@ -703,8 +643,9 @@ dimension. Adaptive archetypes additionally read live state
 (opponent posterior or grievance ledger) and are described by the
 rule that produces the policy rather than by fixed bounds.}
 \label{tab:bounds-comprehensive}
-\small
-\begin{tabular}{@{}lcccc>{\raggedright\arraybackslash}p{0.30\textwidth}@{}}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabularx}{\textwidth}{@{}l >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X c >{\raggedright\arraybackslash}X@{}}
 \toprule
 Archetype & $P(\text{bet}|S)$ & $P(\text{bet}|W)$ & $P(\text{fold}|W)$ & $h$ & Adaptation rule \\
 \midrule
@@ -717,7 +658,7 @@ Archetype & $P(\text{bet}|S)$ & $P(\text{bet}|W)$ & $P(\text{fold}|W)$ & $h$ & A
 \arch{Mirror}    & $0.5\cdot\text{self}+0.5\cdot\text{target}$ & same blend & same blend & 0.78 & Re-targets at each hand to highest-VPIP opponent \\
 \arch{Judge}     & $[0.88, 0.98]$ coop; $[0.95, 1.00]$ retal. & $[0.02, 0.10]$ coop; $[0.30, 0.45]$ retal. & $[0.78, 0.92]$ coop; $[0.30, 0.50]$ retal. & 0.80 & Switches to retaliation after 5+ confirmed bluffs by an opponent \\
 \bottomrule
-\end{tabular}
+\end{tabularx}
 \end{table*}
 
 \subsection{Categorical posterior over types}\label{sec:posterior}
@@ -912,7 +853,7 @@ table. Final pot 110 chips, showdown.
 \smallskip
 \noindent\textbf{Action sequence:}\par\nopagebreak
 \begin{center}
-\begin{tabular}{@{}rlllrrl@{}}
+\setlength{\tabcolsep}{3pt}\begin{tabularx}{\linewidth}{@{}rlllrr>{\raggedright\arraybackslash}X@{}}
 \toprule
 Seq & Seat & Round & Action & Amt & Pot & Notes \\
 \midrule
@@ -924,7 +865,7 @@ Seq & Seat & Round & Action & Amt & Pot & Notes \\
 17--23 & \ldots & turn  & \ldots &   & 74  & Same pattern \\
 24--30 & \ldots & river & \ldots &   & 110 & \arch{Wall} calls the final two raises \\
 \bottomrule
-\end{tabular}
+\end{tabularx}
 \end{center}
 
 \smallskip
@@ -1181,7 +1122,7 @@ $K\heartsuit\,Q\heartsuit$ -- rank 872, a strong hand. Final pot
 \smallskip
 \noindent\textbf{Action sequence:}\par\nopagebreak
 \begin{center}
-\begin{tabular}{@{}rlllrrl@{}}
+\setlength{\tabcolsep}{3pt}\begin{tabularx}{\linewidth}{@{}rlllrr>{\raggedright\arraybackslash}X@{}}
 \toprule
 Seq & Seat & Round & Action & Amt & Pot & Notes \\
 \midrule
@@ -1195,7 +1136,7 @@ Seq & Seat & Round & Action & Amt & Pot & Notes \\
 16 & \arch{Wall}      & river   & \textbf{bet}   & 4 & 28 & \textit{value bet against checked range} \\
 17 & \arch{Firestorm} & river   & call           & 4 & 32 &  \\
 \bottomrule
-\end{tabular}
+\end{tabularx}
 \end{center}
 
 \smallskip
