@@ -325,6 +325,35 @@ spaces were small enough to make the math tractable but also rich
 enough for these strategies to emerge. Please note that poker is
 only the behavioural microscope and not a benchmark to solve.
 
+\begin{table*}[!ht]
+\centering
+\captionsetup{font={small,sf}}
+\caption{\textbf{A primer on fixed-limit Texas Hold'em.} The
+minimum set of concepts needed to read the rest of the paper. The
+betting bounds in row~3 are the specific values we use throughout
+the simulation; everything else applies to fixed-limit Hold'em in
+general.}
+\label{tab:poker-primer}
+\small
+\setlength{\tabcolsep}{6pt}
+\renewcommand{\arraystretch}{1.18}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.22\textwidth}>{\raggedright\arraybackslash}p{0.74\textwidth}@{}}
+\toprule
+Concept & Description \\
+\midrule
+Hole cards & The two private cards each player is dealt at the start of every hand; only that player can see them. \\
+Community cards & Up to five face-up cards shared by everyone at the table; players combine these with their hole cards to form a 5-card hand. \\
+Betting rounds & Four sequential rounds per hand: \emph{preflop} (no community cards yet), \emph{flop} (three community cards revealed), \emph{turn} (one more), \emph{river} (the fifth and final). \\
+Actions & At each turn a player may \emph{fold} (give up the hand), \emph{check} (pass without betting, only if no one has bet), \emph{call} (match the current bet), \emph{bet} (open the wagering), or \emph{raise} (increase an existing bet). \\
+Bet sizing (this paper) & Small bet 2 chips on preflop and flop; big bet 4 chips on turn and river; no more than four raises per round (the ``four-bet cap''). \\
+Blinds & Forced bets: small blind 1 chip and big blind 2 chips, posted by the two seats clockwise of the dealer and rotating each hand. \\
+Pot & The accumulated chips at stake in a hand. The winner of the hand collects the pot. \\
+Showdown & End-of-hand reveal: surviving players turn over their hole cards and the strongest 5-card combination wins. A hand that ends with everyone folding never reaches showdown. \\
+Stack & The chips a player has in front of them; depleted to zero triggers a rebuy in our setup. \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
 Specifically, we built a poker simulation using eight players in
 which each player embodied a distinct playing style. Each agent
 maintained a perception about the others with a probability
@@ -348,26 +377,10 @@ with distinct personalities, and Phase~3.1 used LLMs with the
 ability to reason and retain context. The game and the trust
 system were the same across phases; only the agents changed.
 
-\begin{figure*}[!ht]
-  \centering
-  \includegraphics[width=0.92\textwidth]{01b_five_tier_ladder_with_unbounded.png}
-  \caption{\textbf{Trust--profit correlation across five agent
-  architectures.} Mean Pearson $\rtp$ across five seeds with 95\%
-  bootstrap confidence intervals. The four-tier ladder
-  Phase 1 $\to$ Phase 3.1 reads
-  $-0.752 \to -0.637 \to -0.510 \to -0.094$. Phase 2$^{*}$ (the
-  unbounded hill-climbing sub-experiment) sits at $-0.609$,
-  essentially unchanged from bounded Phase 2.}
-  \label{fig:headline}
-\end{figure*}
-
-\input{../tables/headline_ladder.tex}
-
 In accordance with the phases, the trust--profit correlation also
 evolved quite distinctly, falling from a strongly negative $-0.752$
 under frozen agents to roughly $0$ by the time we reached the LLM
-models that had context, awareness, and memory
-(Fig.~\ref{fig:headline}, Table~\ref{tab:ladder}). The ladder was
+models that had context, awareness, and memory. The ladder was
 the most robust thing we measured. Since we only ran 5 seeds per
 phase, the absolute numbers carried uncertainty, but the rank
 ordering we got was robust. The ordering revealed that the dumber
@@ -422,8 +435,40 @@ smarter, since these studies do not typically re-engineer the
 seller population.
 
 The next line of work is the computation of cooperation in games
-with repeated interactions. This was studied extensively by Axelrod
-through his tournaments in the Prisoner's Dilemma
+with repeated interactions. Before continuing it is worth
+introducing the Prisoner's Dilemma directly, since it is the
+canonical setting in which the tension between cooperation and
+exploitation has been studied. The setup is symmetric: you and
+one other player each face a single choice between cooperating and
+cheating. If you cooperate, you give up a small immediate cost so
+that the other player receives a larger benefit; if you cheat, you
+keep your cost but the other player gets nothing. The other player
+faces the same choice at the same time. Figure~\ref{fig:pd}
+summarises the four outcomes using the framing of Nicky Case's
+\emph{Evolution of Trust} interactive: mutual cooperation yields
+$+2$ each, mutual cheating yields $0$ each, and unilateral
+cheating against a cooperator yields $+3$ to the defector and
+$-1$ to the cooperator. The ``rational'' move for either of you
+in isolation is to cheat (cheating dominates cooperating regardless
+of what the other player does), but mutual cheating leaves
+everyone worse off than mutual cooperation would.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{16_prisoners_dilemma.png}
+  \caption{\textbf{The Prisoner's Dilemma payoff matrix.}
+  Cell colours indicate the joint outcome: mutual cooperation
+  (green) gives the highest joint payoff, mutual cheating (pink)
+  the lowest, and the off-diagonal cells are asymmetric
+  exploit/exploited splits. Framing and payoff structure follow
+  Nicky Case's \emph{Evolution of Trust} interactive.}
+  \label{fig:pd}
+\end{figure}
+
+\FloatBarrier
+
+This dilemma was studied extensively by Axelrod through his
+tournaments in the Prisoner's Dilemma
 \citep{axelrod1984evolution} and Nowak's Five Rules for Cooperation
 \citep{nowak2006five}. They were able to demonstrate that the
 reciprocal strategies selected, like Tit-for-Tat, were robustly
@@ -477,8 +522,53 @@ game-playing benchmarks \citep{liu2024agentbench} suggest that the
 question is yet unanswered. Phases~3 and 3.1 are designed directly
 to test this.
 
+\subsection*{Mathematical concepts used throughout}
+
+Two quantitative tools recur in every part of the analysis, and
+we introduce them once here so the rest of the paper can use them
+without further build-up.
+
+The first is the \emph{Pearson correlation coefficient}. Given
+$n$ paired observations $(x_i, y_i)$ with sample means
+$\bar{x}$ and $\bar{y}$, it is defined as
+\begin{equation}
+  r \;=\;
+  \frac{\sum_{i=1}^{n}(x_i - \bar{x})(y_i - \bar{y})}
+       {\sqrt{\sum_{i=1}^{n}(x_i - \bar{x})^{2}}
+        \,\sqrt{\sum_{i=1}^{n}(y_i - \bar{y})^{2}}}.
+  \label{eq:pearson}
+\end{equation}
+$r$ ranges from $-1$ (perfectly anti-correlated) through $0$
+(no linear relationship) to $+1$ (perfectly correlated); the sign
+indicates the direction of the relationship and the magnitude its
+strength. We use $r$ between an archetype's mean trust score and
+its final stack to measure how reputation maps to economic
+outcome --- a value we call $\rtp$.
+
+The second is \emph{Bayesian updating}. Given a prior belief
+$P(t)$ that the opponent is of type $t$, and a likelihood
+$P(a \mid t)$ that a type-$t$ opponent would have taken the action
+$a$ we just observed, Bayes' rule gives the posterior belief:
+\begin{equation}
+  P(t \mid a) \;=\; \frac{P(a \mid t)\,P(t)}
+                          {\sum_{t'} P(a \mid t')\,P(t')}.
+  \label{eq:bayes}
+\end{equation}
+Each of our agents maintains a categorical posterior over the
+eight archetypes for every other seat at the table, and updates
+it by Eq.~\ref{eq:bayes} after every observed action.
+Section~\ref{sec:posterior} returns to this update in the specific
+form we actually use, including the noise floor and between-hand
+forgetting that make our version ``Bayes-flavoured'' rather than
+strictly Bayesian.
+
+A third concept --- the \emph{honesty score} $h(t)$ that converts
+a probability distribution over archetypes into a scalar trust
+score --- is specific enough to our setup that we defer its
+definition to Section~\ref{sec:archetypes}.
+
 In the next section, we describe the smallest controlled setup
-combining all four.
+combining all four lines of prior work and using these two tools.
 
 % =============================================================================
 \section{Methodology}
@@ -509,7 +599,20 @@ players contest the remainder among themselves.} constructed at
 each per-seat contribution level, with ties split and any remainder
 going to the earliest clockwise seat from the dealer.
 
-\subsection{The eight agent archetypes}
+\subsection{The eight agent archetypes}\label{sec:archetypes}
+
+\begin{figure*}[!ht]
+  \centering
+  \includegraphics[width=0.85\textwidth]{15_archetype_table.png}
+  \caption{\textbf{The eight archetypes seated at the table.}
+  Every simulated hand pits all eight archetypes against each
+  other in the same game; only the agent architecture (frozen
+  rules, hill-climbing, LLM personality, or LLM with reasoning
+  scaffolds) changes between phases. Brand colours are reused
+  throughout the paper to identify each archetype on sight.}
+  \label{fig:archetype-table}
+\end{figure*}
+
 We construct eight strategically distinct archetypes spanning the
 axes that game theory and behavioral economics identify as
 load-bearing: cooperative versus exploitative, static versus
@@ -636,7 +739,7 @@ Archetype & $P(\text{bet}|S)$ & $P(\text{bet}|W)$ & $P(\text{fold}|W)$ & $h$ & A
 \end{tabular}
 \end{table*}
 
-\subsection{Categorical posterior over types}
+\subsection{Categorical posterior over types}\label{sec:posterior}
 Every agent maintains a length-8 categorical distribution over the
 archetype of every other seat. After agent $i$ observes seat $j$
 take action $a$ in betting round $r$, the distribution is updated as
@@ -767,9 +870,8 @@ role-players) replaces the rule-based policies with a language
 model under a personality spec; and Phase 3.1 (LLM with reasoning
 scaffolding) augments that with chain-of-thought, per-opponent
 memory, and self-updated strategy notes. The four-tier headline
-ladder $-0.752 \to -0.637 \to -0.510 \to -0.094$ is summarized
-in Fig.~\ref{fig:headline} and Table~\ref{tab:ladder} above; the
-remainder of this section reports per-phase numbers, figures,
+ladder $-0.752 \to -0.637 \to -0.510 \to -0.094$ frames the
+remainder of this section, which reports per-phase numbers, figures,
 and illustrative hands.
 
 % --------------------------------------------------------------- Phase 1
