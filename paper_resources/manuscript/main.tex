@@ -348,34 +348,39 @@ work presented in the following section.
 \section{Background}
 % =============================================================================
 
-There are four important predecessors that provide the background
-for this study. We will go through them in the order in which they
-bear on the design of our simulation.
+Multiple relevant background precedent works exist that contribute
+to the foundational premise of this research. These are discussed in
+the order in which they relate to our simulations:
 
-Within the empirical economics of online reputation systems, one
-of the first papers to study what would become known as the
-transparency paradox on a large scale was Resnick and Zeckhauser's
-study of eBay \citep{resnick2002trust}. While sellers with perfect
-feedback scores tended to earn lower profit margins, sellers with
-slightly imperfect records did not. The reason for this is simple.
-If a seller always cooperates, they do not move from the listed
-price. Negative reviews would threaten the seller's perfect
-record, so buyers rightly conclude that this seller will never do
-anything that would pose a threat to their reputation by, say,
-offering a better price for the books or going above and beyond on
-returns. That leaves the buyer in the better bargaining position.
-Bolton, Katok, and Ockenfels \citep{bolton2004effective} later
-tried to replicate this in games with controlled trust. A similar
-dynamic is reflected in the microstructures of financial markets.
-Adverse selection against predictable market-makers
-\citep{glosten1985bid} produces the same qualitative patterns not
-by reputation per se but through information asymmetry. This
-mechanism is observational but consistent: visible cooperation can
-be exploited when opponents can act around it. Therefore, it
-provides evidence for the presence of this effect in real-world
-marketplaces too. What it cannot tell us is whether the effect
-would persist if the cooperative actors were smarter, since these
-studies do not typically re-engineer the seller population.
+First, there exists the empirical economics of online reputation
+systems. Resnick \& Zeckhauser \citep{resnick2002trust} analyzed
+their study of eBay to demonstrate what was termed the transparency
+paradox. Their findings indicated that sellers who had achieved
+perfect feedback scores earned lower profit margins than sellers
+whose feedback scores contained slight imperfections. Sellers with
+perfect reputations tend to be overly protective of their
+reputation. Since sellers with a perfect record may never risk
+damaging their reputation with even a single poor rating, buyers can
+accurately assume that such sellers will never negotiate. Therefore,
+the price sellers post represents the lowest price they are willing
+to accept, thus providing the buyer with the ability to negotiate
+and reducing the seller's profit margin. Sellers with slightly less
+than perfect reputations have much greater flexibility to negotiate
+due to the fact that their reputations do not carry the same level
+of vulnerability. Bolton, Katok, \& Ockenfels
+\citep{bolton2004effective} later replicated this pattern in
+controlled trust games and demonstrated the same underlying
+mechanism as Resnick \& Zeckhauser. An analogous phenomenon occurs
+within financial markets, where adverse selection against
+predictably behaving market makers \citep{glosten1985bid} creates
+equivalent effects---caused by asymmetric information rather than a
+reputation itself. In total, this literature demonstrates that the
+phenomenon is indeed present within actual marketplaces, however,
+this literature cannot provide evidence regarding whether the
+phenomenon would continue to occur should cooperative actors be
+intelligent enough to prevent themselves from being taken advantage
+of---since this literature does not alter the composition of
+participating sellers.
 
 \begin{table*}[t]
 \centering
@@ -404,24 +409,34 @@ Stack & The chips a player has in front of them; depleting to zero triggers a re
 \end{tabularx}
 \end{table*}
 
-The next line of work is the computation of cooperation in games
-with repeated interactions. Before continuing it is worth
-introducing the Prisoner's Dilemma directly, since it is the
-canonical setting in which the tension between cooperation and
-exploitation has been studied. The setup is symmetric: you and one
-other player each face a single choice between cooperating and
-cheating. If you cooperate, you give up a small immediate cost so
-that the other player receives a larger benefit; if you cheat, you
-keep your cost but the other player gets nothing. The other player
-faces the same choice at the same time. Figure~\ref{fig:pd}
-shows the setup, in the framing of Nicky Case's
-\textit{Evolution of Trust} interactive: mutual cooperation yields
-$+2$ each, mutual cheating yields $0$ each, and unilateral
-cheating against a cooperator yields $+3$ to the defector and $-1$
-to the cooperator. The ``rational'' move for either player in
-isolation is to cheat (cheating dominates cooperating regardless
-of what the other player does), but mutual cheating leaves
-everyone worse off than mutual cooperation would.
+Second, there is a substantial amount of computational research
+concerning cooperation in repeated games. Prior to discussing
+cooperation, it is necessary to discuss the Prisoner's Dilemma as it
+is widely recognized as the paradigmatic example of the conflict
+between cooperation and exploitation. Each prisoner has two options:
+(A) Cooperate or (B) Defect. Each prisoner makes their decision
+simultaneously. There are four possible outcomes based upon the
+decisions made by each of the prisoners. Both prisoners choosing
+option (A), i.e., Cooperating with one another results in both
+prisoners receiving a moderate penalty for doing so; However, each
+prisoner receives a significant reward. When one prisoner chooses
+option (A), i.e., Cooperates and the other prisoner selects option
+(B), i.e., Defects, the prisoner who selected option (A) incurs a
+loss whereas the prisoner who chose option (B) receives a
+significant reward and pays no penalties. Conversely, when both
+prisoners select option (B), i.e., Defect, both receive no rewards.
+Figure~\ref{fig:pd} illustrates these four possible outcomes using
+the format created by Nicky Case titled \textit{Evolution of Trust}
+Interactive: Mutual Cooperation provides a reward of $+2$ to both
+players; Mutually Defecting provides a reward of $0$ to both
+players; and Unilaterally Defecting Against Another Player Who Has
+Chosen To Cooperate Provides a Reward of $+3$ to the player who
+unilaterally defected and a loss of $-1$ to the player who
+cooperated. In terms of rational self-interest, each prisoner has
+sufficient incentive to defect since defecting always yields greater
+benefits than cooperating, regardless of the choice made by the
+other prisoner; Nevertheless, mutually defective behavior is
+inferior in comparison to mutually cooperative behavior.
 
 \begin{figure}[t]
 \centering
@@ -436,60 +451,64 @@ against $-1$ to the cooperator.}
 \label{fig:pd}
 \end{figure}
 
-This dilemma was studied extensively by Axelrod through his
-tournaments in the Prisoner's Dilemma \citep{axelrod1984evolution}
-and Nowak's five rules for cooperation \citep{nowak2006five}. They
-were able to demonstrate that the reciprocal strategies selected,
-like Tit-for-Tat, were robustly successful in one-on-one
-interactions with simple payoff structures, in which an agent that
-cooperates by default and punishes defections one-for-one does
-well in the long run against most opponents. This line of work
-validates our intuition that cooperation is a strategy of
-competition, but this falls apart due to two assumptions that do
-not hold true anymore in our setting. Firstly, the interactions
-are no longer one-on-one; they are eight-way, so the cost of one
-agent's aggression is spread across seven different opponents.
-Secondly, the action space is much richer than the Prisoner's
-Dilemma's binary. Poker allows folding, calling, raising,
-bluffing\footnote{A \textit{bluff} is a bet made with a weak hand
+Axelrod investigated this problem extensively through his Prisoner's
+Dilemma Tournaments \citep{axelrod1984evolution}, and Nowak
+developed his five principles for the evolutionary development of
+cooperation \citep{nowak2006five}. Axelrod demonstrated that
+reciprocity-based strategies such as Tit-for-Tat are robustly
+effective in one-to-one situations. Agents that cooperate by default
+and punish defectors on a tit-for-tat basis tend to perform
+effectively over time against all types of competitors. This lends
+credence to the notion that cooperation can represent a viable
+strategic alternative. However, Axelrod's conclusions are predicated
+upon two assumptions which fail to apply in our context. Firstly,
+all interactions are now no longer one-to-one but instead involve
+eight separate agents. As a result, the negative impact associated
+with aggressive behavior on behalf of a single individual is diluted
+across seven other competing agents versus being focused solely upon
+one opponent. Secondly, the set of actions available for an agent to
+take extends far beyond simply cooperating or defecting. Poker
+allows an agent to fold, call, raise,
+bluff\footnote{A \textit{bluff} is a bet made with a weak hand
 intended to make opponents fold stronger hands; its inverse, a
 \textit{value bet}, is a bet with a strong hand intended to be
 called by weaker hands. \textit{Fold equity} is the value an
-aggressor captures when opponents fold without reaching
-showdown.}, and slow-playing, which gives many more degrees of
-freedom to extract value. The parallel for Tit-for-Tat in our case
-is the archetype \arch{Mirror}, which appears in sixth place in
-the stack-size ordering. This could be a sign that the results of
-Axelrod's tournament are not directly applicable to environments
-with multiple agents and richer action spaces. However, we
-consider this to be suggestive rather than conclusive.
+aggressor captures when opponents fold without reaching showdown.}
+and slow-play---all of which add additional degrees-of-freedom for
+an agent seeking to extract value from their opponent(s). Our best
+approximation to Tit-for-Tat is \arch{Mirror}---which ranks 6th out
+of 8 in terms of stacks---suggesting that Axelrod's conclusions do
+not necessarily translate well to multi-agent environments that
+contain richer action-spaces; although we interpret this as
+suggestive rather than definitive.
 
-The third line of work is the modelling of Bayesian opponents in
-poker, starting with Billings et al.'s Loki and Poki bots
-\citep{billings1998opponent}, only to be later formalised by
-Southey et al.\ \citep{southey2005bayes} as Bayesian type
-inference. This was later generalised by Ganzfried and Sandholm
-\citep{ganzfried2015safe}. Finally, Carnegie Mellon University's
-superhuman bots, Libratus and Pluribus
-\citep{brown2018superhuman,brown2019superhuman}, show superhuman
-play in heads-up and six-player no-limit Texas Hold'em. However,
-where that differs from our work is that it was inclined to find
-the optimal or safely exploitative play, trying to maximise
-profits. We are not trying to play well; we merely borrow the
-type-inference machinery and use poker as a controlled testbed for
-studying how trust dynamics emerge when the inference is correct,
-transparent, and visible. The poker engine here is merely a
-microscope and not a competitor.
+Thirdly, there is Bayesian opponent modeling in poker. Initially
+this included Billings et al.'s Loki and Poki bots
+\citep{billings1998opponent} and subsequently formalized by Southey
+et al.\ \citep{southey2005bayes} as Bayesian-type inference---
+followed by Ganzfried and Sandholm's \citep{ganzfried2015safe}
+further generalization toward safe-exploitation of an opponent. Most
+recently, Carnegie Mellon University's Libratus and Pluribus
+\citep{brown2018superhuman,brown2019superhuman} reached super-human
+performance levels in heads-up and six-player no-limit Texas
+Hold'em. While that body of work differs from our own
+objectives---specifically seeking optimal or safely exploitative
+behavior to win---we borrow their type-inference machinery and
+utilize poker as a controlled environment for examining how trust
+dynamics evolve under conditions of correct, transparent, and
+collective inference amongst many agents. Our poker engine is viewed
+as a microscope---not as an adversary.
 
-The last and final line of work matters because two of our phases
-use large language models. A small but increasing number of
-studies question whether LLMs deployed as agents in competitive
-and observable settings actually act strategically or simply
-reproduce the textual form of a strategy. Park et al.'s generative
-agents \citep{park2023generative} and updated negotiation and
-game-playing benchmarks \citep{liu2024agentbench} suggest that the
-question is yet unanswered. Phases 3 and 3.1 are designed directly
-to test this.
+Finally, we address this last point since two of our phases employ
+large language models. A rapidly increasing body of research
+concerns the extent to which large language models---when employed
+as agents in competitive, observable settings---act strategically or
+merely replicate textual representations of strategies without
+developing them. Recent negotiation and game-playing benchmarks such
+as AgentBench \citep{liu2024agentbench} and Park et al.'s
+investigation into generative agents \citep{park2023generative}
+indicate that the issue remains unsettled. Phases 3 and 3.1 are
+intended to examine this distinction.
 
 \subsection{Mathematical concepts used throughout}
 Two quantitative tools recur in every part of the analysis, and we
@@ -542,51 +561,57 @@ combining all four lines of prior work and using these two tools.
 % =============================================================================
 
 \subsection{Game environment}
-The game environment is fixed across every phase of the study. We
-use 8-player fixed-limit Texas Hold'em with small blind 1, big
-blind 2, small bet 2 (preflop\footnote{The four betting rounds in
-Texas Hold'em, in order, are \textit{preflop} (after each player
-receives two private ``hole'' cards but before any community
-cards), \textit{flop} (after three community cards are dealt
-simultaneously), \textit{turn} (after a fourth community card),
-and \textit{river} (after a fifth and final community card).} and
-flop), big bet 4 (turn and river), and a four-bet
-cap\footnote{Fixed-limit Texas Hold'em permits at most four raises
-per betting round; further raises are not allowed.} per street.
-Each seat starts with a 200-chip stack and is granted a rebuy
-whenever it busts. Showdowns\footnote{A \textit{showdown} is the
-end-of-hand reveal in which all still-active players turn over
-their hole cards to determine the winner; pots that end with all
-opponents folding to a single player do not reach showdown.} are
-awarded via side pots\footnote{When a player goes all-in for fewer
-chips than the largest contributor, the engine creates a
-\textit{side pot} for the excess so that the short-stacked player
-can only win up to the amount they contributed; deeper-stacked
-players contest the remainder among themselves.} constructed at
-each per-seat contribution level, with ties split and any remainder
-going to the earliest clockwise seat from the dealer.
+The overall game setting remains constant for all phases of this
+study. We will utilize a fixed-limit version of eight player Texas
+Hold'em, where the small blind is 1, the large blind is 2, the small
+bet (2) can be made pre-flop or on the first round of cards (the
+``flop''\footnote{The four betting rounds in Texas Hold'em, in
+order, are \textit{preflop} (after each player receives two private
+``hole'' cards but before any community cards), \textit{flop} (after
+three community cards are dealt simultaneously), \textit{turn}
+(after a fourth community card), and \textit{river} (after a fifth
+and final community card).}), the large bet (4) can be made on the
+second round of cards (``turn'') and third round of cards
+(``river''). There is a cap of four-bet\footnote{Fixed-limit Texas
+Hold'em permits at most four raises per betting round; further
+raises are not allowed.} allowed per round. At the beginning of each
+hand, each player has a chip count of 200 in their respective seat,
+and when a player's chips run out, he/she receives a rebuy. Side
+pots\footnote{When a player goes all-in for fewer chips than the
+largest contributor, the engine creates a \textit{side pot} for the
+excess so that the short-stacked player can only win up to the
+amount they contributed; deeper-stacked players contest the
+remainder among themselves.} are used to determine who wins a
+showdown\footnote{A \textit{showdown} is the end-of-hand reveal in
+which all still-active players turn over their hole cards to
+determine the winner; pots that end with all opponents folding to a
+single player do not reach showdown.}; a side pot is created by
+players contributing money at their individual betting level. Side
+pots are made and awarded depending on whether a player played chips
+into the respective pot and the remainder goes to the player who
+comes first from the dealer, going in clockwise direction.
 
 \subsection{The eight agent archetypes}\label{sec:archetypes}
-We construct eight strategically distinct archetypes spanning the
-axes that game theory and behavioral economics identify as
-load-bearing: cooperative versus exploitative, static versus
-adaptive, per-action versus per-opponent in adaptation style. Each
-agent's policy is a per-round table of action probabilities
-conditioned on hand-strength bucket; the parameters of the static
-archetypes are frozen across runs. Each archetype carries an
-\textit{honesty score} $h \in [0,1]$ defined as
-$P(\text{bet}\mid\text{strong})\cdot(1-P(\text{bluff}\mid\text{weak}))$;
-this scalar is what the trust score weights
-(Eq.~\ref{eq:trust}). Each archetype's name is rendered in its
-brand colour throughout, so the reader can track which agent is
-being discussed. Preflop bound ranges\footnote{Throughout the
-archetype descriptions, \textit{br} = bluff rate (probability of
-betting on a weak hand), \textit{vbr} = value-bet rate (probability
-of betting on a strong hand), and \textit{cr} = call rate facing a
-bet on a medium hand. Ranges are the archetype's Phase 2
-hill-climbing bound boxes around its Phase 1 starting parameters.}
-are listed below; the full per-archetype policy bounds appear in
-Table~\ref{tab:bounds-comprehensive}.
+The eight archetypes (cooperative vs.\ exploitative; static vs.\
+adaptable; based on opponent vs.\ based on action type) span the
+axes identified by Game Theory and Behavioral Economics as ``load
+bearing.'' The policies for each agent are tables of probability
+distributions over actions per round given their hand strength
+bucket. The static types have fixed parameters during all
+simulations. Each of the eight types also has an \textit{honesty}
+score $h = P(\text{bet}\mid\text{strong})\cdot(1-P(\text{bluff}\mid\text{weak}))$,
+which is used as a weighting factor in computing the trust scores
+(Eq.~\ref{eq:trust}). In addition, each of the names of the eight
+types is printed using its own colour scheme throughout the text so
+that you may be able to see which player we are referring to at each
+time. The preflop betting range\footnote{Throughout the archetype
+descriptions, \textit{br} = bluff rate (probability of betting on a
+weak hand), \textit{vbr} = value-bet rate (probability of betting on
+a strong hand), and \textit{cr} = call rate facing a bet on a medium
+hand. Ranges are the archetype's Phase 2 hill-climbing bound boxes
+around its Phase 1 starting parameters.} for each of the eight types
+appears below; additional information about the policy limits per
+type is found in Table~\ref{tab:bounds-comprehensive}.
 
 \archentry{Oracle}{Nash-equilibrium baseline}{0.75}{%
   Plays an approximately game-theory-optimal frequency profile; the
@@ -712,72 +737,91 @@ identifiability under indistinguishable types}; this is a design
 choice, not a finding.
 
 \subsection{Four agent architectures}
-The four phases differ only in the implementation of each agent's
-decision policy. \textbf{Phase 1} (frozen rule-based): each
-archetype is a fixed per-round parameter table. \textbf{Phase 2}
-(bounded online optimization): each agent runs a per-cycle hill-
-climber that, every 200 hands, perturbs one (round, metric) slot by
-$\delta = 0.03$, plays a 200-hand trial, and accepts the
-perturbation if windowed profit improves; perturbations are
-confined to an archetype-shaped bound box. \textbf{Phase 3} (LLM
-personality role-players): each agent's decision is an API call to
-Anthropic's Claude Haiku 4.5 with the archetype's personality spec
-as the system prompt. \textbf{Phase 3.1} (LLM with reasoning
-scaffolding): the Phase 3 setup augmented with chain-of-thought
-prompting capped at two sentences, persistent per-opponent memory
-refreshed every 10 hands, and self-updated strategy notes refreshed
-every 25 hands. A sub-experiment \textbf{Phase 2$^{*}$} removes the
-hill-climber's bound boxes entirely and raises the step size to
-$\delta = 0.15$ with a 50-hand evaluation window.
+The primary difference among these four phases is that the way each
+agent selects its decision-making rule varies. \textbf{Phase 1}
+(Frozen Rules Based on Archetypes): Parameters used to define each
+player's archetype remain static through each round. \textbf{Phase
+2} (Bounded Online Optimisation): Players use a per cycle hill
+climbing method to update their parameter values every 200 rounds.
+For the first 200 rounds, players will randomly select either a
+round or a metric (and thus alter one (round/metric) pair) by
+$\delta = 0.03$. Then they will run 200 hand trials and accept the
+random selection if their total profit increased during those last
+200 rounds. Random selections can be made anywhere within a ``bound
+box'' created around each player's archetype. \textbf{Phase 3} (LLM
+Personality Role-Players): All of a player's decisions are made via
+an API call to Anthropic's Claude Haiku 4.5. This call is made using
+the player's personality specification as the system prompt.
+\textbf{Phase 3.1} (LLM with Reasoning Scaffolding): Phase 3.1 also
+allows players to utilize chain-of-thought prompts limited to two
+sentences. Additionally, opponents' memory and the player's own
+updated strategy notes are refreshed after every ten and twenty-five
+hands, respectively. A sub-experiment called \textbf{Phase
+2$^{*}$} removes the bound boxes from hill climbers, increases the
+size of hill climbers' steps to $\delta = 0.15$, and reduces the
+number of hands hill climbers evaluate from 200 to fifty.
 
 \subsection{Experimental design}
 All four phases use the same five random seeds (42, 137, 256, 512,
-1024) and the same eight archetype assignments. \textit{Hand counts
-differ across phases by an order of magnitude:} Phases 1, 2, and
-2$^{*}$ each play 10\,000 hands per seed; Phase 3 plays 500 hands
-per seed (43\,943 total LLM calls, \$33.10); Phase 3.1 plays 150
-hands per seed (11\,953 calls, ${\sim}\$17$). This asymmetry is
-imposed by API cost and is a known confound in cross-phase
-comparisons of per-seed $\rtp$: even under an identical underlying
-trust--profit relationship, the per-seed correlation in Phase 3.1
-would be measured on a noisier $n$ and would be attenuated in
-magnitude. The reported $\Delta\rtp$ between phases therefore mixes
-a capability effect with a statistical-power effect, an issue we
-address explicitly in the Discussion (\S\,Limitations) and which a
-hand-count-matched replication would resolve.
+1024), and all phases used the same eight archetypes. However, there
+was a huge difference in how many hands were played within each
+phase that can account for why $\rtp$ differed so much among the
+different phases. Specifically, Phases 1, 2, and 2$^{*}$ each played
+10\,000 hands per seed; Phase 3 played 500 hands per seed (total
+43\,943 LLM calls, \$33.10); and Phase 3.1 played 150 hands per seed
+(total 11\,953 calls, \$17). It is well understood that when
+comparing results from multiple phases of data collection using a
+similar model but at very different levels of sampling intensity, it
+will create both a capability effect as well as a statistical-power
+effect. Therefore, the differences in $\rtp$ observed between the
+various phases also reflect a mix of these two effects. We discuss
+this issue explicitly in the discussion section (Limitations), and
+any future hand-count matched replications of the data collected
+here would provide a way to isolate one or both of these issues.
 
-\textit{Sampling temperature.} The canonical Phase 3 and Phase 3.1
-datasets were generated under the Anthropic SDK's default
-temperature of 1.0; the codebase now pins temperature to 0.0 for
-deterministic re-runs. Headline numbers throughout this paper are
-from the temperature-1.0 runs. The full disclosure of this
-methodological caveat is in the Limitations.
+\textit{Sampling temperature.} The Phase 3 and Phase 3.1 datasets
+generated in the Anthropic SDK by default have a temperature setting
+of 1.0. At present the codebase has been modified to pin the
+temperature value at 0.0 for deterministic re-runs of the
+experiments. Results presented as headline values throughout this
+manuscript were based on the runs made at a temperature of 1.0. A
+full description of this methodology caveat is provided in the
+Limitations.
 
 \subsection{Metrics}
-The primary metric is the per-seed Pearson correlation $\rtp$
-between mean trust score (final hand) and final stack across the
-eight archetypes ($n = 8$ paired observations per seed). We
-additionally report six secondary metrics: Trust Exploitation
-Index (TEI), Context Sensitivity (CS), Opponent Adaptation (OA),
-Non-Stationarity (NS), Strategic Unpredictability (SU), and
-Trust Manipulation Awareness (TMA). TMA is the correlation between
-an agent's rolling trust delta and its rolling aggression delta;
-positive values capture the pattern of \textit{building} trust
-through cooperative early play and subsequently \textit{exploiting}
-that trust with higher aggression, an interaction we refer to as
-``trust farming'' in the captions and discussion. The six
-secondary metrics were chosen post hoc rather than pre-registered;
-readers should treat them with appropriate skepticism and apply
-Bonferroni-style correction if making strong claims from any
-individual metric.
-Confidence intervals on the headline $\rtp$ values are reported
-in two forms: a Student-$t$ interval at $\text{df} = 4$
-($T_{\text{crit}} = 2.776$) and a non-parametric percentile
-bootstrap with 10\,000 resamples. The bootstrap on $n = 5$ seeds
-draws from at most $\binom{2n-1}{n} = 126$ distinct combinations,
-so the 10\,000 resamples densely cover the resampling space but do
-not buy additional statistical power beyond the five underlying
-observations.
+The key measure was the Pearson correlation coefficient $\rtp$ per
+seed for the average degree of trust (final hand) and the number of
+chips in each player's stack at the end of all games (average number
+of chips in the stacks of all players) across the eight different
+types of players (8 pairs of measurements in total, one per type).
+
+We also present six auxiliary measures, including the index of
+exploitation of trust (TEI), sensitivity to context (CS), adaptation
+by the opponent (OA), non-stationarity (NS), unpredictability in
+strategy (SU), and awareness of manipulation of trust (TMA).
+
+Awareness of manipulation of trust (TMA) is calculated as the
+correlation between a player's rolling trust delta and its rolling
+aggression delta. Positive values in this case can show patterns of
+building up trust during the initial stages of cooperation followed
+by increasing aggression after building trust (which we call ``trust
+farming'' in captions and further discussions).
+
+These six auxiliary metrics were selected post-hoc instead of being
+pre-selected or registered. Readers should be cautious when using
+these statistics individually due to the risk of Type I error (false
+positives); they should correct their $p$-values with Bonferroni
+adjustments.
+
+Confidence Intervals for the headline Pearson $\rtp$ correlations are
+provided in two ways: a $t$-interval based upon the Student-$t$
+distribution with degrees-of-freedom equal to 4 ($T_{\text{crit}} =
+2.776$) and a non-parametric percentile bootstrap with 10\,000
+iterations. Although there are potentially $n=5$ seeds drawing from
+at most $\binom{2n-1}{n} = 126$ possible combinations of players,
+thus ensuring dense coverage of the sample space via the 10\,000
+iterations, it does not provide greater statistical power than what
+is available from the five actual observations.
 
 % =============================================================================
 \section{Results}\label{sec:results}
