@@ -789,75 +789,73 @@ full description of this methodology caveat is provided in the
 Limitations.
 
 \subsection{Metrics}
-The key measure was the Pearson correlation coefficient $\rtp$ per
-seed for the average degree of trust (final hand) and the number of
-chips in each player's stack at the end of all games (average number
-of chips in the stacks of all players) across the eight different
-types of players (8 pairs of measurements in total, one per type).
+Our headline is the per-seed Pearson correlation $\rtp$ for the
+average degree of trust (final hand) and chips in the stack of each
+player at the end of all games (average number of chips in the
+stacks of all players) across the eight different types of players
+(8 pairs of measurements, 1 per type). We also present 6 auxiliary
+measures (the TEI index, sensitivity to context (CS), adaptation by
+the opponent (OA), non-stationarity (NS), unpredictability in
+strategy (SU), and awareness of manipulation of trust (TMA)).
 
-We also present six auxiliary measures, including the index of
-exploitation of trust (TEI), sensitivity to context (CS), adaptation
-by the opponent (OA), non-stationarity (NS), unpredictability in
-strategy (SU), and awareness of manipulation of trust (TMA).
+Awareness of manipulation of trust (TMA) is the correlation between
+the player's rolling trust delta and its rolling aggression delta;
+positive values in this case can indicate patterns of initially
+building up trust during the early stages of cooperation and then a
+rising aggression after its trust has grown (thus ``farming'' the
+trust, as we note in captions and further discussions).
 
-Awareness of manipulation of trust (TMA) is calculated as the
-correlation between a player's rolling trust delta and its rolling
-aggression delta. Positive values in this case can show patterns of
-building up trust during the initial stages of cooperation followed
-by increasing aggression after building trust (which we call ``trust
-farming'' in captions and further discussions).
+These auxiliary metrics were all chosen post-hoc as opposed to being
+cross-registered or finalized prior to our analyses. Readers ought
+to avoid using these statistics in a vacuum altogether, or at minimum
+conduct a Bonferroni correction so as to avoid Type I error (false
+positives).
 
-These six auxiliary metrics were selected post-hoc instead of being
-pre-selected or registered. Readers should be cautious when using
-these statistics individually due to the risk of Type I error (false
-positives); they should correct their $p$-values with Bonferroni
-adjustments.
-
-Confidence Intervals for the headline Pearson $\rtp$ correlations are
-provided in two ways: a $t$-interval based upon the Student-$t$
-distribution with degrees-of-freedom equal to 4 ($T_{\text{crit}} =
-2.776$) and a non-parametric percentile bootstrap with 10\,000
-iterations. Although there are potentially $n=5$ seeds drawing from
-at most $\binom{2n-1}{n} = 126$ possible combinations of players,
-thus ensuring dense coverage of the sample space via the 10\,000
-iterations, it does not provide greater statistical power than what
-is available from the five actual observations.
+We report each of our headline per-seed Pearson $\rtp$ correlations
+in two ways: the $t$-interval based upon the Student-$t$ distribution
+with degrees-of-freedom equal to 4 ($T_{\text{crit}} = 2.776$) and
+the 10\,000-iteration non-parametric percentile bootstrap. While
+there are at most $n = 5$ seeds possible to sample from no more than
+$\binom{2n-1}{n} = 126$ combinations of players, and thus dense
+coverage of the sample space is ensured across the 10\,000
+iterations, no more statistical power is gained than comes from the
+five actual observations.
 
 % =============================================================================
 \section{Results}\label{sec:results}
 % =============================================================================
 
-We present results in order of agent capability: Phase 1
+We present results in order of capability of the agent-type: Phase 1
 (frozen rule-based agents) establishes the baseline trap; Phase 2
-(bounded hill-climbing) tests whether numerical adaptation can
-soften it; Phase 2$^{*}$ (unbounded hill-climbing) tests whether
-the bounds were the binding constraint; Phase 3 (LLM personality
-role-players) replaces the rule-based policies with a language
-model under a personality spec; and Phase 3.1 (LLM with reasoning
-scaffolding) augments that with chain-of-thought, per-opponent
-memory, and self-updated strategy notes. The four-tier headline
-ladder $-0.752 \to -0.637 \to -0.510 \to -0.094$ frames the
-remainder of this section, which reports per-phase numbers,
-figures, and illustrative hands.
+(bounded hill-climbing) seeks to determine if naked numerical
+adaptation can soften it; Phase 2$^{*}$ (unbounded hill-climbing)
+seeks to determine if the bounds were the binding constraint;
+Phase 3 (LLM personality role-players) replaces the rule-based
+policies with a language model under a personality spec; and
+Phase 3.1 (LLM with reasoning scaffolding) augments that with
+chain-of-thought, per-opponent memory, and self-updated strategy
+notes. The four-tier headline ladder $-0.752 \to -0.637 \to -0.510
+\to -0.094$ frames the rest of this section, which presents the
+per-phase numbers and figures, and illustrative hands.
 
 % --------------------------------------------------------------- Phase 1
 \subsection{Phase 1: trust as a liability}
 
-Phase 1 produces $\rtp = -0.752$ across the five canonical seeds,
-with per-seed values $\{-0.774, -0.608, -0.792, -0.812, -0.776\}$.
+Phase 1 produces $\rtp = -0.752$ over the 5 canonical seeds, with
+per-seed values $\{-0.774, -0.608, -0.792, -0.812, -0.776\}$.
 \arch{Wall} (the most-trusted archetype, honesty 0.96) has the
-smallest mean stack and approximately 9.4 rebuys per seed.
-\arch{Firestorm} (the least-trusted, honesty 0.38) has the
-largest mean stack and zero rebuys. Of the pots \arch{Firestorm}
-wins, $87.1\%$ are walkovers\footnote{A \textit{walkover} (or
-``uncontested pot'') is a hand won without showdown---every other
-player folded before the cards had to be shown. It is the
-bread-and-butter outcome for aggressive players who win by making
-opponents fold rather than by holding the best hand.}; its
-showdown win rate is only $38.5\%$, below the uniform $1/n$ rate.
-\arch{Firestorm} is not a strong poker player on the merits; it
-wins because it is hard to read. The trust--stack relationship
-appears in Fig.~\ref{fig:trust-vs-stack} (left panel).
+smallest mean stack, and around 9.4 rebuys per seed. \arch{Firestorm}
+(the least-trusted, honesty 0.38) has the largest mean stack, and
+zero rebuys. Of the pots \arch{Firestorm} wins, $87.1\%$ are
+walkovers\footnote{A \textit{walkover} (or ``uncontested pot'') is a
+hand won without showdown---every other player folded before the
+cards had to be shown. It is the bread-and-butter outcome for
+aggressive players who win by making opponents fold rather than by
+holding the best hand.}; it wins at showdown only $38.5\%$, lower
+than the uniform $1/n$ rate. \arch{Firestorm} is not a strong poker
+player, on the merits; it wins because it is hard to read. The
+trust--stack relationship is plotted in
+Fig.~\ref{fig:trust-vs-stack} (left panel).
 
 \begin{figure}[H]
   \centering
@@ -886,7 +884,7 @@ in the same round.} pot, paying 35 chips into a hand it had no
 chance to win. The illustrative hand we use here is drawn from
 the Phase 3 dataset so that we can show the trap holding even
 under a language-model implementation of \arch{Wall}; the same
-dynamic occurs more frequently in Phase 1.
+dynamic occurs more frequently in Phase 1 in practice.
 
 \begin{tcolorbox}[storyhand={Box~1.\quad An instance of the trap (Phase 3 hand \#67, 30 actions, 110-chip pot)}]
 \scriptsize
@@ -929,14 +927,14 @@ choose exploitation targets, classifies only 3 of 7 opponents
 reliably above the prespecified 0.60 confidence threshold after
 1{,}000 hands: \arch{Wall} ($p = 1.00$), \arch{Firestorm}
 ($p \approx 0.82$), and occasionally \arch{Phantom}
-($p \approx 0.60$ in some seeds). The remaining four opponents
-fall below the threshold on every seed. Three of these
-(\arch{Sentinel}, \arch{Mirror} in its default state,
-\arch{Judge} in its cooperative state) have byte-identical mean
-parameters under the spec; the posterior over them bottoms out
-at $\log_2(3) \approx 1.58$ bits regardless of observation
-volume---a direct consequence of our design choice rather than
-an emergent finding.
+($p \approx 0.60$ in some seeds). All the other opponents drop
+below the threshold in every seed. Three of them (\arch{Sentinel},
+\arch{Mirror} in its default state, and \arch{Judge} in its
+cooperative state) have identical mean parameters byte-for-byte
+under the spec; the posterior over them bottoms out at
+$\log_2(3) \approx 1.58$ bits regardless of how many observations
+are made. This phenomenon is due to a design choice we made during
+experiment design, rather than an emergent phenomenon.
 
 \FloatBarrier
 
@@ -944,23 +942,24 @@ an emergent finding.
 \subsection{Phase 2: bounded hill-climbing softens but does not
 close the trap}
 
-Phase 2 produces $\rtp = -0.637 \pm 0.125$ with per-seed values
-$\{-0.759, -0.424, -0.719, -0.717, -0.564\}$. The shift from
-Phase 1 ($\Delta\rtp = +0.116$) is consistent across all five
-seeds (per-seed shifts $+0.015$, $+0.184$, $+0.073$, $+0.095$,
-$+0.212$). The Opponent Adaptation metric stays at
-$\mathrm{OA} = 0.0003$ in both Phase 1 and Phase 2: aggregate-
-reward optimization can drift parameters within the bound box
-but cannot, by construction, produce per-opponent strategy
-because the hill-climber has no per-opponent parameter slot.
-Mean per-agent L1\footnote{The \textit{$L_1$ distance} between
-two parameter vectors is the sum of absolute differences across
-all 36 (round, action) slots. Larger $L_1$ means the agent has
-moved further from its starting parameters.} drift in parameter
-space is approximately $0.3$ over $10{,}000$ hands, meaning the
-bounded agents stay close to their starting points. Phase 2's
-softening is real but its mechanism is local: the agents trim
-the worst-performing parts of their stationary policy without
+Phase 2 produces $\rtp = -0.637 \pm 0.125$, with per-seed values
+$\{-0.759, -0.424, -0.719, -0.717, -0.564\}$. The shift from Phase 1
+($\Delta\rtp = +0.116$) is consistent: using a one-tailed Wilcoxon
+test, we see a consistent shift across all five seeds between Phase 1
+and Phase 2 when sampling the bounded population (per-seed shifts
+$+0.015$, $+0.184$, $+0.073$, $+0.095$, $+0.212$), so it is real and
+not noise. The Opponent Adaptation metric stays at
+$\mathrm{OA} = 0.0003$ in both Phase 1 and Phase 2: aggregate-reward
+optimization can drift parameters within the bound box but cannot, by
+construction, produce per-opponent strategy because the hill-climber
+has no per-opponent parameter slot. The mean per-agent
+$L_1$\footnote{The \textit{$L_1$ distance} between two parameter
+vectors is the sum of absolute differences across all 36 (round,
+action) slots. Larger $L_1$ means the agent has moved further from
+its starting parameters.} drift in parameter space is about $0.3$
+over $10{,}000$ hands, meaning the bounded agents don't really move.
+Phase 2's softening is real but its mechanism is local: the agents
+trim the worst-performing parts of their stationary policy without
 inventing anything qualitatively new.
 
 \begin{figure}[H]
@@ -1035,10 +1034,10 @@ elaborate in the Discussion.
 \subsection{Phase 3: language models alone do not break the trap}
 
 Phase 3 produces $\rtp = -0.510 \pm 0.268$ with per-seed values
-$\{-0.884, -0.525, -0.171, -0.712, -0.259\}$. The shift from
-Phase 2 ($\Delta\rtp = +0.127$) matches the Phase 1 $\to$
-Phase 2 step in magnitude. Per-seed variance is roughly twice
-Phase 2's ($0.268$ vs $0.125$). Four of six behavioral-dimension
+$\{-0.884, -0.525, -0.171, -0.712, -0.259\}$. The shift from Phase 2
+($\Delta\rtp = +0.127$) is most similar in magnitude to the
+Phase 1 $\to$ Phase 2 step. Variance is roughly double Phase 2's
+($0.268$ vs $0.125$). Four of six behavioral-dimension
 targets are missed; three move \textit{backward} relative to
 Phases 1 and 2 (Table~\ref{tab:behavioral-shift} reports
 per-archetype VPIP\footnote{\textit{VPIP} (voluntarily put in
@@ -1059,14 +1058,14 @@ bits.
 
 \input{../tables/behavioral_shift_p1_p31.tex}
 
-Personality specs tell the LLM \textit{what} to do but not
-\textit{how} to reason. Absent reasoning support, the LLMs in
-our sample collapse onto a more stereotyped canonical
-interpretation of each archetype, becoming \textit{more}
-classifiable than the explicitly stochastic rule-based versions.
-The softening from Phase 2 to Phase 3 is therefore not produced
-by the same mechanism as Phase 2's softening; it is mostly
-output stochasticity from sampling temperature 1.0.
+Personality specs tell the LLM \textit{what} to do without telling
+it \textit{how} to reason. In the absence of reasoning support, the
+LLMs in our sample collapse onto a more stereotyped canonical
+interpretation of each archetype, making them \textit{more}
+classifiable than the explicitly stochastic rule-based versions. The
+softening from Phase 2 to Phase 3 is therefore not produced by the
+same mechanism as Phase 2's softening; it is output stochasticity
+from sampling temperature 1.0.
 
 \FloatBarrier
 
@@ -1106,22 +1105,21 @@ nonzero residual trap.
 
 \arch{Wall}'s mean stack rises from ${\sim}100$--$200$ chips in
 Phases 1--3 to $280$ in Phase 3.1; rebuy count drops from
-${\sim}9.4$ per seed to zero, consistent with the rank-order
-claim above. The right panel of Fig.~\ref{fig:trust-vs-stack}
-(introduced earlier) shows the trust--stack scatter under
-Phase 3.1: the negative slope visible in the Phase 1 panel is
-gone. The full per-archetype economic ordering is in
-Table~\ref{tab:archetype-p31}.
+${\sim}9.4$ per seed to zero, in keeping with the rank-order claim
+above. The right panel of Fig.~\ref{fig:trust-vs-stack} (introduced
+earlier) shows the trust--stack scatter under Phase 3.1: the negative
+slope visible in the Phase 1 panel is absent. The full per-archetype
+economic ordering is in Table~\ref{tab:archetype-p31}.
 
 \input{../tables/per_archetype_p31.tex}
 
-Four of six secondary metric targets are met in Phase 3.1
-(vs.\ two of six in Phase 3). Strategic Unpredictability rises
-from $1.19$ to $1.55$ bits, crossing the $>1.5$ threshold for
-the first time across all phases. Trust Manipulation Awareness
-rises from $+0.164$ to $+0.242$, with six of eight archetypes
-showing positive TMA; \arch{Wall} and \arch{Sentinel} show the
-strongest signals at $+0.733$ and $+0.704$.
+Four of six secondary metric targets are met in Phase 3.1 (vs.\ two
+of six in Phase 3). Strategic Unpredictability rises from $1.19$ to
+$1.55$ bits, crossing the $>1.5$ threshold for the first time across
+all phases. Trust Manipulation Awareness rises from $+0.164$ to
+$+0.242$, and six of eight archetypes have positive TMA; \arch{Wall}
+and \arch{Sentinel} show the most extreme signals at $+0.733$ and
+$+0.704$.
 
 \begin{figure}[H]
   \centering
@@ -1138,10 +1136,10 @@ strongest signals at $+0.733$ and $+0.704$.
 
 \input{../tables/tma_by_archetype.tex}
 
-The mechanism behind these numbers is most concretely visible in
-a single hand. Box~2 reproduces Phase 3.1 hand \#146:
-\arch{Wall} holding $K\heartsuit\,Q\heartsuit$ (rank $872$) calls
-a flop continuation bet\footnote{A \textit{continuation bet}
+How do you mechanistically get these numbers? The answer is best
+shown in a single hand. Box~2 reproduces Phase 3.1 hand \#146:
+\arch{Wall}, holding $K\heartsuit\,Q\heartsuit$ (rank $872$), calls a
+flop continuation bet\footnote{A \textit{continuation bet}
 (\textit{c-bet}) is a bet made on the flop by the player who
 took the lead in betting preflop, regardless of whether the
 flop helped that player's hand. It is the most common bluff line
@@ -1152,7 +1150,7 @@ about an opponent's hand. \arch{Wall} reads \arch{Firestorm}'s
 river check as a tell because the canonical \arch{Firestorm}
 policy bets every street with a real hand; a river check
 therefore signals that the bluff line has been abandoned.},
-\textit{bets} the river for value, and wins 32 chips. Canonical
+bets the river for value, and wins 32 chips. Canonical
 \arch{Wall} never bets the river in any Phase 1, Phase 2, or
 Phase 3 dataset; Phase 3.1 \arch{Wall}, with reasoning
 scaffolding, does.
@@ -1203,69 +1201,72 @@ notes, does.}
 The trust trap visible in Phase 1 admits a clean mechanistic
 explanation that the Phase 3.1 results then refine. Trust, as we
 measure it, is the expected honesty of an opponent under the
-posterior; a high trust score signals to opponents that the agent
-is most likely an archetype that only bets with strong hands. For
-\arch{Wall} (honesty 0.96) and \arch{Sentinel} (honesty 0.92),
-this belief is \textit{correct}, and that is precisely why it is
-costly: when opponents know an agent only bets with strong hands,
-they fold against its bets (denying value from those strong
-hands) and bet aggressively against its checks (exploiting the
-information that a check signals weakness). The agent's honesty
-becomes a signal that opponents read and trade against. A low
-trust score, conversely, creates strategic ambiguity, and
-\arch{Firestorm} uses that ambiguity to dominate the table. The
-phenomenon parallels what economists studying eBay-style
-reputation systems have called the \textit{transparency paradox}
-\citep{resnick2002trust}: predictable cooperation is exploitable.
+posterior; a high trust score signals to opponents that the agent is
+most likely an archetype that only bets with strong hands. For
+\arch{Wall} (honesty 0.96) and \arch{Sentinel} (honesty 0.92), this
+is correct, and that is precisely the reason it is costly: when
+opponents understand that an agent will only bet with a strong hand,
+they fold against its bets (preventing the agent from obtaining value
+from those strong hands), and they also bet aggressively against its
+checks (taking advantage of the fact that they believe a check
+represents a weak hand). Thus, the agent's honesty becomes a signal
+that opponents can read and trade against. Conversely, a lower trust
+score produces strategic uncertainty, and \arch{Firestorm} takes
+advantage of that uncertainty to dominate the table. The phenomenon
+parallels what economists studying eBay-style reputation systems have
+called the \textit{transparency paradox} \citep{resnick2002trust}:
+predictable cooperation can be exploited.
 
-The mechanism by which \arch{Firestorm} converts ambiguity into
-chips deserves comment because it differs structurally from the
-canonical Iterated Prisoner's Dilemma result. In pairwise IPD,
-Always-Defect is outperformed by Tit-for-Tat because a defector
-faces concentrated retaliation. In our 8-player setting,
-\arch{Firestorm}'s aggression cost is diffused across seven
-simultaneous opponents, so the same strategy that would lose
-heads-up wins at the full table. Our Tit-for-Tat analogue
-(\arch{Mirror}) finishes sixth of eight in economic ordering---
-suggestive but not definitive evidence that the IPD result fails
-to transfer to multi-agent settings with richer action spaces. We
-flag this as a direction for follow-up rather than a conclusion,
-since a single hand-crafted poker analogue is not a clean test of
-the IPD literature.
+To explain how \arch{Firestorm} turns ambiguity into chips we need
+to describe the mechanism behind it, and note that it differs
+structurally from the canonical Iterated Prisoner's Dilemma result.
+When agents engage in pairwise Iterated Prisoner's Dilemma,
+Always-Defect loses to Tit-for-Tat because a defector receives
+concentrated retaliation. In our 8-player setting, however,
+\arch{Firestorm} spreads the cost of its aggressive play across all
+seven opponents simultaneously, so the same strategy that would lose
+heads-up wins at the full table. Additionally, our Tit-for-Tat
+analogue (\arch{Mirror}) ranks sixth of eight in economic ordering,
+suggesting but not proving conclusively that the IPD result does not
+extend to multi-agent settings with richer action spaces. We flag
+this as a potential direction for future research rather than a
+finding, given that only a single hand-crafted poker analogue is used
+here rather than a clean test of the IPD literature.
 
 \subsection{What numerical optimization can and cannot do}
-The next three phases of the experiment narrow the space of
-possible explanations for why the trap is hard to escape. We
-begin with a structural caveat: by construction, three of our
-eight archetypes (\arch{Sentinel}, \arch{Mirror}'s default,
-\arch{Judge}'s cooperative state) share byte-identical mean
-parameters, and the Bayesian posterior cannot distinguish them
-regardless of algorithmic sophistication. Classification accuracy
-in that sub-space is bounded below by the entropy of a uniform
-distribution over the three members. This is a definitional
-point about \textit{our} archetype space, not an information-
-theoretic discovery about reputation systems in general; the
-empirical question of how rapidly classification accuracy degrades
-as inter-archetype distance shrinks toward zero would require
-experimentally varying that distance and is outside the scope of
-the present paper. Real-world monitoring systems---fraud
-detection, content moderation, credit scoring---face an analogous
-failure mode for moderately-behaved actors with overlapping
-profiles, but the analogy is suggestive rather than implied by
-our setup.
+The remainder of the study narrows the space of plausible
+explanations for why the trap is hard to escape through the first
+three phases of experimentation. We begin with a structural caveat:
+three of our eight archetypes (\arch{Sentinel}, \arch{Mirror}'s
+default, \arch{Judge}'s cooperative state) have byte-identical mean
+parameters and are therefore indistinguishable regardless of the
+computational sophistication used to determine the Bayesian
+posterior. Even if we were able to determine the Bayesian posterior
+perfectly, the best classification accuracy achievable within this
+sub-space would be equivalent to randomly guessing among the three
+options. This is a definitional point about \textit{our} archetype
+space, not an information-theoretic discovery about reputation
+systems in general; the empirical question of how rapidly
+classification accuracy degrades as inter-archetype distance shrinks
+toward zero would require experimentally varying that distance and is
+outside the scope of the present paper. Real-world monitoring
+systems---fraud detection, content moderation, credit scoring---face
+an analogous, similarly insurmountable barrier for moderately-behaved
+actors with overlapping profiles; the analogy is suggestive rather
+than implied by our setup.
 
-Within that caveat, the Phase 2 and Phase 2$^{*}$ results argue
-against two specific hypotheses about the trap's origin. Phase 2
-(bounded hill-climbing) softens $\rtp$ by $+0.116$ while
-$\mathrm{OA}$ stays pinned at $0.0003$: aggregate-reward
-optimization can move agent parameters but cannot, by
-construction, produce per-opponent strategy because the
-hill-climber has no per-opponent parameter slot. Phase 2$^{*}$
-(unbounded hill-climbing with $11\times$ greater parameter drift)
-softens $\rtp$ by an additional $+0.028$ and produces a population
-that diverges rather than converges in 36-dimensional parameter
-space---evidence against the hypothesis that the archetype-
-shaped bound boxes are the binding constraint, though the
+Given the above caveat, Phases 2 and 2$^{*}$ provide evidence
+against two particular hypotheses concerning the cause of the trap.
+Phase 2 (bounded hill-climbing) increases $\rtp$ by $+0.116$ while
+$\mathrm{OA}$ remains fixed at $0.0003$: optimization via aggregate
+reward allows for changes in agent parameters but by design cannot
+generate per-opponent strategy because the hill-climber has no
+per-opponent parameter slot. Phase 2$^{*}$ (unbounded hill-climbing
+with $11\times$ greater parameter drift) adds another $+0.028$ to
+$\rtp$ and causes the population to diverge instead of converge in
+36-dimensional parameter space---evidence against the hypothesis
+that the archetype-shaped bound boxes are the binding constraint,
+though the
 sub-experiment varies three optimizer parameters at once
 (bounds removed, step size raised $5\times$, evaluation window
 shrunk $4\times$) and therefore does not cleanly isolate the
