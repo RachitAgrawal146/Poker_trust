@@ -131,6 +131,64 @@ src = src.replace(preamble_inject, renews + preamble_inject, 1)
 src = re.sub(r'width=\\linewidth', 'width=14cm', src)
 src = re.sub(r'width=0\.9\d*\\textwidth', 'width=15cm', src)
 
+# ---------------------------------------------------------------- 11. post-process
+def _postprocess(path):
+    """Recolor archetype names (pandoc drops \\textcolor) and add the running
+    header / footer as real Word header & footer objects. Best-effort: if
+    python-docx is unavailable the docx is still valid, just without colors
+    and running heads."""
+    try:
+        from docx import Document
+        from docx.shared import RGBColor, Inches, Pt
+        from docx.enum.text import WD_TAB_ALIGNMENT, WD_ALIGN_PARAGRAPH
+        from docx.oxml import OxmlElement
+        from docx.oxml.ns import qn
+    except ImportError:
+        print('  (python-docx not installed; skipping colors + headers/footers)')
+        return
+    doc = Document(str(path))
+
+    def _paras(container):
+        for p in container.paragraphs:
+            yield p
+        for t in container.tables:
+            for row in t.rows:
+                for cell in row.cells:
+                    yield from _paras(cell)
+
+    n = 0
+    for p in _paras(doc):
+        for run in p.runs:
+            if not run.bold:
+                continue
+            core = re.sub(r"[’']s\b", "", run.text.strip()).strip(".,;:()[]’'\" ")
+            if core in HEX:
+                run.font.color.rgb = RGBColor.from_string(HEX[core]); n += 1
+
+    def _pagefield(par):
+        rr = par.add_run()
+        for kind, val in (('begin', None), ('instr', ' PAGE '), ('end', None)):
+            if kind == 'instr':
+                e = OxmlElement('w:instrText'); e.set(qn('xml:space'), 'preserve'); e.text = val
+            else:
+                e = OxmlElement('w:fldChar'); e.set(qn('w:fldCharType'), kind)
+            rr._r.append(e)
+
+    for sec in doc.sections:
+        sec.different_first_page_header_footer = False
+        sec.header.is_linked_to_previous = False
+        hp = sec.header.paragraphs[0]; hp.text = ''; hp.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+        rh = hp.add_run('RESEARCH  |  RESEARCH ARTICLE')
+        rh.bold = True; rh.font.size = Pt(8); rh.font.color.rgb = RGBColor.from_string('C8102E')
+        sec.footer.is_linked_to_previous = False
+        fp = sec.footer.paragraphs[0]; fp.text = ''
+        fp.paragraph_format.tab_stops.add_tab_stop(Inches(6.5), WD_TAB_ALIGNMENT.RIGHT)
+        r1 = fp.add_run('Agrawal (2026)'); r1.font.size = Pt(8)
+        fp.add_run('\t'); _pagefield(fp)
+
+    doc.save(str(path))
+    print(f'  post-processed: {n} archetype names recolored, running header/footer added')
+
 # ---------------------------------------------------------------- write + pandoc
 tmp = pathlib.Path(tempfile.mkdtemp()) / 'main_pandoc.tex'
 tmp.write_text(src)
@@ -141,5 +199,6 @@ cmd = ['pandoc', str(tmp), '-o', str(out), '--citeproc',
 print('pandoc:', ' '.join(cmd))
 r = subprocess.run(cmd)
 if r.returncode == 0:
+    _postprocess(out)
     print(f'wrote {out}  ({fig} figures, {tab} tables, {eq} equations)')
 sys.exit(r.returncode)
