@@ -128,8 +128,7 @@ src = re.sub(r'\\label\{[^}]+\}', '', src)
 HEX = {'Oracle':'A8B5C3','Sentinel':'5C8159','Firestorm':'E75D3C','Wall':'A2A7A9',
        'Phantom':'836F91','Predator':'B93C41','Mirror':'CDD3D8','Judge':'3F4F7C'}
 src = re.sub(r'\\arch\{(\w+)\}',
-             lambda m: r'\textcolor[HTML]{' + HEX.get(m.group(1), '333333')
-                       + r'}{\textbf{' + m.group(1) + r'}}', src)
+             lambda m: r'\textbf{' + m.group(1) + r'}', src)
 
 # ---------------------------------------------------------------- 9. flatten custom macros
 renews = (r'\renewcommand{\bbar}{ \textbar{} }' + '\n'
@@ -166,14 +165,7 @@ def _postprocess(path):
                 for cell in row.cells:
                     yield from _paras(cell)
 
-    n = 0
-    for p in _paras(doc):
-        for run in p.runs:
-            if not run.bold:
-                continue
-            core = re.sub(r"[’']s\b", "", run.text.strip()).strip(".,;:()[]’'\" ")
-            if core in HEX:
-                run.font.color.rgb = RGBColor.from_string(HEX[core]); n += 1
+    # archetype names are rendered in plain bold (no per-archetype colour, v6+)
 
     def _pagefield(par):
         rr = par.add_run()
@@ -197,7 +189,7 @@ def _postprocess(path):
         fp.add_run('\t'); _pagefield(fp)
 
     doc.save(str(path))
-    print(f'  post-processed: {n} archetype names recolored, running header/footer added')
+    print('  post-processed: running header/footer added (archetype names plain bold)')
 
 # ---------------------------------------------------------------- write + pandoc
 tmp = pathlib.Path(tempfile.mkdtemp()) / 'main_pandoc.tex'
