@@ -363,8 +363,9 @@ work presented in the following section.
 
 Multiple relevant background precedent works exist that contribute
 to the foundational premise of this research. These are discussed in
-the order in which they relate to our simulations:
+the order in which they relate to our simulations.
 
+\subsection{Online reputation systems}
 First, there exists the empirical economics of online reputation
 systems. Resnick \& Zeckhauser \citep{resnick2002trust} analyzed
 their study of eBay to demonstrate what was termed the transparency
@@ -395,6 +396,19 @@ intelligent enough to prevent themselves from being taken advantage
 of---since this literature does not alter the composition of
 participating sellers.
 
+\begin{figure}[tb]
+\centering
+\includegraphics[width=\linewidth]{00_game_of_trust.png}
+\caption{\textbf{The Prisoner's Dilemma, as a game of trust.} A
+screenshot of the cooperate/cheat setup from Nicky Case's
+\textit{Evolution of Trust} interactive: putting a coin in the
+machine costs you one coin but gives the other player three. Mutual
+cooperation therefore pays $+2$ each, mutual cheating $0$ each, and
+unilateral cheating against a cooperator pays $+3$ to the defector
+against $-1$ to the cooperator.}
+\label{fig:pd}
+\end{figure}
+
 \begin{table*}[t]
 \centering
 \captionsetup{font={small,sf}}
@@ -422,6 +436,7 @@ Stack & The chips a player has in front of them; depleting to zero triggers a re
 \end{tabularx}
 \end{table*}
 
+\subsection{Cooperation in repeated games}
 Second, there is a substantial amount of computational research
 concerning cooperation in repeated games. Prior to discussing
 cooperation, it is necessary to discuss the Prisoner's Dilemma as it
@@ -446,19 +461,6 @@ sufficient incentive to defect since defecting always yields greater
 benefits than cooperating, regardless of the choice made by the
 other prisoner; Nevertheless, mutually defective behavior is
 inferior in comparison to mutually cooperative behavior.
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=\linewidth]{00_game_of_trust.png}
-\caption{\textbf{The Prisoner's Dilemma, as a game of trust.} A
-screenshot of the cooperate/cheat setup from Nicky Case's
-\textit{Evolution of Trust} interactive: putting a coin in the
-machine costs you one coin but gives the other player three. Mutual
-cooperation therefore pays $+2$ each, mutual cheating $0$ each, and
-unilateral cheating against a cooperator pays $+3$ to the defector
-against $-1$ to the cooperator.}
-\label{fig:pd}
-\end{figure}
 
 Axelrod investigated this problem extensively through his Prisoner's
 Dilemma Tournaments \citep{axelrod1984evolution}, and Nowak
@@ -491,6 +493,7 @@ not necessarily translate well to multi-agent environments that
 contain richer action-spaces; although we interpret this as
 suggestive rather than definitive.
 
+\subsection{Bayesian opponent modelling in poker}
 Thirdly, there is Bayesian opponent modeling in poker. Initially
 this included Billings et al.'s Loki and Poki bots
 \citep{billings1998opponent} and subsequently formalized by Southey
@@ -508,6 +511,7 @@ dynamics evolve under conditions of correct, transparent, and
 collective inference amongst many agents. Our poker engine is viewed
 as a microscope---not as an adversary.
 
+\subsection{Language models as strategic agents}
 First, we treat this last point as it relates to two of our phases,
 because these phases employ large language models. An increasing
 amount of work concerns how strategically large language
@@ -669,38 +673,6 @@ type is found in Table~\ref{tab:bounds-comprehensive}.
   revenge on that opponent. Models retaliation based upon perceived
   cheating or ``bad faith.''}{br $\in[.02,.18]$ \bbar vbr $\in[.85,1.00]$ \bbar cr $\in[.25,.50]$ \,(cooperative state)}
 
-\begin{table*}[!ht]
-\centering
-\captionsetup{font={small,sf}}
-\caption{\textbf{Per-archetype policy bounds (Table~A).}
-$P(\text{bet}|S)$, $P(\text{bet}|W)$ are the probabilities of
-betting with a strong or weak hand on a given street (preflop
-unless noted); $P(\text{fold}|W)$ is the probability of folding a
-weak hand to an opponent's bet. Static archetypes live at a fixed
-point inside the bound box. Under Phase 2's bounded hill-climber
-the agent may drift within the box; under Phase 2$^{*}$'s
-unbounded variant the box is replaced by $[0, 1]$ on every
-dimension. Adaptive archetypes additionally read live state
-(opponent posterior or grievance ledger) and are described by the
-rule that produces the policy rather than by fixed bounds.}
-\label{tab:bounds-comprehensive}
-\footnotesize
-\setlength{\tabcolsep}{4pt}
-\begin{tabularx}{\textwidth}{@{}l >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X c >{\raggedright\arraybackslash}X@{}}
-\toprule
-Archetype & $P(\text{bet}|S)$ & $P(\text{bet}|W)$ & $P(\text{fold}|W)$ & $h$ & Adaptation rule \\
-\midrule
-\arch{Oracle}    & $[0.65, 0.85]$ & $[0.15, 0.35]$ & $[0.45, 0.65]$ & 0.67 & None --- fixed mixed strategy \\
-\arch{Sentinel}  & $[0.90, 1.00]$ & $[0.00, 0.10]$ & $[0.80, 0.95]$ & 0.92 & None --- tight value-bettor \\
-\arch{Firestorm} & $[0.85, 1.00]$ & $[0.45, 0.65]$ & $[0.00, 0.20]$ & 0.38 & None --- bets everything \\
-\arch{Wall}      & $[0.95, 1.00]$ & $[0.00, 0.05]$ & $[0.00, 0.05]$ & 0.96 & None --- calls all, folds none \\
-\arch{Phantom}   & $[0.30, 0.50]$ & $[0.60, 0.80]$ pre, $[0.05, 0.20]$ post & $[0.70, 0.90]$ post-flop after preflop bluff & 0.48 & Static but street-conditional \\
-\arch{Predator}  & TAG default; exploit profile vs.\ target & $0.05$ default; $0.55$ vs.\ classified target & $0.65$ default; $0.30$ vs.\ classified target & 0.79 & Activates exploit profile when posterior on opponent $>0.60$ \\
-\arch{Mirror}    & $0.5\cdot\text{self}+0.5\cdot\text{target}$ & same blend & same blend & 0.91 & Re-targets at each hand to highest-VPIP opponent \\
-\arch{Judge}     & $[0.88, 0.98]$ coop; $[0.95, 1.00]$ retal. & $[0.02, 0.10]$ coop; $[0.30, 0.45]$ retal. & $[0.78, 0.92]$ coop; $[0.30, 0.50]$ retal. & 0.92 & Switches to retaliation after 5+ confirmed bluffs by an opponent \\
-\bottomrule
-\end{tabularx}
-\end{table*}
 
 \subsection{Categorical posterior over types}\label{sec:posterior}
 Every agent maintains a length-8 categorical distribution over the
@@ -839,6 +811,39 @@ iterations, it does not provide greater statistical power than what
 is available from the five actual observations.
 
 % =============================================================================
+\begin{table*}[!ht]
+\centering
+\captionsetup{font={small,sf}}
+\caption{\textbf{Per-archetype policy bounds (Table~A).}
+$P(\text{bet}|S)$, $P(\text{bet}|W)$ are the probabilities of
+betting with a strong or weak hand on a given street (preflop
+unless noted); $P(\text{fold}|W)$ is the probability of folding a
+weak hand to an opponent's bet. Static archetypes live at a fixed
+point inside the bound box. Under Phase 2's bounded hill-climber
+the agent may drift within the box; under Phase 2$^{*}$'s
+unbounded variant the box is replaced by $[0, 1]$ on every
+dimension. Adaptive archetypes additionally read live state
+(opponent posterior or grievance ledger) and are described by the
+rule that produces the policy rather than by fixed bounds.}
+\label{tab:bounds-comprehensive}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabularx}{\textwidth}{@{}l >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X c >{\raggedright\arraybackslash}X@{}}
+\toprule
+Archetype & $P(\text{bet}|S)$ & $P(\text{bet}|W)$ & $P(\text{fold}|W)$ & $h$ & Adaptation rule \\
+\midrule
+\arch{Oracle}    & $[0.65, 0.85]$ & $[0.15, 0.35]$ & $[0.45, 0.65]$ & 0.67 & None --- fixed mixed strategy \\
+\arch{Sentinel}  & $[0.90, 1.00]$ & $[0.00, 0.10]$ & $[0.80, 0.95]$ & 0.92 & None --- tight value-bettor \\
+\arch{Firestorm} & $[0.85, 1.00]$ & $[0.45, 0.65]$ & $[0.00, 0.20]$ & 0.38 & None --- bets everything \\
+\arch{Wall}      & $[0.95, 1.00]$ & $[0.00, 0.05]$ & $[0.00, 0.05]$ & 0.96 & None --- calls all, folds none \\
+\arch{Phantom}   & $[0.30, 0.50]$ & $[0.60, 0.80]$ pre, $[0.05, 0.20]$ post & $[0.70, 0.90]$ post-flop after preflop bluff & 0.48 & Static but street-conditional \\
+\arch{Predator}  & TAG default; exploit profile vs.\ target & $0.05$ default; $0.55$ vs.\ classified target & $0.65$ default; $0.30$ vs.\ classified target & 0.79 & Activates exploit profile when posterior on opponent $>0.60$ \\
+\arch{Mirror}    & $0.5\cdot\text{self}+0.5\cdot\text{target}$ & same blend & same blend & 0.91 & Re-targets at each hand to highest-VPIP opponent \\
+\arch{Judge}     & $[0.88, 0.98]$ coop; $[0.95, 1.00]$ retal. & $[0.02, 0.10]$ coop; $[0.30, 0.45]$ retal. & $[0.78, 0.92]$ coop; $[0.30, 0.50]$ retal. & 0.92 & Switches to retaliation after 5+ confirmed bluffs by an opponent \\
+\bottomrule
+\end{tabularx}
+\end{table*}
+
 \section{Results}\label{sec:results}
 % =============================================================================
 
@@ -874,7 +879,7 @@ showdown win rate is only $38.5\%$, below the uniform $1/n$ rate.
 wins because it is hard to read. The trust--stack relationship
 appears in Fig.~\ref{fig:trust-vs-stack} (left panel).
 
-\begin{figure}[H]
+\begin{figure*}[tp]
   \centering
   \includegraphics[width=\linewidth]{05_trust_vs_stack.png}
   \caption{\textbf{Trust versus final stack across phases.}
@@ -884,7 +889,7 @@ appears in Fig.~\ref{fig:trust-vs-stack} (left panel).
   relationship dissolves and \arch{Wall} becomes the top earner.
   Each point is one (archetype, seed) observation.}
   \label{fig:trust-vs-stack}
-\end{figure}
+\end{figure*}
 
 The mechanism is also visible in a single representative hand.
 Box~1 reproduces hand \#67 from seed 42: \arch{Wall} is dealt
@@ -1007,7 +1012,7 @@ With respect to movement in parameter space, the mean per-agent
 $L_1$ drift is $3.4$ (i.e., eleven times more than in the bounded
 version); yet the trap persists.
 
-\begin{figure}[H]
+\begin{figure*}[tp]
   \centering
   \includegraphics[width=\linewidth]{14_nash_convergence_compare.png}
   \caption{\textbf{The 8-agent population becomes dispersed in
@@ -1020,7 +1025,7 @@ version); yet the trap persists.
   cluster spread $>1$ implies the agents become more dispersed at
   end-of-run than at the start.}
   \label{fig:nash}
-\end{figure}
+\end{figure*}
 
 The explanation for why this occurs becomes apparent on examining
 the dispersal in cluster-spread space. The averaged pairwise $L_1$

@@ -18,7 +18,9 @@ over cooperation, or is the trap dynamic dependent on agent capability?**
 Every phase reuses the **same game engine**, **same trust posterior**, and
 **same metrics framework**. Only the agent's `decide_action` changes.
 
-The Polygence research paper is written externally (Overleaf); supporting
+The Polygence research paper is built from
+[`paper_resources/manuscript/main.tex`](paper_resources/manuscript/main.tex)
+(compiled `main.pdf`, editable `main.docx`); supporting
 materials — figures, LaTeX tables, CSV data, story-hand transcripts, and
 topical notes — live in [`paper_resources/`](paper_resources/). See
 [`paper_resources/README.md`](paper_resources/README.md) for the index. The
