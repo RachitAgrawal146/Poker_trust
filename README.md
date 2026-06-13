@@ -13,7 +13,7 @@ over cooperation, or is the trap dynamic dependent on agent capability?**
 | **1** | Frozen rule-based archetype agents | **−0.752** | Trap is real |
 | **2** | Bounded online hill-climbing optimization | **−0.637** | Numerical adaptation chips at trap, doesn't break it |
 | **3** | LLM personality role-players (Haiku) | **−0.510** | LLMs role-play archetypes faithfully but don't reason |
-| **3.1** | LLM + chain-of-thought + memory + adaptive specs | **−0.094** | **Trap breaks: indistinguishable from zero** |
+| **3.1** | LLM + chain-of-thought + memory + adaptive specs | **−0.094** | **Trap attenuates — rank-order weakens, but underpowered (n=5)** |
 
 Every phase reuses the **same game engine**, **same trust posterior**, and
 **same metrics framework**. Only the agent's `decide_action` changes.
