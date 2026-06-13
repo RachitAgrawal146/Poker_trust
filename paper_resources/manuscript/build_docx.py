@@ -34,23 +34,22 @@ TITLE = ("Trust Dynamics in Multi-Agent Strategic Interaction: A Simulation "
          "Study of Bayesian Reputation Systems in 8-Player Limit Texas Hold'em")
 AUTHOR = (r"Rachit Agrawal\\ \normalsize Independent research, 2025--2026.\\ "
           r"\normalsize Correspondence: rachit.agrawal@sahyadrischool.org")
-# NOTE: this abstract is the drafted blurb (the author intends to paraphrase it).
 ABSTRACT = (
- r"What if being trustworthy could cost you? Reputation systems---in online "
- r"marketplaces, credit scoring, and social platforms---reward visible good "
- r"behaviour, yet economists have long noticed a paradox: a perfectly "
- r"transparent cooperator can earn less than a slightly unpredictable one. We "
- r"put that paradox in a petri dish. Eight poker agents play tens of thousands "
- r"of hands, and every agent quietly profiles every other agent's style, "
- r"updating that belief after each hand. We then swap out the agents' minds "
- r"across four escalating designs---from frozen rule-followers to language "
- r"models that reason about their opponents---while holding the game and the "
- r"trust model fixed. The pattern is stubborn: the most-trusted agents are "
- r"reliably the poorest, and numerical optimisation does not rescue them; only "
- r"when agents explicitly reason about the reputation system does the penalty "
- r"for honesty begin to fade. The outcome is a small, fully reproducible "
- r"testbed for a question that matters wherever machines judge one another: "
- r"when does a good reputation become a liability?")
+ r"WHAT IF BEING TRUSTWORTHY COST YOU SOMETHING? Reputation systems (online "
+ r"marketplaces, credit scoring and social platforms) reward ``good'' "
+ r"behavior---however, there is a well-known paradox among economists. A totally "
+ r"transparent and cooperative player will get less than a somewhat unreliable "
+ r"player. We placed that paradox into a petri-dish. Eight poker-players played "
+ r"tens of thousands of hands. Each player silently profiled all other players' "
+ r"styles, and updated those beliefs at each hand. Then we swapped the minds of "
+ r"the agents across four different levels of complexity---from strict rule "
+ r"followers to large language models capable of reasoning about what their "
+ r"opponents would do, while keeping both the game and the trust model constant. "
+ r"And so, it happened again. The best reputations were the least rewarded, and "
+ r"no amount of optimization changed that. It wasn't until the agents were able "
+ r"to reason about the reputation system that some relief began to occur. The "
+ r"result is a compact, completely replicable laboratory for exploring the very "
+ r"important question---when does a good reputation become a bad thing?")
 
 _abs = '\\begin{abstract}\n' + ABSTRACT + '\n\\end{abstract}'
 src = re.sub(r'\\twocolumn\[.*?\\thispagestyle\{firstpage\}',

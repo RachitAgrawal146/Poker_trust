@@ -65,14 +65,14 @@
 \usepackage{caption}
 \usepackage{subcaption}
 \captionsetup{
-  font={small,sf},
-  labelfont={small,sf,bf},
+  font={footnotesize,sf},
+  labelfont={footnotesize,sf,bf},
   labelsep=period,
   format=plain,
   justification=justified,
   singlelinecheck=false,
-  belowskip=4pt,
-  aboveskip=6pt
+  belowskip=11pt,
+  aboveskip=10pt
 }
 
 \usepackage{booktabs}
@@ -86,14 +86,13 @@
 % accent (matches the "RESEARCH | RESEARCH ARTICLE" bar style).
 \titleformat{\section}
   {\sffamily\bfseries\fontsize{11.5}{14}\selectfont\color{black}}
-  {}{0pt}{%
-    \makebox[0pt][l]{\textcolor{scienceRed}{\rule[-1pt]{2.5pt}{12pt}}}%
-    \hspace{8pt}\MakeUppercase{#1}}
+  {\makebox[0pt][l]{\textcolor{scienceRed}{\rule[-1pt]{2.5pt}{12pt}}}%
+   \hspace{8pt}\thesection}{8pt}{\MakeUppercase{#1}}
 \titlespacing*{\section}{0pt}{16pt}{8pt}
 
 \titleformat{\subsection}
   {\sffamily\bfseries\fontsize{10}{12.5}\selectfont}
-  {}{0pt}{#1}
+  {\thesubsection}{8pt}{#1}
 \titlespacing*{\subsection}{0pt}{10pt}{2pt}
 
 \titleformat{\subsubsection}
@@ -225,24 +224,25 @@
     \begin{minipage}{\dimexpr\textwidth-2\fboxsep\relax}
       \vspace{4pt}\noindent{\sffamily\bfseries\fontsize{10}{12}\selectfont ABSTRACT\par}\vspace{4pt}
       \sffamily\bfseries\fontsize{9.5}{13}\selectfont
-      \W{What if being trustworthy could cost you? Reputation
-      systems---in online marketplaces, credit scoring, and social
-      platforms---reward visible good behaviour, yet economists have
-      long noticed a paradox: a perfectly transparent cooperator can
-      earn less than a slightly unpredictable one. We put that
-      paradox in a petri dish. Eight poker agents play tens of
-      thousands of hands, and every agent quietly profiles every
-      other agent's style, updating that belief after each hand. We
-      then swap out the agents' minds across four escalating
-      designs---from frozen rule-followers to language models that
-      reason about their opponents---while holding the game and the
-      trust model fixed. The pattern is stubborn: the most-trusted
-      agents are reliably the poorest, and numerical optimisation
-      does not rescue them; only when agents explicitly reason about
-      the reputation system does the penalty for honesty begin to
-      fade. The outcome is a small, fully reproducible testbed for a
-      question that matters wherever machines judge one another: when
-      does a good reputation become a liability?}
+      WHAT IF BEING TRUSTWORTHY COST YOU SOMETHING? Reputation
+      systems (online marketplaces, credit scoring and social
+      platforms) reward ``good'' behavior---however, there is a
+      well-known paradox among economists. A totally transparent and
+      cooperative player will get less than a somewhat unreliable
+      player. We placed that paradox into a petri-dish. Eight
+      poker-players played tens of thousands of hands. Each player
+      silently profiled all other players' styles, and updated those
+      beliefs at each hand. Then we swapped the minds of the agents
+      across four different levels of complexity---from strict rule
+      followers to large language models capable of reasoning about
+      what their opponents would do, while keeping both the game and
+      the trust model constant. And so, it happened again. The best
+      reputations were the least rewarded, and no amount of
+      optimization changed that. It wasn't until the agents were able
+      to reason about the reputation system that some relief began to
+      occur. The result is a compact, completely replicable
+      laboratory for exploring the very important question---when
+      does a good reputation become a bad thing?
       \vspace{4pt}
     \end{minipage}}
     \vspace{18pt}
@@ -338,16 +338,22 @@ work presented in the following section.
 \section{Background}
 % =============================================================================
 
-\W{Four threads of prior work motivate this study, and we review
-them in the order they bear on our design: the empirical economics
-of online reputation systems, where the cost of transparency was
-first measured; the computational study of cooperation in repeated
-games, from the Prisoner's Dilemma to Axelrod's tournaments;
-Bayesian opponent modelling in poker, whose type-inference machinery
-we borrow; and the open question of whether large language models
-reason strategically or merely imitate strategy. Together these
-frame our central question: is the cost of being trusted a property
-of the reputation system, or of the agents inside it?}
+There are four lines of previous research motivating this study. We
+summarize them here in the order they influence our design:
+\begin{itemize}\itemsep2pt
+  \item The experimental economic literature on reputation systems in
+  the Internet age: this is the body of research documenting the cost
+  of transparency.
+  \item Computational studies on cooperation in repeated
+  games---including the Prisoner's Dilemma to Axelrod's tournaments.
+  \item Bayesians use in modeling poker opponents---the inference
+  mechanism we adopted.
+  \item The still-open question of whether large language models can
+  reason strategically, or only mimic strategy.
+\end{itemize}
+Together, these define our core question: does the cost of being
+trusting depend on either the trust system or on the agents inside
+it?
 
 \subsection{Online reputation systems}
 First, there exists the empirical economics of online reputation
@@ -380,19 +386,6 @@ intelligent enough to prevent themselves from being taken advantage
 of---since this literature does not alter the composition of
 participating sellers.
 
-\begin{figure}[tb]
-\centering
-\includegraphics[width=\linewidth]{00_game_of_trust.png}
-\caption{\textbf{The Prisoner's Dilemma, as a game of trust.} A
-screenshot of the cooperate/cheat setup from Nicky Case's
-\textit{Evolution of Trust} interactive: putting a coin in the
-machine costs you one coin but gives the other player three. Mutual
-cooperation therefore pays $+2$ each, mutual cheating $0$ each, and
-unilateral cheating against a cooperator pays $+3$ to the defector
-against $-1$ to the cooperator.}
-\label{fig:pd}
-\end{figure}
-
 \begin{table*}[t]
 \centering
 \captionsetup{font={small,sf}}
@@ -419,6 +412,19 @@ Stack & The chips a player has in front of them; depleting to zero triggers a re
 \bottomrule
 \end{tabularx}
 \end{table*}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{00_game_of_trust.png}
+\caption{\textbf{The Prisoner's Dilemma, as a game of trust.} A
+screenshot of the cooperate/cheat setup from Nicky Case's
+\textit{Evolution of Trust} interactive: putting a coin in the
+machine costs you one coin but gives the other player three. Mutual
+cooperation therefore pays $+2$ each, mutual cheating $0$ each, and
+unilateral cheating against a cooperator pays $+3$ to the defector
+against $-1$ to the cooperator.}
+\label{fig:pd}
+\end{figure}
 
 \subsection{Cooperation in repeated games}
 Second, there is a substantial amount of computational research
@@ -556,21 +562,26 @@ all four lines of prior work and using these two mathematical tools.
 \section{Methodology}
 % =============================================================================
 
-\W{Across every phase, this study holds one scaffold fixed and
-varies only the agent's mind. The scaffold has three parts: an
-eight-player game of fixed-limit Texas Hold'em; a categorical belief
-that each agent maintains over every opponent's archetype and updates
-after each hand; and a single trust score derived from that belief.
-What changes is only how an agent decides. Phase 1 uses frozen
-rule-based archetypes; Phase 2 lets those rules adapt through bounded
-hill-climbing; Phase 3 replaces them with a language model
-role-playing a personality; and Phase 3.1 adds explicit
-reasoning---chain-of-thought, per-opponent memory, and self-written
-strategy notes. Because the environment and the trust model never
-change, any difference in outcome can be attributed to agent
-capability alone. We describe the shared environment first, then the
-eight archetypes, the belief update, and finally the four agent
-architectures.}
+Throughout every phase of this study, the only variable is the
+agent's mind. The underlying scaffolding includes three components:
+an 8-player version of fixed-limit Texas Hold'em; categorical belief
+about each player's archetype maintained by each player and updated
+after every round; and one single trust score computed based upon
+belief.
+
+In phase 1, agents operate under pre-defined rule-based archetypes.
+In phase 2, agents allow their rules to evolve through limited hill
+climbing. In phase 3, agents replace their rules with a language
+model that represents themselves playing an archetype. In phase 3.1,
+agents add explicit reasoning---chain-of-thought, per-opponent
+memory, and self-generated strategy documentation. Since neither the
+environment nor the trust model ever changes throughout this
+experiment, differences in outcomes can be solely due to variations
+in agent capabilities.
+
+First we describe the common environment, followed by descriptions
+of the eight archetypes (rules), belief updates, and finally the
+four agent implementations.
 
 \subsection{Game environment}
 The overall game setting remains constant for all phases of this
@@ -879,7 +890,7 @@ showdown win rate is only $38.5\%$, below the uniform $1/n$ rate.
 wins because it is hard to read. The trust--stack relationship
 appears in Fig.~\ref{fig:trust-vs-stack} (left panel).
 
-\begin{figure*}[tp]
+\begin{figure}[H]
   \centering
   \includegraphics[width=\linewidth]{05_trust_vs_stack.png}
   \caption{\textbf{Trust versus final stack across phases.}
@@ -889,7 +900,7 @@ appears in Fig.~\ref{fig:trust-vs-stack} (left panel).
   relationship dissolves and \arch{Wall} becomes the top earner.
   Each point is one (archetype, seed) observation.}
   \label{fig:trust-vs-stack}
-\end{figure*}
+\end{figure}
 
 The mechanism is also visible in a single representative hand.
 Box~1 reproduces hand \#67 from seed 42: \arch{Wall} is dealt
@@ -1012,7 +1023,7 @@ With respect to movement in parameter space, the mean per-agent
 $L_1$ drift is $3.4$ (i.e., eleven times more than in the bounded
 version); yet the trap persists.
 
-\begin{figure*}[tp]
+\begin{figure}[H]
   \centering
   \includegraphics[width=\linewidth]{14_nash_convergence_compare.png}
   \caption{\textbf{The 8-agent population becomes dispersed in
@@ -1025,7 +1036,7 @@ version); yet the trap persists.
   cluster spread $>1$ implies the agents become more dispersed at
   end-of-run than at the start.}
   \label{fig:nash}
-\end{figure*}
+\end{figure}
 
 The explanation for why this occurs becomes apparent on examining
 the dispersal in cluster-spread space. The averaged pairwise $L_1$
@@ -1445,17 +1456,16 @@ preliminary evidence against the hypothesis that the trap is a
 bound-box artifact, though Phase 2$^{*}$ varies three optimizer
 parameters at once and does not cleanly isolate the bounds.
 
-\W{Why should this matter beyond a card game? Any system in which
-machines infer trust from observable behaviour---credit scoring,
-content moderation, multi-agent marketplaces, automated
-negotiation---inherits the same risk: if cooperation is legible, it
-can be priced and exploited. Our results suggest that protecting
-cooperative agents may require giving them the capacity to reason
-about the reputation system itself, not merely more data about their
-counterparts. We offer this poker engine as a compact, fully
-reproducible microscope for that question, in the hope that it lowers
-the barrier for others to probe when, and for whom, a good reputation
-becomes a liability.}
+Why should anyone care outside of cards? All systems where machines
+assess trust from observed behavior---Credit Scoring, Content
+Moderation, Multi-Agent Marketplaces, Automated Negotiation---inherit
+the same threat: if cooperation is apparent, it can be evaluated and
+exploited. Our results indicate that protection for cooperative
+agents will likely involve giving them the ability to think about the
+reputation system itself---rather than simply providing them with
+additional information about their counterparts. This poker framework
+serves as a compact, completely reproducible tool for studying the
+specific question---when does a good reputation become a bad thing?
 
 Three follow-up experiments are the most important next steps.
 \textit{First}, an $n = 20$ Phase 3.1 replication at 500 hands per
