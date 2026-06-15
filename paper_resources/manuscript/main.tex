@@ -454,7 +454,7 @@ inferior in comparison to mutually cooperative behavior.
 
 Axelrod investigated this problem extensively through his Prisoner's
 Dilemma Tournaments \citep{axelrod1984evolution}, and Nowak
-developed his five principles for the evolutionary development of
+developed his five rules for the evolutionary development of
 cooperation \citep{nowak2006five}. Axelrod demonstrated that
 reciprocity-based strategies such as Tit-for-Tat are robustly
 effective in one-to-one situations. Agents that cooperate by default
@@ -478,13 +478,13 @@ aggressor captures when opponents fold without reaching showdown.}
 and slow-play---all of which add additional degrees-of-freedom for
 an agent seeking to extract value from their opponent(s). Our best
 approximation to Tit-for-Tat is \arch{Mirror}---which ranks 6th out
-of 8 in terms of stacks---suggesting that Axelrod's conclusions do
+of 8 in terms of Phase 1 stacks---suggesting that Axelrod's conclusions do
 not necessarily translate well to multi-agent environments that
 contain richer action-spaces; although we interpret this as
 suggestive rather than definitive.
 
 \subsection{Bayesian opponent modelling in poker}
-Thirdly, there is Bayesian opponent modeling in poker. Initially
+Third, there is Bayesian opponent modeling in poker. Initially
 this included Billings et al.'s Loki and Poki bots
 \citep{billings1998opponent} and subsequently formalized by Southey
 et al.\ \citep{southey2005bayes} as Bayesian-type inference---
@@ -502,7 +502,7 @@ collective inference amongst many agents. Our poker engine is viewed
 as a microscope---not as an adversary.
 
 \subsection{Language models as strategic agents}
-First, we treat this last point as it relates to two of our phases,
+Finally, we treat this last point as it relates to two of our phases,
 because these phases employ large language models. An increasing
 amount of work concerns how strategically large language
 models---used as agents in competitive and observable
@@ -511,7 +511,7 @@ playing, such as AgentBench \citep{liu2024agentbench}, and Park et
 al.'s study on generative agents \citep{park2023generative}, suggest
 that there is still much to learn about this issue. Phase 3 and
 phase 3.1 are both designed to examine the difference between how
-largely language model-based agents actually behave and what they
+large language model-based agents actually behave and what they
 represent by way of textual strategies.
 
 \subsection{Ideas in mathematics used throughout}
@@ -648,7 +648,7 @@ type is found in Table~\ref{tab:bounds-comprehensive}.
   that its check is weak.}{br $\in[.02,.18]$ \bbar vbr $\in[.85,1.00]$ \bbar cr $\in[.25,.50]$}
 
 \archentry{Firestorm}{Maniac (loose-aggressive)}{0.38}{%
-  A cheater. Always bets and always raises regardless of the strength
+  A cheater. Bets and raises very frequently, whatever the strength
   of its hand. Primarily wins due to opponents folding rather than
   winning at showdown.}{br $\in[.40,.95]$ \bbar vbr $\in[.85,1.00]$ \bbar cr $\in[.45,.90]$}
 
@@ -712,7 +712,7 @@ posteriors towards a uniform prior:
   \qquad \lambda = 0.95,
   \label{eq:decay}
 \end{equation}
-providing an effective memory of about 20 rounds (approximately
+providing an effective memory of about 20 hands (approximately
 $1/(1-\lambda)$). The trust score, our main dependent variable, is
 defined as
 \begin{equation}
@@ -740,8 +740,8 @@ agent selects its decision-making rule varies. \textbf{Phase 1}
 (Frozen Rules Based on Archetypes): Parameters used to define each
 player's archetype remain static through each round. \textbf{Phase
 2} (Bounded Online Optimisation): Players use a per cycle hill
-climbing method to update their parameter values every 200 rounds.
-For the first 200 rounds, players will randomly select either a
+climbing method to update their parameter values every 200 hands.
+For the first 200 hands, players will randomly select either a
 round or a metric (and thus alter one (round/metric) pair) by
 $\delta = 0.03$. Then they will run 200 hand trials and accept the
 random selection if their total profit increased during those last
@@ -811,7 +811,8 @@ these statistics individually due to the risk of Type I error (false
 positives); they should correct their $p$-values with Bonferroni
 adjustments.
 
-Confidence Intervals for the headline Pearson $\rtp$ correlations are
+Throughout, a reported $\pm$ value denotes the standard deviation of
+$\rtp$ across the five seeds. Confidence Intervals for the headline Pearson $\rtp$ correlations are
 provided in two ways: a $t$-interval based upon the Student-$t$
 distribution with degrees-of-freedom equal to 4 ($T_{\text{crit}} =
 2.776$) and a non-parametric percentile bootstrap with 10\,000
@@ -885,7 +886,7 @@ wins, $87.1\%$ are walkovers\footnote{A \textit{walkover} (or
 player folded before the cards had to be shown. It is the
 bread-and-butter outcome for aggressive players who win by making
 opponents fold rather than by holding the best hand.}; its
-showdown win rate is only $38.5\%$, below the uniform $1/n$ rate.
+showdown win rate is only $38.5\%$.
 \arch{Firestorm} is not a strong poker player on the merits; it
 wins because it is hard to read. The trust--stack relationship
 appears in Fig.~\ref{fig:trust-vs-stack} (left panel).
@@ -1136,7 +1137,7 @@ but residual trap.
   Phase 3.1.} \arch{Wall} (trust $\approx 0.85$, highest of any
   archetype) was rank 8 of 8 in Phase 3 with ${\sim}9$ rebuys
   per seed and becomes rank 1 of 8 in Phase 3.1 with zero rebuys.
-  \arch{Firestorm} falls from rank 5 in Phase 3 to rank 2 in
+  \arch{Firestorm} climbs from rank 5 in Phase 3 to rank 2 in
   Phase 3.1.}
   \label{fig:economic-inversion}
 \end{figure}
@@ -1272,7 +1273,7 @@ faces concentrated retaliation. In our 8-player setting,
 \arch{Firestorm}'s aggression cost is diffused across seven
 simultaneous opponents, so the same strategy that would lose
 heads-up wins at the full table. Our Tit-for-Tat analogue
-(\arch{Mirror}) finishes sixth of eight in economic ordering---
+(\arch{Mirror}) finishes sixth of eight in Phase 1's economic ordering---
 suggestive but not definitive evidence that the IPD result fails
 to transfer to multi-agent settings with richer action spaces. We
 flag this as a direction for follow-up rather than a conclusion,
@@ -1287,8 +1288,8 @@ eight archetypes (\arch{Sentinel}, \arch{Mirror}'s default,
 \arch{Judge}'s cooperative state) share byte-identical mean
 parameters, and the Bayesian posterior cannot distinguish them
 regardless of algorithmic sophistication. Classification accuracy
-in that sub-space is bounded below by the entropy of a uniform
-distribution over the three members. This is a definitional
+in that sub-space is bounded above by chance---$1/3$ for three
+indistinguishable types. This is a definitional
 point about \textit{our} archetype space, not an information-
 theoretic discovery about reputation systems in general; the
 empirical question of how rapidly classification accuracy degrades
