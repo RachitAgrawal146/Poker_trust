@@ -1251,14 +1251,16 @@ notes, does.}
 \section{Discussion}
 % =============================================================================
 
-\W{The headline of this study is deliberately uncomfortable: across
-every agent design we tested, being trusted was a financial
-liability rather than an asset, and we could not optimise that
-liability away---we could only reason it away. That distinction is
-the paper's central contribution. The sections below trace why the
-trap forms, why numerical adaptation cannot escape it, and why
-explicit reasoning can, while being candid about the limits of a
-five-seed study.}
+The title to this research has been intentionally unsettling; in
+each agent configuration we tested, being ``trusted'' represented a
+fiscal cost rather than a fiscal advantage, and there was no way to
+remove or optimize that cost---all we could do was rationalize it.
+
+The sections that follow establish how the problem develops, why any
+form of numerical optimization cannot resolve it, and how the use of
+logical reasoning can keep the problem from occurring, but they also
+provide insight into what limitations exist when doing so with a
+five-seed study.
 
 \subsection{The mechanism behind the trap}
 The trust trap visible in Phase 1 admits a clean mechanistic
@@ -1404,12 +1406,12 @@ to claim more than analogical inference.
 Three clusters of limitations remain after the revisions above.
 
 \textit{Statistical power gaps.} The headline correlations are
-computed across $n = 5$ random seeds. \W{The canonical test is a
-one-sample $t$-test of the five per-seed $\rtp$ values against zero
-(df $= 4$, $T_{\text{crit}} = 2.776$); significance therefore depends
-on the between-seed standard deviation rather than on any fixed
-critical correlation, and we do not treat $\rtp$ as though it were
-itself a five-point correlation.} The headline
+computed across $n = 5$ random seeds. The most common test is simply
+a single-sample $t$-test comparing the average $\rtp$ value to zero
+(with df $= 4$, and thus $T_{\text{crit}} = 2.776$); the test's
+$p$-value therefore depends upon the between-seed variance, not some
+fixed critical correlation value, and we do not view $\rtp$ as if it
+were itself a five-point correlation. The headline
 Phase 3.1 result has a 95\% bootstrap interval $[-0.32, +0.20]$
 that contains both a fully neutralized correlation and a
 moderate residual negative correlation, so we cannot
