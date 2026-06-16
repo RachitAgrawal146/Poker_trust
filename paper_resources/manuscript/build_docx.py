@@ -114,8 +114,8 @@ src = re.sub(r'\\W\{((?:[^{}]|\{[^{}]*\})*)\}', r'\1', src)
 
 # ---------------------------------------------------------------- 9. flatten custom macros
 renews = (r'\renewcommand{\bbar}{ \textbar{} }' + '\n'
-          r'\renewcommand{\archentry}[5]{\par\medskip\noindent\textbf{#1} \textbar{} '
-          r'\textit{#2} \textbar{} honesty #3. #4\ (#5)\par}' + '\n')
+          r'\renewcommand{\archentry}[4]{\par\medskip\noindent\textbf{#1} \textbar{} '
+          r'\textit{#2} \textbar{} honesty #3. #4\par}' + '\n')
 src = src.replace(preamble_inject, renews + preamble_inject, 1)
 
 # ---------------------------------------------------------------- 10. image widths fit a page
