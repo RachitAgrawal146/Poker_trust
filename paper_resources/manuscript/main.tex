@@ -348,30 +348,32 @@ trusting depend on either the trust system or on the agents inside
 it?
 
 \subsection{Online reputation systems}
-\W{First, there is the empirical economics of online reputation
-systems. Resnick \& Zeckhauser's large-scale study of eBay
-\citep{resnick2002trust} documented that feedback is provided more
-than half the time and is almost always positive, with sellers
-receiving negative feedback only about 1\% of the time---evidence
-that observable reputation is pervasive and that markets broadly
-reward good behavior rather than penalize it. The motivating tension
-for our work is therefore a theoretical \emph{transparency paradox}
-rather than a settled empirical fact: when a cooperator's behavior is
-perfectly predictable, a sufficiently sophisticated counterparty can
-plan around it and extract value, so visible cooperation could in
-principle be exploited. The cleanest controlled evidence on eBay in
-fact points the other way---toward a reputation premium for
-established identities---which makes the paradox a hypothesis worth
-testing rather than a documented effect. Bolton, Katok, \& Ockenfels
-\citep{bolton2004effective} examine how reputation institutions shape
-cooperation in controlled trust games, and an analogous dynamic
-appears in financial-market microstructure, where adverse selection
-against predictably behaving market makers \citep{glosten1985bid}
-produces related effects through asymmetric information. What this
-literature cannot settle---because it does not re-engineer the
-population of agents---is whether the paradox would survive if
-cooperative actors were intelligent enough to avoid being exploited;
-that gap is what our controlled simulation is built to probe.}
+An empirical approach to understanding the economics of online
+reputation systems has been conducted by Resnick \& Zeckhauser
+\citep{resnick2002trust}, who have documented that, based on
+large-scale data from eBay, feedback is submitted by users greater
+than fifty percent of the time and is virtually all positive, with
+sellers receiving negative feedback less than 1\% of the time (i.e.,
+evidence of ubiquitous observable reputation and markets rewarding
+good behavior). Therefore, the motivation behind our research is a
+theoretical transparency paradox rather than an empirically verified
+phenomenon: when the behavior of a cooperator is completely
+predictable, a sufficiently astute counterpart can plan accordingly
+and take advantage of the cooperator's actions---hence potentially
+creating conditions under which visible cooperation could be
+exploited. Controlled studies using eBay actually point in the
+opposite direction, i.e., toward a reputation premium associated with
+established identities---thus making the paradox a hypothesis worth
+testing versus an empirically demonstrated effect. A similar dynamic
+is observed in financial-market microstructure, where adverse
+selection against predictably acting market-makers
+\citep{glosten1985bid} creates equivalent problems due to differences
+in information asymmetry. However, because the prior literature does
+not replicate or alter the population of agents participating in such
+interactions, it cannot determine whether the paradox would remain
+even if cooperative agents had sufficient intelligence to prevent
+being taken advantage of---so a controlled simulation was developed
+to address that question.
 
 \begin{table*}[t]
 \centering
@@ -694,12 +696,15 @@ defined as
 \end{equation}
 where $h(t) = 1 - P(\text{bluff}\mid\text{weak})$ is the
 archetype's honesty
-score. \W{For state-switching archetypes (\arch{Predator},
-\arch{Judge}, \arch{Mirror}), $h(t)$ is the archetype's canonical,
-nominal honesty---the value implied by its specified mean bluff rate,
-not its realized honesty in a particular state---so trust is the
-honesty an observer expects given the type it believes the agent to
-be.} There are many reasonable ways to define the trust score;
+score. As previously stated, because the state-switching archetypes
+(\arch{Predator}, \arch{Judge}, and \arch{Mirror}) have different
+characteristics that define their level of honesty across states,
+$h(t)$ represents each archetype's nominal, canonical level of
+honesty---that is, the expected level of honesty implied by their
+respective mean bluff rates---and not their actual level of honesty
+in a specific state. As such, trust will represent the expected level
+of honesty that an observer anticipates based upon the type it
+believes the agent to be. There are many reasonable ways to define the trust score;
 here we have chosen this simple form, and we report results under
 this definition throughout. In addition, in our
 limitations section we note that because our definition of the
@@ -709,10 +714,12 @@ produce different relationships. \textit{Three archetypes
 (\arch{Sentinel}, \arch{Mirror} in its default state, \arch{Judge}
 in its cooperative state) are intentionally given near-identical mean
 parameters to demonstrate a controlled case of identifiability among
-indistinguishable types.} \W{Strictly, \arch{Sentinel} and
-\arch{Judge} are byte-identical, whereas \arch{Mirror} differs only
-marginally and additionally blends toward its target at runtime, so
-its realized behavior diverges (Table~\ref{tab:behavioral-shift}).}
+indistinguishable types.} Although, strictly speaking,
+\arch{Sentinel} and \arch{Judge} are byte-identical, \arch{Mirror}
+varies only slightly from \arch{Sentinel} and also dynamically
+adjusts toward its target at runtime; as a result, the realized
+behavior of \arch{Mirror} differs from that of \arch{Sentinel}
+(see Table~\ref{tab:behavioral-shift}).
 This is a design choice, not a finding.
 
 \subsection{Four agent architectures}
@@ -773,23 +780,24 @@ seed for the average degree of trust (final hand) and the number of
 chips in each player's stack at the end of all games (average number
 of chips in the stacks of all players) across the eight different
 types of players (8 pairs of measurements in total, one per type).
-\W{Because these eight points are a fixed, designed set---with two or
-three archetypes clustered at nearly the same trust value---each
-per-seed $\rtp$ is best read as a descriptive correlation over that
-design rather than a sample correlation drawn from a population.}
+Since these eight points represent a predefined, engineered
+set---with two or three archetypes clustering at nearly equal trust
+values---each per-seed $\rtp$ should be viewed as a descriptive
+correlation over that design rather than a sample correlation drawn
+from a population.
 
 We also present six auxiliary measures, including the index of
-exploitation of trust (TEI)\footnote{\W{\textit{TEI} (Trust
-Exploitation Index) is an agent's mean non-showdown profit per
-hand---value won through fold equity rather than at showdown.}},
-sensitivity to context (CS)\footnote{\W{\textit{CS} (Context
-Sensitivity) is the absolute correlation between an opponent's recent
-aggression and the agent's own action.}}, adaptation by the opponent
-(OA)\footnote{\W{\textit{OA} (Opponent Adaptation) is the variance of
-an agent's aggression rate across different opponents.}},
-non-stationarity (NS)\footnote{\W{\textit{NS} (Non-Stationarity)
-gauges how much an agent's action distribution drifts over the run,
-comparing 500-hand windows against its overall distribution.}},
+exploitation of trust (TEI)\footnote{\textit{TEI} (Trust Exploitation Index): an agent's average
+non-showdown winnings per hand---wins generated via fold equity
+rather than at showdown.},
+sensitivity to context (CS)\footnote{\textit{CS} (Contextual Sensitivity): the absolute correlation
+between an opponent's past aggression and the agent's response
+action.}, adaptation by the opponent
+(OA)\footnote{\textit{OA} (Opponent Adaptability): the variance of an agent's
+aggression rate across different opponents.},
+non-stationarity (NS)\footnote{\textit{NS} (Non-Stationarity): how much an agent's action
+distribution changes over the run, comparing 500-hand windows against
+its overall distribution.},
 unpredictability in strategy (SU), and awareness of manipulation of
 trust (TMA).
 
@@ -801,9 +809,9 @@ by increasing aggression after building trust (which we call ``trust
 farming'' in captions and further discussions).
 
 These six auxiliary metrics were selected post-hoc rather than
-pre-registered. \W{We report them descriptively, not as inferential
-tests, so an individual value should be read as suggestive rather
-than as a significance claim.}
+pre-registered. We report the metrics above descriptively, with no inferential
+tests; an individual value should therefore be interpreted as
+indicative rather than as a statement of statistical significance.
 
 Throughout, a reported $\pm$ value denotes the standard deviation of
 $\rtp$ across the five seeds. Confidence Intervals for the headline Pearson $\rtp$ correlations are
@@ -862,9 +870,8 @@ role-players) replaces the rule-based policies with a language
 model under a personality spec; and Phase 3.1 (LLM with reasoning
 scaffolding) augments that with chain-of-thought, per-opponent
 memory, and self-updated strategy notes. The four-tier headline
-ladder $-0.752 \to -0.637 \to -0.510 \to -0.094$ \W{(Phase 2$^{*}$,
-an unbounded-optimization robustness check on Phase 2, is reported
-separately and omitted from this headline sequence)} frames the
+ladder $-0.752 \to -0.637 \to -0.510 \to -0.094$ (Phase 2$^{*}$---a separate, unbounded-optimization robustness check
+on Phase 2---is excluded from this sequential reporting) frames the
 remainder of this section, which reports per-phase numbers,
 figures, and illustrative hands.
 
@@ -900,9 +907,9 @@ appears in Fig.~\ref{fig:trust-vs-stack} (left panel).
 \end{figure}
 
 The mechanism is also visible in a single representative hand.
-\W{(The hand below illustrates \arch{Wall}'s calling-station leak
-specifically; \arch{Firestorm} happens to hold a genuine hand here
-rather than running a bluff.)}
+(\arch{Firestorm} happens to hold a genuine hand here rather than
+running a bluff; the hand directly illustrates \arch{Wall}'s
+calling-station leak.)
 Box~1 reproduces hand \#67 from seed 42: \arch{Wall} is dealt
 $2\spadesuit\,5\clubsuit$ (hand rank\footnote{\textit{Hand rank}
 is taken from standard 7-card poker equity tables: rank 1 is the
@@ -965,9 +972,9 @@ the threshold ($p \approx 0.60$ in some seeds). The remaining four opponents
 fall below the threshold on every seed. Three of these
 (\arch{Sentinel}, \arch{Mirror} in its default state,
 \arch{Judge} in its cooperative state) have near-identical mean
-parameters under the spec \W{(\arch{Sentinel} and \arch{Judge} are
-byte-identical; \arch{Mirror} differs only slightly and blends at
-runtime)}, so the posterior over the cluster saturates at high
+parameters under the spec (\arch{Sentinel} and \arch{Judge} are
+byte-identical; \arch{Mirror} is only minimally different and blends
+at runtime), so the posterior over the cluster saturates at high
 uncertainty---up to $\log_2(3) \approx 1.58$ bits when all three are
 treated as indistinguishable, and at least $\log_2(2) = 1$ bit for
 the byte-identical \arch{Sentinel}/\arch{Judge} pair---a direct
@@ -1162,12 +1169,11 @@ from $1.19$ to $1.55$ bits, crossing the $>1.5$ threshold for
 the first time across all phases. Trust Manipulation Awareness
 rises from $+0.164$ to $+0.242$, with six of eight archetypes
 showing positive TMA; \arch{Wall} and \arch{Sentinel} show the
-strongest signals at $+0.733$ and $+0.704$. \W{We read the high TMA
-of these two honest archetypes (\arch{Wall}, $h = 0.96$;
-\arch{Sentinel}, $h = 0.92$) with caution: their reasoning-augmented
-river value-betting makes trust and aggression rise together without
-any deception, so the ``farming'' label overstates the case for
-them.}
+strongest signals at $+0.733$ and $+0.704$. The high TMA of these two honest types (\arch{Wall}, honesty $0.96$;
+\arch{Sentinel}, honesty $0.92$) warrants some skepticism: their
+reasoning-enhanced river value-betting causes trust and aggression to
+rise together without any deception, somewhat exaggerating their
+apparent ``farming.''
 
 \begin{figure}[H]
   \centering
@@ -1294,8 +1300,8 @@ possible explanations for why the trap is hard to escape. We
 begin with a structural caveat: by construction, three of our
 eight archetypes (\arch{Sentinel}, \arch{Mirror}'s default,
 \arch{Judge}'s cooperative state) share near-identical mean
-parameters \W{(\arch{Sentinel} and \arch{Judge} byte-identically;
-\arch{Mirror} differing only slightly before it blends at runtime)},
+parameters (\arch{Sentinel} and \arch{Judge} are byte-identical;
+\arch{Mirror} is only minimally different and blends at runtime),
 and the Bayesian posterior cannot reliably distinguish them
 regardless of algorithmic sophistication. Classification accuracy
 in that sub-space is bounded above by chance---$1/3$ for three
