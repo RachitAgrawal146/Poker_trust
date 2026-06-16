@@ -277,13 +277,14 @@ contradiction. A trusted agent is almost by definition always
 predictable. When it is right to cooperate, they cooperate, and
 because everyone knows this in an open environment, the opponent
 can plan around them. This is what was observed in the real
-world: eBay sellers with a perfect rating earned lower profit
-margins than those with a slightly imperfect record
-\citep{resnick2002trust,bolton2004effective}. The reason was that
-buyers knew the perfect-rated seller would not risk their perfect
-score, so the listed price was the lowest they would go. Sellers
-with imperfect records were not bound by this. Predictability
-could be exploited \citep{glosten1985bid}.
+world: the worry is that a perfectly predictable cooperator can be
+planned around and, in principle, exploited. The empirical record is
+far from settled, though---the cleanest controlled studies of eBay
+reputation actually find a \emph{premium} for established sellers
+rather than a penalty \citep{resnick2002trust,bolton2004effective}---so
+we treat this transparency paradox as a hypothesis to test rather
+than an established fact, of the kind that predictably behaving
+market-makers also face \citep{glosten1985bid}.
 
 We wanted to answer this question but in a controlled environment
 where we tampered with each of the features, like the rules, the
@@ -733,7 +734,7 @@ For the first 200 hands, players will randomly select either a
 round or a metric (and thus alter one (round/metric) pair) by
 $\delta = 0.03$. Then they will run 200 hand trials and accept the
 random selection if their total profit increased during those last
-200 rounds. Random selections can be made anywhere within a ``bound
+200 hands. Random selections can be made anywhere within a ``bound
 box'' created around each player's archetype. \textbf{Phase 3} (LLM
 Personality Role-Players): All of a player's decisions are made via
 an API call to Anthropic's Claude Haiku 4.5. This call is made using
@@ -793,7 +794,7 @@ rather than at showdown.},
 sensitivity to context (CS)\footnote{\textit{CS} (Contextual Sensitivity): the absolute correlation
 between an opponent's past aggression and the agent's response
 action.}, adaptation by the opponent
-(OA)\footnote{\textit{OA} (Opponent Adaptability): the variance of an agent's
+(OA)\footnote{\textit{OA} (Opponent Adaptation): the variance of an agent's
 aggression rate across different opponents.},
 non-stationarity (NS)\footnote{\textit{NS} (Non-Stationarity): how much an agent's action
 distribution changes over the run, comparing 500-hand windows against
@@ -828,7 +829,7 @@ is available from the five actual observations.
 \begin{table*}[!ht]
 \centering
 \captionsetup{font={small,sf}}
-\caption{\textbf{Per-archetype policy bounds (Table~A).}
+\caption{\textbf{Per-archetype policy bounds.}
 $P(\text{bet}|S)$, $P(\text{bet}|W)$ are the probabilities of
 betting with a strong or weak hand on a given street (preflop
 unless noted); $P(\text{fold}|W)$ is the probability of folding a
@@ -1060,11 +1061,12 @@ are not converging on a common Nash-like profile.
 \begin{figure*}[tp]
   \centering
   \includegraphics[width=\linewidth]{10_param_drift_unbounded_aggressive.png}
-  \caption{\textbf{Per-archetype $L_1$ drift from Phase 1 starting
-  parameters under aggressive unbounded hill-climbing.} Each
-  archetype moves significantly (mean drift $3.4$), but no two
-  archetypes converge on the same location. Trajectories are
-  colour-coded by archetype.}
+  \caption{\textbf{Per-archetype preflop bluff-rate drift under
+  aggressive unbounded hill-climbing.} Each panel is one archetype
+  and each translucent line is one of the five seeds. Every
+  archetype's bluff rate wanders substantially over the run, yet the
+  panels do not converge on a common profile (the corresponding mean
+  $L_1$ parameter drift is $3.4$).}
   \label{fig:param-drift}
 \end{figure*}
 
@@ -1277,9 +1279,11 @@ information that a check signals weakness). The agent's honesty
 becomes a signal that opponents read and trade against. A low
 trust score, conversely, creates strategic ambiguity, and
 \arch{Firestorm} uses that ambiguity to dominate the table. The
-phenomenon parallels what economists studying eBay-style
-reputation systems have called the \textit{transparency paradox}
-\citep{resnick2002trust}: predictable cooperation is exploitable.
+phenomenon is an instance of the \textit{transparency paradox}
+introduced earlier---that predictable cooperation can be
+exploited---which our zero-sum testbed shows can arise under simple
+agent policies, even though the empirical reputation record does not
+establish it for real markets.
 
 The mechanism by which \arch{Firestorm} converts ambiguity into
 chips deserves comment because it differs structurally from the
@@ -1337,9 +1341,11 @@ shrunk $4\times$) and therefore does not cleanly isolate the
 parameter-space hypothesis. The non-convergence has three
 plausible structural causes that we expect would survive any
 specific optimizer choice: the trust posterior is non-stationary
-inside each agent's optimization loop (with $\lambda = 0.95$,
-opponents take ${\sim}70$ hands to update beliefs after a
-strategy change but the evaluation window is 50 hands), all eight
+inside each agent's optimization loop (with $\lambda = 0.95$ the
+effective memory is $1/(1-\lambda) = 20$ hands, so beliefs take
+several such windows---on the order of $70$ hands---to fully
+re-converge after a strategy change, longer than the 50-hand
+evaluation window), all eight
 agents climb simultaneously so each trial perturbation is
 evaluated against a moving joint behavior, and axis-aligned
 coordinate descent in 36 dimensions cannot discover joint optima
@@ -1531,17 +1537,14 @@ and analysis scripts are available at
 \bibliography{references}
 
 \subsection*{Supplementary Materials}
-\small\begin{itemize}\setlength{\itemsep}{2pt}\setlength{\parskip}{0pt}
-  \item Bayesian update worked example: \path{docs/worked_examples.md}
-  \item Identifiability ceiling derivation:\\
-    \path{docs/stage5_identifiability.md}
-  \item Phase 2$^{*}$ unbounded methodology footnote:\\
-    \path{paper_resources/notes/}\\
-    \path{phase2_unbounded_writeup_aggressive.md}
-  \item Methods disclosures (temperature, side-pot, CIs):\\
-    \path{paper_resources/notes/methods_disclosures.md}
-  \item Bootstrap and Fisher-$z$ CI table:\\
-    \path{paper_resources/data/r_bootstrap_ci.csv}
-\end{itemize}
+The following supporting materials are available in the project
+repository:
+\small\begin{enumerate}\setlength{\itemsep}{3pt}\setlength{\parskip}{0pt}
+  \item \textbf{Bayesian update worked example.} \path{docs/worked_examples.md}
+  \item \textbf{Identifiability ceiling derivation.} \path{docs/stage5_identifiability.md}
+  \item \textbf{Phase 2$^{*}$ unbounded-optimization methodology.} \path{paper_resources/notes/phase2_unbounded_writeup_aggressive.md}
+  \item \textbf{Methods disclosures} (sampling temperature, side-pot construction, confidence intervals). \path{paper_resources/notes/methods_disclosures.md}
+  \item \textbf{Bootstrap and Fisher-$z$ CI table.} \path{paper_resources/data/r_bootstrap_ci.csv}
+\end{enumerate}
 
 \end{document}
