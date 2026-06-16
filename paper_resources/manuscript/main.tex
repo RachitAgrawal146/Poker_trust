@@ -181,11 +181,10 @@
 % Compact archetype text entry (no portrait): colored name | role |
 % honesty, then description, then bound line.
 % Use \archentry{Name}{role}{honesty}{description}{bounds}.
-\newcommand{\archentry}[5]{%
+\newcommand{\archentry}[4]{%
   \par\vspace{5pt}\noindent
   {\sffamily\fontsize{10}{12}\selectfont\arch{#1}\bbar\textit{#2}\bbar honesty #3}\\[1pt]
-  \small #4\\[2pt]
-  {\scriptsize\sffamily\textcolor{darkGray}{#5}}\par}
+  \small #4\par}
 
 \hyphenpenalty=200
 \tolerance=1500
@@ -300,16 +299,9 @@ of the trust system or the design of the characters themselves?
 Poker turned out to be the perfect environment to try this. Each
 hand was a set of interactions that mapped directly to real-life
 interactions---while there was some hidden information (for
-example, a player's private cards\footnote{The two private cards
-each player is dealt at the start of every hand; only the player
-can see them.}), public actions (bets, calls, and folds) were
+example, a player's private cards), public actions (bets, calls, and folds) were
 visible to everyone at the table. Fixed-limit Texas
-Hold'em\footnote{Limit Texas Hold'em fixes the bet size on each
-round. In our setup, bets and raises on the first two rounds are
-2 chips; on the last two rounds they are 4 chips. No player can
-place more than four bets in a single round (the ``four-bet
-cap''), which keeps the action space small and the math
-tractable.} was the way to go, where both the bet sizes and action
+Hold'em was the way to go, where both the bet sizes and action
 spaces were small enough to make the math tractable but also rich
 enough for these strategies to emerge. Please note that poker is
 only the behavioural microscope and not a benchmark to solve.
@@ -583,16 +575,9 @@ The overall game setting remains constant for all phases of this
 study. We will utilize a fixed-limit version of eight player Texas
 Hold'em, where the small blind is 1, the large blind is 2, the small
 bet (2) can be made pre-flop or on the first round of cards (the
-``flop''\footnote{The four betting rounds in Texas Hold'em, in
-order, are \textit{preflop} (after each player receives two private
-``hole'' cards but before any community cards), \textit{flop} (after
-three community cards are dealt simultaneously), \textit{turn}
-(after a fourth community card), and \textit{river} (after a fifth
-and final community card).}), the large bet (4) can be made on the
+``flop''), the large bet (4) can be made on the
 second round of cards (``turn'') and third round of cards
-(``river''). There is a cap of four-bet\footnote{Fixed-limit Texas
-Hold'em permits at most four raises per betting round; further
-raises are not allowed.} allowed per round. At the beginning of each
+(``river''). There is a cap of four-bet allowed per round. At the beginning of each
 hand, each player has a chip count of 200 in their respective seat,
 and when a player's chips run out, he/she receives a rebuy. Side
 pots\footnote{When a player goes all-in for fewer chips than the
@@ -600,10 +585,7 @@ largest contributor, the engine creates a \textit{side pot} for the
 excess so that the short-stacked player can only win up to the
 amount they contributed; deeper-stacked players contest the
 remainder among themselves.} are used to determine who wins a
-showdown\footnote{A \textit{showdown} is the end-of-hand reveal in
-which all still-active players turn over their hole cards to
-determine the winner; pots that end with all opponents folding to a
-single player do not reach showdown.}; a side pot is created by
+showdown; a side pot is created by
 players contributing money at their individual betting level. Side
 pots are made and awarded depending on whether a player played chips
 into the respective pot and the remainder goes to the player who
@@ -622,41 +604,36 @@ which is used as a weighting factor in computing the trust scores
 (Eq.~\ref{eq:trust}). In addition, each of the names of the eight
 types is printed using its own colour scheme throughout the text so
 that you may be able to see which player we are referring to at each
-time. The preflop betting range\footnote{Throughout the archetype
-descriptions, \textit{br} = bluff rate (probability of betting on a
-weak hand), \textit{vbr} = value-bet rate (probability of betting on
-a strong hand), and \textit{cr} = call rate facing a bet on a medium
-hand. Ranges are the archetype's Phase 2 hill-climbing bound boxes
-around its Phase 1 starting parameters.} for each of the eight types
-appears below; additional information about the policy limits per
-type is found in Table~\ref{tab:bounds-comprehensive}.
+time. The full per-archetype policy bounds---bet, bluff, and fold
+probabilities and the adaptation rule for each of the eight
+types---are given in Table~\ref{tab:bounds-comprehensive}.
 
 \archentry{Oracle}{Baseline}{0.67}{%
   The honest ``baseline'' from which other players deviate. This
   player plays an approximate game-theoretic optimal mix and is used
   as the model by which all adaptive players are
-  evaluated.}{br $\in[.20,.45]$ \bbar vbr $\in[.80,1.00]$ \bbar cr $\in[.20,.50]$}
+  evaluated.}
 
 \archentry{Sentinel}{Honest (tight-aggressive, TAG)}{0.92}{%
   The truthful player. Folds most hands and plays aggressively when
   it enters. It signals that its bet is strong, while signalling
-  that its check is weak.}{br $\in[.02,.18]$ \bbar vbr $\in[.85,1.00]$ \bbar cr $\in[.25,.50]$}
+  that its check is weak.}
 
 \archentry{Firestorm}{Maniac (loose-aggressive)}{0.38}{%
   A cheater. Bets and raises very frequently, whatever the strength
   of its hand. Primarily wins due to opponents folding rather than
-  winning at showdown.}{br $\in[.40,.95]$ \bbar vbr $\in[.85,1.00]$ \bbar cr $\in[.45,.90]$}
+  winning at showdown.}
 
 \archentry{Wall}{Calling station}{0.96}{%
   The player who never folds and never bluffs. The most-trusted
   player because it is so predictable; but in Phases 1 through 3 it
   is also the weakest economically for the same
-  reason.}{br $\in[.00,.05]$ \bbar vbr $\in[.40,.75]$ \bbar cr $\in[.65,.95]$}
+  reason.}
 
 \archentry{Phantom}{Deceiver}{0.48}{%
   An early aggressive bluffer that folds to resistance. Described as
   being placed in a vague region of the archetype
-  space.}{br $\in[.35,.85]$ \bbar vbr $\in[.45,.85]$ \bbar cr $\in[.10,.45]$}
+  space.}
 
 \archentry{Predator}{Opponent classifier}{0.79}{%
   Based upon the posterior beliefs about an opponent's type, this
@@ -664,20 +641,20 @@ type is found in Table~\ref{tab:bounds-comprehensive}.
   $0.6$ probability of being a non-TAG player. If the opponent has
   less than a $0.6$ chance of being a non-TAG player, this player
   returns to its base-case behaviour of playing like the
-  Sentinel.}{br $\in[.10,.40]$ \bbar vbr $\in[.75,1.00]$ \bbar cr $\in[.20,.50]$}
+  Sentinel.}
 
 \archentry{Mirror}{Tit-for-Tat}{0.91}{%
   Takes the most-active opponent's behaviours and blends them with
   its own policy. In theory this represents the poker version of the
   Iterated Prisoner's Dilemma (IPD) Tit-for-Tat strategy; however, in
   practice it has been shown to work poorly in multi-player
-  games.}{br $\in[.03,.25]$ \bbar vbr $\in[.75,1.00]$ \bbar cr $\in[.22,.52]$}
+  games.}
 
 \archentry{Judge}{Punishes bluffing}{0.92}{%
   Maintains a record of how each opponent has interacted with it;
   after five instances of an opponent bluffing, this player takes
   revenge on that opponent. Models retaliation based upon perceived
-  cheating or ``bad faith.''}{br $\in[.02,.18]$ \bbar vbr $\in[.85,1.00]$ \bbar cr $\in[.25,.50]$ \,(cooperative state)}
+  cheating or ``bad faith.''}
 
 
 \subsection{Categorical posterior over types}\label{sec:posterior}
