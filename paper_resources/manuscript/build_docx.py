@@ -109,7 +109,8 @@ HEX = {'Oracle':'A8B5C3','Sentinel':'5C8159','Firestorm':'E75D3C','Wall':'A2A7A9
 src = re.sub(r'\\arch\{(\w+)\}',
              lambda m: r'\textbf{' + m.group(1) + r'}', src)
 # unwrap drafted-prose highlight \W{...} -> plain text for the Word build
-src = re.sub(r'\\W\{([^{}]*)\}', r'\1', src)
+# (handles one level of nested braces, e.g. \W{... \citep{key} ...})
+src = re.sub(r'\\W\{((?:[^{}]|\{[^{}]*\})*)\}', r'\1', src)
 
 # ---------------------------------------------------------------- 9. flatten custom macros
 renews = (r'\renewcommand{\bbar}{ \textbar{} }' + '\n'
