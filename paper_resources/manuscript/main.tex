@@ -49,7 +49,7 @@
 \definecolor{cMirror}{HTML}{CDD3D8}     % Split Silver   — reflective, adaptive
 \definecolor{cJudge}{HTML}{3F4F7C}      % Navy Court     — authoritative, firm
 
-% \arch{Name} → bold colored name. Use throughout body prose.
+% \arch{Name} → bold archetype name. Used throughout the body prose.
 \newcommand{\arch}[1]{\textbf{#1}}
 
 % --- FIGURES, TABLES, CAPTIONS ----------------------------------------------
@@ -405,14 +405,39 @@ Stack & The chips a player has in front of them; depleting to zero triggers a re
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=\linewidth]{00_game_of_trust.png}
-\caption{\textbf{The Prisoner's Dilemma, as a game of trust.} A
-screenshot of the cooperate/cheat setup from Nicky Case's
-\textit{Evolution of Trust} interactive: putting a coin in the
-machine costs you one coin but gives the other player three. Mutual
-cooperation therefore pays $+2$ each, mutual cheating $0$ each, and
-unilateral cheating against a cooperator pays $+3$ to the defector
-against $-1$ to the cooperator.}
+\begin{tikzpicture}[font=\sffamily]
+  \tikzset{
+    payoff/.style={minimum width=2.55cm, minimum height=1.95cm,
+                   draw=scienceRule, line width=0.6pt, align=center},
+    colhdr/.style={font=\sffamily\bfseries\footnotesize, align=center,
+                   text=darkGray, text width=2.55cm},
+    rowhdr/.style={font=\sffamily\bfseries\footnotesize, align=center,
+                   text width=2.0cm, rotate=90, text=darkGray},
+  }
+  % payoff cells: large number = your payoff, grey = opponent payoff
+  \node[payoff, fill=green!12] (cc) at (0,0)
+        {{\large\bfseries $+2$}\\[3pt]\textcolor{gray}{opp.\ $+2$}};
+  \node[payoff, fill=red!9]    (ck) at (2.55,0)
+        {{\large\bfseries $-1$}\\[3pt]\textcolor{gray}{opp.\ $+3$}};
+  \node[payoff, fill=blue!8]   (kc) at (0,-1.95)
+        {{\large\bfseries $+3$}\\[3pt]\textcolor{gray}{opp.\ $-1$}};
+  \node[payoff, fill=gray!12]  (kk) at (2.55,-1.95)
+        {{\large\bfseries $0$}\\[3pt]\textcolor{gray}{opp.\ $0$}};
+  % column headers
+  \node[colhdr] at (0,1.42)    {Opponent\\cooperates};
+  \node[colhdr] at (2.55,1.42) {Opponent\\cheats};
+  % row headers
+  \node[rowhdr] at (-1.78,0)     {You\\cooperate};
+  \node[rowhdr] at (-1.78,-1.95) {You\\cheat};
+\end{tikzpicture}
+\caption{\textbf{The Prisoner's Dilemma, as a game of trust.} The
+payoff matrix in the framing of Nicky Case's \textit{Evolution of
+Trust} interactive: cooperating (``putting a coin in the machine'')
+costs you one coin but gives the other player three. The large
+number in each cell is your payoff and the grey number is the
+opponent's. Mutual cooperation pays $+2$ each, mutual cheating $0$
+each, and unilateral cheating against a cooperator pays $+3$ to the
+defector against $-1$ to the cooperator.}
 \label{fig:pd}
 \end{figure}
 
@@ -604,10 +629,10 @@ bucket. The static types have fixed parameters during all
 simulations. Each of the eight types also has an \textit{honesty}
 score $h = 1 - P(\text{bluff}\mid\text{weak})$,
 which is used as a weighting factor in computing the trust scores
-(Eq.~\ref{eq:trust}). In addition, each of the names of the eight
-types is printed using its own colour scheme throughout the text so
-that you may be able to see which player we are referring to at each
-time. The full per-archetype policy bounds---bet, bluff, and fold
+(Eq.~\ref{eq:trust}). In addition, the eight type names are set in
+bold throughout the text so the reader can track which player is
+being discussed at any point. The full per-archetype policy
+bounds---bet, bluff, and fold
 probabilities and the adaptation rule for each of the eight
 types---are given in Table~\ref{tab:bounds-comprehensive}.
 
@@ -897,13 +922,15 @@ appears in Fig.~\ref{fig:trust-vs-stack} (left panel).
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\linewidth]{05_trust_vs_stack.png}
+  \includegraphics[width=\linewidth]{05_trust_vs_stack.pdf}
   \caption{\textbf{Trust versus final stack across phases.}
   (\textbf{Left}) Phase 1: the most-trusted archetypes cluster
   in the low-stack region and \arch{Firestorm} (low trust) is
   the highest earner. (\textbf{Right}) Phase 3.1: the
   relationship dissolves and \arch{Wall} becomes the top earner.
-  Each point is one (archetype, seed) observation.}
+  Each point is one archetype (mean across the five seeds); the
+  vertical axis is on a log scale and the dashed line is the
+  least-squares fit.}
   \label{fig:trust-vs-stack}
 \end{figure}
 
@@ -1010,7 +1037,7 @@ anything fundamentally different.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\linewidth]{07_phase2_bounded_vs_unbounded_aggressive.png}
+  \includegraphics[width=\linewidth]{07_phase2_bounded_vs_unbounded_aggressive.pdf}
   \caption{\textbf{Bounded versus unbounded hill-climbing per
   seed.} The left of each pair of bars is $\rtp$ for bounded
   Phase 2 hill-climbing; the right is $\rtp$ for aggressive
@@ -1037,7 +1064,7 @@ version); yet the trap persists.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\linewidth]{14_nash_convergence_compare.png}
+  \includegraphics[width=\linewidth]{14_nash_convergence_compare.pdf}
   \caption{\textbf{The 8-agent population becomes dispersed in
   parameter space.} Averaged pairwise $L_1$ distance between all
   eight agents in a 36-dimensional parameter space over
@@ -1060,7 +1087,7 @@ are not converging on a common Nash-like profile.
 
 \begin{figure*}[tp]
   \centering
-  \includegraphics[width=\linewidth]{10_param_drift_unbounded_aggressive.png}
+  \includegraphics[width=\linewidth]{10_param_drift_unbounded_aggressive.pdf}
   \caption{\textbf{Per-archetype preflop bluff-rate drift under
   aggressive unbounded hill-climbing.} Each panel is one archetype
   and each translucent line is one of the five seeds. Every
@@ -1144,7 +1171,7 @@ but residual trap.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\linewidth]{03_economic_inversion.png}
+  \includegraphics[width=\linewidth]{03_economic_inversion.pdf}
   \caption{\textbf{Economic ordering inverts from Phase 3 to
   Phase 3.1.} \arch{Wall} (trust $\approx 0.85$, highest of any
   archetype) was rank 8 of 8 in Phase 3 with ${\sim}9$ rebuys
@@ -1179,7 +1206,7 @@ apparent ``farming.''
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\linewidth]{06_tma_by_archetype.png}
+  \includegraphics[width=\linewidth]{06_tma_by_archetype.pdf}
   \caption{\textbf{Trust Manipulation Awareness (TMA) per
   archetype in Phase 3.1.} Positive TMA indicates an agent's
   rolling trust delta correlates with its rolling aggression

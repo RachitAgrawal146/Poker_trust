@@ -31,9 +31,9 @@ def main() -> int:
 
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(13, 4.8), sharey=True)
 
-    for ax, traj, title, accent in [
-        (ax1, base, "Weak HC (delta=0.03, eval=200, ~25 cycles)", "#C0392B"),
-        (ax2, agg, "Aggressive HC (delta=0.15, eval=50, ~100 cycles)", "#600000"),
+    for ax, traj, label in [
+        (ax1, base, r"Weak HC ($\delta=0.03$)"),
+        (ax2, agg, r"Aggressive HC ($\delta=0.15$)"),
     ]:
         seeds = sorted(traj.keys(), key=lambda k: int(k.split("_")[1]))
         cis = []
@@ -47,21 +47,19 @@ def main() -> int:
         mean_ci = float(np.mean(cis))
         ax.axhline(spread[0], color="grey", linewidth=0.5, linestyle=":")
         ax.set_xlabel("Hand index")
-        ax.set_title(f"{title}\nMean convergence index = {mean_ci:.3f}",
-                     fontsize=11, color=accent)
+        # Short panel identifier + in-axis convergence index (the caption
+        # carries the full interpretation).
+        ax.set_title(label, fontsize=10.5)
+        ax.text(0.04, 0.95,
+                f"mean final/initial spread = {mean_ci:.3f}",
+                transform=ax.transAxes, fontsize=8.5, va="top", color="#333")
         ax.set_ylim(0, 10)
         ax.legend(loc="lower right" if mean_ci > 1 else "upper right",
                   fontsize=8)
 
-    ax1.set_ylabel("Mean pairwise L1 between 8 agents (36-dim)")
+    ax1.set_ylabel("Mean pairwise $L_1$ between 8 agents (36-dim)")
 
-    fig.suptitle("Nash Convergence Test — Stronger HC Causes DIVERGENCE",
-                 fontsize=12, fontweight="bold")
-    fig.text(0.5, -0.02,
-             "Convergence index = final spread / initial spread. < 1 = convergence; > 1 = divergence. "
-             "BOTH runs preserve archetype diversity; the aggressive run actually drives agents APART.",
-             ha="center", fontsize=9, color="#444", style="italic")
-    fig.tight_layout(rect=(0, 0.02, 1, 0.94))
+    fig.tight_layout()
     _save(fig, _REPO_ROOT / "paper_resources/figures",
           "14_nash_convergence_compare.png")
     return 0

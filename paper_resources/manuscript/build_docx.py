@@ -29,6 +29,14 @@ src = (MAN / 'main.tex').read_text()
 src = re.sub(r'\\input\{([^}]+)\}',
              lambda m: (MAN / m.group(1)).resolve().read_text(), src)
 
+# ---------------------------------------------------------------- 1b. native
+# TikZ payoff matrix (Fig 1) -> pre-rendered PNG. pandoc cannot execute
+# TikZ, so swap the tikzpicture for the standalone raster of the same
+# matrix (regenerate it with the snippet in the repo if the figure changes).
+src = re.sub(r'\\begin\{tikzpicture\}.*?\\end\{tikzpicture\}',
+             r'\\includegraphics[width=10cm]{01_payoff_matrix.png}',
+             src, flags=re.S)
+
 # ---------------------------------------------------------------- 2. title block
 TITLE = ("Trust Dynamics in Multi-Agent Strategic Interaction: A Simulation "
          "Study of Bayesian Reputation Systems in 8-Player Limit Texas Hold'em")
@@ -121,6 +129,10 @@ src = src.replace(preamble_inject, renews + preamble_inject, 1)
 # ---------------------------------------------------------------- 10. image widths fit a page
 src = re.sub(r'width=\\linewidth', 'width=14cm', src)
 src = re.sub(r'width=0\.9\d*\\textwidth', 'width=15cm', src)
+# The LaTeX build embeds vector PDFs; Word cannot, so point each
+# \includegraphics at the 300-dpi PNG sibling that the figure scripts
+# emit alongside every PDF.
+src = re.sub(r'(\\includegraphics\[[^\]]*\]\{[^}]+)\.pdf\}', r'\1.png}', src)
 
 # ---------------------------------------------------------------- 11. post-process
 def _postprocess(path):

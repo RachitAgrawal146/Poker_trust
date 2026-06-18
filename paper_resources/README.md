@@ -33,7 +33,7 @@ paper_resources/
 │   │                                 and boxed hand placed; PROSE markers
 │   │                                 indicate where to write
 │   └── references.bib                Bibliography stub with key references
-├── figures/                          (publication-ready PNGs, 180 dpi)
+├── figures/                          (publication-ready: 300-dpi PNG + vector PDF)
 ├── tables/                           (LaTeX `tabular` snippets)
 ├── data/                             (CSV source data behind every table)
 ├── interesting_hands/                (curated hand transcripts per phase)
@@ -61,7 +61,20 @@ in the preamble if you organize them differently. Then:
 5. When you cite something, add the entry to `references.bib` and
    `\citep{key}` in the prose.
 
-## Figures (20 PNGs)
+## Figures
+
+Every figure used in the paper is emitted twice by the generator
+scripts: a **vector PDF** (embedded by the `pdflatex` build) and a
+**300-dpi PNG** (used by the pandoc/Word build, which cannot embed
+PDFs). Regenerate them with `python3 analysis/make_paper_figures.py`
+(figures 03/05/06/07), `analysis/phase2_unbounded_compare.py`
+(figure 10), and `analysis/nash_convergence_compare.py` (figure 14).
+The figures use the Okabe–Ito colourblind-safe palette and carry no
+on-figure titles (all interpretation lives in the captions).
+
+Figure 1 in the manuscript is a **native TikZ payoff matrix** drawn
+inline in `main.tex`; `figures/01_payoff_matrix.png` is the
+pre-rendered raster the Word build substitutes for it.
 
 Headline / cross-phase:
 
@@ -72,7 +85,7 @@ Headline / cross-phase:
 | `02_per_seed_ladder.png` | Per-seed dot plot showing variance growth across phases |
 | `03_economic_inversion.png` | Wall 8→1, Oracle 3→8: most-trusted wins in P3.1 |
 | `04_behavioral_shift.png` | VPIP/PFR/AF shifts P1 vs P3.1 |
-| `05_trust_vs_stack.png` | Pooled trust-vs-stack scatter |
+| `05_trust_vs_stack.png` | Trust-vs-stack scatter: Phase 1 (trap) vs Phase 3.1 (dissolved), archetype means, log-y |
 | `06_tma_by_archetype.png` | Trust Manipulation Awareness per archetype |
 
 Phase 2 unbounded sub-experiment:

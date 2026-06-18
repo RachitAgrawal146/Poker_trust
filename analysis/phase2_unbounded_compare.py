@@ -230,22 +230,15 @@ def fig_param_drift(traj_path: Path, outdir: Path,
             ax.plot(xs, ys, color=ARCHETYPE_COLORS[arch], linewidth=1.0,
                     alpha=0.7)
 
-        ax.set_title(arch, fontsize=11, fontweight="bold")
+        # Per-panel archetype label (small-multiple identifier, not a title).
+        ax.set_title(arch, fontsize=10, fontweight="bold")
         ax.set_xlabel("hand")
         ax.set_ylim(0.0, 1.0)
         ax.axhline(0.5, color="grey", linewidth=0.4, linestyle=":")
 
     axes[0].set_ylabel("preflop bluff rate (br)")
     axes[4].set_ylabel("preflop bluff rate (br)")
-    fig.suptitle(
-        "Phase 2 Unbounded — Preflop Bluff-Rate Drift Across Seeds",
-        fontsize=13, fontweight="bold",
-    )
-    fig.text(0.5, 0.02,
-             "Each translucent line = one seed. With unbounded freedom, agents are free "
-             "to drift toward br=0 or br=1; the question is whether they converge.",
-             ha="center", fontsize=9, color="#555", style="italic")
-    fig.tight_layout(rect=(0, 0.03, 1, 0.96))
+    fig.tight_layout()
     suffix = f"_{tag}" if tag else ""
     _save(fig, outdir, f"10_param_drift_unbounded{suffix}.png")
 
