@@ -43,7 +43,7 @@ TITLE = ("Trust Dynamics in Multi-Agent Strategic Interaction: A Simulation "
 AUTHOR = (r"Rachit Agrawal\\ \normalsize Independent research, 2025--2026.\\ "
           r"\normalsize Correspondence: rachit.agrawal@sahyadrischool.org")
 ABSTRACT = (
- r"WHAT IF BEING TRUSTWORTHY COST YOU SOMETHING? Reputation systems (online "
+ r"What if being trustworthy cost you something? Reputation systems (online "
  r"marketplaces, credit scoring and social platforms) reward ``good'' "
  r"behavior---however, there is a well-known paradox among economists. A totally "
  r"transparent and cooperative player will get less than a somewhat unreliable "

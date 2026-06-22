@@ -140,7 +140,7 @@
 \usepackage[most]{tcolorbox}
 \tcbset{
   storyhand/.style={
-    enhanced, breakable, boxrule=0.4pt, arc=2pt,
+    enhanced, breakable=false, boxrule=0.4pt, arc=2pt,
     colback=gray!3, colframe=scienceRed!70,
     coltitle=white, colbacktitle=scienceRed,
     fonttitle=\sffamily\bfseries\fontsize{9}{11}\selectfont,
@@ -223,7 +223,7 @@
     \begin{minipage}{\dimexpr\textwidth-2\fboxsep\relax}
       \vspace{4pt}\noindent{\sffamily\bfseries\fontsize{10}{12}\selectfont ABSTRACT\par}\vspace{4pt}
       \sffamily\bfseries\fontsize{9.5}{13}\selectfont
-      WHAT IF BEING TRUSTWORTHY COST YOU SOMETHING? Reputation
+      What if being trustworthy cost you something? Reputation
       systems (online marketplaces, credit scoring and social
       platforms) reward ``good'' behavior---however, there is a
       well-known paradox among economists. A totally transparent and
@@ -595,8 +595,9 @@ experiment, differences in outcomes can be solely due to variations
 in agent capabilities.
 
 First we describe the common environment, followed by descriptions
-of the eight archetypes (rules), belief updates, and finally the
-four agent implementations.
+of the eight archetypes (rules), belief updates, the experimental
+design, and the metrics; we close with a detailed description of the
+four agent implementations, one per phase.
 
 \subsection{Game environment}
 The overall game setting remains constant for all phases of this
@@ -748,31 +749,6 @@ behavior of \arch{Mirror} differs from that of \arch{Sentinel}
 (see Table~\ref{tab:behavioral-shift}).
 This is a design choice, not a finding.
 
-\subsection{Four agent architectures}
-The primary difference among these four phases is that the way each
-agent selects its decision-making rule varies. \textbf{Phase 1}
-(Frozen Rules Based on Archetypes): Parameters used to define each
-player's archetype remain static through each round. \textbf{Phase
-2} (Bounded Online Optimisation): Players use a per cycle hill
-climbing method to update their parameter values every 200 hands.
-For the first 200 hands, players will randomly select either a
-round or a metric (and thus alter one (round/metric) pair) by
-$\delta = 0.03$. Then they will run 200 hand trials and accept the
-random selection if their total profit increased during those last
-200 hands. Random selections can be made anywhere within a ``bound
-box'' created around each player's archetype. \textbf{Phase 3} (LLM
-Personality Role-Players): All of a player's decisions are made via
-an API call to Anthropic's Claude Haiku 4.5. This call is made using
-the player's personality specification as the system prompt.
-\textbf{Phase 3.1} (LLM with Reasoning Scaffolding): Phase 3.1 also
-allows players to utilize chain-of-thought prompts limited to two
-sentences. Additionally, opponents' memory and the player's own
-updated strategy notes are refreshed after every ten and twenty-five
-hands, respectively. A sub-experiment called \textbf{Phase
-2$^{*}$} removes the bound boxes from hill climbers, increases the
-size of hill climbers' steps to $\delta = 0.15$, and reduces the
-number of hands hill climbers evaluate from 200 to fifty.
-
 \subsection{Experimental design}
 All four phases use the same five random seeds (42, 137, 256, 512,
 1024), and all phases used the same eight archetypes. However, there
@@ -884,6 +860,68 @@ Archetype & $P(\text{bet}|S)$ & $P(\text{bet}|W)$ & $P(\text{fold}|W)$ & $h$ & A
 \end{tabularx}
 \end{table*}
 
+\subsection{The four agent architectures in detail}
+The phases share every component described above and differ only in
+how each agent turns the current game state into an action. We
+describe each in turn; Table~\ref{tab:bounds-comprehensive} gives the
+numerical policy that each phase starts from.
+
+\paragraph{Phase 1 --- frozen rules.} \W{Each archetype is a fixed
+lookup table that maps the current betting round and the agent's
+hand-strength bucket (strong, medium, or weak, as scored by the
+Monte-Carlo evaluator) to a probability distribution over fold,
+check, call, bet, and raise. The agent samples its action from that
+distribution, and nothing about the table changes for the duration of
+a run. This makes Phase 1 the cleanest possible baseline: every later
+phase is measured against the behaviour it produces. The three
+inherently adaptive archetypes (\arch{Predator}, \arch{Mirror}, and
+\arch{Judge}) still read live state---an opponent posterior or a
+grievance ledger---but the rules that consume that state are
+themselves frozen.}
+
+\paragraph{Phase 2 --- bounded online optimisation.} \W{Every agent
+runs a per-cycle hill-climber. At the start of a 200-hand cycle it
+perturbs a single (round, metric) entry of its own policy by
+$\delta = 0.03$, plays the cycle, and keeps the change only if its
+cumulative profit over those 200 hands improved; otherwise it
+reverts. The perturbation is confined to a ``bound box'' drawn around
+the archetype's canonical parameters
+(Table~\ref{tab:bounds-comprehensive}), so a \arch{Sentinel} can
+sharpen its value-betting but can never wander into
+\arch{Firestorm}'s bluff-everything region. Phase 2 therefore asks a
+deliberately narrow question: can local, reward-greedy tuning
+\emph{within} a personality escape the trap?}
+
+\paragraph{Phase 2$^{*}$ --- unbounded optimisation.} \W{This
+robustness variant removes the bound box entirely, letting every
+metric roam the full $[0,1]$ interval, enlarges the step to
+$\delta = 0.15$, and shrinks the evaluation window from 200 hands to
+fifty so the optimiser takes many more and much larger moves. It is
+the falsification test for the hypothesis that the archetype
+boxes---rather than the trust dynamics---are what hold the trap in
+place.}
+
+\paragraph{Phase 3 --- LLM personality role-players.} \W{Each decision
+is delegated to Anthropic's Claude Haiku 4.5. The agent's personality
+specification is supplied as the system prompt, the live hand state
+(hole cards, board, pot, betting history, and stack sizes) is
+serialised into the user message, and the model's reply is parsed
+back into one of the legal actions. There is no memory across hands
+and no explicit reasoning step: the model simply role-plays the
+personality one decision at a time, sampled at the SDK default
+temperature of $1.0$.}
+
+\paragraph{Phase 3.1 --- LLM with reasoning scaffolding.} \W{Phase 3.1
+keeps the same model and personality prompts but adds three scaffolds.
+A two-sentence chain-of-thought field forces the model to state a
+reason before it acts; a per-opponent memory, refreshed every ten
+hands, summarises how each rival has been playing; and a
+self-authored strategy note, rewritten every twenty-five hands, lets
+the agent carry a running plan from hand to hand. Together these let
+an agent reason about the reputation system itself rather than only
+about its own cards---and this is the single intervention that moves
+$\rtp$ materially toward zero.}
+
 \section{Results}\label{sec:results}
 % =============================================================================
 
@@ -899,7 +937,12 @@ memory, and self-updated strategy notes. The four-tier headline
 ladder $-0.752 \to -0.637 \to -0.510 \to -0.094$ (Phase 2$^{*}$---a separate, unbounded-optimization robustness check
 on Phase 2---is excluded from this sequential reporting) frames the
 remainder of this section, which reports per-phase numbers,
-figures, and illustrative hands.
+figures, and illustrative hands. Table~\ref{tab:archetype-p31}
+previews the endpoint of that ladder---the final per-archetype
+economic ordering under Phase 3.1---which the per-phase narrative
+below then builds toward.
+
+\input{../tables/per_archetype_p31.tex}
 
 % --------------------------------------------------------------- Phase 1
 \subsection{Phase 1: trust as a liability}
@@ -920,7 +963,7 @@ showdown win rate is only $38.5\%$.
 wins because it is hard to read. The trust--stack relationship
 appears in Fig.~\ref{fig:trust-vs-stack} (left panel).
 
-\begin{figure}[H]
+\begin{figure}[tb]
   \centering
   \includegraphics[width=\linewidth]{05_trust_vs_stack.pdf}
   \caption{\textbf{Trust versus final stack across phases.}
@@ -1035,7 +1078,7 @@ occurs is localised to the agents trimming off the least-effective
 components of an otherwise stationary policy without introducing
 anything fundamentally different.
 
-\begin{figure}[H]
+\begin{figure}[tb]
   \centering
   \includegraphics[width=\linewidth]{07_phase2_bounded_vs_unbounded_aggressive.pdf}
   \caption{\textbf{Bounded versus unbounded hill-climbing per
@@ -1062,7 +1105,7 @@ With respect to movement in parameter space, the mean per-agent
 $L_1$ drift is $3.4$ (i.e., eleven times more than in the bounded
 version); yet the trap persists.
 
-\begin{figure}[H]
+\begin{figure}[tb]
   \centering
   \includegraphics[width=\linewidth]{14_nash_convergence_compare.pdf}
   \caption{\textbf{The 8-agent population becomes dispersed in
@@ -1169,7 +1212,7 @@ power in this study, we cannot conclusively determine whether this
 reduction corresponds to complete elimination or merely a weakened
 but residual trap.
 
-\begin{figure}[H]
+\begin{figure}[tb]
   \centering
   \includegraphics[width=\linewidth]{03_economic_inversion.pdf}
   \caption{\textbf{Economic ordering inverts from Phase 3 to
@@ -1188,9 +1231,7 @@ claim above. The right panel of Fig.~\ref{fig:trust-vs-stack}
 (introduced earlier) shows the trust--stack scatter under
 Phase 3.1: the negative slope visible in the Phase 1 panel is
 gone. The full per-archetype economic ordering is in
-Table~\ref{tab:archetype-p31}.
-
-\input{../tables/per_archetype_p31.tex}
+Table~\ref{tab:archetype-p31}, shown at the start of this section.
 
 Four of six secondary metric targets are met in Phase 3.1
 (vs.\ two of six in Phase 3). Strategic Unpredictability rises
@@ -1204,7 +1245,7 @@ reasoning-enhanced river value-betting causes trust and aggression to
 rise together without any deception, somewhat exaggerating their
 apparent ``farming.''
 
-\begin{figure}[H]
+\begin{figure}[tb]
   \centering
   \includegraphics[width=\linewidth]{06_tma_by_archetype.pdf}
   \caption{\textbf{Trust Manipulation Awareness (TMA) per
@@ -1327,6 +1368,22 @@ flag this as a direction for follow-up rather than a conclusion,
 since a single hand-crafted poker analogue is not a clean test of
 the IPD literature.
 
+\W{It is worth dwelling on why this trap is so stable. The loop is
+self-reinforcing: every honest action an agent takes is an
+informative sample that sharpens its opponents' posterior, and a
+sharper posterior makes the next exploitation more precise. Honesty
+therefore does not merely cost the agent once---it pays for the very
+classification that will later be turned against it. Viewed through
+the lens of signalling theory, trust is a perfectly truthful signal,
+and in a competitive zero-sum setting a perfectly truthful signal
+about a cooperator is exactly the information an adversary needs to
+fold out its value bets and to attack its checks. \arch{Firestorm}'s
+advantage is the mirror image of this: by acting almost independently
+of its hand strength it emits an uninformative signal, and an
+uninformative signal cannot be traded against. The trap is thus less
+about honesty itself than about the predictability that accurate
+honesty creates.}
+
 \subsection{What numerical optimization can and cannot do}
 The next three phases of the experiment narrow the space of
 possible explanations for why the trap is hard to escape. We
@@ -1395,6 +1452,19 @@ The Phase 3 softening may therefore be produced by output
 stochasticity at sampling temperature 1.0 rather than by a
 structural change in agent behavior.
 
+\W{Taken together, the two hill-climbing phases point to a single
+conclusion: the trap is a property of the observation-and-exploitation
+loop, not of any particular parameter setting. A local, reward-greedy
+optimizer can only nudge an agent toward a neighbouring policy, which
+the fixed and shared trust model promptly re-classifies and
+re-exploits; there is no escape route in policy space that greedy
+steps can reach, because the very gradient the agent climbs is defined
+by opponents who are climbing at the same time. This is why larger
+steps disperse the population rather than converging it---each agent
+chases a target that the others' simultaneous adaptation keeps moving.
+Numerical optimization can polish a policy, but it cannot reason its
+way out of being modelled, and being modelled is the whole problem.}
+
 \subsection{What reasoning adds, and what we can and cannot claim
 outside poker}
 The Phase 3.1 result is consistent with an interpretation in
@@ -1417,6 +1487,21 @@ the Phase 1 \arch{Wall} and unreliable for the Phase 3
 hands, rather than a single illustrative case, is the natural
 follow-up.
 
+\W{What changes in Phase 3.1 is not the amount of information
+available to the agent but the use it makes of that information. A
+hill-climber and a personality-only language model both play at the
+first order: they optimize or role-play their own policy. The
+reasoning-scaffolded agent plays at the second order---it represents
+how it is being perceived and then acts to break the predictability
+that its reputation rewards. The \arch{Wall} hand in Box~2 is a
+miniature of exactly this shift: the agent does not merely execute
+``calling station,'' it infers from \arch{Firestorm}'s out-of-character
+river check that the board now favours it and departs from its script
+to take value. The capability that attenuates the trap is therefore
+meta-cognitive rather than informational---a meaningfully different
+prescription from ``give the cooperator more features about its
+counterparties.''}
+
 These mechanisms suggest hypotheses for real-world reputation
 systems, but we emphasize the limit of the analogy: our testbed
 is a zero-sum game and the proposed exploitation mechanism
@@ -1434,6 +1519,21 @@ And \textit{transparency itself may be costly} when it makes
 cooperative strategies too easy to model and exploit. Each of
 these would require direct validation in a positive-sum domain
 to claim more than analogical inference.
+
+\W{Stepping back from the individual phases, the four-tier ladder
+tells a single story about \emph{where} the remedy for the trap
+lives. Freezing the rules (Phase 1) makes the trap maximal; tuning
+the rules numerically (Phases 2 and 2$^{*}$) barely moves it;
+replacing the rules with a fluent but non-reasoning language model
+(Phase 3) softens it mostly through added output noise; and only when
+the agent is given the machinery to reason about the reputation
+system (Phase 3.1) does the correlation approach zero. The remedy, if
+our reading is correct, is not a better policy or a richer feature set
+but a higher \emph{order} of reasoning---a conclusion that would have
+been invisible without holding the game and the trust model fixed
+while varying only the agent's mind. We regard this monotone ladder as
+the paper's central qualitative result, and the precise magnitude of
+each rung as the part most in need of replication.}
 
 \subsection{Limitations}
 Three clusters of limitations remain after the revisions above.
@@ -1511,17 +1611,6 @@ preliminary evidence against the hypothesis that the trap is a
 bound-box artifact, though Phase 2$^{*}$ varies three optimizer
 parameters at once and does not cleanly isolate the bounds.
 
-Why should anyone care outside of cards? All systems where machines
-assess trust from observed behavior---Credit Scoring, Content
-Moderation, Multi-Agent Marketplaces, Automated Negotiation---inherit
-the same threat: if cooperation is apparent, it can be evaluated and
-exploited. Our results indicate that protection for cooperative
-agents will likely involve giving them the ability to think about the
-reputation system itself---rather than simply providing them with
-additional information about their counterparts. This poker framework
-serves as a compact, completely reproducible tool for studying the
-specific question---when does a good reputation become a bad thing?
-
 Three follow-up experiments are the most important next steps.
 \textit{First}, an $n = 20$ Phase 3.1 replication at 500 hands per
 seed (matching Phase 3) is the highest-leverage single experiment:
@@ -1537,15 +1626,23 @@ Beyond these three, a multi-LLM replication, a no-limit Hold'em
 extension, and an experimental varying of inter-archetype distance
 would each strengthen the present findings.
 
+Why should anyone care outside of cards? All systems where machines
+assess trust from observed behavior---Credit Scoring, Content
+Moderation, Multi-Agent Marketplaces, Automated Negotiation---inherit
+the same threat: if cooperation is apparent, it can be evaluated and
+exploited. Our results indicate that protection for cooperative
+agents will likely involve giving them the ability to think about the
+reputation system itself---rather than simply providing them with
+additional information about their counterparts. This poker framework
+serves as a compact, completely reproducible tool for studying the
+specific question---when does a good reputation become a bad thing?
+
 % =============================================================================
 \section*{Sources and Acknowledgments}
 
 \subsection*{Acknowledgments}
 We thank Anthropic for the API access that made Phases 3 and 3.1
 feasible.
-
-\paragraph*{Funding.} Anthropic API expenditure was self-funded by
-the author.
 
 \paragraph*{Author contributions.} R.A.\ conceived the study,
 implemented the simulation, performed the analysis, and wrote the
