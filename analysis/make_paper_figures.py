@@ -87,25 +87,16 @@ PHASE_COLORS = {
 ARCHETYPES = ["oracle", "sentinel", "firestorm", "wall",
               "phantom", "predator", "mirror", "judge"]
 
-# Okabe-Ito colorblind-safe qualitative palette (Wong 2011, Nat. Methods).
-# Every hue is distinguishable under deuteranopia/protanopia/tritanopia.
-# The two archetypes most often discussed together -- Firestorm (the
-# aggressor) and Wall (the calling-station) -- are vermillion vs blue
-# (NOT red/green), so they never collide for a colourblind reader.
 ARCHETYPE_COLORS = {
-    "oracle":    "#999999",   # neutral grey  — baseline
-    "sentinel":  "#009E73",   # bluish green  — honest/grounded
-    "firestorm": "#D55E00",   # vermillion    — aggressive
-    "wall":      "#0072B2",   # blue          — stoic
-    "phantom":   "#CC79A7",   # reddish purple— elusive
-    "predator":  "#E69F00",   # orange        — opportunistic
-    "mirror":    "#56B4E9",   # sky blue      — reflective
-    "judge":     "#000000",   # black         — authoritative
+    "oracle":    "#5C5C5C",
+    "sentinel":  "#1B9E77",
+    "firestorm": "#D55E00",
+    "wall":      "#0072B2",
+    "phantom":   "#9467BD",
+    "predator":  "#E41A1C",
+    "mirror":    "#F0E442",
+    "judge":     "#56B4E9",
 }
-
-# Diverging pair for sign-coded bars (positive vs negative), colourblind-safe.
-POS_COLOR = "#0072B2"   # blue
-NEG_COLOR = "#D55E00"   # vermillion
 
 
 # ---------------------------------------------------------------------------
@@ -113,42 +104,26 @@ NEG_COLOR = "#D55E00"   # vermillion
 # ---------------------------------------------------------------------------
 
 def _setup_style() -> None:
-    # One typeface and one size scale across every figure so the paper's
-    # plots read as a single family rather than default-matplotlib output.
     plt.rcParams.update({
         "font.family": "DejaVu Sans",
-        "font.size": 10.5,
-        "axes.titlesize": 11,
-        "axes.titleweight": "normal",
-        "axes.labelsize": 10.5,
-        "xtick.labelsize": 9.5,
-        "ytick.labelsize": 9.5,
-        "legend.fontsize": 9.5,
-        "axes.linewidth": 0.8,
+        "font.size": 11,
+        "axes.titlesize": 13,
+        "axes.titleweight": "bold",
+        "axes.labelsize": 11,
         "axes.spines.top": False,
         "axes.spines.right": False,
         "axes.grid": True,
         "grid.alpha": 0.25,
         "grid.linestyle": "--",
         "legend.frameon": False,
-        "figure.dpi": 120,
-        "savefig.dpi": 300,
-        "pdf.fonttype": 42,   # embed TrueType (editable, portable) in PDF
-        "ps.fonttype": 42,
     })
 
 
 def _save(fig: plt.Figure, outdir: Path, name: str) -> None:
-    """Write each figure twice: a vector PDF (the version the LaTeX build
-    embeds) and a 300-dpi PNG (used by the pandoc/Word build, which cannot
-    embed PDFs). ``name`` is given with a raster extension; the PDF sibling
-    is derived from it."""
     outdir.mkdir(parents=True, exist_ok=True)
-    png_path = outdir / name
-    pdf_path = png_path.with_suffix(".pdf")
-    fig.savefig(pdf_path, bbox_inches="tight")           # vector
-    fig.savefig(png_path, dpi=300, bbox_inches="tight")  # raster fallback
-    print(f"  wrote {pdf_path.name} + {png_path.name}")
+    path = outdir / name
+    fig.savefig(path, dpi=180, bbox_inches="tight")
+    print(f"  wrote {path}")
     plt.close(fig)
 
 
@@ -378,8 +353,14 @@ def fig_economic_inversion(outdir: Path) -> None:
     ax.set_xticklabels(["Phase 3 economic rank", "Phase 3.1 economic rank"],
                        fontsize=10)
     ax.set_yticks(range(1, 9))
-    ax.set_ylabel("Economic rank (1 = top earner)")
     ax.set_xlim(-0.45, 1.45)
+    ax.set_title("Economic Ordering Inversion: Wall Goes 8 → 1, Oracle 3 → 8",
+                 fontsize=12)
+
+    fig.text(0.99, -0.02,
+             "Cooperative Wall (most-trusted, calling-station) climbs from rank 8 (last) to rank 1 (first)\n"
+             "in Phase 3.1, with zero rebuys. Strategic Oracle drops from 3 to 8.",
+             ha="right", va="top", fontsize=8.5, color="#555", style="italic")
 
     ax.grid(False)
     fig.tight_layout()
@@ -450,89 +431,51 @@ def fig_behavioral_shift(outdir: Path) -> None:
 # Figure 5: trust-vs-stack scatter per phase
 # ---------------------------------------------------------------------------
 
-# Phase 1 per-archetype mean trust score (final hand) and mean final
-# stack, used for the left panel of the trust-vs-stack figure.
-#   trust: legacy v3 deep-analysis "Trust trajectories" at h10000; trust
-#          scores are horizon-independent (they converge well before
-#          10k hands), so these equal the canonical Phase 1 values.
-#   stack: legacy v3 deep-analysis Section 2 mean final stack per
-#          archetype. Magnitudes scale with the play horizon; only the
-#          trust-vs-stack *relationship* (steeply negative) is read off
-#          this panel, which is what the caption describes.
-P1_TRUST_STACK = {
-    "oracle":    (0.753, 3091),
-    "sentinel":  (0.798, 2797),
-    "firestorm": (0.427, 17862),
-    "wall":      (0.961, 174),
-    "phantom":   (0.646, 129),
-    "predator":  (0.806, 1125),
-    "mirror":    (0.784, 2856),
-    "judge":     (0.801, 1995),
-}
-
-
-def _archetype_means(stats_path: Path) -> dict:
-    """Mean (trust, final_stack) per archetype across all seeds in a
-    phase3/phase3.1 stats dump."""
-    data = json.load(open(stats_path))
-    acc: dict = {a: [[], []] for a in ARCHETYPES}
-    for seed in data["seeds"]:
-        for entry in seed["per_seat"]:
-            a = entry["archetype"]
-            if a in acc:
-                acc[a][0].append(entry["trust"])
-                acc[a][1].append(entry["final_stack"])
-    return {a: (float(np.mean(t)), float(np.mean(s)))
-            for a, (t, s) in acc.items() if t}
-
-
 def fig_trust_vs_stack(outdir: Path) -> None:
     fig, axes = plt.subplots(1, 2, figsize=(11.0, 4.8), sharey=False)
 
+    p3_path = _REPO_ROOT / "paper_resources" / "data" / "phase3_stats.json"
     p31_path = _REPO_ROOT / "paper_resources" / "data" / "phase31_stats.json"
-    if not p31_path.exists():
-        print(f"  skipping fig 5: {p31_path} missing")
+    if not p3_path.exists() or not p31_path.exists():
+        print(f"  skipping fig 5: {p3_path} or {p31_path} missing")
         plt.close(fig)
         return
 
-    panels = [
-        (axes[0], P1_TRUST_STACK, "Phase 1  (frozen rules)"),
-        (axes[1], _archetype_means(p31_path), "Phase 3.1  (LLM + reasoning)"),
-    ]
+    p3_data = json.load(open(p3_path))
+    p31_data = json.load(open(p31_path))
 
-    for ax, means, label in panels:
-        xs, ys = [], []
-        for arch in ARCHETYPES:
-            if arch not in means:
-                continue
-            t, s = means[arch]
-            xs.append(t)
-            ys.append(s)
-            ax.scatter([t], [s], s=70, color=ARCHETYPE_COLORS[arch],
-                       edgecolor="black", linewidth=0.5, zorder=3)
-            ax.annotate(arch, (t, s), textcoords="offset points",
-                        xytext=(5, 4), fontsize=8.0,
-                        color=ARCHETYPE_COLORS[arch])
+    for ax, data, title, color in [
+        (axes[0], p3_data, "Phase 3 (LLM personalities) — r = -0.510",
+         "#E67E22"),
+        (axes[1], p31_data, "Phase 3.1 (LLM + reasoning) — r = -0.094",
+         "#1B9E77"),
+    ]:
+        # Pool every seat across every seed
+        all_trust = []
+        all_stack = []
+        for seed in data["seeds"]:
+            for entry in seed["per_seat"]:
+                all_trust.append(entry["trust"])
+                all_stack.append(entry["final_stack"])
+        ax.scatter(all_trust, all_stack, c=color, s=55, alpha=0.7,
+                   edgecolor="black", linewidth=0.4)
 
-        xa, ya = np.array(xs), np.array(ys)
-        # Pearson r on the log of the stack (the relationship is monotone
-        # across orders of magnitude); reported in the caption, not on-figure.
-        r = float(np.corrcoef(xa, np.log10(ya))[0, 1])
-        slope, intercept = np.polyfit(xa, np.log10(ya), 1)
-        xfit = np.linspace(xa.min(), xa.max(), 100)
-        ax.plot(xfit, 10 ** (slope * xfit + intercept), color="black",
-                linestyle="--", linewidth=1.0, alpha=0.6, zorder=2)
-        print(f"    {label}: r(trust, log10 stack) = {r:+.3f}")
+        # Best-fit line
+        if len(all_trust) >= 2:
+            xa = np.array(all_trust)
+            ya = np.array(all_stack)
+            slope, intercept = np.polyfit(xa, ya, 1)
+            xs = np.linspace(xa.min(), xa.max(), 100)
+            ax.plot(xs, slope * xs + intercept, color="black",
+                    linestyle="--", linewidth=1.0, alpha=0.7)
 
-        ax.set_yscale("log")
         ax.set_xlabel("Mean trust score (final hand)")
-        ax.set_ylabel("Mean final stack (chips, log scale)")
-        ax.set_xlim(0.35, 1.02)
-        # A small in-axis phase tag (panel identity also stated in the caption).
-        ax.text(0.04, 0.94, label, transform=ax.transAxes, fontsize=10,
-                fontweight="bold", va="top")
+        ax.set_ylabel("Final stack (chips)")
+        ax.set_title(title, fontsize=11)
 
-    fig.tight_layout()
+    fig.suptitle("Trust vs. Final Stack — Phase 3 vs. Phase 3.1",
+                 fontsize=12, fontweight="bold")
+    fig.tight_layout(rect=(0, 0, 1, 0.95))
     _save(fig, outdir, "05_trust_vs_stack.png")
 
 
@@ -558,7 +501,7 @@ def fig_tma_by_archetype(outdir: Path) -> None:
 
     archs = list(TMA_P31.keys())
     vals = [TMA_P31[a] for a in archs]
-    colors = [POS_COLOR if v > 0 else NEG_COLOR for v in vals]
+    colors = ["#1B9E77" if v > 0 else "#D55E00" for v in vals]
 
     ax.barh(range(len(archs)), vals, color=colors, edgecolor="black",
             linewidth=0.7, alpha=0.9)
@@ -566,52 +509,23 @@ def fig_tma_by_archetype(outdir: Path) -> None:
         offset = -0.02 if v < 0 else 0.02
         ax.text(v + offset, i, f"{v:+.3f}",
                 va="center", ha="left" if v >= 0 else "right",
-                fontsize=9.5, fontweight="bold")
+                fontsize=10, fontweight="bold")
     ax.axvline(0, color="black", linewidth=0.8)
     ax.set_yticks(range(len(archs)))
-    ax.set_yticklabels(archs)
+    ax.set_yticklabels(archs, fontsize=10)
     ax.invert_yaxis()
-    ax.set_xlabel("TMA  (positive = trust farming, negative = reactive)")
+    ax.set_xlabel("TMA (Trust Manipulation Awareness)")
+    ax.set_title("Phase 3.1 — Trust Farming by Archetype",
+                 fontsize=12)
     ax.set_xlim(-0.5, 0.95)
+
+    fig.text(0.99, -0.02,
+             "Positive TMA = the agent gains trust before exploiting it (six of eight \"farm\").\n"
+             "Wall and Sentinel — the most cooperative archetypes — are the heaviest farmers.",
+             ha="right", va="top", fontsize=8.5, color="#555", style="italic")
 
     fig.tight_layout()
     _save(fig, outdir, "06_tma_by_archetype.png")
-
-
-# ---------------------------------------------------------------------------
-# Figure 7: bounded Phase 2 vs unbounded Phase 2* per-seed r
-#
-# Self-contained version of the paper's Fig. 3. The original two-panel
-# build (analysis/phase2_unbounded_compare.py) reads the per-archetype
-# economic ordering out of runs_phase2_unbounded.sqlite; that database is
-# stored via git-LFS and is not always present. The paper caption only
-# describes the per-seed paired bars, so this regenerates exactly that
-# panel from the canonical per-seed r values already recorded above.
-# ---------------------------------------------------------------------------
-
-def fig_p2_bounded_vs_unbounded(outdir: Path) -> None:
-    fig, ax = plt.subplots(figsize=(8.0, 4.6))
-
-    bounded = R_BY_PHASE["Phase 2\nHill-climbing"]
-    unbounded = P2_UNBOUNDED_R_AGGRESSIVE
-    x = np.arange(len(SEEDS))
-    width = 0.38
-
-    ax.bar(x - width/2, bounded, width, color="#0072B2", alpha=0.9,
-           edgecolor="black", linewidth=0.6,
-           label=f"Phase 2 bounded (mean {np.mean(bounded):+.3f})")
-    ax.bar(x + width/2, unbounded, width, color="#D55E00", alpha=0.9,
-           edgecolor="black", linewidth=0.6,
-           label=f"Phase 2* unbounded (mean {np.mean(unbounded):+.3f})")
-    ax.axhline(0, color="black", linewidth=0.7)
-    ax.set_xticks(x)
-    ax.set_xticklabels([f"seed {s}" for s in SEEDS])
-    ax.set_ylabel(r"Trust-profit Pearson $r$")
-    ax.set_ylim(-1.0, 0.15)
-    ax.legend(loc="lower right")
-
-    fig.tight_layout()
-    _save(fig, outdir, "07_phase2_bounded_vs_unbounded_aggressive.png")
 
 
 # ---------------------------------------------------------------------------
@@ -643,7 +557,6 @@ def main(argv=None) -> int:
         (4, fig_behavioral_shift),
         (5, fig_trust_vs_stack),
         (6, fig_tma_by_archetype),
-        (7, fig_p2_bounded_vs_unbounded),
     ]
 
     only = None
