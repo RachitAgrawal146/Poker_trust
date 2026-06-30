@@ -1,46 +1,48 @@
-# TODO.md — author action items (nothing here is for the bundler to write)
+# TODO.md — author action items
 
-The bundle is built from your **final paraphrased manuscript** (the exact source
-of `main5_updated_1.pdf`) and compiles cleanly offline. The items below are
-prose / rights decisions only you can make. No wording was changed.
+The bundle is built from your final paraphrased manuscript and compiles cleanly
+offline with **zero errors and zero undefined-reference warnings**. The one
+required fix is done; what remains are optional consistency calls only you can
+make.
 
-## 1. Figure 1 removed — one sentence still references it  *(required)*
+## ✅ 1. "Figure ??" dangling reference — FIXED
 
-Figure 1 (`00_game_of_trust.png`, a screenshot of Nicky Case's *Evolution of
-Trust*) was removed — it is borrowed third-party content arXiv does not permit.
-Its float and `\label{fig:pd}` are gone, and the remaining figures
-auto-renumbered to 1–6.
+Done in this revision (on your instruction). The broken clause
+`Figure~\ref{fig:pd} illustrates these four possible outcomes using the framing
+of Nicky Case's \textit{Evolution of Trust} interactive:` was deleted and the
+next word capitalized. The sentence now reads:
 
-But the body still points at it with `\ref{fig:pd}`, which now prints as
-**"Figure&nbsp;??"**. The sentence to revise is at **`main.tex` line 420**
-("Cooperation in repeated games" subsection):
+> "…When both prisoners select option (B), i.e., defect, neither receives any
+> reward. **Mutual cooperation provides a reward of +2** to both players; mutual
+> defection provides a reward of 0…"
 
-> "When both prisoners select option (B), i.e., defect, neither receives any
-> reward. **Figure~\ref{fig:pd} illustrates these four possible outcomes using
-> the framing of Nicky Case's \textit{Evolution of Trust} interactive:** mutual
-> cooperation provides a reward of $+2$ to both players; mutual defection
-> provides a reward of $0$ to both players; and unilaterally defecting against a
-> cooperator provides a reward of $+3$ to the defector and a loss of $-1$ to the
-> cooperator."
+No "Figure ??" remains; the compile has no undefined references. This also
+removed the last textual tie to the borrowed figure.
 
-**Decide / write (your words):** delete the `Figure~\ref{fig:pd} illustrates
-these four possible outcomes using the framing of Nicky Case's \textit{Evolution
-of Trust} interactive:` clause, or replace it with your own non-borrowed
-framing. The payoff values ($+2$/$0$/$+3$/$-1$) stand on their own. Until then
-the PDF shows "Figure&nbsp;??" here — a LaTeX *warning*, not an error, so arXiv
-will still accept and build the submission.
+## 2. (Optional, not a blocker) Affiliation consistency
 
-## 2. Hardcoded figure/table numbers — none found  *(no action)*
+The title page says "Independent research, 2025–2026" while you're submitting
+from your school email / put your school on the arXiv form. arXiv accepts
+"Independent research" fine — this is purely a consistency call. Pick one
+identity and make the paper and the form agree. (Keeping "Independent research"
+is defensible if the school didn't supervise the Polygence work.) **Not changed
+— your call; left exactly as written.**
 
-Every figure/table reference uses `\ref{…}`, so numbering updates automatically.
-No hardcoded "Figure 2"/"Table 3" strings in the prose.
+## 3. (Optional, not a blocker) Abstract register
 
-## 3. shell-escape / biblatex / figure-format blockers — none  *(no action)*
+The abstract is more colloquial than a typical cs.GT abstract ("petri-dish,"
+"swapped the minds of the agents"). arXiv has no style rules, so this is a
+voice/first-impression decision, not a compliance issue. **Not changed — left
+exactly as written; revise only if you want to.**
 
-No `minted`/`\write18` (builds with `-no-shell-escape`); bibliography is
-BibTeX + natbib frozen to `main.bbl` (no biber); all figures are PNG (no EPS).
+## Non-issues (verified, no action)
 
-## 4. (Optional, not arXiv-blocking) references have no DOIs/URLs
+- **Hardcoded figure/table numbers:** none — every reference uses `\ref{…}`.
+- **shell-escape / biblatex / EPS:** none — builds `-no-shell-escape`, BibTeX +
+  natbib frozen to `main.bbl`, all figures PNG.
+- **Reference DOIs/URLs:** none in the source; arXiv doesn't require them (add
+  upstream and re-freeze the `.bbl` if you want clickable links).
 
-`references.bib` has 17 entries and no DOI/URL fields. arXiv does not require
-them; add them upstream and re-freeze the `.bbl` if you want clickable links.
+After uploading: form → primary class **cs.GT** → endorsement → finalize. (Noted
+from your message: sole-authored, so the endorser route differs from a co-author
+submission — confirm the under-18 consent path is sorted before starting.)

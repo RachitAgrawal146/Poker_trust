@@ -5,25 +5,24 @@ Simulation Study of Bayesian Reputation Systems in 8-Player Limit Texas
 Hold'em*
 **Target:** arXiv, primary category **cs.GT**
 
-## Source used (corrected)
+## Source used
 
-The bundle is built from the **exact LaTeX that produced your final
-`main5_updated_1.pdf`** — i.e. the version with the **paraphrased prose**, the
-**whitespace trimmed**, and the **figures rearranged** (economic-inversion
-figure moved up). This was verified by hash:
+Built from the **exact LaTeX that produced your final `main5_updated_1.pdf`**
+(paraphrased prose, whitespace trimmed, figures rearranged). Verified by hash:
+the source's compiled PDF md5 equals the uploaded
+`main5_updated_1.pdf` (`e0818443ccaafb0612904ebcd129b3c4`). A line-diff against
+that source shows only the removed Figure 1 float and the one author-approved
+prose fix below.
 
-```
-md5(main5_updated_1.pdf you uploaded) = e0818443ccaafb0612904ebcd129b3c4
-md5(this source's compiled PDF)       = e0818443ccaafb0612904ebcd129b3c4   ← identical
-```
+## Author-approved edits in this revision
 
-That source is **not** any committed git branch — `focused-thompson` (the branch
-I used in the previous attempt) still has the *un-paraphrased* draft prose and
-the extra whitespace, which is exactly the mismatch you flagged. The correct
-source was the working copy from earlier this session
-(`build2/paper_resources/manuscript/main.tex`). The bundle is that file with
-**only** the borrowed Figure 1 float removed plus path fixes — confirmed by a
-line diff (the diff shows nothing but the removed float).
+| Edit | Where | Detail |
+|---|---|---|
+| Removed borrowed Figure 1 | float deleted | `00_game_of_trust.png` (Nicky Case *Evolution of Trust*) + its `\caption`/`\label{fig:pd}` |
+| **Fixed the dangling reference** | `main.tex` line ~419 | deleted the broken clause `Figure~\ref{fig:pd} illustrates these four possible outcomes using the framing of Nicky Case's \textit{Evolution of Trust} interactive:` and capitalized the next word. Now reads: *"…neither receives any reward. Mutual cooperation provides a reward of +2…"* |
+
+The second edit was made on your explicit instruction. **No "Figure ??" remains,
+and there are no undefined-reference warnings.**
 
 ## Toolchain
 
@@ -37,16 +36,12 @@ line diff (the diff shows nothing but the removed float).
 ## Compile passes
 
 ### Freeze build (Step C, with `references.bib`, clean dir)
-| Step | Exit |
-|---|---|
-| `pdflatex` | 0 |
-| `bibtex main` | 0 (read `plainnat.bst`, `references.bib` → `main.bbl`) |
-| `pdflatex` ×2 | 0, 0 |
+`pdflatex → bibtex (exit 0) → pdflatex → pdflatex` — all exit 0.
 
 ### Step F — clean compile, **bundle contents only** (no `.bib`, no bibtex)
 | Pass | Exit | Output |
 |---|---|---|
-| 1–3 | 0 | `Output written on main.pdf (12 pages, 978729 bytes)` |
+| 1–3 | 0 | `Output written on main.pdf (12 pages, 978121 bytes)` |
 
 Frozen `main.bbl` resolved all 17 citations with no `.bib` present. ✅
 
@@ -54,37 +49,35 @@ Frozen `main.bbl` resolved all 17 citations with no `.bib` present. ✅
 Tarball extracted into a brand-new empty directory, `pdflatex ×3`, no bibtex:
 | Pass | Exit |
 |---|---|
-| 1–3 | 0 — `Output written on main.pdf (12 pages, 978729 bytes)` |
+| 1–3 | 0 — `Output written on main.pdf (12 pages, 978121 bytes)` |
 
 **Step H result: ✅ PASS** — byte-identical 12-page PDF from the tarball alone.
 
-## Warnings (benign; none block arXiv)
+## Warnings
 
 | Warning | Count | Disposition |
 |---|---|---|
-| `Reference 'fig:pd' undefined` (line 420) | 1 | **Expected** — the removed Figure 1. Renders as "Figure&nbsp;??" in the prose. **Author action — `TODO.md`.** |
-| `There were undefined references` | 1 | roll-up of the above |
-| `Overfull/Underfull \hbox/\vbox` | 7 | cosmetic only; from the author's two-column layout |
+| Undefined references | **0** | ✅ the `fig:pd` dangling reference is fixed — clean |
+| Missing files | **0** | all 6 figures + 3 tables + `.bbl` resolve |
+| `Overfull/Underfull \hbox/\vbox` | 7 | cosmetic only; from the two-column layout |
 
-No hard errors, no `Fatal error`, no missing-file warnings.
+**No hard errors, no `Fatal error`, no undefined references, no missing files.**
 
 ## Output
 
 | | |
 |---|---|
-| Pages | **12** (was 13 in the focused-thompson attempt; this is the paraphrased/trimmed layout, one figure shorter after the ncase removal) |
-| PDF | `paper.pdf` — 978,729 bytes |
-| Figures rendered | 6 (all PNG, all found) |
-| Figure numbering | auto-renumbered 1–6 after Figure 1 removal: (1) trust-vs-stack, (2) bounded-vs-unbounded, (3) economic-inversion, (4) nash dispersal, (5) param-drift, (6) TMA — i.e. economic-inversion still precedes nash/param-drift, matching your PDF's order |
+| Pages | **12** |
+| PDF | `paper.pdf` — 978,121 bytes |
+| Figures | 6, numbered 1–6: (1) trust-vs-stack, (2) bounded-vs-unbounded, (3) economic-inversion, (4) nash dispersal, (5) param-drift, (6) TMA — economic-inversion precedes nash/param-drift, matching your PDF |
 
 ## Bundle size
 
 | | |
 |---|---|
-| Tarball `arxiv_submission.tar.gz` | **879,298 bytes (≈ 0.86 MB)** |
+| Tarball `arxiv_submission.tar.gz` | **879,244 bytes (≈ 0.86 MB)** |
 | Uncompressed | ≈ 1.1 MB |
 | arXiv limit | 50 MB — well within |
-| Largest assets | `14_nash_convergence_compare.png` 215 KB · `03_economic_inversion.png` 194 KB · `10_param_drift_unbounded_aggressive.png` 165 KB |
 
 ## arXiv-compatibility (Step E)
 
@@ -97,5 +90,5 @@ No hard errors, no `Fatal error`, no missing-file warnings.
 | filenames | lowercase ASCII, no spaces, no collisions |
 | size vs 50 MB | 0.86 MB — OK |
 
-**Verdict: the corrected bundle (paraphrased final text, ncase figure removed)
-compiles offline, no shell-escape, from a fresh extract, on the first try.**
+**Verdict: the bundle compiles offline, no shell-escape, from a fresh extract,
+with zero errors and zero undefined-reference warnings. Ready to upload.**

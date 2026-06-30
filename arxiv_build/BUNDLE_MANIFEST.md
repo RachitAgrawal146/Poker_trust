@@ -40,16 +40,18 @@ linger harmlessly in the preamble).
 All 6 figures are PNG, total ≈ 0.95 MB. Figure order (economic-inversion before
 nash/param-drift) matches your `main5_updated_1.pdf`.
 
-## Removed content (the only permitted content change)
+## Removed content (author-approved edits)
 
 | Item | Action | Reason |
 |---|---|---|
 | `00_game_of_trust.png` | excluded | borrowed third-party image (Nicky Case, *Evolution of Trust*); arXiv disallows |
 | its `\begin{figure}[H]…\end{figure}` float incl. `\caption` + `\label{fig:pd}` | deleted from `main.tex` | removes the float for the borrowed image |
+| broken `Figure~\ref{fig:pd} illustrates … Nicky Case's \textit{Evolution of Trust} interactive:` clause (main.tex ~line 419) | deleted, next word capitalized to "Mutual" | author-instructed fix of the dangling reference left by the figure removal |
 
-Prose untouched. The body still has `Figure~\ref{fig:pd}` (main.tex:420) →
-renders "??"; left for the author (`TODO.md`). Remaining figures auto-renumber
-to **1–6**.
+Remaining figures auto-renumber to **1–6**. After the second edit there is **no
+dangling reference and no "Figure ??"** in the output — the compile has zero
+undefined references. The surrounding payoff sentence ("Mutual cooperation
+provides a reward of +2…") stands on its own.
 
 ## Path/filename fixes (mechanical only)
 
