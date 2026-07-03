@@ -298,3 +298,140 @@ All six pass OOXML schema validation (element ordering for `m:dPr`, `m:rPr`, `m:
 - **¶48 (Results):** the safe past-tense map over-converted the infinitive in "inform an LLM what to **do**" to "what to **did**". Reverted to "what to do" (the verb "do" there is an infinitive, not a finite Results verb). The finite verbs in the same sentence ("inform→informed", "collapse→collapsed") were kept.
 - Noun/verb-ambiguous words (e.g. *causes, tests, reports, frames, calls, wins, reads, shows, makes, remains, spans*) were **excluded** from the automatic tense map to avoid mis-converting nouns; "three structural **causes**" was verified intact.
 - The per-seed value sets written in braces — e.g. `{-0.774, -0.608, …}` — are legitimate set notation, **not** leaked LaTeX, and were left untouched.
+
+---
+
+# Pass 2 — final mechanical formatting pass (`JEI_manuscript_FINAL.docx`)
+
+Working copy: `JEI_manuscript_FINAL.docx` (copied from `JEI_manuscript_WORKING.docx`, which is left untouched). Same rules as pass 1: every change below is mechanical — cross-reference numbers, verb form/voice only, or flag-only location markers. No scientific content was authored; no placeholder was filled. **32 edits this pass; 103 total across both passes.**
+
+| Group | Edits |
+|---|---|
+| Item 17 — Figure/table cross-references resolved (5) | 5 |
+| Items 17/36 — References to the never-carried-over policy-bounds table → flagged (4) | 4 |
+| Items 15/39 — Results past tense, finished (9) | 9 |
+| Items 24/40 — Methods active → passive, finished (11) | 11 |
+| Items 24/40 — Methods mid-sentence tense parallel (1) | 1 |
+| Mentor item — [TODO-DISCUSSION-LOOP] location markers (2, flag-only) | 2 |
+
+## Item 17 — Figure/table cross-references resolved (5)
+
+- **¶32** — _appositive names the target: "the final per-archetype economic ordering under Phase 3.1" = Table 1 caption_
+  - before: Table [#] previews the endpoint
+  - after:  Table 1 previews the endpoint
+- **¶34** — _Figure 1 caption: "Trust versus final stack in the LLM phases. (Left) Phase 3 …"_
+  - before: (Figure [#], left, Phase 3)
+  - after:  (Figure 1, left, Phase 3)
+- **¶46** — _Table 2 caption: "Behavioral fingerprints … VPIP = …; PFR = …"_
+  - before: (Table [#] reports per-archetype VPIP
+  - after:  (Table 2 reports per-archetype VPIP
+- **¶50** — _same trust–stack scatter figure; right panel = Phase 3.1 per Figure 1 caption_
+  - before: Figure [#] (introduced earlier)
+  - after:  Figure 1 (introduced earlier)
+- **¶50** — _"shown at the start of this section" = the Table 1 reference resolved at the Results opening_
+  - before: in Table [#], shown at the start
+  - after:  in Table 1, shown at the start
+
+## Items 17/36 — References to the never-carried-over policy-bounds table → flagged (4)
+
+- **¶96** — _target is the per-archetype policy-bounds table (LaTeX tab:bounds-comprehensive), absent from this docx_
+  - before: are given in Table [#].
+  - after:  are given in Table [TODO-XREF-TABLE: policy-bounds table was not carried into this document — rebuild it (counts toward the 8-item limit) or reword; see TODO item 36].
+- **¶112** — _target is the per-archetype policy-bounds table (LaTeX tab:bounds-comprehensive), absent from this docx_
+  - before: (see Table [#])
+  - after:  (see Table [TODO-XREF-TABLE: policy-bounds table was not carried into this document — rebuild it (counts toward the 8-item limit) or reword; see TODO item 36])
+- **¶123** — _target is the per-archetype policy-bounds table (LaTeX tab:bounds-comprehensive), absent from this docx_
+  - before: Table [#] gives the numerical policy
+  - after:  Table [TODO-XREF-TABLE: policy-bounds table was not carried into this document — rebuild it (counts toward the 8-item limit) or reword; see TODO item 36] gives the numerical policy
+- **¶127** — _target is the per-archetype policy-bounds table (LaTeX tab:bounds-comprehensive), absent from this docx_
+  - before: (see Table [#])
+  - after:  (see Table [TODO-XREF-TABLE: policy-bounds table was not carried into this document — rebuild it (counts toward the 8-item limit) or reword; see TODO item 36])
+
+## Items 15/39 — Results past tense, finished (9)
+
+- **¶32** — _finishes the parallel list whose other verbs (established/replaced/augmented) were converted in pass 1; can→could is sequence-of-tenses_
+  - before: tests whether numerical adaptation can soften it
+  - after:  tested whether numerical adaptation could soften it
+- **¶32** — _same parallel list_
+  - before: tests whether the bounds were the binding constraint
+  - after:  tested whether the bounds were the binding constraint
+- **¶35** — _specific hand #67 narration; lead-in already past_
+  - before: and calls every street of a 3-bet pot
+  - after:  and called every street of a 3-bet pot
+- **¶46** — _reported finding_
+  - before: three of the metrics move backward
+  - after:  three of the metrics moved backward
+- **¶52** — _specific hand #146 narration_
+  - before: calls a flop continuation bet
+  - after:  called a flop continuation bet
+- **¶52** — _specific hand #146 narration_
+  - before: reads Firestorm
+  - after:  read Firestorm
+- **¶52** — _specific hand #146 narration_
+  - before: places a value bet on the river
+  - after:  placed a value bet on the river
+- **¶52** — _specific hand #146 narration_
+  - before: and wins 32 chips
+  - after:  and won 32 chips
+- **¶52** — _observed fact about the recorded Phase 1–3 datasets_
+  - before: Canonical Wall never makes a river bet
+  - after:  Canonical Wall never made a river bet
+
+## Items 24/40 — Methods active → passive, finished (11)
+
+- **¶84** — _subject/verb inversion, part 1 of sentence_
+  - before: We use r between
+  - after:  r between
+- **¶84** — _part 2 of same sentence_
+  - before: its final stack to measure how
+  - after:  its final stack is used to measure how
+- **¶84** — _de-agentified relative clause_
+  - before: a value we call 
+  - after:  a value called 
+- **¶87** — _clean inversion inside the TODO-XREF sentence_
+  - before: we will revisit this belief-updating mechanism (including the noise floor and hand-forgetting) in detail.
+  - after:  this belief-updating mechanism (including the noise floor and hand-forgetting) will be revisited in detail.
+- **¶92** — _clean inversion_
+  - before: First we describe the common environment
+  - after:  First the common environment is described
+- **¶108** — _clean inversion_
+  - before: We characterize Equation 3 as
+  - after:  Equation 3 is characterized as
+- **¶112** — _two clean inversions_
+  - before: here we have chosen this simple form, and we report results under this definition throughout
+  - after:  here this simple form has been chosen, and results are reported under this definition throughout
+- **¶112** — _dummy-subject passive_
+  - before: in our limitations section we note that
+  - after:  in our limitations section it is noted that
+- **¶114** — _clean inversion_
+  - before: We discuss this issue explicitly in the discussion section
+  - after:  This issue is discussed explicitly in the discussion section
+- **¶119** — _de-agentified relative clause_
+  - before: (which we call 
+  - after:  (which is called 
+- **¶127** — _clean inversion of embedded question_
+  - before: can we achieve escape from the trap using
+  - after:  can escape from the trap be achieved using
+
+## Items 24/40 — Methods mid-sentence tense parallel (1)
+
+- **¶114** — _finishes the mid-sentence parallel: the second clause already reads "and all phases used the same eight archetypes"_
+  - before: All four phases use the same five random seeds
+  - after:  All four phases used the same five random seeds
+
+## Mentor item — [TODO-DISCUSSION-LOOP] location markers (2, flag-only)
+
+- **¶55** — _location marker only; opening Discussion paragraph is the hypothesis-verdict slot_
+  - before: The title to this research has been intentionally unsettling…
+  - after:  …+ [TODO-DISCUSSION-LOOP: mentor guidance — restate the Introduction hypothesis here at the top of the Discussion and state whether the results supported it (author’s words; see TODO_handwrite.md)]
+- **¶76** — _location marker only; concluding "We have presented…" paragraph_
+  - before: We have presented a controlled simulation study of trust dyn…
+  - after:  …+ [TODO-DISCUSSION-LOOP: mentor guidance — close the loop here: return to the stated hypothesis and give its final verdict alongside the ladder summary (author’s words; see TODO_handwrite.md)]
+
+## Deliberately NOT changed in pass 2
+
+- **¶32 "frames / reports / previews", ¶46 "Table 2 reports"** — document-navigation meta-text about the paper/table itself; conventionally present tense.
+- **¶38 "which reads its posterior"** — general description of the Predator mechanism (a design truth), allowed in present.
+- **¶85 "the action a we just observed", ¶92 "we close with a detailed description"** — the only two remaining first-person constructions in Methods; neither has a clean word-preserving passive, so they are left to the author (TODO item 24).
+- **¶76 "falls along the ladder" (Discussion)** — Discussion tense was never part of the mechanical scope; flagged as a [VERIFY] item since the author will edit this paragraph anyway for the hypothesis loop-closer.
+- **Title, subject terms, and all game-theory/poker framing** — untouched everywhere (see the Subject-integrity check in COMPLIANCE_REPORT.md).

@@ -1,34 +1,35 @@
-# COMPLIANCE_REPORT.md — JEI v7 (2025) checklist re-run
+# COMPLIANCE_REPORT.md — JEI v7 (2025) checklist, after pass 2
 
-**Manuscript:** `JEI_manuscript_WORKING.docx`
-**Pass type:** mechanical compliance only (no scientific content authored)
-**Schema validation:** ✅ PASSED (OOXML well-formed; all injected math validates)
-**Mechanical edits logged:** 71 (see `CHANGELOG.md`)
-**Author hand-edits still required:** see `TODO_handwrite.md`
+**Manuscript:** `JEI_manuscript_FINAL.docx` (pass-2 copy; `JEI_manuscript_WORKING.docx`
+from pass 1 is preserved unchanged)
+**Pass type:** mechanical compliance only — no scientific content authored, no
+placeholder filled with prose, no subject reframing
+**Schema validation:** ✅ PASSED (OOXML well-formed; all 6 native equations validate)
+**Mechanical edits logged:** 103 total (71 pass 1 + 32 pass 2) — see `CHANGELOG.md`
+**Author hand-edits remaining:** see `TODO_handwrite.md`
 
 Legend: **DONE** = applied mechanically · **PARTIAL** = mechanical part done,
 authorial part flagged · **TODO-AUTHOR** = needs your words/decision (placeholder
-or flag left) · **N/A** = already compliant, no action.
+or flag in place) · **N/A** = already compliant.
 
 ---
 
-## 1 · Formatting integrity (template conformance) — ✅ ALL PASS
+## 1 · Formatting integrity (re-verified after pass 2) — ✅ ALL PASS
 
 | Requirement | Spec | In file | Status |
 |---|---|---|---|
-| Font | Arial 11 pt | `rFonts=Arial`, `sz=22`; only Arial in body runs | ✅ |
+| Font | Arial 11 pt | default `Arial`/`sz 22`; only Arial in body runs | ✅ |
 | Line spacing | 1.5 | `w:line=360, lineRule=auto` | ✅ |
-| Margins | 1″ all sides | `top/right/bottom/left = 1440` | ✅ |
-| Page size | US Letter | `12240 × 15840` | ✅ |
+| Margins | 1″ all sides | 1440 DXA ×4 | ✅ |
+| Page size | US Letter | 12240 × 15840 | ✅ |
 | Line numbers | continuous, by 1 | `lnNumType countBy=1 restart=continuous` | ✅ |
-| Section order | Summary→Intro→Results→Discussion→Methods→Refs→Figs→Tables→Appendix | present in that order | ✅ |
-| Methods placement | after Discussion | confirmed (¶79, after Discussion ¶54–78) | ✅ |
-| Equations | native, not pasted images | 5 display + 1 inline OMML; 0 placeholders left | ✅ |
-| Leaked LaTeX | none | 0 backslash tokens, 0 `^`/math-`_`, 0 `[Equation]` | ✅ |
+| Section order | Summary→Intro→Results→Discussion→Methods→Refs→Figs→Tables→Appendix | confirmed (¶11/14/31/54/79/136/149/162/168) | ✅ |
+| Equations | native, not pasted | 5 display + 1 inline OMML; 0 placeholders | ✅ |
+| Cross-ref placeholders `[#]` | none unhandled | **0 remain** — 5 resolved, 4 converted to explicit flags | ✅ |
+| Leaked LaTeX / raw math text | none | 0 backslash tokens, 0 stray `^`/`_` | ✅ |
 
-> **Note:** I could not render the file to a paginated PDF in this environment
-> (LibreOffice is non-functional here), so page-count figures below are
-> word-count estimates — open in Word to confirm exact pagination.
+> Rendering to paginated PDF is still not possible in this environment
+> (LibreOffice broken), so page counts below are word-count estimates.
 
 ---
 
@@ -37,156 +38,157 @@ or flag left) · **N/A** = already compliant, no action.
 ### A. Submission blockers
 | # | Item | Status | Note |
 |---|---|---|---|
-| 1 | Senior (adult) author | **TODO-AUTHOR** | none on title page; must be added & submit |
-| 2 | Figure+table ≤ 8 | **PARTIAL** | removed borrowed Fig 1 → **10 → 9**; still **1 over** |
+| 1 | Senior (adult) author | **TODO-AUTHOR** | must be added, listed last, and submit |
+| 2 | Figures+tables ≤ 8 | **TODO-AUTHOR** | **9** (6 fig + 3 tbl), 1 over — before any boxes/bounds-table re-adds; merge candidate: Fig 6 + Table 3 (both TMA) |
 
 ### B. Title page
 | # | Item | Status | Note |
 |---|---|---|---|
-| 3 | Title ≤ 110 char | **TODO-AUTHOR** | currently **134**; option given in TODO |
-| 4 | Real affiliation | **TODO-AUTHOR** | "Independent research" not accepted |
-| 5 | Student-author line | **TODO-AUTHOR** | confirm "High School" placeholder |
-| 6 | KEYWORDS (3–5 single words) | **DONE / TODO-AUTHOR** | `[TODO-KEYWORDS]` ¶8; candidate words listed |
-| 7 | OVERVIEW blurb | **DONE / TODO-AUTHOR** | `[TODO-OVERVIEW]` ¶9 |
+| 3 | Title ≤ 110 char | **TODO-AUTHOR** | 134 now; trim must keep the game-theory subject explicit |
+| 4 | Real affiliation | **TODO-AUTHOR** | "Independent research" not accepted by JEI |
+| 5 | Student-author line | **TODO-AUTHOR** | confirm level |
+| 6 | KEYWORDS | **TODO-AUTHOR** | `[TODO-KEYWORDS]` ¶8 |
+| 7 | OVERVIEW | **TODO-AUTHOR** | `[TODO-OVERVIEW]` ¶9 |
 
 ### C. Summary
 | # | Item | Status | Note |
 |---|---|---|---|
-| 8 | "We hypothesized…" sentence | **DONE / TODO-AUTHOR** | `[TODO-HYPOTHESIS]` ¶12 |
-| 9 | `[VERIFY]` rhetorical questions | **TODO-AUTHOR** | stylistic |
+| 8 | "We hypothesized…" | **TODO-AUTHOR** | `[TODO-HYPOTHESIS]` ¶12 — part of the hypothesis spine |
+| 9 | `[VERIFY]` rhetorical opener | **TODO-AUTHOR** | stylistic |
 
 ### D. Introduction
 | # | Item | Status | Note |
 |---|---|---|---|
-| 10 | Closing paragraph (hyp+results+takeaways) | **DONE / TODO-AUTHOR** | `[TODO-INTRO-CLOSING]` ¶25 |
+| 10 | Closing paragraph | **TODO-AUTHOR** | `[TODO-INTRO-CLOSING]` ¶25 |
 | 11 | Hypothesis about science, not model | **TODO-AUTHOR** | guidance in TODO |
-| 12 | Background-merge seam transitions | **TODO-AUTHOR** | 3 seams quoted in TODO |
-| 13 | Bulleted list → prose | **DONE / TODO-AUTHOR** | `[TODO-LIST]` ¶21–24; 4 items quoted |
-| 14 | `[VERIFY]` Intro present tense | **TODO-AUTHOR** | general truths may stay present |
+| 12 | Background-merge transitions | **TODO-AUTHOR** | 3 seams |
+| 13 | List → prose | **TODO-AUTHOR** | `[TODO-LIST]` ¶20–24 |
+| 14 | `[VERIFY]` Intro tense | **TODO-AUTHOR** | |
 
 ### E. Results
 | # | Item | Status | Note |
 |---|---|---|---|
-| 15 | Past tense throughout | **DONE / TODO-AUTHOR** | **27** reporting verbs converted to past; **7** left as historical-present (Box 2 hand narration ¶52) or meta/general-truth (¶32 "frames", ¶35 "calls", ¶38 "reads") — author stylistic call |
-| 16 | Hand boxes (Box 1, Box 2) | **DONE / TODO-AUTHOR** | `[TODO-BOX]` ¶36, ¶53; rebuild as fig/table or cut |
-| 17 | Cross-refs `[#]` | **PARTIAL** | equations resolved (Eq 2–5); 9 fig/table `[#]` + 2 section `[TODO-XREF]` left |
-| 18 | `[VERIFY]` italic Phase subheaders | **N/A** | kept (allowed); confirm |
+| 15 | Past tense | **DONE** | 36 verbs converted across passes (27 + 9); 5 left deliberately present — all document-navigation meta-text (¶32 ×3, ¶46) or mechanism description (¶38) — noted for author confirmation |
+| 16 | Hand boxes | **TODO-AUTHOR** | `[TODO-BOX]` ¶36, ¶53 |
+| 17 | Cross-refs | **DONE / TODO-AUTHOR** | equations resolved pass 1; **5 figure/table refs resolved pass 2** (Table 1 ×2, Figure 1 ×2, Table 2); 2 section refs + 4 missing-table refs remain as explicit flags |
+| 18 | `[VERIFY]` italic Phase subheaders | **N/A** | kept (allowed) |
 
 ### F. Discussion
 | # | Item | Status | Note |
 |---|---|---|---|
-| 19 | Subsection-seam transitions | **TODO-AUTHOR** | 4 seams quoted in TODO |
-| 20 | Conclusion folded in | **TODO-AUTHOR** | review ¶76/¶78 read as conclusion |
-| 21 | `[VERIFY]` no overclaiming | **TODO-AUTHOR** | "support" not "prove" |
-| 22 | `[VERIFY]` limitations balance | **TODO-AUTHOR** | ¶72–75 |
+| 19 | Subsection-seam transitions | **TODO-AUTHOR** | 4 seams |
+| 20 | Conclusion folded in | **TODO-AUTHOR** | review ¶76–78 |
+| 21 | `[VERIFY]` no overclaiming | **TODO-AUTHOR** | |
+| 22 | `[VERIFY]` limitations balance | **TODO-AUTHOR** | |
+| — | **Mentor: hypothesis loop-closure** | **FLAGGED** | `[TODO-DISCUSSION-LOOP]` inserted at ¶55 (Discussion opening) and ¶76 (conclusion) — locations only, prose is the author's |
 
 ### G. Materials & Methods
 | # | Item | Status | Note |
 |---|---|---|---|
-| 23 | Methods after Discussion | **DONE** | confirmed |
-| 24 | Active → passive voice | **PARTIAL** | 6 sentences inverted; rest is an authorial sweep |
-| 25 | Equations entered natively | **DONE** | 5 display + 1 inline OMML |
-| 26 | Pasted/Unicode symbols re-entered | **DONE** | rₜₚ, Phase 2*, Δ, ♠♥♦♣, L₁, log₂, x̄/ȳ, Tᵪᵣᵢₜ, xᵢ/yᵢ, $-escapes |
-| 27 | Math primer moved to Methods | **DONE** | structural; confirm placement |
+| 23 | Methods after Discussion | **DONE** | |
+| 24 | Active → passive | **DONE / TODO-AUTHOR** | **18 sentences converted** (6 pass 1 + 12 pass 2); only 2 first-person constructions remain (¶85, ¶92 — no word-preserving passive exists; author to reword) |
+| 25 | Native equations | **DONE** | 6 OMML objects |
+| 26 | Symbols re-entered | **DONE** | |
+| 27 | Math primer placement | **DONE** | confirm |
 | 28 | `[VERIFY]` archetypes read as prose | **TODO-AUTHOR** | |
-| 29 | Code citation (GitHub, no Drive) | **N/A / TODO-AUTHOR** | repo cited; confirm method |
-| 30 | `[VERIFY]` software versions | **TODO-AUTHOR** | add library versions |
+| 29 | Code citation | **N/A / TODO-AUTHOR** | GitHub repo cited; confirm |
+| 30 | `[VERIFY]` software versions | **TODO-AUTHOR** | |
 
 ### H. Footnotes
 | # | Item | Status | Note |
 |---|---|---|---|
-| 31 | 16 footnotes removed | **DONE / TODO-AUTHOR** | removed; integrate-or-drop each (list in TODO) |
+| 31 | 16 footnotes removed | **DONE / TODO-AUTHOR** | integrate-or-drop each |
 
 ### I. References
 | # | Item | Status | Note |
 |---|---|---|---|
-| 32 | DOIs / `https://` links | **TODO-AUTHOR** | none in source; cannot fabricate |
+| 32 | DOIs / links | **TODO-AUTHOR** | none supplied anywhere → none inserted (fabrication forbidden); MLA-8 mechanics re-verified: numbered by citation order, "et al." for 3+, journal/book titles italicized (12 italic runs across 12 refs), no hanging indent |
 | 33 | `[VERIFY]` MLA-8 title case | **TODO-AUTHOR** | |
 
 ### J. Figures & tables
 | # | Item | Status | Note |
 |---|---|---|---|
-| 34 | Borrowed Figure 1 removed | **DONE** | image+caption deleted; Figs 2–7 → 1–6; in-text ref flagged |
-| 35 | `[VERIFY]` caption completeness | **TODO-AUTHOR** | title/shown/methods/stats/seeds |
-| 36 | Tables as Word tables | **DONE / TODO-AUTHOR** | 3 native tables present; 2 Methods tables not rebuilt |
-| 37 | Multi-panel single file | **N/A** | already single combined images |
+| 34 | Borrowed Figure 1 removed | **DONE** | pass 1 |
+| 35 | `[VERIFY]` caption completeness | **TODO-AUTHOR** | |
+| 36 | Tables as Word tables | **DONE / TODO-AUTHOR** | 3 native tables; policy-bounds table absent — now explicitly marked by 4 `[TODO-XREF-TABLE]` flags (¶96/112/123/127) so the decision can't be missed |
+| 37 | Multi-panel single file | **N/A** | |
 
 ### K. Global prose-policy scan
 | # | Item | Status | Note |
 |---|---|---|---|
-| 38 | First-person singular | **N/A** | none ("we/our" only) |
-| 39 | Present-tense reporting | **DONE / TODO-AUTHOR** | Results converted (item 15); 7 historical-present verbs flagged |
-| 40 | Active voice in Methods | **PARTIAL** | see item 24 |
-| 41 | Lists in main text | **DONE / TODO-AUTHOR** | flagged (item 13) |
-| 42 | Direct quotations | **TODO-AUTHOR** | 21 scare-quote sets — confirm none verbatim |
-| 43 | Pasted/Unicode symbols | **DONE** | see item 26 |
+| 38 | First-person singular | **N/A** | none |
+| 39 | Present-tense reporting | **DONE** | see item 15; Discussion "falls along the ladder" (¶76) newly flagged `[VERIFY]` |
+| 40 | Active voice in Methods | **DONE / TODO-AUTHOR** | see item 24 |
+| 41 | Lists in main text | **TODO-AUTHOR** | item 13 |
+| 42 | Direct quotations | **TODO-AUTHOR** | scare-quotes confirmed own-terms; final check is author's |
+| 43 | Symbols | **DONE** | |
 
 ### L. Length
 | # | Item | Status | Note |
 |---|---|---|---|
-| 44 | 10-page limit (Intro→Methods) | **TODO-AUTHOR** | **over** — see §4 |
+| 44 | 10-page limit | **TODO-AUTHOR** | ≈ 8,600 main-text words ≈ 18–20 pages at the mandated format — substantial trim required |
 
 ---
 
 ## 3 · Figure + table count
 
-| | Count | Limit | Status |
-|---|---|---|---|
-| Figures | 6 (Fig 1–6) | — | |
-| Tables | 3 (Table 1–3) | — | |
-| **Combined** | **9** | **8** | ❌ **1 over** |
-
-Removing the borrowed Figure 1 brought this from 10 to 9. One more must go;
-Box 1/Box 2 and the two un-rebuilt Methods tables are **not** in this count yet.
-Easiest single cut: merge Fig 6 and Table 3 (both are TMA-per-archetype). See
-`TODO_handwrite.md` Part 4.
+**9 combined (6 figures + 3 tables) vs. limit 8 — ❌ 1 over.** Not counting:
+Box 1, Box 2 (item 16) and the policy-bounds + primer tables (item 36), each of
+which would add one if rebuilt. No data figure or results table was deleted in
+this pass — the cut/merge is the author's choice (inventory in
+`TODO_handwrite.md` Part 4).
 
 ## 4 · Page length vs the 10-page limit
 
-Rendering to exact pages was not possible here (no working renderer), so this is
-a **word-count estimate**:
+Word-count estimate (no renderer available): Summary 184 · Introduction ~1,650 ·
+Results ~1,590 · Discussion ~2,700 (slightly up: two flag markers) · Methods
+~2,570 → **main text ≈ 8,600 words ≈ 18–20 formatted pages**, roughly double the
+limit. ❌ Trimming is author content work.
 
-| Section | Words |
-|---|---|
-| Summary | 184 |
-| Introduction | 1,653 |
-| Results | 1,575 |
-| Discussion | 2,605 |
-| Materials & Methods | 2,566 |
-| **Main text (Intro→Methods, the limited span)** | **≈ 8,580** |
-| References + figures + tables + appendix | 681 |
-| **Whole document** | **≈ 9,300** |
+## 5 · Subject-integrity check
 
-At the mandated Arial 11 / 1.5 spacing / 1″ margins, ≈8,580 words of main text is
-roughly **18–20 text pages** — well over the 10-page limit (the source ran ~13
-two-column journal pages, so the single-column JEI reflow is expected to be
-longer). **Substantial trimming is required**, and that is content work reserved
-for the author. ❌ over limit.
+This manuscript is, and after both formatting passes plainly remains, a
+**game-theoretic multi-agent simulation study**: eight rule-based/LLM agents
+playing 8-player Limit Texas Hold'em while maintaining Bayesian posteriors over
+each other's strategy archetypes, evaluated by a trust–profit correlation.
 
----
+- The **title** still names the subject exactly: *"Trust Dynamics in Multi-Agent
+  Strategic Interaction: A Simulation Study of Bayesian Reputation Systems in
+  8-Player Limit Texas Hold'em."* No edit in either pass touched the title.
+- The **Methods** still state the game-theoretic framing explicitly (e.g., ¶96:
+  the eight archetypes "span the axes identified by Game Theory and Behavioral
+  Economics as 'load bearing'"; the fixed-limit Hold'em environment; the
+  Bayesian belief-update equations). No terminology was softened, renamed, or
+  relabeled anywhere in the manuscript.
+- **No edit in this pass concealed, hedged, or reframed the subject** to improve
+  perceived scope fit for any venue. Every pass-2 edit is enumerated in
+  `CHANGELOG.md`; all 32 are cross-reference numbers, verb form/voice changes,
+  or bracketed flag markers. Zero edits touch subject-describing nouns.
+- No instruction encountered during this pass required subject softening, so
+  nothing was flagged under constraint 2.
 
-## 5 · Additional findings (beyond the 44-item list)
+This note is a transparency record for the author, not a scope claim: whether
+the paper fits a given venue's scope is an editorial question for that venue;
+the manuscript itself does not disguise what it studies.
 
-- **Acknowledgments section absent.** JEI's mandatory order includes an
-  *Acknowledgments* section between Materials & Methods and References; the
-  manuscript goes straight from Methods to References. → Add a brief
-  Acknowledgments section (or confirm intentional omission). *Not auto-added —
-  it is authored content.*
-- **Stray leaked list directive removed.** A bold list item reading `sep2pt`
-  (a `\setlist{itemsep=2pt}`-type remnant) sat between the list lead-in and the
-  first item; deleted as mechanical cleanup (logged).
-- **Infinitive over-conversion caught & reverted.** The past-tense map had
-  turned "what to **do**" into "what to **did**" (¶48); reverted, since "do"
-  there is an infinitive, not a Results verb.
+## 6 · Validation summary
 
----
+- ✅ Schema validation PASSED after all edits (332 paragraphs).
+- ✅ Formatting integrity intact (§1 table).
+- ✅ 0 unhandled `[#]`; all 16 bracketed markers map to a `TODO_handwrite.md` item:
+  KEYWORDS 1 · OVERVIEW 1 · HYPOTHESIS 1 · INTRO-CLOSING 1 · DISCUSSION-LOOP 2 ·
+  LIST 1 · BOX 2 · XREF 2 · XREF-TABLE 4 · FIG1-REMOVED 1.
+- ✅ No `[TODO-…]` placeholder was filled with authored prose — all 10 remaining
+  required-content slots still carry their markers.
+- ✅ All 32 pass-2 before→after pairs verified present-exactly-once in the
+  document; zero lingering first-person in the converted spots.
 
-## 6 · Bottom line
+## 7 · Bottom line
 
-Mechanical compliance is **complete and schema-valid**: template formatting,
-native equations, symbol rendering, tense in Results, the six passive-voice
-Methods edits, figure renumbering, and every required placeholder are in place,
-with all 71 changes logged. **The manuscript is not yet submission-ready** — it
-remains blocked on author-only work: a senior author, the title length, the
-≤8 figure/table cut, the ~2× length overage, and the prose/decision items in
-`TODO_handwrite.md`. None of those were touched, by policy.
+Mechanical JEI conformance is **complete**: everything a formatting pass may
+legitimately do has been done and logged (103 edits). The manuscript is **not
+yet submission-ready** — it is blocked on author-only work: senior author, the
+≤8 figure/table cut, the title trim, the ~2× length overage, the hypothesis
+spine (Summary → Intro closing → Discussion loop-closure, per mentor guidance),
+and the placeholder/prose items in `TODO_handwrite.md`. None of those were
+touched, by policy.

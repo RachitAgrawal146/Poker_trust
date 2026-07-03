@@ -1,226 +1,186 @@
-# TODO_handwrite.md — author hand-edit punch list
+# TODO_handwrite.md — author hand-edit punch list (after pass 2)
 
-The mechanical pass (`CHANGELOG.md`) is done. Everything below needs **your
-words** or **your decision** — none of it could be done mechanically without
-authoring scientific content, which the JEI AI policy forbids me from doing.
+Two mechanical passes are complete (`CHANGELOG.md` has all 103 logged edits).
+`JEI_manuscript_FINAL.docx` is now mechanically finished: all resolvable
+cross-references are filled in, Results tense and Methods voice conversions are
+done except where your words are required, and every remaining gap is a
+`Ctrl-F`-able bracketed marker. Everything below needs **your words or your
+decision** — none of it could be done without authoring scientific content,
+which the JEI AI policy forbids.
 
-Every spot that needs new words has a **bracketed marker in
-`JEI_manuscript_WORKING.docx`** so you can `Ctrl-F` to it:
+| Marker in the docx | Count | Meaning |
+|---|---|---|
+| `[TODO-KEYWORDS]` `[TODO-OVERVIEW]` `[TODO-HYPOTHESIS]` `[TODO-INTRO-CLOSING]` | 4 | required element missing — write it |
+| `[TODO-DISCUSSION-LOOP]` | 2 | **new (mentor guidance)** — where the Discussion must return to the hypothesis |
+| `[TODO-LIST]` | 1 | forbidden bulleted list to rewrite as prose |
+| `[TODO-BOX]` | 2 | hand-transcript boxes — rebuild as end figure/table or cut |
+| `[TODO-XREF]` | 2 | section cross-refs whose numbering JEI removed — reword |
+| `[TODO-XREF-TABLE]` | 4 | refs to the **policy-bounds table that is not in this docx** — rebuild it or reword |
+| `[FIG1-REMOVED]` | 1 | sentence that referred to the deleted PD figure |
 
-| Marker | Meaning |
-|---|---|
-| `[TODO-KEYWORDS]` `[TODO-OVERVIEW]` `[TODO-HYPOTHESIS]` `[TODO-INTRO-CLOSING]` | empty/missing required element — write it |
-| `[TODO-LIST]` | a forbidden list to rewrite as prose |
-| `[TODO-BOX]` | a hand-transcript box to rebuild as a figure/table or cut |
-| `[TODO-XREF]` | a section cross-reference that JEI numbering dropped |
-| `[FIG1-REMOVED]` | a sentence that referred to the deleted Figure 1 |
-| `[#]` | a figure/table/equation number to fill once you finalize the set |
-
-Work top to bottom; Part 1 are submission blockers.
-
----
-
-## PART 1 — SUBMISSION BLOCKERS (JEI returns the manuscript without these)
-
-**1 · Senior (adult) author — MISSING.** (fix-list item 1) The title page lists
-only **Rachit Agrawal**. JEI requires a senior/adult author listed **last**, and
-that adult must submit through Editorial Manager. → Add your mentor/PI with a
-real affiliation; do not submit from a student account.
-
-**2 · Figure + table count is 9; limit is 8.** (items 2, 34) I removed the
-borrowed Figure 1 (Nicky Case screenshot), so you are down from 10 to **9**
-(6 figures + 3 tables). You must drop **one more**, and remember the two
-hand boxes (item 16) and two Methods tables (item 36) are *not* counted yet.
-See the inventory in **Part 4**.
-
-**3 · Title is 134 characters; limit is 110.** (item 3) Current:
-> "Trust Dynamics in Multi-Agent Strategic Interaction: A Simulation Study of
-> Bayesian Reputation Systems in 8-Player Limit Texas Hold'em"
-
-→ Cut ~24 characters. A compliant option (96 ch) you may adapt:
-*"Trust Dynamics in Multi-Agent Strategic Interaction: A Bayesian Reputation
-Study in Limit Hold'em."* (Wording is yours.)
+Work top to bottom; Part 1 items are submission blockers.
 
 ---
 
-## PART 2 — FILL THE PLACEHOLDERS (each has a marker in the docx)
+## PART 1 — SUBMISSION BLOCKERS
 
-**6 · KEYWORDS** — `[TODO-KEYWORDS]`, ¶8. Supply **3–5 keywords, each a single
-standalone word** (no phrases). Drawn from your own text, you might pick from:
-*trust, reputation, poker, Bayesian, agents, simulation.*
+**1 · Senior (adult) author — MISSING.** (fix-list item 1) Title page lists only
+Rachit Agrawal. JEI requires a senior/adult author listed **last**, and that
+adult must submit through Editorial Manager.
 
-**7 · OVERVIEW** — `[TODO-OVERVIEW]`, ¶9. A 2–3 sentence plain-language blurb
-(the website summary).
+**2 · Figure + table count is 9; limit is 8.** (items 2, 34, 36) Currently
+6 figures + 3 tables. You must cut/merge at least one — and the two hand
+boxes (item 16) and the policy-bounds table (item 36, now referenced by four
+`[TODO-XREF-TABLE]` markers) would **add** to the count if rebuilt. Inventory in
+Part 4. Easiest single move: merge Figure 6 and Table 3 (both are TMA-per-archetype).
 
-**8 · Hypothesis in the Summary** — `[TODO-HYPOTHESIS]`, ¶12. Add one explicit
-*"We hypothesized…"* sentence. Frame it about the **science** (whether
-observation-based reputation rewards exploitation), not about the model
-"working" (item 11).
-
-**10/11 · Closing Introduction paragraph** — `[TODO-INTRO-CLOSING]`, ¶25. JEI
-requires the final Intro paragraph to state (a) the hypothesis, (b) the major
-results (the −0.752 → −0.094 ladder), and (c) 1–2 key takeaways. The Intro
-currently ends on the question *"…does the cost of being trusting depend on the
-trust system or on the agents inside it?"* — add the closing paragraph after it.
-
-**13 · Bulleted list → prose** — `[TODO-LIST]`, ¶21–24. JEI forbids lists in the
-main text. The "four lines of previous research" (lead-in ¶20) are currently
-four list items — rewrite as a running paragraph **in your own words**:
-1. (¶21) "The experimental economic literature on reputation systems in the
-   Internet age: … the cost of transparency."
-2. (¶22) "Computational studies on cooperation in repeated games — including the
-   Prisoner's Dilemma to Axelrod's tournaments."
-3. (¶23) "Bayesians use in modeling poker opponents — the inference mechanism we
-   adopted."
-4. (¶24) "The still-open question of whether large language models can reason
-   strategically, or only mimic strategy."
-
-**16 · Hand-transcript boxes** — `[TODO-BOX]`, ¶36 (Box 1) and ¶53 (Box 2).
-Each was a multi-line action table that can't sit in JEI body text. The lead-in
-sentences are kept:
-- ¶35: *"The mechanism was also visible in a single representative hand…"* → Box 1
-- ¶52: *"The mechanism underlying these values was best shown in a single hand.
-  Box 2 reproduced Phase 3.1 hand #146: Wall, holding K♥ Q♥…"* → Box 2
-
-→ For each: rebuild as a **Word figure/table at the end** (counts toward the
-8-item limit — see Part 4) **or cut it** and fold the key line into the prose.
-
-**17 · Cross-references `[#]`** — fill the number once your figure/table set is
-final. Equation refs were already resolved (now read "Equation 2/3/…"). The
-**9 remaining `[#]`** are:
-
-| ¶ | Context |
-|---|---|
-| 32 | "…illustrative hands. **Table [#]** previews the endpoint…" |
-| 34 | "…personality-only role-play (**Figure [#]**, left, Phase 3)…" |
-| 46 | "…relative to Phases 1 and 2 (**Table [#]** reports per-archetype VPIP…)" |
-| 50 | "…The right panel of **Figure [#]** (introduced earlier)…" |
-| 50 | "…economic ordering was in **Table [#]**, shown at the start…" |
-| 96 | "…the eight types — are given in **Table [#]**." |
-| 112 | "…that of Sentinel (see **Table [#]**)…" |
-| 123 | "…is described in turn; **Table [#]** gives the numerical policy…" |
-| 127 | "…canonical parameters (see **Table [#]**)…" |
-
-**17 (section refs) · `[TODO-XREF]`** — ¶87 and ¶88 referred to a numbered
-*Section* ("…we will revisit this in Section [#]…", "…its definition is deferred
-to Section [#]…"). JEI manuscripts have no section numbers. → Reword to a named
-pointer ("…later in the Materials & Methods…") or delete the cross-reference.
-
-**(Figure-1 fallout) · `[FIG1-REMOVED]`** — ¶27, inside the Prisoner's-Dilemma
-background sentence. It read "…Figure [#] illustrates these four possible
-outcomes." With Figure 1 gone, rewrite the clause to describe the four PD
-payoffs in words, or delete the dependent clause.
+**3 · Title is 134 characters; limit is 110.** (item 3) Shorten by ~24
+characters — wording is yours. *(Do not soften the subject: the title's
+game-theory/poker framing is accurate and should survive the trim.)*
 
 ---
 
-## PART 3 — PROSE DECISIONS (no marker — review and revise in place)
+## PART 2 — THE HYPOTHESIS SPINE (mentor guidance: make the paper hypothesis-central)
 
-**4 · Affiliation** "Independent research, 2025–2026" (¶3) → replace with a real
-institution (your school: Department/School, City, State, Country).
-**5 · "Student Authors" line** "Rachit Agrawal, High School" (¶6) → confirm
-school level; the student must also be a first author.
+These four markers form one thread — write them as a set so they agree:
 
-**12 · Background-merge seams (Introduction).** The former Background subsections
-(2.1–2.4) are now consecutive paragraphs ¶26–30 with no subheadings; the joins
-may read abruptly. Add a transition sentence at each seam:
-- ¶26 → ¶27 seam: *"…conducted by Resnick…"* **|** *"Second, there is a
-  substantial amount of computational research concerning cooperation…"*
-- ¶28 → ¶29 seam: *"…Nowak developed his five rules…"* **|** *"Third, there is
-  Bayesian opponent modeling in poker. Initially this included Billings et
-  al.'s Loki…"*
-- ¶29 → ¶30 seam: *"…the inference mechanism we adopted."* **|** *"Finally, we
-  treat this last point as it relates to two of our phases…"*
+**8 · `[TODO-HYPOTHESIS]` (Summary, ¶12).** One explicit *"We hypothesized…"*
+sentence. Frame it around the strategic-trust science (e.g., whether
+observation-based reputation rewards exploitation) — **not** "our simulation
+works" (item 11).
 
-**19 · Discussion-subsection seams.** The former §5.1–5.4 are concatenated
-(¶55–78), no subheadings. Smooth these joins:
-- ¶59 → ¶60: *"…why this trap is so stable."* **|** *"The next three phases of
-  the experiment narrow the space of possible explanations…"*
-- ¶63 → ¶64: *"…trap behavior is a robust property…"* **|** *"The Phase 3.1
-  result is consistent with an interpretation in which agent reasoning…"*
-- ¶67 → ¶68: *"…meta-cognitive rather than informational…"* **|** *"These
-  mechanisms suggest hypotheses for real-world reputation systems…"*
-- ¶71 → ¶72: *"…the paper's central qualitative result…"* **|** *"Three clusters
-  of limitations remain after the revisions above."*
+**10/11 · `[TODO-INTRO-CLOSING]` (end of Introduction, ¶25).** Closing paragraph
+stating (a) the hypothesis, (b) the major results (the −0.752 → −0.094 ladder),
+(c) 1–2 takeaways.
 
-**20 · Conclusion folded into Discussion.** JEI has no separate Conclusion. Your
-former §6 now ends the Discussion at ¶76 (*"We have presented a controlled
-simulation study…"*). Confirm it reads as a concluding paragraph that briefly
-summarizes results and impact (¶78, *"Why should anyone care outside of
-cards?…"*, currently closes it).
+**NEW · `[TODO-DISCUSSION-LOOP]` ×2 (Discussion).** Close the loop on the
+hypothesis:
+- **¶55 (Discussion opening paragraph** — "The title to this research has been
+  intentionally unsettling…"**):** restate the Introduction hypothesis and state
+  plainly whether the results supported it.
+- **¶76 (concluding paragraph** — "We have presented a controlled simulation
+  study…"**):** the final verdict on the hypothesis alongside the ladder summary.
 
-**24 · Methods passive voice (remaining).** Six sentences were already inverted
-to passive (see CHANGELOG item 24). The rest of Materials & Methods (¶79–135)
-is still mostly active voice ("We use…", "We construct…", "We characterize…").
-JEI wants **passive voice in Methods only**. → Convert the remaining
-"We <verb>…" sentences (e.g. "We use 8-player fixed-limit…" → "An 8-player
-fixed-limit game was used…"). This is a large, meaning-preserving but
-authorial sweep, so it is left to you.
+Location markers only — the sentences are yours. While editing ¶76, also decide
+the tense of "the Pearson correlation … **falls** along the ladder" (see
+`[VERIFY]` list below).
 
-**31 · 16 footnote definitions were removed.** JEI uses no footnotes. For each,
-decide: (a) fold the definition into the sentence as a clause, or (b) drop it
-(standard scientific terms need no definition). **Any definition taken from an
-external source must be paraphrased.** Removed definitions:
-bluff / value bet / fold equity; side pot; TEI; CS; OA; NS; walkover; hand rank;
-3-bet / 4-bet; L₁ distance; VPIP; PFR; AF; SU; continuation bet (c-bet); tell.
+---
 
-**32 · Reference DOIs/URLs.** JEI requires an `https://` link for any reference
-with a DOI/weblink. The source had none. → Look up and append the DOI URL for
-each of the 12 references.
+## PART 3 — FILL THE REMAINING PLACEHOLDERS
 
-**44 · Length.** JEI's 10-page limit covers Introduction → end of Materials &
-Methods. The current main text is **≈8,580 words** (Intro 1,650 / Results 1,575
-/ Discussion 2,605 / Methods 2,565) which at the required Arial 11 / 1.5
-spacing is well over 10 pages (rough estimate **~18–20 text pages** before
-figures, tables, and references — render to confirm). → Substantial trimming is
-required; this is content work only you can do.
+**6 · `[TODO-KEYWORDS]` (¶8).** 3–5 keywords, each a single standalone word.
+Candidates from your own text: *trust, reputation, poker, Bayesian, agents,
+simulation.*
 
-### `[VERIFY]` proofreading flags (quick author confirmations)
-- **9** — Summary opens with rhetorical questions ("What if being trustworthy
-  cost you something?"). JEI summaries are declarative — keep or reword.
-- **14** — Introduction present tense: general truths ("Trust is…") may stay
-  present, but any "what we did/found" must be past.
-- **15 (residual)** — 27 Results reporting verbs were converted to past tense.
-  **7** were intentionally left and are yours to confirm: ¶32 "frames" (paper
-  roadmap), ¶35 "calls every street" and ¶38 "reads its posterior" (general
-  archetype behavior), and the four verbs in the Box 2 hand replay (¶52:
-  "calls… reads… wins 32 chips… makes a river bet") — historical present. Convert
-  to past if you want strict JEI past tense, or keep as deliberate present.
-- **18** — Italic Phase 1…Phase 3.1 subheaders in Results were kept (allowed) —
-  confirm you want them.
-- **21** — Scan Discussion for causal overstatement (data *support*, not *prove*).
-- **22** — Confirm Limitations (¶72–75) don't dominate the Discussion.
-- **28** — Confirm the eight archetype descriptions (Methods) read as prose, not
-  a disguised list.
-- **30** — Add software/version specifics (hand evaluator, NumPy, Anthropic SDK
-  version) — the simulation analogue of "company + catalog number."
-- **33** — Skim references for MLA-8 title-case consistency.
-- **35** — Confirm each figure caption has: title, what's shown, methods,
-  statistics/values, and the seed count (n = 5); verify the bold-title boundary.
-- **42** — 21 sets of double quotes are scare-quotes on your own terms (allowed);
-  confirm none are verbatim external quotations (JEI forbids direct quotes).
+**7 · `[TODO-OVERVIEW]` (¶9).** 2–3 sentence plain-language blurb (website summary).
+
+**13 · `[TODO-LIST]` (¶20–24).** The "four lines of previous research" bulleted
+list must become running prose in your words (JEI forbids main-text lists).
+
+**16 · `[TODO-BOX]` ×2 (¶36, ¶53).** Hand-transcript boxes (hand #67, hand #146):
+rebuild each as a Word figure/table at the end (counts toward the 8-item limit)
+or cut it and fold the key line into the prose.
+
+**17 · `[TODO-XREF]` ×2 (¶87, ¶88).** Former "Section N" cross-refs; JEI has no
+section numbers. Reword to a named pointer ("later in the Materials & Methods")
+or delete the clause.
+
+**36 · `[TODO-XREF-TABLE]` ×4 (¶96, ¶112, ¶123, ¶127).** All four point at the
+**per-archetype policy-bounds table**, which was never carried into this
+document. Decide once: (a) rebuild it as a Word table at the end — it then takes
+a number, counts toward the 8-item limit, and you replace all four markers with
+"Table N"; or (b) reword the four sentences to not cite a table. This is the
+single highest-leverage remaining decision because it interacts with blocker 2.
+
+**(Figure-1 fallout) · `[FIG1-REMOVED]` (¶27).** The Prisoner's-Dilemma sentence
+that referenced the removed borrowed figure — rewrite the clause to describe the
+four PD payoffs in words, or delete it.
+
+**Resolved for you in pass 2 (no action):** the five formerly-broken
+figure/table numbers now read **Table 1** (×2, ¶32/¶50), **Figure 1** (×2,
+¶34/¶50), **Table 2** (¶46). ⚠️ If you add, cut, or merge any figure/table while
+fixing blocker 2, **re-check these five numbers** — they are correct only for
+the current 6-figure/3-table set.
 
 ---
 
 ## PART 4 — FIGURE + TABLE INVENTORY (must end at ≤ 8)
 
-Currently **9** (over by 1), before re-adding any boxes/Methods tables:
+Currently **9** (over by 1), before re-adding any boxes or the bounds table:
 
-| # | Item | Keep? |
+| # | Item | Notes |
 |---|---|---|
-| Fig 1 | Trust vs. final stack (LLM phases) | |
+| Fig 1 | Trust vs. final stack (LLM phases) | referenced ¶34, ¶50 |
 | Fig 2 | Bounded vs. unbounded hill-climbing per seed | |
 | Fig 3 | Economic ordering inversion P3 → P3.1 | |
 | Fig 4 | Population dispersal in parameter space | |
 | Fig 5 | Per-archetype preflop bluff-rate drift | |
-| Fig 6 | Trust Manipulation Awareness per archetype | |
-| Table 1 | Phase 3.1 economic outcomes by archetype | |
-| Table 2 | Behavioral fingerprints, P1 vs P3.1 | |
-| Table 3 | Trust Manipulation Awareness per archetype | |
-| (Box 1) | Hand #67 transcript — *not counted yet* (item 16) | |
-| (Box 2) | Hand #146 transcript — *not counted yet* (item 16) | |
-| (Methods) | Policy-bounds table — *not rebuilt* (item 36) | |
-| (Methods) | Limit-Hold'em primer table — *not rebuilt* (item 36) | |
+| Fig 6 | TMA per archetype | overlaps Table 3 |
+| Table 1 | Phase 3.1 economic outcomes | referenced ¶32, ¶50 |
+| Table 2 | Behavioral fingerprints P1 vs P3.1 | referenced ¶46 |
+| Table 3 | TMA per archetype | overlaps Fig 6 |
+| (Box 1, Box 2) | hand transcripts — not counted yet (item 16) | |
+| (bounds table) | not rebuilt — 4 markers point at it (item 36) | |
+| (primer table) | limit-Hold'em primer — not rebuilt (item 36) | |
 
-→ Decide the final ≤ 8. Note Fig 6 and Table 3 both present TMA — merging them
-is one easy way to get under the limit. Re-number figures/tables and fill every
-`[#]` (Part 2, item 17) once the set is locked.
+---
+
+## PART 5 — PROSE DECISIONS (no marker — review in place)
+
+**4 · Affiliation** "Independent research, 2025–2026" (¶3) → JEI requires a real
+institution (your school: Department/School, City, State, Country).
+**5 · "Student Authors" line** (¶6) → confirm school level; student must be a
+first author.
+
+**12 · Background-merge seams (Introduction, ¶26–30).** Three joins need your
+transition sentences (seam quotes in the pass-1 version of this file):
+¶26→¶27 (Resnick → "Second, there is…"), ¶28→¶29 (Nowak → "Third, there is
+Bayesian opponent modeling…"), ¶29→¶30 ("…we adopted." → "Finally…").
+
+**19 · Discussion-subsection seams (¶55–78).** Four joins: ¶59→¶60, ¶63→¶64,
+¶67→¶68, ¶71→¶72.
+
+**20 · Conclusion folded into Discussion.** Confirm ¶76–78 read as a conclusion
+(you will already be editing ¶76 for the loop-closer).
+
+**24 · Methods voice — 2 sentences remain.** Pass 2 converted every cleanly
+invertible first-person sentence (18 total across both passes). Two have no
+word-preserving passive and need your rewording:
+- ¶85: "…a likelihood P(a|t) that a type-t opponent would have taken the action
+  a **we just observed**…"
+- ¶92: "…the metrics; **we close with** a detailed description of the four agent
+  implementations, one per phase."
+Also note the Methods still contains agentless present-tense system description
+("Every agent uses a hill climber…") — JEI convention is past+passive for what
+you did, but present for how the system works is defensible; your call.
+
+**31 · 16 removed footnote definitions.** Integrate as clauses or drop
+(paraphrase anything externally sourced): bluff/value bet/fold equity; side pot;
+TEI; CS; OA; NS; walkover; hand rank; 3-bet/4-bet; L₁ distance; VPIP; PFR; AF;
+SU; continuation bet; tell.
+
+**32 · Reference DOIs.** Look up and append the `https://doi.org/...` link for
+each of the 12 references (none existed in the source; none were fabricated).
+
+**44 · Length.** Main text ≈ 8,600 words ≈ 18–20 pages at Arial 11 / 1.5 — the
+JEI limit is 10 pages (Intro → end of Methods). Substantial trimming required;
+content work only you can do.
+
+### `[VERIFY]` proofreading flags
+- **9** — Summary opens with rhetorical questions; JEI summaries are declarative.
+- **14** — Intro present tense: general truths fine; "what we did/found" must be past.
+- **15 (residual)** — deliberately left present: ¶32 "frames/reports/previews"
+  and ¶46 "Table 2 reports" (document-navigation meta-text), ¶38 "reads its
+  posterior" (mechanism description). Convert only if you want strict past
+  throughout. **New:** ¶76 "the Pearson correlation … **falls** along the
+  ladder" (Discussion) — decide while writing the loop-closer there.
+- **18** — italic Phase 1…3.1 subheaders in Results kept (allowed).
+- **21** — Discussion: data *support*, never *prove*.
+- **22** — Limitations (¶72–75) shouldn't dominate the Discussion.
+- **28** — archetype descriptions (Methods) must read as prose, not a disguised list.
+- **30** — add software/library versions (hand evaluator, NumPy, Anthropic SDK).
+- **33** — MLA-8 title-case consistency across references.
+- **35** — every figure caption: title, what's shown, methods, stats, n = 5 seeds.
+- **42** — 21 scare-quote pairs are your own terms (allowed); confirm none are
+  verbatim external quotations.
