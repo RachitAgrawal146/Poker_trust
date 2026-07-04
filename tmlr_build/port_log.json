@@ -1,0 +1,44 @@
+[
+ {
+  "step": "A",
+  "action": "preamble replaced",
+  "detail": "two-column custom preamble (geometry, mathptmx/helvet, titlesec, fancyhdr footer \"Agrawal (year) \u2014 N of 12\", lastpage, natbib[numbers,round]+\\citenumfont/\\bibnumfmt, researchbadge/category macros, tikz [unused]) -> official TMLR template preamble; colors/captions/tables/boxes/links/macros kept verbatim",
+  "before": null,
+  "after": null
+ },
+ {
+  "step": "A",
+  "action": "title block replaced",
+  "detail": "custom \\twocolumn[...] title block (badge, category line, author, correspondence, boxed abstract, rule, \\thispagestyle{firstpage}) -> \\maketitle + standard abstract environment; title text and abstract text copied verbatim",
+  "before": null,
+  "after": null
+ },
+ {
+  "step": "B",
+  "action": "Broader Impact Statement marker inserted",
+  "detail": "empty \\subsubsection* with [TODO-BROADER-IMPACT] placed before the Sources back-matter, per template convention (template places it after main text, before references)",
+  "before": null,
+  "after": null
+ },
+ {
+  "step": "C",
+  "action": "Author contributions paragraph removed (anonymization)",
+  "detail": "restore for camera-ready \u2014 verbatim text preserved in DEANONYMIZATION_CHECKLIST.md",
+  "before": "\\paragraph*{Author contributions.} R.A.\\ conceived the study,\nimplemented the simulation, performed the analysis, and wrote the\nmanuscript.",
+  "after": null
+ },
+ {
+  "step": "C",
+  "action": "GitHub URL neutralized (anonymization)",
+  "detail": "Data and materials availability paragraph",
+  "before": "\u2026are available at \\url{https://github.com/RachitAgrawal146/Poker_trust}.",
+  "after": "\u2026are available in an anonymized repository; the link will be restored in the camera-ready version."
+ },
+ {
+  "step": "A",
+  "action": "manual References heading + \\footnotesize dropped",
+  "detail": "thebibliography prints its own References heading under the TMLR/article layout; \\footnotesize was a two-column space hack \u2014 template-forced, no text change",
+  "before": null,
+  "after": null
+ }
+]
