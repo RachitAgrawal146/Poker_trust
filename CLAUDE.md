@@ -72,11 +72,23 @@ by `run_sim.py` with 5 seeds × 10 000 hands at Stage 6.
    failure, fix the issue and make a new commit. Amending loses work
    when hooks have already rejected the previous attempt.
 
-6. **The working branch is `claude/poker-trust-simulation-6h3xR`** on
-   `origin` (`rachitagrawal146/poker_trust`). Four sub-branches
-   (`stage6-adaptive`, `stage7-logging`, `stage9-viewer`,
-   `stage10-research`) were used during parallel development but are
-   now all merged and should not be checked out.
+6. **The working branch is `main`** on `origin`
+   (`rachitagrawal146/poker_trust`). All historical development
+   branches (`claude/poker-trust-simulation-6h3xR`, the four stage
+   sub-branches, `claude/dazzling-sagan-dQ7ZF`,
+   `claude/focused-thompson-1gTAE`, `claude/stoic-mccarthy-3tnxav`)
+   were merged where relevant and deleted in 2026-07; references to
+   them elsewhere in this file are historical narrative only.
+
+7. **Publication artifacts (2026-07).** The canonical paper LaTeX is
+   `paper_resources/manuscript/main.tex` (publication form: the
+   borrowed Nicky-Case PD figure is removed for rights reasons).
+   Submission-ready variants live at the repo root: `arxiv_build/`
+   (verified arXiv source bundle + tarball), `tmlr_submission/` +
+   `tmlr_build/` (anonymized TMLR source, PDF, and port reports),
+   and `jei_submission/` (JEI-formatted docx + compliance reports).
+   Treat all four as frozen deliverables — regenerate via the scripts
+   and reports inside them rather than editing outputs by hand.
 
 ## File layout (critical)
 

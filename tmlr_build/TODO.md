@@ -4,19 +4,14 @@ The port and anonymization are done and verified (see PORT_REPORT.md). These
 three items need your writing or your judgment — nothing here was drafted for
 you.
 
-## 1 · Write the Broader Impact Statement  *(required before upload)*
+## 1 · Broader Impact Statement — ✅ DONE
 
-`main.tex` contains an empty
-`\subsubsection*{Broader Impact Statement}` holding only
-`[TODO-BROADER-IMPACT: author to write --- see TODO.md]`, placed after the
-Conclusion per the TMLR template. TMLR encourages discussing possible
-repercussions of the work, "notably any potential negative impact that a user
-of this research should be aware of" (see the TMLR Ethics Guidelines). Your
-Discussion already contains material in your own words about real-world
-reputation systems and the limits of the poker analogy that you may want to
-draw on. Replace the marker with your statement — or, since the section is
-optional at TMLR, delete the subsubsection entirely. Either way the marker must
-not survive to upload.
+Your three-paragraph statement (supplied 2026-07) was inserted **verbatim**
+into `\subsubsection*{Broader Impact Statement}`, replacing the
+`[TODO-BROADER-IMPACT]` marker (only mechanical change: straight double quotes
+around "trust farming" became LaTeX ``…'' quotes). The rebuilt
+`tmlr_anonymous.pdf` is now **20 pages**, compiles with zero errors/undefined
+references, and the identity grep is still all-zero.
 
 ## 2 · Decide: anonymized mirror vs. placeholder sentence  *(recommended: mirror)*
 

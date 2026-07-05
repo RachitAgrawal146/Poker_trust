@@ -114,3 +114,12 @@ Fresh-directory build of the packaged `tmlr_submission/` exactly as submitted
 One environment note: `lmodern` (required by tmlr.sty) was missing from the
 container's TeX Live and was installed via `apt-get install lmodern` — an
 environment fix, not a document change.
+
+## 7 · Post-port update (2026-07)
+
+The author supplied the Broader Impact Statement text; it was inserted
+**verbatim** in place of the `[TODO-BROADER-IMPACT]` marker (mechanical change
+only: straight `"…"` quotes → LaTeX ``…''). Rebuilt fresh: **20 pages**,
+0 errors, 0 undefined references, identity grep still 0 everywhere. TODO item 1
+is closed; items 2 (anonymized mirror — author is preparing it) and 3 (visual
+review) remain with the author.

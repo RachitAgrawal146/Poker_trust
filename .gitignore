@@ -29,3 +29,12 @@ phase2/ml/models_hs/
 phase2/ml/models_live/
 phase2/ml/models_split/
 phase2/ml/models_tabular/
+
+# LaTeX build artifacts (sources + frozen .bbl stay committed)
+*.aux
+*.out
+*.blg
+*.synctex.gz
+*.toc
+*.fls
+*.fdb_latexmk
