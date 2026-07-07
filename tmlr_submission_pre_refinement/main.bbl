@@ -1,0 +1,90 @@
+\begin{thebibliography}{12}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Axelrod(1984)]{axelrod1984evolution}
+Robert Axelrod.
+\newblock \emph{The Evolution of Cooperation}.
+\newblock Basic Books, 1984.
+
+\bibitem[Billings et~al.(1998)Billings, Papp, Schaeffer, and
+  Szafron]{billings1998opponent}
+Darse Billings, Denis Papp, Jonathan Schaeffer, and Duane Szafron.
+\newblock Opponent modeling in poker.
+\newblock In \emph{Proceedings of the National Conference on Artificial
+  Intelligence (AAAI)}, pages 493--499, 1998.
+
+\bibitem[Bolton et~al.(2004)Bolton, Katok, and Ockenfels]{bolton2004effective}
+Gary~E. Bolton, Elena Katok, and Axel Ockenfels.
+\newblock How effective are electronic reputation mechanisms? {A}n experimental
+  investigation.
+\newblock \emph{Management Science}, 50\penalty0 (11):\penalty0 1587--1602,
+  2004.
+
+\bibitem[Brown and Sandholm(2018)]{brown2018superhuman}
+Noam Brown and Tuomas Sandholm.
+\newblock Superhuman {AI} for heads-up no-limit poker: {L}ibratus beats top
+  professionals.
+\newblock \emph{Science}, 359\penalty0 (6374):\penalty0 418--424, 2018.
+
+\bibitem[Brown and Sandholm(2019)]{brown2019superhuman}
+Noam Brown and Tuomas Sandholm.
+\newblock Superhuman {AI} for multiplayer poker.
+\newblock \emph{Science}, 365\penalty0 (6456):\penalty0 885--890, 2019.
+
+\bibitem[Ganzfried and Sandholm(2015)]{ganzfried2015safe}
+Sam Ganzfried and Tuomas Sandholm.
+\newblock Safe opponent exploitation.
+\newblock \emph{ACM Transactions on Economics and Computation}, 3\penalty0
+  (2):\penalty0 8:1--8:28, 2015.
+
+\bibitem[Glosten and Milgrom(1985)]{glosten1985bid}
+Lawrence~R. Glosten and Paul~R. Milgrom.
+\newblock Bid, ask and transaction prices in a specialist market with
+  heterogeneously informed traders.
+\newblock \emph{Journal of Financial Economics}, 14\penalty0 (1):\penalty0
+  71--100, 1985.
+
+\bibitem[Liu et~al.(2024)Liu, Yu, Zhang, Xu, Lei, Lai, Gu, Ding, Men, Yang,
+  Zhang, Deng, Zeng, Du, Zhang, Shen, Zhang, Su, Sun, Huang, Dong, and
+  Tang]{liu2024agentbench}
+Xiao Liu, Hao Yu, Hanchen Zhang, Yifan Xu, Xuanyu Lei, Hanyu Lai, Yu~Gu,
+  Hangliang Ding, Kaiwen Men, Kejuan Yang, Shudan Zhang, Xiang Deng, Aohan
+  Zeng, Zhengxiao Du, Chenhui Zhang, Sheng Shen, Tianjun Zhang, Yu~Su, Huan
+  Sun, Minlie Huang, Yuxiao Dong, and Jie Tang.
+\newblock {A}gent{B}ench: Evaluating {LLM}s as agents.
+\newblock In \emph{International Conference on Learning Representations
+  (ICLR)}, 2024.
+
+\bibitem[Nowak(2006)]{nowak2006five}
+Martin~A. Nowak.
+\newblock Five rules for the evolution of cooperation.
+\newblock \emph{Science}, 314\penalty0 (5805):\penalty0 1560--1563, 2006.
+
+\bibitem[Park et~al.(2023)Park, O'Brien, Cai, Morris, Liang, and
+  Bernstein]{park2023generative}
+Joon~Sung Park, Joseph~C. O'Brien, Carrie~J. Cai, Meredith~Ringel Morris, Percy
+  Liang, and Michael~S. Bernstein.
+\newblock Generative agents: Interactive simulacra of human behavior.
+\newblock In \emph{Proceedings of the 36th Annual {ACM} Symposium on User
+  Interface Software and Technology (UIST)}, 2023.
+
+\bibitem[Resnick and Zeckhauser(2002)]{resnick2002trust}
+Paul Resnick and Richard Zeckhauser.
+\newblock Trust among strangers in internet transactions: {E}mpirical analysis
+  of {eBay}'s reputation system.
+\newblock \emph{The Economics of the Internet and E-Commerce, Advances in
+  Applied Microeconomics}, 11:\penalty0 127--157, 2002.
+
+\bibitem[Southey et~al.(2005)Southey, Bowling, Larson, Piccione, Burch,
+  Billings, and Rayner]{southey2005bayes}
+Finnegan Southey, Michael Bowling, Bryce Larson, Carmelo Piccione, Neil Burch,
+  Darse Billings, and Chris Rayner.
+\newblock {B}ayes' bluff: Opponent modelling in poker.
+\newblock In \emph{Proceedings of the Twenty-First Conference on Uncertainty in
+  Artificial Intelligence (UAI)}, pages 550--558, 2005.
+
+\end{thebibliography}

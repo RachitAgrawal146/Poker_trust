@@ -1,0 +1,38 @@
+[
+ {
+  "step": "1a Resnick -> \\citet",
+  "before": "conducted by Resnick \\& Zeckhauser\n\\citep{resnick2002trust}",
+  "after": "conducted by \\citet{resnick2002trust}",
+  "note": "renders \"conducted by Resnick and Zeckhauser (2002)\" \u2014 name once"
+ },
+ {
+  "step": "1b Billings -> \\citeauthor+\\citeyearpar",
+  "before": "this included Billings et al.'s Loki and Poki bots\n\\citep{billings1998opponent}",
+  "after": "this included \\citeauthor{billings1998opponent}'s Loki and Poki bots\n\\citeyearpar{billings1998opponent}",
+  "note": "renders \"Billings et al.'s Loki and Poki bots (1998)\" \u2014 fewest-character possessive form"
+ },
+ {
+  "step": "1c Southey -> \\citet",
+  "before": "formalized by Southey\net al.\\ \\citep{southey2005bayes}",
+  "after": "formalized by\n\\citet{southey2005bayes}",
+  "note": "renders \"formalized by Southey et al. (2005)\" \u2014 name once"
+ },
+ {
+  "step": "1d Ganzfried -> \\citeauthor+\\citeyearpar",
+  "before": "followed by Ganzfried and Sandholm's \\citep{ganzfried2015safe}\nfurther generalization",
+  "after": "followed by \\citeauthor{ganzfried2015safe}'s \\citeyearpar{ganzfried2015safe}\nfurther generalization",
+  "note": "renders \"Ganzfried and Sandholm's (2015) further generalization\" \u2014 name once"
+ },
+ {
+  "step": "2 remove Sources heading",
+  "before": "\\section*{Sources}\n\n\\paragraph*{Competing interests.}",
+  "after": "\\paragraph*{Competing interests.}",
+  "note": "Competing interests + Data availability now sit directly after the Broader Impact Statement (TMLR convention); paragraph text untouched"
+ },
+ {
+  "step": "4b mirror URL",
+  "before": "and analysis scripts are available in an anonymized repository; the link will be\nrestored in the camera-ready version.",
+  "after": "and analysis scripts are available at\n\\url{https://anonymous.4open.science/r/trust-sim-anonymous}\n(anonymized repository for review).",
+  "note": "URL taken from the prompt SETUP line; author must confirm the mirror is live before upload"
+ }
+]
