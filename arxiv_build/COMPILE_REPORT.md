@@ -92,3 +92,20 @@ Tarball extracted into a brand-new empty directory, `pdflatex ×3`, no bibtex:
 
 **Verdict: the bundle compiles offline, no shell-escape, from a fresh extract,
 with zero errors and zero undefined-reference warnings. Ready to upload.**
+
+---
+
+## 2026-07-17 — Abstract swap rebuild (`finalpaper.pdf`)
+
+The plain-language abstract was replaced with the author's final technical
+abstract (hedged version: r-ladder with per-seed SDs, unbounded robustness
+check, 95% bootstrap CI, capability-vs-power caveat, hand-count-matched
+replication call). Text supplied verbatim by the author; encoded to house
+style only (`\rtp`/`\Delta\rtp` math, `$\pm$`, `\rightarrow`, `95\%`,
+`10\,000`, `---` dashes). Same recipe (pdflatex ×3, frozen `main.bbl`,
+no shell-escape): 0 errors, 0 undefined references. Page count 12 → 13
+(longer abstract reflows the two-column body). Verified: source diff vs
+the previous bundle is exactly the abstract hunk; all body landmark
+strings and every data digit-run unchanged (page furniture only).
+`paper.pdf` is superseded by `finalpaper.pdf`; tarball regenerated to
+match the bundle.

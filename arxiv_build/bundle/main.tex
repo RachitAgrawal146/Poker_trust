@@ -223,25 +223,39 @@
     \begin{minipage}{\dimexpr\textwidth-2\fboxsep\relax}
       \vspace{4pt}\noindent{\sffamily\bfseries\fontsize{10}{12}\selectfont ABSTRACT\par}\vspace{4pt}
       \sffamily\bfseries\fontsize{9.5}{13}\selectfont
-      What if being trustworthy cost you something? Reputation
-      systems (online marketplaces, credit scoring and social
-      platforms) reward ``good'' behavior---however, there is a
-      well-known paradox among economists. A totally transparent and
-      cooperative player will get less than a somewhat unreliable
-      player. We placed that paradox into a petri-dish. Eight
-      poker-players played tens of thousands of hands. Each player
-      silently profiled all other players' styles, and updated those
-      beliefs at each hand. Then we swapped the minds of the agents
-      across four different levels of complexity---from strict rule
-      followers to large language models capable of reasoning about
-      what their opponents would do, while keeping both the game and
-      the trust model constant. And so, it happened again. The best
-      reputations were the least rewarded, and no amount of
-      optimization changed that. It wasn't until the agents were able
-      to reason about the reputation system that some relief began to
-      occur. The result is a compact, completely replicable
-      laboratory for exploring the very important question---when
-      does a good reputation become a bad thing?
+      Reputation systems that infer trustworthiness from observed
+      behavior are widespread in online marketplaces, credit scoring,
+      and social platforms; the transparency paradox---that a
+      perfectly visible cooperative record earns lower returns than a
+      less legible one---remains a hypothesis to test rather than an
+      established fact. We test it in a controlled simulation of
+      8-player fixed-limit Texas Hold'em in which every agent
+      maintains a categorical posterior over the archetype of every
+      other agent and updates it after each observed action. Holding
+      the game and trust model fixed, we vary only the agents' minds
+      across four architectures: frozen rule-based archetypes,
+      bounded online hill-climbing, large-language-model personality
+      role-players (Claude Haiku 4.5), and the same model augmented
+      with chain-of-thought, per-opponent memory, and self-updated
+      strategy notes. Across five random seeds per condition, the
+      negative Pearson correlation between trust and final stack
+      attenuates monotonically along the ladder $\rtp = -0.752 \pm
+      0.073 \rightarrow -0.637 \pm 0.125 \rightarrow -0.510 \pm
+      0.268 \rightarrow -0.094 \pm 0.301$ ($\pm$ = SD across
+      seeds); an unbounded hill-climbing robustness check
+      ($\Delta\rtp = +0.028$) suggests the trap is not an artifact
+      of the archetype bound boxes. The 95\% bootstrap interval for
+      the final architecture, $[-0.32, +0.20]$, is consistent with
+      substantial but not necessarily complete attenuation, and
+      because hand counts fall from 10\,000 per seed in the
+      rule-based phases to 500 and 150 in the LLM phases, the ladder
+      mixes a capability effect with a statistical-power effect. We
+      take this as preliminary evidence that, in our zero-sum
+      testbed, observation-based reputation rewards exploitation
+      under simple agent policies and that reasoning about the
+      reputation system itself substantially attenuates the effect;
+      whether the attenuation is structural or a small-sample
+      artifact is left to a hand-count-matched replication.
       \vspace{4pt}
     \end{minipage}}
     \vspace{18pt}
