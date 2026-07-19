@@ -87,8 +87,19 @@ by `run_sim.py` with 5 seeds × 10 000 hands at Stage 6.
    (verified arXiv source bundle + tarball), `tmlr_submission/` +
    `tmlr_build/` (anonymized TMLR source, PDF, and port reports),
    and `jei_submission/` (JEI-formatted docx + compliance reports).
-   Treat all four as frozen deliverables — regenerate via the scripts
+   `tog_submission/` + `tog_build/` (IEEE Transactions on Games
+   double-anonymous port, 10-page gate) were added 2026-07-19.
+   Treat all of these as frozen deliverables — regenerate via the scripts
    and reports inside them rather than editing outputs by hand.
+   **Canonical abstract (author decision, 2026-07-19): the hedged
+   technical abstract** (r_tp ladder + SDs, unbounded robustness check,
+   95% bootstrap CI, capability-vs-power caveat) as encoded in
+   `arxiv_build/bundle/main.tex` — use it verbatim in every future
+   regeneration or new port of any submission variant. The retired
+   plain-language abstract ("What if being trustworthy cost you
+   something?…") still sits in `tmlr_submission/` and
+   `paper_resources/manuscript/` and should be swapped out whenever
+   those are next regenerated.
 
 ## File layout (critical)
 

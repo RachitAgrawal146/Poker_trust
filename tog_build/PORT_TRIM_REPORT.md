@@ -109,3 +109,42 @@ unconstrained since supplementary is outside the page limit).
 Author items are in `TODO.md`. The only marker in the main PDF is the
 Index-Terms placeholder; it must be replaced with 4–6 chosen terms before
 OpenReview/ScholarOne upload.
+
+---
+
+# Addendum — 2026-07-19: author-directed abstract regeneration
+
+The author directed that the **hedged technical abstract** (the one now in
+`arxiv_build/finalpaper.pdf`) replace the plain-language abstract here and in
+all future regenerations. This supersedes the Step-1 "abstract byte-identical
+to input" property; the governing check is now **byte-identical to the arXiv
+technical abstract** (same LaTeX encoding: `\rtp` math, `$\pm$`,
+`\rightarrow`, `95\%`, `10\,000`, `---` dashes). Verified ✅.
+
+**Page consequence and resolution (structural, no prose touched):**
+
+| Build | Pages |
+|---|---|
+| 10-page PASS state with plain-language abstract | 10 |
+| + technical abstract (~75% longer) | **11 — gate broken** (spill: ~7 reference lines) |
+| rejected lever: shrink all 5 figures ~10% | recovers only ~5 lines; degrades legibility of already-dense 2-panel plots |
+| **applied lever: Broader Impact Statement → supplementary (verbatim)** | **10 ✓ PASS** |
+
+The Broader Impact move is one of the three options measured for the author in
+TODO.md item 3 ("move to supplementary"), executed verbatim (2,077 bytes,
+byte-identical text, now a `\section*` in `supplementary.pdf` between Box S2
+and the Supplementary Materials list; supplement grew 2 → 3 pages, which is
+outside the page limit). **PROVISIONAL — AWAITING-CONFIRMATION:** if the
+author prefers Broader Impact back in the main text, the alternatives are
+(a) approve ~15% width reduction on several figures, or (b) supply
+`approved_cuts.md`; reverting the move alone returns the main text to 11
+pages.
+
+Re-validated after regeneration: 0 errors / 0 undefined (both PDFs);
+12-string anonymity grep = 0 across source + both PDFs; main `[TODO-` = 1
+(INDEX-TERMS only), supp = 0; title byte-identical to input; citation
+renders intact (spot-checked Billings, Ganzfried); Table S1 / Fig. S1 /
+Boxes S1–S2 / pointer list all render; main = 10/10 pages.
+
+Status unchanged: **READY (pending INDEX-TERMS)** — plus the provisional
+Broader-Impact placement above.

@@ -12,20 +12,18 @@
    If you want any of the four back in the main text, the page gate will
    fail again (M0 with everything in main = 12 pages).
 
-3. **Broader Impact Statement — AUTHOR-DECISION (measured).** Default
-   applied: KEEP in main as `\section*` before References.
-   - keep in main: 10 pages (current) — **costs nothing**
-   - move to supplementary: still 10 pages (measured) — saves nothing, only adds slack
-   - drop: still 10 pages (measured) — saves nothing
-   Recommendation implicit in the numbers: keep.
+3. **Broader Impact Statement — placement changed 2026-07-19, confirm it.**
+   After the technical abstract swap (your instruction), keep-in-main costs
+   11 pages (gate fail). Applied: **moved verbatim to supplementary** →
+   main = 10/10 ✓. Confirm this placement, or choose an alternative:
+   approve ~15% figure shrinks, or supply `approved_cuts.md`. Reverting the
+   move alone puts the main text back at 11 pages.
 
-4. **Abstract version.** Per the port spec, the abstract is byte-identical
-   to the TMLR input — i.e., the **plain-language** abstract. Note that the
-   arXiv build (`arxiv_build/finalpaper.pdf`) now carries your newer hedged
-   technical abstract. Decide whether ToG should keep the plain-language
-   version or receive the technical one; if the latter, say so and it will
-   be swapped with the same verbatim+house-style mechanics as the arXiv pass
-   (page impact will be re-measured — it is ~75% longer).
+4. **Abstract version — RESOLVED 2026-07-19.** Author directed the hedged
+   technical abstract for ToG and all future regenerations; applied,
+   byte-identical to the arXiv encoding. (The TMLR upload candidate and the
+   canonical manuscript still carry the plain-language abstract — say the
+   word to sync either.)
 
 5. **"The author(s) declare" one-worder** from the TMLR pass is still
    AWAITING-AUTHOR-APPROVAL and applies verbatim here too
