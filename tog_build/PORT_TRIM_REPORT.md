@@ -146,5 +146,7 @@ Re-validated after regeneration: 0 errors / 0 undefined (both PDFs);
 renders intact (spot-checked Billings, Ganzfried); Table S1 / Fig. S1 /
 Boxes S1–S2 / pointer list all render; main = 10/10 pages.
 
-Status unchanged: **READY (pending INDEX-TERMS)** — plus the provisional
-Broader-Impact placement above.
+Status at the end of this pass: READY (pending INDEX-TERMS) with
+provisional Broader-Impact placement. **Superseded by the 2026-07-19
+closeout: all author decisions applied — see CLOSEOUT_REPORT.md. Final
+status: UPLOAD-READY.**

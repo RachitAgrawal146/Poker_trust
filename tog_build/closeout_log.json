@@ -1,0 +1,17 @@
+[
+ {
+  "change": "D1 Index Terms (author-chosen, verbatim)",
+  "before": "[TODO-INDEX-TERMS: author to pick 4--6 --- candidates from his own text:\ntrust, reputation, poker, Bayesian, agents, simulation, multi-agent]",
+  "after": "Bayesian reputation systems, multi-agent simulation, trust dynamics, game theory, large language models"
+ },
+ {
+  "change": "D3 Competing interests one-worder (approved)",
+  "before": "The author declares no competing",
+  "after": "The author(s) declare no competing"
+ },
+ {
+  "change": "D5 Phase 1 SD insertion (author-computed, matches abstract convention)",
+  "before": "Phase 1 produces $\\rtp = -0.752$ across the five canonical seeds,",
+  "after": "Phase 1 produces $\\rtp = -0.752 \\pm 0.073$ across the five canonical seeds,"
+ }
+]
