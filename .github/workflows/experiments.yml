@@ -140,6 +140,37 @@ jobs:
             exit 1
           fi
 
+      # A present-but-invalid key (typo, revoked, no credit, model not
+      # enabled for the account) is indistinguishable from a valid one until
+      # something actually calls the API. Without this, that failure lands in
+      # all 20 jobs at once, several minutes in, looking like a code fault.
+      # One ~4-token call here turns it into a single clear error before any
+      # fan-out. Costs a fraction of a cent.
+      - name: Preflight — verify the API key with one minimal call
+        if: inputs.dry_run != true
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          pip install --quiet anthropic
+          python3 - <<'PY'
+          import sys
+          import anthropic
+          try:
+              client = anthropic.Anthropic()
+              resp = client.messages.create(
+                  model="${{ env.MODEL }}",
+                  max_tokens=4,
+                  messages=[{"role": "user", "content": "Reply with OK"}],
+              )
+              print("API key valid, model reachable:",
+                    resp.content[0].text.strip())
+          except Exception as e:
+              print(f"::error::API preflight failed — {type(e).__name__}: {e}")
+              print("::error::Fix the ANTHROPIC_API_KEY secret before running. "
+                    "No simulation jobs were started, so nothing was spent.")
+              sys.exit(1)
+          PY
+
   # -------------------------------------------------------------------------
   # One job per (seed, arm). These are fully independent.
   # -------------------------------------------------------------------------

@@ -328,6 +328,13 @@ def main(argv: Optional[List[str]] = None) -> int:
                         "not overwrite a published phase.")
     p.add_argument("--yes", action="store_true",
                    help="Skip the cost confirmation prompt.")
+    p.add_argument("--max-failure-rate", type=float, default=0.05,
+                   help="Fail a seed whose share of failed LLM calls exceeds "
+                        "this (default: 0.05). A failed call is not an error "
+                        "the agent surfaces -- it silently falls back to "
+                        "CHECK/FOLD -- so sustained rate limiting would "
+                        "quietly turn agents into folders and produce "
+                        "plausible-looking but meaningless data.")
     args = p.parse_args(argv)
 
     explicit_db = args.db is not None
@@ -434,8 +441,28 @@ def main(argv: Optional[List[str]] = None) -> int:
             if summary["chip_delta"] != 0:
                 print(f"  !! CHIP CONSERVATION FAILURE: delta={summary['chip_delta']}. "
                       f"This run is contaminated — investigate before using the data.")
-            print(f"  done: {summary['llm_calls']} calls, "
-                  f"{summary['llm_failures']} failures\n")
+                return 3
+
+            calls = summary["llm_calls"]
+            fails = summary["llm_failures"]
+            rate = fails / max(calls + fails, 1)
+            print(f"  done: {calls} calls, {fails} failures ({rate:.2%})\n")
+
+            # A failed LLM call is invisible in the resulting data: the agent
+            # falls back to CHECK/FOLD and play continues. So a seed throttled
+            # by rate limiting still yields a full database and a perfectly
+            # plausible r -- it just describes a table of agents that folded a
+            # lot, not the archetypes we meant to study. Fail the seed loudly
+            # instead. Its artifact is not uploaded, so aggregation excludes
+            # it rather than silently averaging it in.
+            if rate > args.max_failure_rate:
+                print(f"  !! LLM FAILURE RATE {rate:.2%} EXCEEDS "
+                      f"{args.max_failure_rate:.2%} for seed {seed}.")
+                print(f"     {fails} of {calls + fails} calls failed. Agents "
+                      f"fall back to CHECK/FOLD on failure, so this seed's "
+                      f"data is not trustworthy. Most likely cause is API "
+                      f"rate limiting across the parallel jobs.")
+                return 4
     except KeyboardInterrupt:
         print("\nInterrupted. Completed seeds are saved; re-run the same "
               "command to resume where it stopped.")
