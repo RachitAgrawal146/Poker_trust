@@ -1,7 +1,20 @@
 % =============================================================================
-% references.bib — bibliography stub for main.tex
+% references.bib — bibliography for main.tex
 %
 % Add/edit entries as needed; cite via \citep{key} or \citet{key}.
+%
+% NOTE ON UNCITED ENTRIES: this file is processed by bibtex, which emits
+% only entries that are actually \cite'd somewhere in the document. An
+% entry added here but never cited will NOT appear in the rendered
+% bibliography. Five entries sat uncited for several revisions (Harsanyi,
+% von Neumann & Morgenstern, Nash, Bowling et al., Nowak & May), so the
+% paper rendered 12 references while this file held 17. All entries are
+% now cited. If you add one, cite it.
+%
+% Organised in blocks: foundations; reputation (economic theory);
+% reputation (empirical/online); cooperation and indirect reciprocity;
+% poker and imperfect-information game AI; opponent modelling and
+% multi-agent learning; language models as agents; statistical methods.
 % =============================================================================
 
 @book{axelrod1984evolution,
@@ -164,4 +177,358 @@
   title     = {{A}gent{B}ench: Evaluating {LLM}s as Agents},
   booktitle = {International Conference on Learning Representations (ICLR)},
   year      = {2024}
+}
+
+% =============================================================================
+% Reputation in economic theory
+% =============================================================================
+
+@article{kreps1982reputation,
+  author  = {Kreps, David M. and Wilson, Robert},
+  title   = {Reputation and Imperfect Information},
+  journal = {Journal of Economic Theory},
+  volume  = {27},
+  number  = {2},
+  pages   = {253--279},
+  year    = {1982}
+}
+
+@article{milgrom1982predation,
+  author  = {Milgrom, Paul and Roberts, John},
+  title   = {Predation, Reputation, and Entry Deterrence},
+  journal = {Journal of Economic Theory},
+  volume  = {27},
+  number  = {2},
+  pages   = {280--312},
+  year    = {1982}
+}
+
+@article{fudenberg1989reputation,
+  author  = {Fudenberg, Drew and Levine, David K.},
+  title   = {Reputation and Equilibrium Selection in Games with a Patient Player},
+  journal = {Econometrica},
+  volume  = {57},
+  number  = {4},
+  pages   = {759--778},
+  year    = {1989}
+}
+
+@book{mailath2006repeated,
+  author    = {Mailath, George J. and Samuelson, Larry},
+  title     = {Repeated Games and Reputations: Long-Run Relationships},
+  publisher = {Oxford University Press},
+  year      = {2006}
+}
+
+@article{akerlof1970market,
+  author  = {Akerlof, George A.},
+  title   = {The Market for ``Lemons'': Quality Uncertainty and the Market Mechanism},
+  journal = {The Quarterly Journal of Economics},
+  volume  = {84},
+  number  = {3},
+  pages   = {488--500},
+  year    = {1970}
+}
+
+@article{spence1973job,
+  author  = {Spence, Michael},
+  title   = {Job Market Signaling},
+  journal = {The Quarterly Journal of Economics},
+  volume  = {87},
+  number  = {3},
+  pages   = {355--374},
+  year    = {1973}
+}
+
+% =============================================================================
+% Reputation systems — empirical and online
+% =============================================================================
+
+@article{dellarocas2003digitization,
+  author  = {Dellarocas, Chrysanthos},
+  title   = {The Digitization of Word of Mouth: Promise and Challenges of
+            Online Feedback Mechanisms},
+  journal = {Management Science},
+  volume  = {49},
+  number  = {10},
+  pages   = {1407--1424},
+  year    = {2003}
+}
+
+@article{josang2007survey,
+  author  = {J{\o}sang, Audun and Ismail, Roslan and Boyd, Colin},
+  title   = {A Survey of Trust and Reputation Systems for Online Service Provision},
+  journal = {Decision Support Systems},
+  volume  = {43},
+  number  = {2},
+  pages   = {618--644},
+  year    = {2007}
+}
+
+@article{resnick2006value,
+  author  = {Resnick, Paul and Zeckhauser, Richard and Swanson, John
+            and Lockwood, Kate},
+  title   = {The Value of Reputation on {eBay}: A Controlled Experiment},
+  journal = {Experimental Economics},
+  volume  = {9},
+  number  = {2},
+  pages   = {79--101},
+  year    = {2006}
+}
+
+% =============================================================================
+% Cooperation, indirect reciprocity, and social dilemmas
+% =============================================================================
+
+@article{nowak1998evolution,
+  author  = {Nowak, Martin A. and Sigmund, Karl},
+  title   = {Evolution of Indirect Reciprocity by Image Scoring},
+  journal = {Nature},
+  volume  = {393},
+  number  = {6685},
+  pages   = {573--577},
+  year    = {1998}
+}
+
+@article{nowak2005evolution,
+  author  = {Nowak, Martin A. and Sigmund, Karl},
+  title   = {Evolution of Indirect Reciprocity},
+  journal = {Nature},
+  volume  = {437},
+  number  = {7063},
+  pages   = {1291--1298},
+  year    = {2005}
+}
+
+@article{berg1995trust,
+  author  = {Berg, Joyce and Dickhaut, John and McCabe, Kevin},
+  title   = {Trust, Reciprocity, and Social History},
+  journal = {Games and Economic Behavior},
+  volume  = {10},
+  number  = {1},
+  pages   = {122--142},
+  year    = {1995}
+}
+
+@article{fehr2000cooperation,
+  author  = {Fehr, Ernst and G{\"a}chter, Simon},
+  title   = {Cooperation and Punishment in Public Goods Experiments},
+  journal = {American Economic Review},
+  volume  = {90},
+  number  = {4},
+  pages   = {980--994},
+  year    = {2000}
+}
+
+@inproceedings{leibo2017multiagent,
+  author    = {Leibo, Joel Z. and Zambaldi, Vinicius and Lanctot, Marc
+              and Marecki, Janusz and Graepel, Thore},
+  title     = {Multi-agent Reinforcement Learning in Sequential Social Dilemmas},
+  booktitle = {Proceedings of the 16th International Conference on Autonomous
+              Agents and Multiagent Systems (AAMAS)},
+  pages     = {464--473},
+  year      = {2017}
+}
+
+% =============================================================================
+% Poker and imperfect-information game AI
+% =============================================================================
+
+@article{billings2002challenge,
+  author  = {Billings, Darse and Davidson, Aaron and Schaeffer, Jonathan
+            and Szafron, Duane},
+  title   = {The Challenge of Poker},
+  journal = {Artificial Intelligence},
+  volume  = {134},
+  number  = {1-2},
+  pages   = {201--240},
+  year    = {2002}
+}
+
+@inproceedings{zinkevich2007regret,
+  author    = {Zinkevich, Martin and Johanson, Michael and Bowling, Michael
+              and Piccione, Carmelo},
+  title     = {Regret Minimization in Games with Incomplete Information},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  volume    = {20},
+  pages     = {1729--1736},
+  year      = {2007}
+}
+
+@article{moravcik2017deepstack,
+  author  = {Morav{\v{c}}{\'i}k, Matej and Schmid, Martin and Burch, Neil
+            and Lis{\'y}, Viliam and Morrill, Dustin and Bard, Nolan
+            and Davis, Trevor and Waugh, Kevin and Johanson, Michael
+            and Bowling, Michael},
+  title   = {{DeepStack}: Expert-level Artificial Intelligence in
+            Heads-up No-limit Poker},
+  journal = {Science},
+  volume  = {356},
+  number  = {6337},
+  pages   = {508--513},
+  year    = {2017}
+}
+
+@article{rubin2011computer,
+  author  = {Rubin, Jonathan and Watson, Ian},
+  title   = {Computer Poker: A Review},
+  journal = {Artificial Intelligence},
+  volume  = {175},
+  number  = {5-6},
+  pages   = {958--987},
+  year    = {2011}
+}
+
+% =============================================================================
+% Opponent modelling and multi-agent learning
+% =============================================================================
+
+@article{albrecht2018autonomous,
+  author  = {Albrecht, Stefano V. and Stone, Peter},
+  title   = {Autonomous Agents Modelling Other Agents: A Comprehensive
+            Survey and Open Problems},
+  journal = {Artificial Intelligence},
+  volume  = {258},
+  pages   = {66--95},
+  year    = {2018}
+}
+
+% =============================================================================
+% Language models as strategic and social agents
+% =============================================================================
+
+@inproceedings{wei2022chain,
+  author    = {Wei, Jason and Wang, Xuezhi and Schuurmans, Dale and
+              Bosma, Maarten and Ichter, Brian and Xia, Fei and
+              Chi, Ed H. and Le, Quoc V. and Zhou, Denny},
+  title     = {Chain-of-Thought Prompting Elicits Reasoning in Large
+              Language Models},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  volume    = {35},
+  pages     = {24824--24837},
+  year      = {2022}
+}
+
+@inproceedings{yao2023react,
+  author    = {Yao, Shunyu and Zhao, Jeffrey and Yu, Dian and Du, Nan
+              and Shafran, Izhak and Narasimhan, Karthik and Cao, Yuan},
+  title     = {{ReAct}: Synergizing Reasoning and Acting in Language Models},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year      = {2023}
+}
+
+@inproceedings{shinn2023reflexion,
+  author    = {Shinn, Noah and Cassano, Federico and Gopinath, Ashwin
+              and Narasimhan, Karthik and Yao, Shunyu},
+  title     = {{Reflexion}: Language Agents with Verbal Reinforcement Learning},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  volume    = {36},
+  year      = {2023}
+}
+
+@article{bakhtin2022human,
+  author  = {Bakhtin, Anton and Brown, Noam and Dinan, Emily and
+            Farina, Gabriele and Flaherty, Colin and Fried, Daniel and
+            Goff, Andrew and Gray, Jonathan and Hu, Hengyuan and others},
+  title   = {Human-level Play in the Game of {Diplomacy} by Combining
+            Language Models with Strategic Reasoning},
+  journal = {Science},
+  volume  = {378},
+  number  = {6624},
+  pages   = {1067--1074},
+  year    = {2022}
+}
+
+@article{akata2023playing,
+  author  = {Akata, Elif and Schulz, Lion and Coda-Forno, Julian and
+            Oh, Seong Joon and Bethge, Matthias and Schulz, Eric},
+  title   = {Playing Repeated Games with Large Language Models},
+  journal = {arXiv preprint arXiv:2305.16867},
+  year    = {2023}
+}
+
+@article{xu2023exploring,
+  author  = {Xu, Yuzhuang and Wang, Shuo and Li, Peng and Luo, Fuwen and
+            Wang, Xiaolong and Liu, Weidong and Liu, Yang},
+  title   = {Exploring Large Language Models for Communication Games:
+            An Empirical Study on {W}erewolf},
+  journal = {arXiv preprint arXiv:2309.04658},
+  year    = {2023}
+}
+
+@inproceedings{zhou2024sotopia,
+  author    = {Zhou, Xuhui and Zhu, Hao and Mathur, Leena and Zhang, Ruohong
+              and Yu, Haofei and Qi, Zhengyang and Morency, Louis-Philippe
+              and Bisk, Yonatan and Fried, Daniel and Neubig, Graham
+              and Sap, Maarten},
+  title     = {{SOTOPIA}: Interactive Evaluation for Social Intelligence
+              in Language Agents},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year      = {2024}
+}
+
+@inproceedings{piatti2024cooperate,
+  author    = {Piatti, Giorgio and Jin, Zhijing and Kleiman-Weiner, Max
+              and Sch{\"o}lkopf, Bernhard and Sachan, Mrinmaya
+              and Mihalcea, Rada},
+  title     = {Cooperate or Collapse: Emergence of Sustainable Cooperation
+              in a Society of {LLM} Agents},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  volume    = {37},
+  year      = {2024}
+}
+
+% =============================================================================
+% Statistical and information-theoretic methods
+% =============================================================================
+
+@article{shannon1948mathematical,
+  author  = {Shannon, Claude E.},
+  title   = {A Mathematical Theory of Communication},
+  journal = {The Bell System Technical Journal},
+  volume  = {27},
+  number  = {3},
+  pages   = {379--423},
+  year    = {1948}
+}
+
+@article{fisher1921probable,
+  author  = {Fisher, Ronald A.},
+  title   = {On the ``Probable Error'' of a Coefficient of Correlation
+            Deduced from a Small Sample},
+  journal = {Metron},
+  volume  = {1},
+  pages   = {3--32},
+  year    = {1921}
+}
+
+@article{efron1979bootstrap,
+  author  = {Efron, Bradley},
+  title   = {Bootstrap Methods: Another Look at the Jackknife},
+  journal = {The Annals of Statistics},
+  volume  = {7},
+  number  = {1},
+  pages   = {1--26},
+  year    = {1979}
+}
+
+@article{benjamini1995controlling,
+  author  = {Benjamini, Yoav and Hochberg, Yosef},
+  title   = {Controlling the False Discovery Rate: A Practical and Powerful
+            Approach to Multiple Testing},
+  journal = {Journal of the Royal Statistical Society: Series B},
+  volume  = {57},
+  number  = {1},
+  pages   = {289--300},
+  year    = {1995}
+}
+
+@article{gelman2014statistical,
+  author  = {Gelman, Andrew and Loken, Eric},
+  title   = {The Statistical Crisis in Science},
+  journal = {American Scientist},
+  volume  = {102},
+  number  = {6},
+  pages   = {460--465},
+  year    = {2014}
 }

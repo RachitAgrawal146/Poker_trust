@@ -356,7 +356,20 @@ large-scale data from eBay, feedback is submitted by users greater
 than fifty percent of the time and is virtually all positive, with
 sellers receiving negative feedback less than 1\% of the time (i.e.,
 evidence of ubiquitous observable reputation and markets rewarding
-good behavior). Therefore, the motivation behind our research is a
+good behavior). Broader surveys of online feedback mechanisms
+\citep{dellarocas2003digitization} and of the trust and reputation
+systems built on them \citep{josang2007survey} describe the same
+basic architecture that we model here: a public, observation-derived
+score that other participants condition their behaviour on. The
+underlying economic problem such systems exist to solve is
+information asymmetry between parties to a transaction
+\citep{akerlof1970market}, and the mechanism by which an informed
+party conveys quality to an uninformed one is costly signalling
+\citep{spence1973job}---a framing we return to in our honesty score,
+which is defined precisely as the reliability of an agent's
+betting signal.
+
+Therefore, the motivation behind our research is a
 theoretical transparency paradox rather than an empirically verified
 phenomenon: when the behavior of a cooperator is completely
 predictable, a sufficiently astute counterpart can plan accordingly
@@ -364,8 +377,9 @@ and take advantage of the cooperator's actions---hence potentially
 creating conditions under which visible cooperation could be
 exploited. Controlled studies using eBay actually point in the
 opposite direction, i.e., toward a reputation premium associated with
-established identities---thus making the paradox a hypothesis worth
-testing versus an empirically demonstrated effect. A similar dynamic
+established identities \citep{resnick2006value}---thus making the
+paradox a hypothesis worth testing versus an empirically demonstrated
+effect. A similar dynamic
 is observed in financial-market microstructure, where adverse
 selection against predictably acting market-makers
 \citep{glosten1985bid} creates equivalent problems due to differences
@@ -375,6 +389,27 @@ interactions, it cannot determine whether the paradox would remain
 even if cooperative agents had sufficient intelligence to prevent
 being taken advantage of---so a controlled simulation was developed
 to address that question.
+
+\subsection{Reputation as a formal object}
+Reputation also has a long formal treatment in game theory, which
+supplies the vocabulary we use throughout. Kreps \& Wilson
+\citep{kreps1982reputation} and Milgrom \& Roberts
+\citep{milgrom1982predation} showed that when one player is
+uncertain about another's \emph{type}, that uncertainty is itself
+strategically valuable: a player may act against its short-run
+interest in order to shape the beliefs others hold about it.
+Fudenberg \& Levine \citep{fudenberg1989reputation} sharpened this
+into a general result about patient players, and Mailath \&
+Samuelson \citep{mailath2006repeated} give the modern synthesis.
+Our setup is a computational instance of exactly this structure---a
+population of agents holding beliefs over one another's types, with
+those beliefs feeding back into behaviour---with one deliberate
+difference: in the classical models the reputation-holder chooses
+how to invest in its reputation, whereas in Phases 1 and 2 our
+agents cannot. That asymmetry is the point of the phase ladder, and
+it is only in Phase 3.1 that agents acquire anything resembling the
+strategic control over their own reputation that this literature
+assumes.
 
 \begin{table*}[t]
 \centering
@@ -430,7 +465,22 @@ inferior in comparison to mutually cooperative behavior.
 Axelrod investigated this problem extensively through his Prisoner's
 Dilemma Tournaments \citep{axelrod1984evolution}, and Nowak
 developed his five rules for the evolutionary development of
-cooperation \citep{nowak2006five}. Axelrod demonstrated that
+cooperation \citep{nowak2006five}, having earlier shown with May
+that spatial structure alone can sustain cooperation without any
+reciprocity mechanism at all \citep{nowak1992spatial}. The strand of
+that literature closest to our own concern is \emph{indirect}
+reciprocity, in which agents condition their behaviour not on what a
+partner did to them but on what a partner did to third parties, as
+summarised by a public image score \citep{nowak1998evolution,
+nowak2005evolution}. Our trust posterior is an indirect-reciprocity
+mechanism in this precise sense: an observer updates its beliefs
+about an agent from actions taken against everyone at the table, not
+merely against the observer. The experimental literature on human
+trust behaviour---the investment game of Berg et al.
+\citep{berg1995trust} and the costly-punishment results of Fehr \&
+G\"achter \citep{fehr2000cooperation}---supplies the two behaviours
+we hand-built into \arch{Mirror} and \arch{Judge} respectively.
+Axelrod demonstrated that
 reciprocity-based strategies such as Tit-for-Tat are robustly
 effective in one-to-one situations. Agents that cooperate by default
 and punish defectors on a tit-for-tat basis tend to perform
@@ -459,16 +509,32 @@ contain richer action-spaces; although we interpret this as
 suggestive rather than definitive.
 
 \subsection{Bayesian opponent modelling in poker}
-Third, there is Bayesian opponent modeling in poker. Initially
-this included Billings et al.'s Loki and Poki bots
-\citep{billings1998opponent} and subsequently formalized by Southey
+Third, there is Bayesian opponent modeling in poker. The formal
+foundation is Harsanyi's treatment of games of incomplete
+information \citep{harsanyi1967games}, which converts uncertainty
+about an opponent into a probability distribution over opponent
+\emph{types}; our length-8 posterior over archetypes is a direct
+computational instance of a Harsanyi type space. Poker was proposed
+early as a testbed for such reasoning \citep{billings2002challenge}.
+Practical work initially
+included Billings et al.'s Loki and Poki bots
+\citep{billings1998opponent} and was subsequently formalized by Southey
 et al.\ \citep{southey2005bayes} as Bayesian-type inference---
 followed by Ganzfried and Sandholm's \citep{ganzfried2015safe}
-further generalization toward safe-exploitation of an opponent. Most
-recently, Carnegie Mellon University's Libratus and Pluribus
+further generalization toward safe-exploitation of an opponent; Rubin
+\& Watson \citep{rubin2011computer} survey the field up to that
+point. A second, largely separate line of work pursued equilibrium
+rather than exploitation: counterfactual regret minimisation
+\citep{zinkevich2007regret} scaled to the point where heads-up limit
+Hold'em---the same betting structure we use---was weakly solved
+\citep{bowling2015heads}, and deep variants
+\citep{moravcik2017deepstack} and Carnegie Mellon University's
+Libratus and Pluribus
 \citep{brown2018superhuman,brown2019superhuman} reached super-human
 performance levels in heads-up and six-player no-limit Texas
-Hold'em. While that body of work differs from our own
+Hold'em. The broader problem of agents modelling other agents,
+across domains, is surveyed by Albrecht \& Stone
+\citep{albrecht2018autonomous}. While that body of work differs from our own
 objectives---specifically seeking optimal or safely exploitative
 behavior to win---we borrow their type-inference machinery and
 utilize poker as a controlled environment for examining how trust
@@ -484,7 +550,28 @@ models---used as agents in competitive and observable
 settings---behave. Current benchmarks for negotiation and game
 playing, such as AgentBench \citep{liu2024agentbench}, and Park et
 al.'s study on generative agents \citep{park2023generative}, suggest
-that there is still much to learn about this issue. Phase 3 and
+that there is still much to learn about this issue. Closer to our
+setting, language models have been studied directly as players of
+repeated matrix games \citep{akata2023playing}, of social-deduction
+games that turn on deception and its detection
+\citep{xu2023exploring}, and of resource dilemmas requiring
+sustained cooperation \citep{piatti2024cooperate}; SOTOPIA
+\citep{zhou2024sotopia} evaluates social intelligence in language
+agents more generally. The most striking existing demonstration
+that language and strategy can be combined at a high level is
+\emph{Cicero}, which reached human-level play in \emph{Diplomacy}
+\citep{bakhtin2022human}---though it pairs a language model with a
+dedicated strategic-reasoning module rather than, as we do, asking
+the language model itself to carry the strategy.
+
+The three scaffolds that distinguish our Phase 3.1 from Phase 3 are
+each taken from this literature rather than invented here:
+chain-of-thought prompting, which elicits intermediate reasoning
+before an answer \citep{wei2022chain}; the interleaving of reasoning
+with action in an environment \citep{yao2023react}; and verbal
+self-reflection carried across episodes as persistent notes
+\citep{shinn2023reflexion}, which is what our adaptive strategy
+notes implement. Phase 3 and
 phase 3.1 are both designed to examine the difference between how
 large language model-based agents actually behave and what they
 represent by way of textual strategies.
@@ -773,17 +860,28 @@ These six auxiliary metrics were selected post-hoc rather than
 pre-registered. We report the metrics above descriptively, with no inferential
 tests; an individual value should therefore be interpreted as
 indicative rather than as a statement of statistical significance.
+Reporting six metrics without correcting for multiplicity would, if
+these were inferential claims, invite exactly the error that
+false-discovery-rate procedures exist to control
+\citep{benjamini1995controlling}; choosing the metrics after seeing
+the data compounds it \citep{gelman2014statistical}. We therefore
+make no significance claim on any of the six.
 
 Throughout, a reported $\pm$ value denotes the standard deviation of
-$\rtp$ across the five seeds. Confidence Intervals for the headline Pearson $\rtp$ correlations are
+$\rtp$ across seeds. Confidence Intervals for the headline Pearson $\rtp$ correlations are
 provided in two ways: a $t$-interval based upon the Student-$t$
-distribution with degrees-of-freedom equal to 4 ($T_{\text{crit}} =
-2.776$) and a non-parametric percentile bootstrap with 10\,000
+distribution with $n-1$ degrees of freedom, where $n$ is that
+phase's seed count (for the five-seed phases reported here,
+$\text{df}=4$ and $T_{\text{crit}} = 2.776$), and a non-parametric
+percentile bootstrap \citep{efron1979bootstrap} with 10\,000
 iterations. Although there are potentially $n=5$ seeds drawing from
 at most $\binom{2n-1}{n} = 126$ possible combinations of players,
 thus ensuring dense coverage of the sample space via the 10\,000
 iterations, it does not provide greater statistical power than what
-is available from the five actual observations.
+is available from the five actual observations. Per-seed intervals
+on an individual $\rtp$ use the Fisher $z$-transformation
+\citep{fisher1921probable} on the $n=8$ archetype pairs underlying
+that correlation.
 
 % =============================================================================
 \begin{table*}[!ht]
@@ -1061,7 +1159,16 @@ distance between all eight agents in 36-dimensional parameter space
 expands from an initial $5.82$ to $\ge 7.5$ on every seed; the mean
 of the final-to-initial cluster-spread ratios is $1.324$. While the
 agents are moving eleven times harder than in the bounded case, they
-are not converging on a common Nash-like profile.
+are not converging on a common Nash-like profile
+\citep{nash1950equilibrium}---the natural prediction if one treats
+eight independent profit-maximisers in a zero-sum game
+\citep{vonneumann1944theory} as a system that ought to settle into
+equilibrium. They diverge instead. We stress that this is a negative
+result about \emph{this optimizer at this budget}, not a proof that
+no equilibrium exists; a population of independently hill-climbing
+agents is a poor equilibrium-finder, a point made more generally in
+the multi-agent learning literature on sequential social dilemmas
+\citep{leibo2017multiagent}.
 
 \arch{Firestorm}'s mean stack continues to remain ${\sim}6{\times}$
 that of the next closest archetype; \arch{Wall} still incurs
@@ -1096,7 +1203,8 @@ $(\text{bets}+\text{raises})/\text{calls}$. AF $>2$ is
 aggressive; AF $<1$ is passive.} fingerprints). Among the secondary
 metrics, CS drops from $0.142$ to $0.076$, NS collapses to $0$, and
 SU\footnote{\textit{Strategic Unpredictability} (SU) is the
-Shannon entropy in bits over each agent's action distribution.
+Shannon entropy \citep{shannon1948mathematical} in bits over each
+agent's action distribution.
 Higher SU = harder to predict.} falls from $1.88$ to $1.19$
 bits.
 
@@ -1509,8 +1617,11 @@ with a statistical-power effect in the cross-phase ladder. The
 six secondary metrics (TEI, CS, OA, NS, SU, TMA) were chosen
 post hoc and are unadjusted for multiple comparisons. The single
 highest-leverage follow-up addressing all of these is an $n = 20$
-Phase 3.1 replication at the 500-hand horizon, estimated at
-${\sim}\$60$ in API spend.
+Phase 3.1 replication: ${\sim}\$70$ in API spend at the 150-hand
+horizon, which quadruples the seed count while remaining directly
+comparable to the runs reported here, or ${\sim}\$230$ at the
+500-hand horizon, which additionally removes the hand-count
+asymmetry against Phase 3.
 
 \textit{Reproducibility and replication gaps.} The canonical
 Phase 3 and 3.1 datasets were generated under the Anthropic SDK's

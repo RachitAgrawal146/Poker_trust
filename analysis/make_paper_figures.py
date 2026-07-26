@@ -34,48 +34,35 @@ if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
 # ---------------------------------------------------------------------------
-# Canonical per-seed Pearson r between mean trust score (final hand) and
-# final stack across 5 seeds (42, 137, 256, 512, 1024).
+# Per-seed Pearson r between mean trust score (final hand) and final stack.
 #
-# PROVENANCE — these values are lifted from canonical scorecards:
-#   Phase 1, Phase 2 (bounded), Phase 3, Phase 3.1:
-#       reports/phase31_long_scorecard.txt (the "TRUST-PROFIT R LADDER
-#       ACROSS FOUR PHASES" table)
-#   Phase 2* unbounded (aggressive):
-#       reports/phase2_unbounded_scorecard_aggressive.txt
-#   Phase 2* unbounded (weak HC, methodology footnote):
-#       reports/phase2_unbounded_scorecard.txt
+# These values used to be hardcoded here AND, separately, in
+# `analysis/bootstrap_ci.py`, with a comment in each asking the next
+# maintainer to keep the two in lockstep by hand. They now come from
+# `paper_resources/data/r_by_phase.json` via `analysis.r_data`, which is
+# the single source of truth; the provenance of each phase's numbers is
+# documented in that file's header.
 #
-# Last reconciled against the scorecards on 2026-05-22 at commit
-# `57cca9a1`. To re-derive these numbers programmatically from the
-# canonical SQLite databases, run `compute_metrics.py` on each phase's
-# `runs_phase*.sqlite` and read the per-seed `r` column out of the
-# scorecard output. The 95% CIs that the paper cites are computed in
-# `analysis/bootstrap_ci.py`, which takes these same per-seed r values
-# as input.
+# Consequence for re-runs: landing new data (for example the n=20
+# Phase 3.1 replication the paper's Limitations section calls for) is a
+# matter of regenerating the JSON — the figures, the LaTeX tables and the
+# confidence intervals then all quote the same numbers by construction,
+# with no Python edited and no chance of the three drifting apart.
+#
+# Seed count is derived from the data, never assumed, and may differ
+# between phases (a 20-seed Phase 3.1 alongside a 5-seed Phase 1 is a
+# valid configuration).
 # ---------------------------------------------------------------------------
 
-SEEDS = [42, 137, 256, 512, 1024]
-
-R_BY_PHASE = {
-    "Phase 1\nFrozen rules":        [-0.774, -0.608, -0.792, -0.812, -0.776],
-    "Phase 2\nHill-climbing":       [-0.759, -0.424, -0.719, -0.717, -0.564],
-    "Phase 3\nLLM personalities":   [-0.884, -0.525, -0.171, -0.712, -0.259],
-    "Phase 3.1\nLLM + reasoning":   [-0.289, -0.338, -0.327, +0.047, +0.435],
-}
-
-# Phase 2* unbounded sub-experiment (rendered alongside the other phases
-# by fig_five_tier_ladder but NOT counted as a separate phase in the
-# four-tier ladder). AGGRESSIVE is the canonical "did they converge to
-# Nash?" test referenced in the paper; WEAK is preserved as a
-# methodology footnote (HC delta too small to give the optimizer real
-# budget — see paper_resources/notes/phase2_unbounded_writeup.md).
-P2_UNBOUNDED_R_AGGRESSIVE = [-0.354, -0.700, -0.344, -0.887, -0.759]
-P2_UNBOUNDED_R_WEAK = [-0.791, -0.676, -0.932, -0.717, -0.779]
-P2_UNBOUNDED_R = P2_UNBOUNDED_R_AGGRESSIVE  # canonical
-
-# Ordering used for slopes / line plots
-PHASE_ORDER = list(R_BY_PHASE.keys())
+from analysis.r_data import (  # noqa: E402
+    SEEDS,
+    R_BY_PHASE,
+    P2_UNBOUNDED_R,
+    P2_UNBOUNDED_R_AGGRESSIVE,
+    P2_UNBOUNDED_R_WEAK,
+    PHASE_ORDER,
+    load_r_data,
+)
 
 PHASE_COLORS = {
     "Phase 1\nFrozen rules":      "#8B0000",   # dark red — the trap

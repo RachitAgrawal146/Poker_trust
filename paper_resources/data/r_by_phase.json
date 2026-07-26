@@ -1,0 +1,66 @@
+{
+  "_comment": [
+    "Canonical per-seed trust-profit Pearson r, one entry per phase.",
+    "SINGLE SOURCE OF TRUTH. analysis/r_data.py loads this file, and both",
+    "analysis/bootstrap_ci.py and analysis/make_paper_figures.py read it",
+    "from there. Do not re-hardcode these numbers anywhere else.",
+    "",
+    "PROVENANCE (5-seed canonical set, reconciled 2026-05-22 @ 57cca9a1):",
+    "  Phase 1 / Phase 2 / Phase 3 / Phase 3.1:",
+    "      reports/phase31_long_scorecard.txt",
+    "      ('TRUST-PROFIT R LADDER ACROSS FOUR PHASES' table)",
+    "  Phase 2* unbounded (aggressive, canonical):",
+    "      reports/phase2_unbounded_scorecard_aggressive.txt",
+    "  Phase 2* unbounded (weak HC, methodology footnote):",
+    "      reports/phase2_unbounded_scorecard.txt",
+    "",
+    "'seeds' and 'r' must be the same length for every phase. Seed counts",
+    "may differ BETWEEN phases (e.g. a 20-seed Phase 3.1 replication",
+    "alongside 5-seed Phase 1); every downstream consumer derives n from",
+    "len(r) rather than assuming 5."
+  ],
+  "phases": {
+    "Phase 1 (frozen rules)": {
+      "short": "Phase 1\nFrozen rules",
+      "ladder": true,
+      "hands_per_seed": 10000,
+      "seeds": [42, 137, 256, 512, 1024],
+      "r": [-0.774, -0.608, -0.792, -0.812, -0.776]
+    },
+    "Phase 2 (bounded HC)": {
+      "short": "Phase 2\nHill-climbing",
+      "ladder": true,
+      "hands_per_seed": 10000,
+      "seeds": [42, 137, 256, 512, 1024],
+      "r": [-0.759, -0.424, -0.719, -0.717, -0.564]
+    },
+    "Phase 2* (unbounded HC, weak)": {
+      "short": "Phase 2*\nUnbounded (weak)",
+      "ladder": false,
+      "hands_per_seed": 10000,
+      "seeds": [42, 137, 256, 512, 1024],
+      "r": [-0.791, -0.676, -0.932, -0.717, -0.779]
+    },
+    "Phase 2* (unbounded HC, aggr.)": {
+      "short": "Phase 2*\nUnbounded (aggr.)",
+      "ladder": false,
+      "hands_per_seed": 10000,
+      "seeds": [42, 137, 256, 512, 1024],
+      "r": [-0.354, -0.700, -0.344, -0.887, -0.759]
+    },
+    "Phase 3 (LLM personalities)": {
+      "short": "Phase 3\nLLM personalities",
+      "ladder": true,
+      "hands_per_seed": 500,
+      "seeds": [42, 137, 256, 512, 1024],
+      "r": [-0.884, -0.525, -0.171, -0.712, -0.259]
+    },
+    "Phase 3.1 (LLM + reasoning)": {
+      "short": "Phase 3.1\nLLM + reasoning",
+      "ladder": true,
+      "hands_per_seed": 150,
+      "seeds": [42, 137, 256, 512, 1024],
+      "r": [-0.289, -0.338, -0.327, 0.047, 0.435]
+    }
+  }
+}
