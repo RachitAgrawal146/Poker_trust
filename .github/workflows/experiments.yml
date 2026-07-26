@@ -43,6 +43,11 @@ permissions:
 
 env:
   MODEL: claude-haiku-4-5-20251001
+  # Hands per seed during a dry run. Shared by the run and aggregate jobs:
+  # aggregation only counts a seed as complete when its database holds the
+  # full hand count, so if these two disagree every database is rejected as
+  # incomplete and there is nothing left to aggregate.
+  DRY_HANDS: 2
 
 jobs:
   # -------------------------------------------------------------------------
@@ -162,10 +167,15 @@ jobs:
           mkdir -p out
           DB="out/runs_seed_${{ matrix.seed }}.sqlite"
           if [ "${{ inputs.dry_run }}" = "true" ]; then
+            # --seeds pins this job to its own matrix seed. Without it the
+            # dry run falls back to the default seed list and every job
+            # plays seed 42, so 20 files would carry 20 names but one seed
+            # and aggregation would collapse them to a single result.
             python3 phase3/run_phase31_replication.py \
               --dry-run --arm "${{ matrix.arm }}" \
-              --dry-run-seeds 1 --dry-run-hands 2
-            cp /tmp/phase31_dryrun.sqlite "$DB"
+              --db "$DB" \
+              --seeds "${{ matrix.seed }}" \
+              --dry-run-seeds 1 --dry-run-hands "$DRY_HANDS"
           else
             # Resumable and idempotent: re-running this job re-uses any
             # completed seed already present in the restored database.
@@ -214,8 +224,14 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          HANDS="${{ needs.plan.outputs.hands }}"
           EXP="${{ inputs.experiment }}"
+          # Must match the hand count the run jobs actually played, or every
+          # database is rejected as incomplete.
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            HANDS="$DRY_HANDS"
+          else
+            HANDS="${{ needs.plan.outputs.hands }}"
+          fi
 
           if [ "$EXP" = "ablation" ]; then
             # Each arm becomes its own entry so no published phase is
