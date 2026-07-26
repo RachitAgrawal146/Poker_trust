@@ -287,7 +287,11 @@ def _estimate(num_seeds: int, num_hands: int) -> None:
 def main(argv: Optional[List[str]] = None) -> int:
     p = argparse.ArgumentParser(description=__doc__,
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("--db", default=str(DEFAULT_DB), help="Target SQLite database.")
+    p.add_argument("--db", default=None,
+                   help="Target SQLite database. Defaults to "
+                        f"{DEFAULT_DB.name} for a real run, or a scratch file "
+                        "for --dry-run. An explicit path is honoured in both "
+                        "modes, so a dry run can write where the caller wants.")
     p.add_argument("--hands", type=int, default=150,
                    help="Hands per seed. 150 matches the published Phase 3.1 "
                         "horizon (directly comparable); 500 matches Phase 3 and "
@@ -326,7 +330,8 @@ def main(argv: Optional[List[str]] = None) -> int:
                    help="Skip the cost confirmation prompt.")
     args = p.parse_args(argv)
 
-    db_path = Path(args.db)
+    explicit_db = args.db is not None
+    db_path = Path(args.db) if explicit_db else DEFAULT_DB
     seeds = ([int(s) for s in args.seeds.split(",") if s.strip()]
              if args.seeds else list(REPLICATION_SEEDS))
 
@@ -358,7 +363,11 @@ def main(argv: Optional[List[str]] = None) -> int:
     if args.dry_run:
         seeds = seeds[:args.dry_run_seeds]
         num_hands = args.dry_run_hands
-        db_path = Path("/tmp/phase31_dryrun.sqlite")
+        if not explicit_db:
+            db_path = Path("/tmp/phase31_dryrun.sqlite")
+        # Always start a dry run from an empty database: its purpose is to
+        # prove the path works, and resuming onto stale mock rows would
+        # quietly skip the very work being validated.
         if db_path.exists():
             db_path.unlink()
         print("=" * 68)
