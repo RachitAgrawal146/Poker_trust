@@ -56,6 +56,7 @@ if str(_REPO_ROOT) not in sys.path:
 
 from analysis.r_data import (  # noqa: E402
     SEEDS,
+    PHASE_SEEDS,
     R_BY_PHASE,
     P2_UNBOUNDED_R,
     P2_UNBOUNDED_R_AGGRESSIVE,
@@ -261,21 +262,42 @@ def fig_per_seed_ladder(outdir: Path) -> None:
                  fontsize=12)
     ax.set_ylim(-1.05, 0.65)
 
-    # Annotate trap inversion seeds
+    # Annotate the seeds where the trap inverts (r > 0).
+    #
+    # Two things here must scale with the seed count rather than assume the
+    # original five. The seed label is looked up in *this phase's* seed list
+    # (PHASE_SEEDS), not the global SEEDS, which belongs to Phase 1 and is
+    # shorter as soon as one phase is re-run at a different n. And the
+    # annotations are capped: at n=20 more than half the seeds can be
+    # positive, and twenty overlapping arrows render as a solid block.
+    MAX_LABELS = 5
+    caption = ""
     for x_idx, phase in enumerate(PHASE_ORDER):
         if "3.1" not in phase:
             continue
-        for seed_idx, r in enumerate(R_BY_PHASE[phase]):
-            if r > 0:
-                ax.annotate(f"seed {SEEDS[seed_idx]}",
-                            xy=(x_idx, r), xytext=(x_idx - 0.35, r + 0.10),
-                            fontsize=8.5, color="#1B9E77", fontweight="bold",
-                            arrowprops=dict(arrowstyle="->", color="#1B9E77",
-                                            lw=0.8))
+        rs = R_BY_PHASE[phase]
+        seeds = PHASE_SEEDS[phase]
+        positive = [(i, r) for i, r in enumerate(rs) if r > 0]
+        # Label the most extreme inversions; they are the informative ones.
+        shown = sorted(positive, key=lambda t: -t[1])[:MAX_LABELS]
+        for seed_idx, r in shown:
+            ax.annotate(f"seed {seeds[seed_idx]}",
+                        xy=(x_idx, r), xytext=(x_idx - 0.35, r + 0.10),
+                        fontsize=8.5, color="#1B9E77", fontweight="bold",
+                        arrowprops=dict(arrowstyle="->", color="#1B9E77",
+                                        lw=0.8))
+        n_pos, n_tot = len(positive), len(rs)
+        if n_pos:
+            listed = ", ".join(str(seeds[i]) for i, _ in shown)
+            more = "" if n_pos <= MAX_LABELS else f", … ({n_pos} in total)"
+            caption = (f"{n_pos} of {n_tot} Phase 3.1 seeds ({listed}{more}) "
+                       f"flip the trap to POSITIVE r.")
+        else:
+            caption = f"No Phase 3.1 seed of {n_tot} flips the trap to positive r."
 
-    fig.text(0.99, -0.02,
-             "Two of five Phase 3.1 seeds (512, 1024) flip the trap to POSITIVE r.",
-             ha="right", va="top", fontsize=8.5, color="#555", style="italic")
+    if caption:
+        fig.text(0.99, -0.02, caption,
+                 ha="right", va="top", fontsize=8.5, color="#555", style="italic")
 
     fig.tight_layout()
     _save(fig, outdir, "02_per_seed_ladder.png")
