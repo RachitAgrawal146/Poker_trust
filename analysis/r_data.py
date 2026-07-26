@@ -135,6 +135,16 @@ _DATA = load_r_data()
 R_BY_PHASE: Dict[str, List[float]] = {
     p.short: p.r for p in _DATA.ladder_phases()
 }
+
+# Per-phase seed lists, keyed the same way as ``R_BY_PHASE``. Use this
+# anywhere an index into a phase's r values is turned back into a seed
+# number: ``SEEDS`` below is a single list and is only correct while every
+# phase shares it, which stops being true the moment one phase is re-run at
+# a different seed count.
+PHASE_SEEDS: Dict[str, List[int]] = {
+    p.short: p.seeds for p in _DATA.ladder_phases()
+}
+
 SEEDS: List[int] = _DATA.ladder_phases()[0].seeds
 P2_UNBOUNDED_R_AGGRESSIVE: List[float] = _DATA["Phase 2* (unbounded HC, aggr.)"].r
 P2_UNBOUNDED_R_WEAK: List[float] = _DATA["Phase 2* (unbounded HC, weak)"].r

@@ -32,7 +32,7 @@ if str(_REPO_ROOT) not in sys.path:
 
 # Reuse the same canonical numbers the figures script uses
 from analysis.make_paper_figures import (  # type: ignore  # noqa: E402
-    R_BY_PHASE, SEEDS, ARCHETYPES, BEHAVIORAL,
+    R_BY_PHASE, SEEDS, PHASE_SEEDS, ARCHETYPES, BEHAVIORAL,
     RANK_P3, RANK_P31, TMA_P31,
 )
 
@@ -97,13 +97,28 @@ def table_headline_ladder(data_dir: Path, tex_dir: Path) -> None:
     phases_short = ["Phase 1", "Phase 2", "Phase 3", "Phase 3.1"]
     phase_keys = list(R_BY_PHASE.keys())
 
-    # CSV: per-seed and summary
+    # CSV: per-seed and summary.
+    #
+    # Rows are built from the union of every phase's seeds rather than from a
+    # single shared list. Indexing one phase's r values by another phase's
+    # seed position is only valid while all phases share a seed list; once a
+    # phase is re-run at a different n that assumption silently truncates the
+    # table to the shorter list and mislabels the rows it does emit. A phase
+    # that did not run a given seed gets an explicit dash.
+    seed_maps = {p: dict(zip(PHASE_SEEDS[p], R_BY_PHASE[p])) for p in phase_keys}
+    all_seeds = sorted({s for p in phase_keys for s in PHASE_SEEDS[p]},
+                       key=lambda s: (SEEDS.index(s) if s in SEEDS else 10**9, s))
+
     header = ["seed"] + phases_short
     rows = []
-    for i, seed in enumerate(SEEDS):
-        rows.append([seed] + [f"{R_BY_PHASE[p][i]:+.3f}" for p in phase_keys])
+    for seed in all_seeds:
+        rows.append([seed] + [
+            f"{seed_maps[p][seed]:+.3f}" if seed in seed_maps[p] else "--"
+            for p in phase_keys
+        ])
     rows.append(["mean"] + [f"{np.mean(R_BY_PHASE[p]):+.3f}" for p in phase_keys])
     rows.append(["std"]  + [f"{np.std(R_BY_PHASE[p]):.3f}" for p in phase_keys])
+    rows.append(["n"]    + [str(len(R_BY_PHASE[p])) for p in phase_keys])
     _write_csv(data_dir / "headline_ladder.csv", header, rows)
 
     # LaTeX
