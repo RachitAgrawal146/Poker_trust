@@ -53,10 +53,21 @@ def _write_csv(path: Path, header: list, rows: list) -> None:
 
 def _write_latex_table(path: Path, caption: str, label: str,
                        column_spec: str, header: list, rows: list,
-                       footnote: str = "") -> None:
+                       footnote: str = "", starred: bool = False) -> None:
+    """Write one LaTeX table.
+
+    ``starred`` selects the full-text-width ``table*`` float instead of the
+    single-column ``table``. Wide tables must be starred: the manuscript is
+    ``twocolumn``, so a 6- or 7-column table set as a plain ``table``
+    overflows its column. This used to be corrected by hand after running
+    this script, which meant every regeneration silently reverted the fix.
+    Encoding it here keeps the generator's output identical to what the
+    manuscript expects, so re-running after new data is safe.
+    """
+    env = "table*" if starred else "table"
     path.parent.mkdir(parents=True, exist_ok=True)
     lines = [
-        r"\begin{table}[ht]",
+        rf"\begin{{{env}}}[ht]",
         r"\centering",
         r"\small",
         rf"\begin{{tabular}}{{{column_spec}}}",
@@ -72,7 +83,7 @@ def _write_latex_table(path: Path, caption: str, label: str,
     lines += [
         rf"\caption{{{caption}}}",
         rf"\label{{tab:{label}}}",
-        r"\end{table}",
+        rf"\end{{{env}}}",
     ]
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
     print(f"  wrote {path}")
@@ -162,6 +173,7 @@ def table_per_archetype_p31(data_dir: Path, tex_dir: Path) -> None:
         header=["Archetype", "Trust", "Stack", "$\\sigma$",
                 "Rebuys", "Rank P3", "Rank P3.1", "$\\Delta$"],
         rows=rows,
+        starred=True,
     )
 
 
@@ -195,6 +207,7 @@ def table_behavioral_shift(data_dir: Path, tex_dir: Path) -> None:
         header=["Archetype", "VPIP P1", "VPIP P3.1", "PFR P1", "PFR P3.1",
                 "AF P1", "AF P3.1"],
         rows=rows,
+        starred=True,
     )
 
 
@@ -220,10 +233,17 @@ def table_tma(data_dir: Path, tex_dir: Path) -> None:
 
     _write_latex_table(
         tex_dir / "tma_by_archetype.tex",
+        # The trailing clause is load-bearing, not decoration: it was added
+        # in response to peer review, which read a high TMA for the two
+        # most honest archetypes as evidence of deception. For Wall and
+        # Sentinel the signal reflects trust and legitimate value-betting
+        # rising together, not manipulation. Do not drop it.
         caption="Trust Manipulation Awareness (TMA) per archetype in Phase 3.1. "
                 "Positive TMA = the agent gains trust before exploiting it. "
-                "Six of eight archetypes farm, with Wall and Sentinel showing "
-                "the strongest signals.",
+                "Six of eight archetypes farm; Wall and Sentinel show the "
+                "strongest signals, but for these two honest archetypes the "
+                "high TMA reflects correlated trust and legitimate "
+                "value-betting rather than deception.",
         label="tma",
         column_spec="lrl",
         header=["Archetype", "TMA", "Direction"],
