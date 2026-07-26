@@ -74,6 +74,95 @@ def _load_personality_spec(archetype: str) -> str:
     return text
 
 
+class Scaffolds:
+    """Which Phase 3.1 reasoning scaffolds are switched on.
+
+    Phase 3.1 adds three things to Phase 3, and the manuscript claims all
+    three are needed. Testing that claim requires turning them on and off
+    independently, so they are three flags rather than one:
+
+    * ``cot``    -- chain-of-thought: the model writes brief reasoning before
+                    a final ``ACTION:`` line. Also selects the 96-token
+                    output budget and the Phase 3.1 parser.
+    * ``memory`` -- per-opponent rolling action summaries injected into the
+                    decision prompt.
+    * ``notes``  -- adaptive strategy notes, refreshed by one extra LLM call
+                    every 25 hands.
+
+    ``Scaffolds.all()`` is Phase 3.1; ``Scaffolds.none()`` is Phase 3. The
+    leave-one-out arms in between are what the ablation reports.
+
+    Note that ``cot`` is deliberately separable from the other two: with
+    ``cot=False, memory=True`` the agent still receives opponent summaries
+    but must answer in the one-word Phase 3 format. That is the intended
+    contrast -- it removes the *reasoning* scaffold while leaving the
+    *information* scaffolds in place.
+    """
+
+    __slots__ = ("cot", "memory", "notes")
+
+    def __init__(self, cot: bool = False, memory: bool = False,
+                 notes: bool = False) -> None:
+        self.cot = bool(cot)
+        self.memory = bool(memory)
+        self.notes = bool(notes)
+
+    @classmethod
+    def all(cls) -> "Scaffolds":
+        return cls(cot=True, memory=True, notes=True)
+
+    @classmethod
+    def none(cls) -> "Scaffolds":
+        return cls()
+
+    @classmethod
+    def from_spec(cls, spec: str) -> "Scaffolds":
+        """Parse an arm name.
+
+        ``full`` / ``phase31``     -> all three
+        ``none`` / ``phase3``      -> none
+        ``no-cot``/``no-memory``/``no-notes`` -> leave-one-out
+        ``cot``/``memory``/``notes``          -> that one only
+        Comma-separated combinations also work: ``cot,memory``.
+        """
+        s = spec.strip().lower().replace("_", "-")
+        if s in ("full", "phase31", "all"):
+            return cls.all()
+        if s in ("none", "phase3"):
+            return cls.none()
+        if s.startswith("no-"):
+            out = cls.all()
+            drop = s[3:]
+            if not hasattr(out, drop):
+                raise ValueError(f"unknown scaffold {drop!r} in {spec!r}")
+            setattr(out, drop, False)
+            return out
+        out = cls.none()
+        for part in s.split(","):
+            part = part.strip()
+            if not part:
+                continue
+            if not hasattr(out, part):
+                raise ValueError(f"unknown scaffold {part!r} in {spec!r}")
+            setattr(out, part, True)
+        return out
+
+    @property
+    def any(self) -> bool:
+        return self.cot or self.memory or self.notes
+
+    def label(self) -> str:
+        if self.cot and self.memory and self.notes:
+            return "full"
+        if not self.any:
+            return "none"
+        return "+".join(n for n in ("cot", "memory", "notes") if getattr(self, n))
+
+    def __repr__(self) -> str:  # pragma: no cover - debugging aid
+        return (f"Scaffolds(cot={self.cot}, memory={self.memory}, "
+                f"notes={self.notes})")
+
+
 def _build_system_prompt(archetype: str, seat: int, phase31: bool = False) -> str:
     """Build the system prompt for an LLM poker agent.
 
@@ -81,6 +170,11 @@ def _build_system_prompt(archetype: str, seat: int, phase31: bool = False) -> st
     phase31=True : Phase 3.1 prompt with chain-of-thought + memory + adaptive
                    notes scaffolding (memory and notes are filled in by the
                    user message at decision time, not the system prompt).
+
+    The flag here corresponds specifically to the chain-of-thought scaffold
+    (``Scaffolds.cot``), because that is the only one of the three that
+    changes the system prompt; memory and notes are injected per-call into
+    the user message so the system prompt stays cacheable.
     """
     personality = _load_personality_spec(archetype)
     base_rules = f"""You are playing Limit Texas Hold'em at an 8-player table. You are seat {seat}.
@@ -423,13 +517,23 @@ class LLMChatAgent(BaseAgent):
         provider: str = "ollama",
         rng: Optional[np.random.Generator] = None,
         phase31: bool = False,
+        scaffolds: Optional["Scaffolds"] = None,
     ) -> None:
         super().__init__(name=name, archetype=archetype, seat=seat, rng=rng)
         self._client = client
         self._model = model
         self._provider = provider
-        self._phase31 = phase31
-        self._system_prompt = _build_system_prompt(archetype, seat, phase31=phase31)
+        # ``scaffolds`` supersedes ``phase31`` when given. The boolean is
+        # kept so existing callers (and the published Phase 3 / 3.1
+        # configurations) keep working unchanged: phase31=True is exactly
+        # all three scaffolds on.
+        self._sc = scaffolds if scaffolds is not None else (
+            Scaffolds.all() if phase31 else Scaffolds.none()
+        )
+        self._phase31 = self._sc.any
+        self._system_prompt = _build_system_prompt(
+            archetype, seat, phase31=self._sc.cot
+        )
 
         # Stats
         self.llm_calls: int = 0
@@ -470,8 +574,8 @@ class LLMChatAgent(BaseAgent):
         # Build prompt and call LLM
         user_msg = _build_decision_prompt(
             game_state, self.hole_cards, hs, self.archetype,
-            opponent_memory=(self._opponent_memory if self._phase31 else None),
-            strategy_notes=(self._strategy_notes if self._phase31 else None),
+            opponent_memory=(self._opponent_memory if self._sc.memory else None),
+            strategy_notes=(self._strategy_notes if self._sc.notes else None),
         )
 
         print(f"    {self.name} calling LLM...", end="", flush=True)
@@ -480,11 +584,13 @@ class LLMChatAgent(BaseAgent):
             response = _call_llm(
                 self._client, self._provider, self._model,
                 self._system_prompt, user_msg,
-                max_output_tokens=(96 if self._phase31 else 16),
+                max_output_tokens=(96 if self._sc.cot else 16),
             )
             self.llm_calls += 1
             elapsed = time.time() - t0
-            if self._phase31:
+            # Parser must match the prompt format, which is set by the CoT
+            # scaffold alone -- not by whether any scaffold is active.
+            if self._sc.cot:
                 action = _parse_phase31_action(response)
             else:
                 action = _parse_action(response)
@@ -532,17 +638,20 @@ class LLMChatAgent(BaseAgent):
 
     def on_hand_start(self, hand_id: int) -> None:
         super().on_hand_start(hand_id)
-        if self._phase31:
+        if self._sc.notes:
             self._actions_this_hand = []
             self._stack_at_hand_start = self.stack
 
     def observe_action(self, record) -> None:
         super().observe_action(record)
-        if not self._phase31:
-            return
-        # Track our own actions for the post-hand reflection
+        # Each branch is gated by the scaffold that consumes it, so an
+        # ablation arm does no bookkeeping it will never read.
         if record.seat == self.seat:
-            self._actions_this_hand.append(record.action_type.value)
+            # Own actions feed the post-hand reflection (notes only).
+            if self._sc.notes:
+                self._actions_this_hand.append(record.action_type.value)
+            return
+        if not self._sc.memory:
             return
         # Track per-opponent recent actions for memory updates
         log = self._opp_action_log.setdefault(record.seat, [])
@@ -554,7 +663,7 @@ class LLMChatAgent(BaseAgent):
 
     def on_hand_end(self, hand_id: int) -> None:
         super().on_hand_end(hand_id)
-        if not self._phase31:
+        if not (self._sc.memory or self._sc.notes):
             return
         # Compute profit this hand from stack delta (rebuy-aware: if we
         # rebought, the runner has already topped up the stack, so the
@@ -562,11 +671,12 @@ class LLMChatAgent(BaseAgent):
         profit = self.stack - self._stack_at_hand_start
         # Refresh the per-opponent memory from the action log every 10 hands
         # to keep API costs bounded.
-        if hand_id % 10 == 0:
+        if self._sc.memory and hand_id % 10 == 0:
             self._refresh_opponent_memory()
         # Trigger an adaptive-spec update every 25 hands -- one extra LLM
-        # call per agent per 25 hands.
-        if hand_id % 25 == 0 and hand_id > 0:
+        # call per agent per 25 hands. This is the only scaffold that costs
+        # extra API calls, so dropping it also makes an arm cheaper.
+        if self._sc.notes and hand_id % 25 == 0 and hand_id > 0:
             self._update_strategy_notes(hand_id, profit)
 
     def _refresh_opponent_memory(self) -> None:
@@ -634,11 +744,12 @@ class LLMChatJudge(LLMChatAgent):
                  provider: str = "ollama",
                  name: str = "LLM-Judge",
                  rng: Optional[np.random.Generator] = None,
-                 phase31: bool = False) -> None:
+                 phase31: bool = False,
+                 scaffolds: Optional["Scaffolds"] = None) -> None:
         super().__init__(
             seat=seat, name=name, archetype="judge",
             client=client, model=model, provider=provider, rng=rng,
-            phase31=phase31,
+            phase31=phase31, scaffolds=scaffolds,
         )
         self.grievance: Dict[int, int] = {}
         self.triggered: Dict[int, bool] = {}

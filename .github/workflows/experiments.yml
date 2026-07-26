@@ -1,0 +1,277 @@
+# ---------------------------------------------------------------------------
+# Paper experiments — runnable from the GitHub web UI or mobile app.
+#
+# Every experiment here is a set of independent per-seed simulations, so the
+# work fans out across a job matrix: 20 seeds run in 20 parallel jobs, and the
+# wall-clock cost is one seed rather than twenty. This repository is public,
+# so Actions minutes on standard runners are free; the only real cost is
+# Anthropic API spend, which is estimated up front in the job summary.
+#
+# The API key is read from the repository secret ANTHROPIC_API_KEY. It is
+# never printed and never committed.
+#
+# Safety: the workflow refuses to spend anything unless `confirm` is typed
+# as RUN. Set `dry_run` to exercise the whole pipeline against an offline
+# mock client for $0 first.
+# ---------------------------------------------------------------------------
+name: Paper experiments
+
+on:
+  workflow_dispatch:
+    inputs:
+      experiment:
+        description: "Which experiment to run"
+        required: true
+        default: phase31-n20
+        type: choice
+        options:
+          - phase31-n20        # P0: n=20 Phase 3.1 replication @150 hands (~$68)
+          - phase3-temp0       # Phase 3 re-run at temperature 0.0 @500 hands (~$33)
+          - ablation           # 3 leave-one-out arms x 5 seeds @150 hands (~$51)
+      confirm:
+        description: "Type RUN to authorise API spend (ignored when dry_run)"
+        required: false
+        default: ""
+      dry_run:
+        description: "Offline mock client — validates everything, costs $0"
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+
+env:
+  MODEL: claude-haiku-4-5-20251001
+
+jobs:
+  # -------------------------------------------------------------------------
+  # Build the job matrix and refuse to proceed unless spend is authorised.
+  # -------------------------------------------------------------------------
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.plan.outputs.matrix }}
+      hands: ${{ steps.plan.outputs.hands }}
+      phase_key: ${{ steps.plan.outputs.phase_key }}
+      jobs: ${{ steps.plan.outputs.jobs }}
+      est_cost: ${{ steps.plan.outputs.est_cost }}
+      est_hours: ${{ steps.plan.outputs.est_hours }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build matrix and estimate cost
+        id: plan
+        shell: bash
+        run: |
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json, os
+
+          EXP        = "${{ inputs.experiment }}"
+          SEEDS_20   = [42,137,256,512,1024,12666,13927,14942,19277,29004,
+                        41939,42908,58556,69218,70875,72385,73280,77153,86890,99769]
+          SEEDS_5    = SEEDS_20[:5]
+
+          # Measured from the published runs (reports/phase3*_long_scorecard.txt):
+          #   Phase 3   43,943 calls / 12.6 h  -> 1.03 s/call, $0.000753/call
+          #   Phase 3.1 11,953 calls /  6.9 h  -> 2.08 s/call, $0.001422/call
+          COT   = dict(calls_per_hand=15.9, sec=2.08, usd=0.001422)
+          NOCOT = dict(calls_per_hand=17.6, sec=1.03, usd=0.000753)
+
+          if EXP == "phase31-n20":
+              hands, rate = 150, COT
+              combos = [{"seed": s, "arm": "full"} for s in SEEDS_20]
+              key = "Phase 3.1 (LLM + reasoning)"
+          elif EXP == "phase3-temp0":
+              hands, rate = 500, NOCOT
+              combos = [{"seed": s, "arm": "none"} for s in SEEDS_5]
+              key = "Phase 3 (LLM personalities)"
+          else:  # ablation
+              hands, rate = 150, COT
+              combos = [{"seed": s, "arm": a}
+                        for a in ("no-cot", "no-memory", "no-notes")
+                        for s in SEEDS_5]
+              key = ""   # each arm writes its own key, set per-job
+
+          calls_per_job = hands * rate["calls_per_hand"]
+          total_calls   = calls_per_job * len(combos)
+          print(f"matrix={json.dumps({'include': combos})}")
+          print(f"hands={hands}")
+          print(f"phase_key={key}")
+          print(f"jobs={len(combos)}")
+          print(f"est_cost={total_calls * rate['usd']:.2f}")
+          print(f"est_hours={calls_per_job * rate['sec'] / 3600:.1f}")
+          PY
+
+      - name: Cost gate
+        shell: bash
+        env:
+          # Passed as an env var rather than interpolated into the script, so
+          # the secret is never embedded in a command line. We only ever test
+          # whether it is empty.
+          HAVE_KEY: ${{ secrets.ANTHROPIC_API_KEY != '' }}
+        run: |
+          {
+            echo "### ${{ inputs.experiment }}"
+            echo ""
+            echo "| | |"
+            echo "|---|---|"
+            echo "| Parallel jobs | ${{ steps.plan.outputs.jobs }} |"
+            echo "| Hands per seed | ${{ steps.plan.outputs.hands }} |"
+            echo "| Estimated API cost | \$${{ steps.plan.outputs.est_cost }} |"
+            echo "| Estimated wall clock | ~${{ steps.plan.outputs.est_hours }} h |"
+            echo "| Dry run | ${{ inputs.dry_run }} |"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            echo "Dry run — no API calls, no spend."; exit 0
+          fi
+          if [ "${{ inputs.confirm }}" != "RUN" ]; then
+            echo "::error::Refusing to spend. Type RUN in the 'confirm' box, or tick dry_run."
+            exit 1
+          fi
+          if [ "$HAVE_KEY" != "true" ]; then
+            echo "::error::Repository secret ANTHROPIC_API_KEY is not set."
+            exit 1
+          fi
+
+  # -------------------------------------------------------------------------
+  # One job per (seed, arm). These are fully independent.
+  # -------------------------------------------------------------------------
+  run:
+    needs: plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 350          # under the 360-minute hosted-runner ceiling
+    strategy:
+      fail-fast: false            # one bad seed must not kill the other 19
+      max-parallel: 20            # free-tier concurrency for public repos
+      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install --quiet numpy treys anthropic
+
+      - name: Run seed ${{ matrix.seed }} (arm ${{ matrix.arm }})
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          mkdir -p out
+          DB="out/runs_seed_${{ matrix.seed }}.sqlite"
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            python3 phase3/run_phase31_replication.py \
+              --dry-run --arm "${{ matrix.arm }}" \
+              --dry-run-seeds 1 --dry-run-hands 2
+            cp /tmp/phase31_dryrun.sqlite "$DB"
+          else
+            # Resumable and idempotent: re-running this job re-uses any
+            # completed seed already present in the restored database.
+            python3 phase3/run_phase31_replication.py \
+              --db "$DB" \
+              --hands "${{ needs.plan.outputs.hands }}" \
+              --seeds "${{ matrix.seed }}" \
+              --arm "${{ matrix.arm }}" \
+              --model "$MODEL" \
+              --yes
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: db-${{ matrix.arm }}-${{ matrix.seed }}
+          path: out/*.sqlite
+          retention-days: 30
+
+  # -------------------------------------------------------------------------
+  # Merge the per-seed databases, recompute r, refresh every derived artifact,
+  # and commit. Runs even if some seeds failed, so a partial result is still
+  # captured rather than lost.
+  # -------------------------------------------------------------------------
+  aggregate:
+    needs: [plan, run]
+    if: always() && !cancelled()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install --quiet numpy treys matplotlib
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          pattern: db-*
+          merge-multiple: false
+
+      - name: Recompute r and refresh derived artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          HANDS="${{ needs.plan.outputs.hands }}"
+          EXP="${{ inputs.experiment }}"
+
+          if [ "$EXP" = "ablation" ]; then
+            # Each arm becomes its own entry so no published phase is
+            # overwritten and the headline ladder figure is untouched.
+            for ARM in no-cot no-memory no-notes; do
+              python3 phase3/run_phase31_replication.py --emit-r-json \
+                --db-glob "artifacts/db-${ARM}-*/*.sqlite" \
+                --hands "$HANDS" \
+                --phase-key "Phase 3.1 ablation ($ARM)"
+            done
+          else
+            python3 phase3/run_phase31_replication.py --emit-r-json \
+              --db-glob 'artifacts/db-*/*.sqlite' \
+              --hands "$HANDS" \
+              --phase-key "${{ needs.plan.outputs.phase_key }}"
+            # Figures and LaTeX tables read the same JSON, so they stay
+            # consistent with the CIs by construction.
+            python3 analysis/make_paper_figures.py
+            python3 analysis/make_paper_tables.py
+          fi
+
+          python3 analysis/bootstrap_ci.py | tee ci_report.txt
+          python3 analysis/bootstrap_ci.py --csv \
+            > paper_resources/data/r_bootstrap_ci.csv
+          rm -f paper_resources/data/r_by_phase.json.bak
+
+      - name: Publish results to the job summary
+        shell: bash
+        run: |
+          { echo '### Updated confidence intervals'; echo '```';
+            cat ci_report.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Archive databases
+        uses: actions/upload-artifact@v4
+        with:
+          name: all-databases-${{ inputs.experiment }}
+          path: artifacts/**/*.sqlite
+          retention-days: 90
+
+      - name: Commit
+        if: inputs.dry_run != true
+        shell: bash
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A paper_resources analysis || true
+          if git diff --cached --quiet; then
+            echo "No changes to commit."; exit 0
+          fi
+          git commit -m "experiment: ${{ inputs.experiment }} results (${{ needs.plan.outputs.jobs }} seeds)
+
+          Ran via .github/workflows/experiments.yml.
+          Per-seed r recomputed and every derived artifact refreshed from
+          paper_resources/data/r_by_phase.json.
+
+          Estimated API spend: \$${{ needs.plan.outputs.est_cost }}."
+          for i in 1 2 3 4; do
+            git push origin HEAD:${{ github.ref_name }} && break || sleep $((2**i))
+          done

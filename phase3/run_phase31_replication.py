@@ -198,30 +198,64 @@ def per_seed_r(db_path: Path, seed_to_run: Dict[int, int]) -> Dict[int, float]:
         conn.close()
 
 
-def emit_r_json(db_path: Path, num_hands: int, json_path: Path,
-                dry_run: bool = False) -> int:
-    """Rewrite the Phase 3.1 entry of ``r_by_phase.json`` from the database."""
-    done = completed_seeds(db_path, num_hands)
-    if not done:
-        print(f"  no completed seeds in {db_path} at {num_hands} hands — nothing to emit")
+def collect_r(db_paths: List[Path], num_hands: int) -> Dict[int, float]:
+    """Collect ``seed -> r`` across one or more databases.
+
+    Running seeds in parallel (one CI job per seed) produces one
+    single-seed database per job rather than one shared file, so
+    aggregation has to span databases. Seeds are keyed by value, not by
+    file, so a seed present in two databases resolves to the later one
+    and re-running a single seed to replace a bad result works as
+    expected.
+    """
+    out: Dict[int, float] = {}
+    for db in db_paths:
+        done = completed_seeds(db, num_hands)
+        if not done:
+            print(f"  {db.name}: no completed seed at {num_hands} hands — skipped")
+            continue
+        for seed, r in per_seed_r(db, done).items():
+            out[seed] = r
+    # Order by the frozen seed list where possible, then any extras.
+    def _key(s: int) -> int:
+        return REPLICATION_SEEDS.index(s) if s in REPLICATION_SEEDS else 10**9
+    return {s: out[s] for s in sorted(out, key=_key)}
+
+
+def emit_r_json(db_paths: List[Path], num_hands: int, json_path: Path,
+                dry_run: bool = False, phase_key: str = PHASE_KEY) -> int:
+    """Rewrite one phase entry of ``r_by_phase.json`` from the databases."""
+    rmap = collect_r(db_paths, num_hands)
+    if not rmap:
+        print(f"  no completed seeds at {num_hands} hands — nothing to emit")
         return 1
 
-    rmap = per_seed_r(db_path, done)
     seeds = list(rmap.keys())
     rs = [rmap[s] for s in seeds]
 
     payload = json.loads(json_path.read_text())
-    entry = payload["phases"][PHASE_KEY]
+    if phase_key not in payload["phases"]:
+        # A new arm (e.g. an ablation leave-one-out) gets its own entry
+        # rather than overwriting a published phase. ladder=false keeps it
+        # out of the headline four-tier figure.
+        payload["phases"][phase_key] = {
+            "short": phase_key, "ladder": False,
+            "hands_per_seed": num_hands, "seeds": [], "r": [],
+        }
+    entry = payload["phases"][phase_key]
     old_n, old_r = len(entry["r"]), list(entry["r"])
     entry["seeds"] = seeds
     entry["r"] = [round(x, 3) for x in rs]
     entry["hands_per_seed"] = num_hands
 
-    mean_old = sum(old_r) / len(old_r)
     mean_new = sum(rs) / len(rs)
-    print(f"  {PHASE_KEY}")
+    print(f"  {phase_key}")
     print(f"    n:      {old_n} -> {len(seeds)}")
-    print(f"    mean r: {mean_old:+.3f} -> {mean_new:+.3f}")
+    if old_r:
+        mean_old = sum(old_r) / len(old_r)
+        print(f"    mean r: {mean_old:+.3f} -> {mean_new:+.3f}")
+    else:
+        print(f"    mean r: {mean_new:+.3f}")
     print(f"    r:      {[f'{x:+.3f}' for x in rs]}")
 
     if dry_run:
@@ -262,7 +296,14 @@ def main(argv: Optional[List[str]] = None) -> int:
                    help="Comma-separated seed override. Default: the frozen 20.")
     p.add_argument("--model", default=DEFAULT_MODEL)
     p.add_argument("--provider", default="anthropic", choices=["anthropic", "ollama"])
-    p.add_argument("--label", default="phase31-n20-replication")
+    p.add_argument("--label", default=None,
+                   help="Run label stored in the database. Defaults to a name "
+                        "derived from the arm.")
+    p.add_argument("--arm", default="full",
+                   help="Which reasoning scaffolds are active. 'full' = "
+                        "Phase 3.1 (all three); 'none' = Phase 3; "
+                        "'no-cot' / 'no-memory' / 'no-notes' are the "
+                        "leave-one-out ablation arms. Default: full.")
     p.add_argument("--dry-run", action="store_true",
                    help="Validate the full path offline with a mock client. "
                         "No API calls, no cost.")
@@ -271,7 +312,16 @@ def main(argv: Optional[List[str]] = None) -> int:
     p.add_argument("--dry-run-seeds", type=int, default=2,
                    help="Seeds to exercise during --dry-run (default: 2).")
     p.add_argument("--emit-r-json", action="store_true",
-                   help="Recompute per-seed r from --db and update r_by_phase.json.")
+                   help="Recompute per-seed r from --db (or --db-glob) and "
+                        "update r_by_phase.json.")
+    p.add_argument("--db-glob", default=None,
+                   help="Glob matching several single-seed databases, for "
+                        "aggregating a parallel run "
+                        "(e.g. 'artifacts/**/runs_seed_*.sqlite').")
+    p.add_argument("--phase-key", default=PHASE_KEY,
+                   help="Which phase entry in r_by_phase.json to write. "
+                        "Ablation arms should use their own key so they do "
+                        "not overwrite a published phase.")
     p.add_argument("--yes", action="store_true",
                    help="Skip the cost confirmation prompt.")
     args = p.parse_args(argv)
@@ -280,9 +330,29 @@ def main(argv: Optional[List[str]] = None) -> int:
     seeds = ([int(s) for s in args.seeds.split(",") if s.strip()]
              if args.seeds else list(REPLICATION_SEEDS))
 
+    from phase3.llm_chat_agent import Scaffolds
+    try:
+        scaffolds = Scaffolds.from_spec(args.arm)
+    except ValueError as e:
+        print(f"ERROR: {e}", file=sys.stderr)
+        return 2
+    label = args.label or f"phase31-repl-{scaffolds.label()}"
+
     if args.emit_r_json:
-        print("Emitting r_by_phase.json from", db_path)
-        return emit_r_json(db_path, args.hands, R_JSON)
+        if args.db_glob:
+            import glob as _glob
+            db_paths = sorted(Path(p) for p in _glob.glob(args.db_glob,
+                                                          recursive=True))
+            if not db_paths:
+                print(f"ERROR: --db-glob matched nothing: {args.db_glob}",
+                      file=sys.stderr)
+                return 2
+            print(f"Emitting from {len(db_paths)} database(s)")
+        else:
+            db_paths = [db_path]
+            print("Emitting r_by_phase.json from", db_path)
+        return emit_r_json(db_paths, args.hands, R_JSON,
+                           phase_key=args.phase_key)
 
     # ---------------- dry run ----------------
     if args.dry_run:
@@ -349,7 +419,7 @@ def main(argv: Optional[List[str]] = None) -> int:
             summary = run_one_seed(
                 seed=seed, num_hands=num_hands, client=client,
                 model=args.model, provider=args.provider,
-                logger=logger, label=args.label, phase31=True,
+                logger=logger, label=label, scaffolds=scaffolds,
             )
             summaries.append(summary)
             if summary["chip_delta"] != 0:
@@ -377,13 +447,12 @@ def main(argv: Optional[List[str]] = None) -> int:
     if args.dry_run:
         print()
         print("Validating r extraction...")
-        done = completed_seeds(db_path, num_hands)
-        rmap = per_seed_r(db_path, done)
-        for seed, r in rmap.items():
+        for seed, r in collect_r([db_path], num_hands).items():
             print(f"  seed {seed}: r = {r:+.3f}")
         print()
         print("Previewing the r_by_phase.json update (no write):")
-        emit_r_json(db_path, num_hands, R_JSON, dry_run=True)
+        emit_r_json([db_path], num_hands, R_JSON, dry_run=True,
+                    phase_key=args.phase_key)
         print()
         print("DRY RUN OK — the full path works end to end.")
         print("The r values above are meaningless (the mock always calls);")

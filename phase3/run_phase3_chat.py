@@ -57,18 +57,23 @@ ARCHETYPES = [
 
 
 def build_chat_roster(client: Any, model: str, provider: str,
-                      phase31: bool = False) -> List:
-    """Build the 8-seat roster where every agent calls the LLM."""
+                      phase31: bool = False, scaffolds: Any = None) -> List:
+    """Build the 8-seat roster where every agent calls the LLM.
+
+    ``scaffolds`` (a ``Scaffolds``) overrides ``phase31`` when supplied, and
+    is how the ablation arms select which of the three Phase 3.1 additions
+    are active. Every seat gets the same arm.
+    """
     agents = []
     for seat, name, archetype in ARCHETYPES:
         agents.append(LLMChatAgent(
             seat=seat, name=name, archetype=archetype,
             client=client, model=model, provider=provider,
-            phase31=phase31,
+            phase31=phase31, scaffolds=scaffolds,
         ))
     agents.append(LLMChatJudge(
         seat=7, client=client, model=model, provider=provider,
-        phase31=phase31,
+        phase31=phase31, scaffolds=scaffolds,
     ))
     return agents
 
@@ -117,9 +122,11 @@ def run_one_seed(
     logger: SQLiteLogger,
     label: str,
     phase31: bool = False,
+    scaffolds: Any = None,
 ) -> Dict[str, Any]:
     print("  Building roster...", flush=True)
-    agents = build_chat_roster(client, model, provider, phase31=phase31)
+    agents = build_chat_roster(client, model, provider,
+                               phase31=phase31, scaffolds=scaffolds)
     num_seats = len(agents)
     starting_stack = SIMULATION["starting_stack"]
 
