@@ -678,16 +678,20 @@ Eq.~\ref{eq:posterior} as Bayes-flavoured but not strictly
 Bayesian. The noise floor is encoded into the likelihood function
 (a uniform contamination model). The likelihood function is computed
 from the analytic policy for each archetype, so it is well-specified.
-Equation~\ref{eq:decay} models the between-hand shrinking of the
-posteriors towards a uniform prior:
+Equation~\ref{eq:decay} models the between-hand flattening of the
+posteriors towards a uniform prior. Each component is raised to the
+power $\lambda$ and the result renormalized---an exponential
+tempering step:
 \begin{equation}
-  p_{i\to j} \;\leftarrow\;
-    \lambda\,p_{i\to j} + (1-\lambda)\,|\mathcal{T}|^{-1},
+  p_{i\to j}(t) \;\leftarrow\;
+    \frac{p_{i\to j}(t)^{\lambda}}
+         {\sum_{t'\in\mathcal{T}} p_{i\to j}(t')^{\lambda}},
   \qquad \lambda = 0.95,
   \label{eq:decay}
 \end{equation}
-providing an effective memory of about 20 hands (approximately
-$1/(1-\lambda)$). The trust score, our main dependent variable, is
+Under this update the log-odds between any two types decay by the
+factor $\lambda$ per hand, providing an effective memory of about 20
+hands (approximately $1/(1-\lambda)$). The trust score, our main dependent variable, is
 defined as
 \begin{equation}
   \text{trust}_{i\to j} \;=\;
