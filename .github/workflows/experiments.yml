@@ -37,6 +37,14 @@ on:
         required: false
         default: false
         type: boolean
+      parallelism:
+        description: "Max simultaneous seed jobs. Higher is faster but risks API rate limiting; a throttled seed fails loudly and must be re-run from scratch, wasting its spend."
+        required: false
+        default: "10"
+      seed_limit:
+        description: "Optional: run only the first N seeds (per arm). Empty = all. Use to size an experiment to remaining credit."
+        required: false
+        default: ""
 
 permissions:
   contents: write
@@ -73,8 +81,11 @@ jobs:
           import json, os
 
           EXP        = "${{ inputs.experiment }}"
+          SEED_LIMIT = "${{ inputs.seed_limit }}".strip()
           SEEDS_20   = [42,137,256,512,1024,12666,13927,14942,19277,29004,
                         41939,42908,58556,69218,70875,72385,73280,77153,86890,99769]
+          if SEED_LIMIT:
+              SEEDS_20 = SEEDS_20[:int(SEED_LIMIT)]
           SEEDS_5    = SEEDS_20[:5]
 
           # Measured from the published runs (reports/phase3*_long_scorecard.txt):
@@ -83,29 +94,38 @@ jobs:
           COT   = dict(calls_per_hand=15.9, sec=2.08, usd=0.001422)
           NOCOT = dict(calls_per_hand=17.6, sec=1.03, usd=0.000753)
 
+          # Rates are PER ARM, not per experiment: the no-cot ablation arm
+          # answers in the one-word 16-token format, so it runs at the cheap
+          # fast Phase 3 rate. A single experiment-wide rate overstated the
+          # ablation by ~$8, which matters when sizing runs to a budget.
+          def rate_for(arm):
+              return NOCOT if arm in ("none", "no-cot") else COT
+
           if EXP == "phase31-n20":
-              hands, rate = 150, COT
+              hands = 150
               combos = [{"seed": s, "arm": "full"} for s in SEEDS_20]
               key = "Phase 3.1 (LLM + reasoning)"
           elif EXP == "phase3-temp0":
-              hands, rate = 500, NOCOT
+              hands = 500
               combos = [{"seed": s, "arm": "none"} for s in SEEDS_5]
               key = "Phase 3 (LLM personalities)"
           else:  # ablation
-              hands, rate = 150, COT
+              hands = 150
               combos = [{"seed": s, "arm": a}
                         for a in ("no-cot", "no-memory", "no-notes")
                         for s in SEEDS_5]
               key = ""   # each arm writes its own key, set per-job
 
-          calls_per_job = hands * rate["calls_per_hand"]
-          total_calls   = calls_per_job * len(combos)
+          est_cost  = sum(hands * rate_for(c["arm"])["calls_per_hand"]
+                          * rate_for(c["arm"])["usd"] for c in combos)
+          est_hours = max(hands * rate_for(c["arm"])["calls_per_hand"]
+                          * rate_for(c["arm"])["sec"] for c in combos) / 3600
           print(f"matrix={json.dumps({'include': combos})}")
           print(f"hands={hands}")
           print(f"phase_key={key}")
           print(f"jobs={len(combos)}")
-          print(f"est_cost={total_calls * rate['usd']:.2f}")
-          print(f"est_hours={calls_per_job * rate['sec'] / 3600:.1f}")
+          print(f"est_cost={est_cost:.2f}")
+          print(f"est_hours={est_hours:.1f}")
           PY
 
       - name: Cost gate
@@ -180,7 +200,12 @@ jobs:
     timeout-minutes: 350          # under the 360-minute hosted-runner ceiling
     strategy:
       fail-fast: false            # one bad seed must not kill the other 19
-      max-parallel: 20            # free-tier concurrency for public repos
+      # Deliberately below the free-tier ceiling of 20. Every job calls the
+      # same API key concurrently (~29 calls/min each), and a rate-limited
+      # seed fails via the failure-rate guard and must be re-run from
+      # scratch — CI jobs are ephemeral, so the resume logic cannot save a
+      # partial seed. Slower-but-complete beats fast-but-refunded-nothing.
+      max-parallel: ${{ fromJSON(inputs.parallelism || '10') }}
       matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
