@@ -402,7 +402,15 @@ def make_client(provider: str, model: str, **kwargs) -> Any:
     """
     if provider == "anthropic":
         import anthropic
-        return anthropic.Anthropic()
+        # max_retries raised from the SDK default of 2. The SDK retries 429
+        # and 5xx with exponential backoff and honors retry-after, which is
+        # the correct behavior when many parallel CI jobs share one key; the
+        # outer retry loop in _call_llm only sleeps a flat 0.5 s, so without
+        # this a burst of throttling converts directly into failed calls,
+        # and failed calls silently become CHECK/FOLD in the data (or trip
+        # the replication driver's failure-rate guard and kill the seed).
+        # Retries change only robustness, never decision content.
+        return anthropic.Anthropic(max_retries=8)
     elif provider == "ollama":
         try:
             from openai import OpenAI
