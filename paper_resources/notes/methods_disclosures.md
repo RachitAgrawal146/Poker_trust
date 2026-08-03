@@ -71,7 +71,10 @@ Phase 1 likelihood tables in the trust model. Adapting agents in
 Phase 2 / Phase 2\* are intentionally exploiting a stale reputation
 system; this is the experimental control. The decay parameter is
 `λ = 0.95`, the noise floor `ε = 0.05`, and the third-party-weight
-`tpw = 1.0`; all are exposed in `config.TRUST`. Sensitivity sweeps
+`tpw = 0.8` (evidence observed after the observer folded enters the
+update with its likelihood raised to the 0.8 power, i.e. slightly
+discounted relative to directly contested evidence); all are exposed
+in `config.TRUST`. Sensitivity sweeps
 over these constants live in `phase1/run_sensitivity.py`.
 
 ## 6. Reproducibility caveats already in CLAUDE.md
