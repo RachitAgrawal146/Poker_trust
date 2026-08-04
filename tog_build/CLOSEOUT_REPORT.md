@@ -1,5 +1,11 @@
 # CLOSEOUT_REPORT.md — ToG final closeout (author decisions applied)
 
+> **Superseded in part by `FINAL_PASS_REPORT.md` (2026-08-04).** The
+> n=20 replication and the doubled bibliography changed the exhibits,
+> the relocation set, and the upload bundle. This file remains the
+> record of the 2026-07-19 port; take current gate numbers from the
+> final-pass report.
+
 Input state: `tog_submission/` at READY (pending INDEX-TERMS), 10/10 pages.
 Applied exactly the five confirmed author decisions of 2026-07-19 — nothing else.
 

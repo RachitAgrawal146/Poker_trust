@@ -154,16 +154,17 @@ def fig_four_tier_ladder(outdir: Path) -> None:
 
     ax.set_xticks(range(len(PHASE_ORDER)))
     ax.set_xticklabels(PHASE_ORDER, fontsize=10)
-    ax.set_ylabel("Trust-profit Pearson r\n(mean across 5 seeds)", fontsize=11)
+    ax.set_ylabel("Trust-profit Pearson r\n(mean across seeds)", fontsize=11)
     ax.set_title("Trust-Profit r Across Four Agent Architectures",
                  fontsize=12)
     ax.set_ylim(-1.05, 0.40)
 
+    _n31 = len(R_BY_PHASE[PHASE_ORDER[-1]])
     fig.text(0.99, -0.02,
              "Error bars: 95% percentile bootstrap CI on the mean "
-             "(10,000 resamples, n=5 seeds).\n"
-             "Phase 3.1 CI contains zero AND moderate negative correlations; "
-             "n=20 replication needed.",
+             f"(10,000 resamples; n=5 seeds, n={_n31} for Phase 3.1).\n"
+             "The Phase 3.1 interval is centered on zero and excludes every "
+             "earlier phase's correlation.",
              ha="right", va="top", fontsize=8.5, color="#555", style="italic")
 
     fig.tight_layout()
@@ -223,9 +224,12 @@ def fig_five_tier_ladder(outdir: Path) -> None:
                  fontsize=12)
     ax.set_ylim(-1.05, 0.45)
 
+    _n31b = len(R_BY_PHASE[PHASE_ORDER[-1]])
     fig.text(0.99, -0.02,
-             "Error bars: 95% percentile bootstrap CI on the mean (10,000 resamples, n=5 seeds).\n"
-             "Phase 3.1 CI [-0.32, +0.20] contains zero AND moderate negative correlations.",
+             "Error bars: 95% percentile bootstrap CI on the mean "
+             f"(10,000 resamples; n=5 seeds, n={_n31b} for Phase 3.1).\n"
+             "The Phase 3.1 interval is centered on zero and excludes every "
+             "earlier phase's correlation.",
              ha="right", va="top", fontsize=8.5, color="#555", style="italic")
     fig.tight_layout()
     _save(fig, outdir, "01b_five_tier_ladder_with_unbounded.png")
@@ -363,12 +367,23 @@ def fig_economic_inversion(outdir: Path) -> None:
                        fontsize=10)
     ax.set_yticks(range(1, 9))
     ax.set_xlim(-0.45, 1.45)
-    ax.set_title("Economic Ordering Inversion: Wall Goes 8 → 1, Oracle 3 → 8",
-                 fontsize=12)
+    # Derived from the plotted data, never hardcoded: an earlier revision
+    # regenerated the plot from the n=20 replication but left five-seed
+    # strings in the title and footer, so the figure contradicted itself.
+    first = min(archs, key=lambda a: RANK_P31[a])
+    last = max(archs, key=lambda a: RANK_P31[a])
+    ax.set_title(
+        f"Economic Ordering Decouples from Trust: "
+        f"{last.capitalize()} {RANK_P3[last]} → {RANK_P31[last]}, "
+        f"Wall {RANK_P3['wall']} → {RANK_P31['wall']}",
+        fontsize=12)
 
     fig.text(0.99, -0.02,
-             "Cooperative Wall (most-trusted, calling-station) climbs from rank 8 (last) to rank 1 (first)\n"
-             "in Phase 3.1, with zero rebuys. Strategic Oracle drops from 3 to 8.",
+             f"Most-trusted Wall (calling-station) rises from rank {RANK_P3['wall']} to "
+             f"{RANK_P31['wall']}, above its 200-chip buy-in, with rebuys down to "
+             f"{_N20AGG['wall']['rebuys']:.1f} per seed.\n"
+             f"Least-trusted {last.capitalize()}, top earner of every rule-based phase, "
+             f"falls to last. {first.capitalize()} finishes first.",
              ha="right", va="top", fontsize=8.5, color="#555", style="italic")
 
     ax.grid(False)
@@ -444,7 +459,7 @@ def fig_trust_vs_stack(outdir: Path) -> None:
     fig, axes = plt.subplots(1, 2, figsize=(11.0, 4.8), sharey=False)
 
     p3_path = _REPO_ROOT / "paper_resources" / "data" / "phase3_stats.json"
-    p31_path = _REPO_ROOT / "paper_resources" / "data" / "phase31_stats.json"
+    p31_path = _REPO_ROOT / "paper_resources" / "data" / "phase31_n20_stats.json"
     if not p3_path.exists() or not p31_path.exists():
         print(f"  skipping fig 5: {p3_path} or {p31_path} missing")
         plt.close(fig)
@@ -456,7 +471,9 @@ def fig_trust_vs_stack(outdir: Path) -> None:
     for ax, data, title, color in [
         (axes[0], p3_data, "Phase 3 (LLM personalities) — r = -0.510",
          "#E67E22"),
-        (axes[1], p31_data, "Phase 3.1 (LLM + reasoning) — r = -0.094",
+        (axes[1], p31_data,
+         "Phase 3.1 (LLM + reasoning, n=20, T=0) — r = "
+         f"{np.mean(R_BY_PHASE['Phase 3.1' + chr(10) + 'LLM + reasoning']):+.3f}",
          "#1B9E77"),
     ]:
         # Pool every seat across every seed
@@ -505,6 +522,27 @@ TMA_P31 = {
 }
 
 
+# ---------------------------------------------------------------------------
+# n=20 override: the three dicts above hold the retired five-seed values.
+# The canonical Phase 3.1 exhibits now derive from the twenty-seed
+# temperature-0 replication, extracted by analysis/recompute_p31_n20.py
+# into phase31_n20_stats.json. Overriding here (rather than deleting the
+# dicts) keeps the old values greppable for provenance while guaranteeing
+# every figure renders the canonical dataset.
+# ---------------------------------------------------------------------------
+import json as _json
+_N20 = _json.load(open(_REPO_ROOT / "paper_resources" / "data"
+                       / "phase31_n20_stats.json"))
+_N20AGG = _N20["aggregates"]
+BEHAVIORAL["P3.1"] = {a: {"vpip": _N20AGG[a]["vpip"],
+                          "pfr": _N20AGG[a]["pfr"],
+                          "af": _N20AGG[a]["af"]} for a in ARCHETYPES}
+RANK_P31 = {a: _N20AGG[a]["rank_p31"] for a in ARCHETYPES}
+TMA_P31 = {a: _N20AGG[a]["tma"] for a in ARCHETYPES}
+_WORDS = {1: "one", 2: "two", 3: "three", 4: "four",
+          5: "five", 6: "six", 7: "seven", 8: "eight"}
+
+
 def fig_tma_by_archetype(outdir: Path) -> None:
     fig, ax = plt.subplots(figsize=(9.0, 4.8))
 
@@ -526,11 +564,20 @@ def fig_tma_by_archetype(outdir: Path) -> None:
     ax.set_xlabel("TMA (Trust Manipulation Awareness)")
     ax.set_title("Phase 3.1 — Trust Farming by Archetype",
                  fontsize=12)
-    ax.set_xlim(-0.5, 0.95)
+    # Data-derived: the old fixed [-0.5, 0.95] window was sized for the
+    # five-seed exploration, whose TMA reached +0.73, and left most of the
+    # axis empty once the n=20 values (max +0.30) replaced it.
+    ax.set_xlim(min(vals) - 0.18, max(vals) + 0.18)
 
+    # Derived from the plotted data — see the note in fig_economic_inversion.
+    n_pos = sum(1 for v in vals if v > 0)
+    ranked = sorted(archs, key=lambda a: TMA_P31[a], reverse=True)
+    top1, top2 = ranked[0], ranked[1]
     fig.text(0.99, -0.02,
-             "Positive TMA = the agent gains trust before exploiting it (six of eight \"farm\").\n"
-             "Wall and Sentinel — the most cooperative archetypes — are the heaviest farmers.",
+             f"Positive TMA = the agent gains trust before exploiting it "
+             f"({_WORDS.get(n_pos, n_pos)} of {_WORDS.get(len(archs), len(archs))} \"farm\").\n"
+             f"{top1.capitalize()} ({TMA_P31[top1]:+.3f}) and {top2.capitalize()} "
+             f"({TMA_P31[top2]:+.3f}) are the heaviest; every magnitude is small.",
              ha="right", va="top", fontsize=8.5, color="#555", style="italic")
 
     fig.tight_layout()

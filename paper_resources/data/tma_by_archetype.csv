@@ -1,9 +1,9 @@
 archetype,TMA,direction
-wall,+0.733,farming (heavy)
-sentinel,+0.704,farming (heavy)
-predator,+0.625,farming (heavy)
-phantom,+0.286,farming
-judge,+0.116,farming
-oracle,+0.065,farming
-mirror,-0.277,reactive
-firestorm,-0.313,reactive
+judge,+0.304,farming
+predator,+0.280,farming
+oracle,+0.273,farming
+phantom,+0.261,farming
+mirror,+0.200,farming
+wall,+0.190,farming
+sentinel,+0.138,farming
+firestorm,-0.157,no awareness

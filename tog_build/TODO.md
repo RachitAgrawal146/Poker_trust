@@ -4,12 +4,14 @@
    reputation systems, multi-agent simulation, trust dynamics, game
    theory, large language models".
 
-2. **Relocation set — CONFIRMED (closeout).** Moved:
-   Box 1 → S1, Box 2 → S2, primer table → Table S1, TMA figure → Figure S1,
-   plus the supplementary pointer list. The main text hit 10/10 pages with
-   this set plus two table-width reflow fixes — no further moves needed.
-   If you want any of the four back in the main text, the page gate will
-   fail again (M0 with everything in main = 12 pages).
+2. **Relocation set — EXTENDED 2026-08-04 (see `FINAL_PASS_REPORT.md`).**
+   The July set was: Box 1 → S1, Box 2 → S2, primer table → Table S1,
+   TMA figure → Figure S1, plus the supplementary pointer list. Doubling
+   the bibliography (17 → 34 rendered entries) pushed the main text to
+   11 pages, so three more items moved: the Pearson/Bayes primer
+   subsection → Section S1, and two never-`\ref`'d figures →
+   Figures S3–S4. Main is back at 10/10 with no prose cut. Pulling any
+   of these back into the main text will fail the page gate again.
 
 3. **Broader Impact Statement — CONFIRMED supplementary (closeout).**
    Stays verbatim in `supplementary.tex`; no pending decision.

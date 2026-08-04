@@ -1,5 +1,11 @@
 # UPLOAD_SET_REPORT.md — IEEE ResearchExchange upload set
 
+> **Superseded in part by `FINAL_PASS_REPORT.md` (2026-08-04).** The
+> n=20 replication and the doubled bibliography changed the exhibits,
+> the relocation set, and the upload bundle. This file remains the
+> record of the 2026-07-19 port; take current gate numbers from the
+> final-pass report.
+
 Built from `tog_submission/` (closeout state behind `tog_anonymous_FINAL.pdf`);
 the source directory was not modified — all work on copies.
 

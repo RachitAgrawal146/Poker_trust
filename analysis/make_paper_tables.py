@@ -124,17 +124,26 @@ def table_headline_ladder(data_dir: Path, tex_dir: Path) -> None:
     # LaTeX
     _write_latex_table(
         tex_dir / "headline_ladder.tex",
+        # n and the P1->P3.1 delta are computed from the data rather than
+        # hardcoded, so a re-run at a different seed count cannot leave the
+        # caption contradicting its own table.
         caption="Per-seed Pearson r between mean trust score (final hand) and "
                 "final stack across the four agent architectures. Phase 3.1 "
                 "(LLM agents with chain-of-thought, opponent memory, and "
                 "adaptive strategy notes) breaks the trap: the mean r is "
-                "statistically indistinguishable from zero at $n=5$.",
+                "statistically indistinguishable from zero at "
+                f"$n={len(R_BY_PHASE[phase_keys[-1]])}$.",
         label="ladder",
         column_spec="lrrrr",
         header=["Seed", "P1", "P2", "P3", "P3.1"],
         rows=rows,
-        footnote=(r"P1 $\to$ P3.1: $\Delta r = +0.658$, larger than all "
-                  r"intermediate steps combined."),
+        # The single P3 -> P3.1 step against the sum of the two steps that
+        # precede it -- a meaningful comparison, unlike "P1 -> P3.1 is larger
+        # than the intermediate steps combined", which is an identity.
+        footnote=(rf"P3 $\to$ P3.1: $\Delta r = "
+                  rf"{np.mean(R_BY_PHASE[phase_keys[-1]]) - np.mean(R_BY_PHASE[phase_keys[-2]]):+.3f}$, "
+                  rf"exceeding the two preceding steps combined "
+                  rf"($ {np.mean(R_BY_PHASE[phase_keys[-2]]) - np.mean(R_BY_PHASE[phase_keys[0]]):+.3f}$)."),
     )
 
 
@@ -162,6 +171,23 @@ P31_PER_ARCHETYPE = {
 }
 
 
+# n=20 override — same rationale as in make_paper_figures: the dict above
+# holds the retired five-seed values; the canonical exhibit data comes from
+# the twenty-seed extraction. rank_p3 is Phase 3 data and is unchanged.
+import json as _json
+_N20AGG = _json.load(open(_REPO_ROOT / "paper_resources" / "data"
+                          / "phase31_n20_stats.json"))["aggregates"]
+P31_PER_ARCHETYPE = {
+    a: {"trust": round(_N20AGG[a]["trust"], 3),
+        "stack": round(_N20AGG[a]["stack"]),
+        "stack_std": round(_N20AGG[a]["stack_std"]),
+        "rebuys": round(_N20AGG[a]["rebuys"], 1),
+        "rank_p3": P31_PER_ARCHETYPE[a]["rank_p3"],
+        "rank_p31": _N20AGG[a]["rank_p31"]}
+    for a in sorted(P31_PER_ARCHETYPE, key=lambda x: _N20AGG[x]["rank_p31"])
+}
+
+
 def table_per_archetype_p31(data_dir: Path, tex_dir: Path) -> None:
     archetypes = list(P31_PER_ARCHETYPE.keys())
     header = ["archetype", "trust", "stack_mean", "stack_std",
@@ -179,10 +205,12 @@ def table_per_archetype_p31(data_dir: Path, tex_dir: Path) -> None:
 
     _write_latex_table(
         tex_dir / "per_archetype_p31.tex",
-        caption="Phase 3.1 economic outcomes by archetype (mean across 5 seeds, "
-                "150 hands each). Ranks are derived from final-stack ordering. "
-                "Wall, the most-trusted archetype, climbs from rank 8 (Phase 3) "
-                "to rank 1 (Phase 3.1), with zero rebuys.",
+        caption="Phase 3.1 economic outcomes by archetype (twenty-seed "
+                "temperature-0 replication, 150 hands per seed). Ranks are "
+                "derived from final-stack ordering. Firestorm, the dominant "
+                "earner of every rule-based phase, finishes last; Wall, the "
+                "most-trusted archetype, ends above its 200-chip buy-in with "
+                "rebuys collapsing from 9.4 per seed (Phase 1) to 0.6.",
         label="archetype-p31",
         column_spec="lrrrrrrr",
         header=["Archetype", "Trust", "Stack", "$\\sigma$",
@@ -214,7 +242,10 @@ def table_behavioral_shift(data_dir: Path, tex_dir: Path) -> None:
     _write_latex_table(
         tex_dir / "behavioral_shift_p1_p31.tex",
         caption="Phase 1 (frozen rules) vs. Phase 3.1 (LLM + reasoning) "
-                "behavioral fingerprints. VPIP = voluntarily put in pot; "
+                "behavioral fingerprints. Phase 1 columns are the five "
+                "canonical seeds at 10\\,000 hands; Phase 3.1 columns are the "
+                "twenty-seed temperature-0 replication at 150 hands per seed. "
+                "VPIP = voluntarily put in pot; "
                 "PFR = preflop raise rate; AF = aggression factor "
                 "((bets+raises)/calls).",
         label="behavioral-shift",
@@ -253,12 +284,13 @@ def table_tma(data_dir: Path, tex_dir: Path) -> None:
         # most honest archetypes as evidence of deception. For Wall and
         # Sentinel the signal reflects trust and legitimate value-betting
         # rising together, not manipulation. Do not drop it.
-        caption="Trust Manipulation Awareness (TMA) per archetype in Phase 3.1. "
+        caption="Trust Manipulation Awareness (TMA) per archetype in Phase 3.1 "
+                "(twenty-seed temperature-0 replication). "
                 "Positive TMA = the agent gains trust before exploiting it. "
-                "Six of eight archetypes farm; Wall and Sentinel show the "
-                "strongest signals, but for these two honest archetypes the "
-                "high TMA reflects correlated trust and legitimate "
-                "value-betting rather than deception.",
+                "Seven of eight archetypes show weakly positive TMA "
+                "(maximum +0.30); for honest archetypes the signal reflects "
+                "correlated trust and legitimate value-betting rather than "
+                "deception.",
         label="tma",
         column_spec="lrl",
         header=["Archetype", "TMA", "Direction"],
@@ -300,7 +332,7 @@ def table_economic_inversion(data_dir: Path, tex_dir: Path) -> None:
 def table_per_seed_stacks(data_dir: Path, tex_dir: Path) -> None:
     """Emit a CSV of per-seed final stacks per archetype for both P3 and P3.1."""
     for phase, json_name in [("P3", "phase3_stats.json"),
-                             ("P3.1", "phase31_stats.json")]:
+                             ("P3.1", "phase31_n20_stats.json")]:
         path = _REPO_ROOT / "paper_resources" / "data" / json_name
         if not path.exists():
             print(f"  skipping {phase} per-seed stacks: {path} missing")
