@@ -17,7 +17,9 @@
     "'seeds' and 'r' must be the same length for every phase. Seed counts",
     "may differ BETWEEN phases (e.g. a 20-seed Phase 3.1 replication",
     "alongside 5-seed Phase 1); every downstream consumer derives n from",
-    "len(r) rather than assuming 5."
+    "len(r) rather than assuming 5.",
+    "",
+    "ABLATION STATUS (2026-08-04): the scaffold ablation is PARTIAL. Only the no-cot arm completed cleanly (n=5). The no-memory arm produced 3 seeds that passed the failure-rate guard but finished DURING the credit-exhaustion window, so their final hands -- the exact hands that set the final stacks r is computed from -- are contaminated; they were removed rather than reported. The no-notes arm produced nothing. Re-running no-memory and no-notes at 5 seeds each costs ~$34."
   ],
   "phases": {
     "Phase 1 (frozen rules)": {
@@ -181,22 +183,8 @@
         -0.692,
         -0.168,
         -0.512
-      ]
-    },
-    "Phase 3.1 ablation (no-memory)": {
-      "short": "Phase 3.1 ablation (no-memory)",
-      "ladder": false,
-      "hands_per_seed": 150,
-      "seeds": [
-        256,
-        512,
-        1024
       ],
-      "r": [
-        -0.105,
-        -0.381,
-        -0.319
-      ]
+      "note": "Complete and uncontaminated: all five seeds finished 03:53-03:55Z, before the API credit balance was exhausted at 04:33:58Z (workflow run 30874382486). The no-memory and no-notes arms of the same run were lost to that exhaustion and are NOT recorded here."
     }
   }
 }
