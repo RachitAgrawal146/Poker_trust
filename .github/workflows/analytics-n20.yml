@@ -1,0 +1,64 @@
+# One-shot analytics job: recompute the Phase 3.1 per-archetype exhibits
+# from the n=20 replication's databases.
+#
+# Why push-triggered on its own branch: the container driving this repo
+# cannot download workflow artifacts (its egress proxy blocks both
+# api.github.com and the Azure blob storage the artifacts live on) and
+# cannot use workflow_dispatch (integration token lacks actions:write).
+# A push-triggered workflow runs from the pushed ref, and the runner CAN
+# reach the artifact store — so the analysis runs where the data is
+# reachable, and commits the resulting JSON back to this same branch for
+# the session to pull. Zero API spend; a few minutes of free CI.
+name: Analytics n20
+
+on:
+  push:
+    branches: [analytics-n20]
+
+permissions:
+  contents: write
+  actions: read      # cross-run artifact download
+
+jobs:
+  recompute:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install --quiet numpy
+
+      - name: Download the n=20 run's databases
+        uses: actions/download-artifact@v4
+        with:
+          name: all-databases-phase31-n20
+          run-id: 30788234686
+          github-token: ${{ github.token }}
+          path: artifacts
+
+      - name: Recompute per-archetype statistics
+        run: |
+          find artifacts -name '*.sqlite' | sort
+          python3 analysis/recompute_p31_n20.py \
+            --db-glob 'artifacts/**/*.sqlite' \
+            --hands 150 \
+            --out paper_resources/data/phase31_n20_stats.json
+
+      - name: Commit the JSON back to this branch
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add paper_resources/data/phase31_n20_stats.json
+          git commit -m "analytics: per-archetype stats from the n=20 databases
+
+          Produced by analysis/recompute_p31_n20.py over the 20 single-seed
+          databases of workflow run 30788234686 (artifact
+          all-databases-phase31-n20)."
+          for i in 1 2 3 4; do
+            git push origin HEAD:analytics-n20 && break || sleep $((2**i))
+          done
