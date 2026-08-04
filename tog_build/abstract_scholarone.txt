@@ -1,0 +1,41 @@
+ScholarOne "Abstract" field text — 248 words
+=============================================
+
+WHY THIS FILE EXISTS
+The abstract inside the manuscript is 288 words. That is the hedged
+technical abstract the author canonized on 2026-07-19 (recorded in
+CLAUDE.md as "use it verbatim in every future regeneration or new port of
+any submission variant"), so it was NOT edited. IEEE guidance is ~250
+words and the ScholarOne abstract box can reject longer text, so this is a
+246-word version for the portal field only. It says the same things: same
+ladder, same SDs, same bootstrap interval, same capability-vs-power caveat,
+same hedge. Nothing was added.
+
+If the portal accepts 288 words, paste the manuscript abstract instead and
+ignore this file. If it objects, paste the text below.
+
+-----------------------------------------------------------------------
+
+Reputation systems that infer trustworthiness from observed behavior are
+widespread in online marketplaces, credit scoring, and social platforms; the
+transparency paradox -- that a perfectly visible cooperative record earns lower
+returns than a less legible one -- is a hypothesis, not an established fact. We
+test it in a controlled 8-player fixed-limit Texas Hold'em simulation where
+every agent maintains a categorical posterior over every other agent's
+archetype, updated after each observed action. Holding game and trust model
+fixed, we vary only the agents' minds across four architectures: frozen
+rule-based archetypes, bounded online hill-climbing, large-language-model
+personality role-players (Claude Haiku 4.5), and the same model augmented with
+chain-of-thought, per-opponent memory, and self-updated strategy notes. Across
+five random seeds per condition (twenty, at temperature 0, for the final
+architecture), the negative Pearson correlation between trust and final stack
+attenuates monotonically along the ladder r_tp = -0.752, -0.637, -0.510, +0.062
+(SDs across seeds 0.073, 0.125, 0.268, 0.378); an unbounded hill-climbing check
+suggests the trap is not an artifact of the archetype bound boxes. The final
+architecture's 95% bootstrap interval [-0.10, +0.22] is centered on zero and
+excludes every earlier architecture. Hand counts fall from 10,000 per seed in
+the rule-based phases to 500 and 150 in the LLM phases, so the ladder mixes
+capability with statistical power. This is preliminary evidence that
+observation-based reputation rewards exploitation under simple policies and that
+reasoning about the reputation system attenuates the effect; whether that
+attenuation is structural is left to a hand-count-matched replication.

@@ -1,8 +1,5 @@
 % Supplementary material for the ToG double-anonymous submission.
-% Every float below is relocated VERBATIM from the main manuscript
-% (see PORT_TRIM_REPORT.md); only the S-prefix numbering and the two
-% box-title labels are changed, each logged. Not counted toward the
-% 10-page limit per ToG policy.
+% Not counted toward the 10-page limit per ToG policy.
 
 \documentclass[journal,onecolumn]{IEEEtran}
 
@@ -212,7 +209,7 @@ the agent may drift within the box; under Phase 2$^{*}$'s
 unbounded variant the box is replaced by $[0, 1]$ on every
 dimension. Adaptive archetypes additionally read live state
 (opponent posterior or grievance ledger) and are described by the
-rule that produces the policy rather than by fixed bounds.}
+rule that produces the policy rather than by fixed bounds. The bound boxes describe each archetype's \emph{policy}; the observer's likelihood model instead reads four summary statistics per archetype (bluff rate, value-bet rate, call rate, made-bet rate). For \arch{Sentinel} and \arch{Judge}'s cooperative state those four are byte-identical at $(0.083, 0.900, 0.325, 0.225)$ despite the differing boxes, which is the identifiability floor discussed in the main text.}
 \label{tab:bounds-comprehensive}
 \footnotesize
 \setlength{\tabcolsep}{4pt}
@@ -252,6 +249,8 @@ firestorm & -0.157 & no awareness \\
 \caption{Trust Manipulation Awareness (TMA) per archetype in Phase 3.1 (twenty-seed temperature-0 replication). Positive TMA = the agent gains trust before exploiting it. Seven of eight archetypes show weakly positive TMA (maximum +0.30); for honest archetypes the signal reflects correlated trust and legitimate value-betting rather than deception.}
 \label{tab:tma}
 \end{table}
+
+\input{tables/behavioral_shift_p1_p31.tex}
 
 \begin{figure}[tb]
   \centering

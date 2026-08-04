@@ -5,6 +5,12 @@ described the pre-n=20, 17-reference state. That report is kept as the
 record of the July port; everything below is what changed since, and the
 numbers here are the current ones.
 
+> **Read the second-round section at the bottom first.** A referee
+> pre-flight after this section was written found four content defects and
+> forced one more relocation, so the upload-set and float numbers below are
+> one revision stale. Current numbers live under "Referee pre-flight pass
+> (second round)".
+
 ## What forced a new pass
 
 Three things landed after the July closeout:
@@ -137,3 +143,111 @@ with no `references.bib`, so expanding it means replaying the
 citation-bearing prose the same way it was replayed into ToG. Left for a
 deliberate decision rather than done silently, since it touches two
 frozen, separately verified bundles for venues that may not be used.
+
+
+---
+
+# Referee pre-flight pass, 2026-08-04 (second round)
+
+An external pre-flight caught four content defects the first pass missed,
+two of them inside figures. All are fixed; the gates below were re-run
+from scratch afterwards.
+
+## Blocking defects
+
+**B1 — Fig. 2 contradicted its own data.** `03_economic_inversion.png`
+carried the title "Economic Ordering Inversion: Wall Goes 8 → 1, Oracle
+3 → 8" and a footer claiming Wall reached rank 1 with zero rebuys. The
+plotted lines, the LaTeX caption and Table I all showed the n=20 result
+(Wall 8→6 on 0.6 rebuys, Mirror first, Firestorm last). The plot had been
+regenerated from the twenty-seed data; the annotation strings were
+hardcoded from the five-seed temperature-1.0 run and were never touched.
+
+**B2 — Supplementary Fig. S1 had the same defect.**
+`06_tma_by_archetype.png` claimed "six of eight farm" and named Wall and
+Sentinel the heaviest farmers. The bars show seven of eight positive with
+Judge (+0.304) and Predator (+0.280) heaviest and Wall/Sentinel the
+*lightest* positive.
+
+Both are now **derived from the plotted arrays** rather than written by
+hand, so the class of bug cannot recur: the titles and footers are
+f-strings over `RANK_P3`/`RANK_P31`/`TMA_P31`/`_N20AGG`. The TMA figure's
+x-limits were also fixed at `[-0.5, 0.95]` — sized for the five-seed run
+whose TMA reached +0.73 — and now track the data.
+
+**B3 — §V-C claimed all three scaffolds are required** and attributed the
+evidence to "the supplementary validation suite", which does not exist in
+any bundle. §IV-F, Limitations and the Conclusion all correctly say only
+the no-CoT arm ran. The paragraph now says what the other three say.
+
+**B4 — SU threshold.** "crossing the >1.5 threshold for the first time
+across all phases" contradicted §IV-D, where SU is 1.88 in Phases 1–2
+before falling to 1.19 in Phase 3. Now: "recovering past 1.5 for the
+first time in the LLM phases (Phases 1–2 sat at 1.88)."
+
+**B5 — prior-venue trace in the source.** `main.tex` lines 1–3 said the
+document was "mechanically ported from the verified TMLR source". Invisible
+in the PDF but present in the upload zip, where it tells an editor the
+paper had a prior venue. Removed, along with the equivalent header in
+`supplementary.tex`. Grep for `TMLR`/`tmlr`/`under review`/`PORT_TRIM`
+across source and both PDFs: 0.
+
+## Same-pass corrections
+
+| Item | Fix |
+|---|---|
+| "The four agents are all lookup tables" (Phase 1) | → "All eight agents"; "four" had leaked in from the "four agent architectures" heading |
+| "At the beginning of each **hand**, each player has a chip count of 200" | → per-run buy-in with stacks carrying across hands; as written it contradicted rebuys and the varying final stacks |
+| "four lines of previous research" with four bullets | Background has five subsections; the missing one (reputation as a formal object) is now its own bullet, and the later "all four lines" callback is corrected |
+| "Bayesians use in modeling poker opponents" | → "Bayesian opponent modelling in poker" |
+| "byte-identical" Sentinel/Judge (5 places) vs Table S2's *different* bound boxes | Scoped to the four summary statistics the likelihood model reads; Table S2's caption now states that the boxes differ while those four are byte-identical at (0.083, 0.900, 0.325, 0.225) — verified against `archetype_params.ARCHETYPE_AVERAGES`. The cross-check a referee would run now resolves in the paper's favour |
+| Fig. 2 caption's "~9 rebuys per seed" in a Phase 3→3.1 comparison | The number is right (Phase 3 Wall = 9.40, recomputed from `phase3_stats.json`) but read as carried over from the Phase 1 sentence in §IV-A. Both the caption and the body now name the phase |
+| "Anthropic Haiku 4.5" | → "Claude Haiku 4.5", matching the other two mentions |
+| Supplementary Fig. S2 never cited | One parenthetical added in §IV-C |
+| Abstract 288 words vs IEEE's ~250 | **Manuscript abstract unchanged** — see below |
+
+## Abstract: deliberately not edited
+
+The reviewer is right that 288 words exceeds IEEE's ~250 guidance and that
+the ScholarOne field can object. The manuscript abstract was still left
+alone, because it is the hedged technical abstract the author canonized on
+2026-07-19, recorded in `CLAUDE.md` as "use it verbatim in every future
+regeneration or new port of any submission variant". Silently rewriting it
+would override a standing author decision to satisfy a soft guideline.
+
+Instead, `tog_build/abstract_scholarone.txt` holds a **246-word** version
+for the portal field only — same ladder, same SDs, same bootstrap
+interval, same capability-vs-power caveat, same hedge, nothing added. If
+the portal accepts 288 words, paste the manuscript abstract and ignore the
+file.
+
+## Page gate, again
+
+The corrections added net text and pushed main back to 11 pages. Reclaimed
+by tightening the added prose and by one further relocation: the
+behavioral-fingerprint table (Phase 1 vs Phase 3.1 VPIP/PFR/AF) moves to
+Supplementary **Table S4**, with both in-text references repointed. Main
+now carries Table I (per-archetype economics) and Figs. 1–2.
+
+## Gates after the second pass
+
+| Gate | Result |
+|---|---|
+| Main page count | 10 / 10 including references |
+| Supplementary | 5 pages |
+| Build | main 0 errors, 0 undefined; supplementary 0 errors; 0 overfull >20pt |
+| References | 34 |
+| Anonymity + prior-venue grep — 16 strings × (3 source files + both PDFs) | all 0 |
+| Stale-string grep — 10 strings × both PDFs (`Goes 8`, `six of eight`, `validation suite`, `across all phases`, `The four agents`, …) | all 0 |
+| S-pointer resolution | all 15 `Supplementary …~S<n>` strings resolve; Table S4 and Figs. S3–S4 verified against `supplementary.aux` |
+| Standalone bundle | `tog_main_source.zip` → 10 pages under `TEXINPUTS=.: BSTINPUTS=.:` |
+| Regression | canonical 15pp/49 refs, arXiv 13pp, TMLR 21pp — all 0 undefined |
+
+Upload zip is now 10 files (the behavioral table left with the relocation).
+
+## Still open, author-side
+
+- The `anonymous.4open.science` link cannot be checked from here (the host
+  blocks automated access). Open it in a private window and confirm both
+  that it renders and that its expiry is set past the review horizon.
+- Cover letter / response-to-reviewers is author-supplied.

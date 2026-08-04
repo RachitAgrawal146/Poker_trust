@@ -367,12 +367,23 @@ def fig_economic_inversion(outdir: Path) -> None:
                        fontsize=10)
     ax.set_yticks(range(1, 9))
     ax.set_xlim(-0.45, 1.45)
-    ax.set_title("Economic Ordering Inversion: Wall Goes 8 → 1, Oracle 3 → 8",
-                 fontsize=12)
+    # Derived from the plotted data, never hardcoded: an earlier revision
+    # regenerated the plot from the n=20 replication but left five-seed
+    # strings in the title and footer, so the figure contradicted itself.
+    first = min(archs, key=lambda a: RANK_P31[a])
+    last = max(archs, key=lambda a: RANK_P31[a])
+    ax.set_title(
+        f"Economic Ordering Decouples from Trust: "
+        f"{last.capitalize()} {RANK_P3[last]} → {RANK_P31[last]}, "
+        f"Wall {RANK_P3['wall']} → {RANK_P31['wall']}",
+        fontsize=12)
 
     fig.text(0.99, -0.02,
-             "Cooperative Wall (most-trusted, calling-station) climbs from rank 8 (last) to rank 1 (first)\n"
-             "in Phase 3.1, with zero rebuys. Strategic Oracle drops from 3 to 8.",
+             f"Most-trusted Wall (calling-station) rises from rank {RANK_P3['wall']} to "
+             f"{RANK_P31['wall']}, above its 200-chip buy-in, with rebuys down to "
+             f"{_N20AGG['wall']['rebuys']:.1f} per seed.\n"
+             f"Least-trusted {last.capitalize()}, top earner of every rule-based phase, "
+             f"falls to last. {first.capitalize()} finishes first.",
              ha="right", va="top", fontsize=8.5, color="#555", style="italic")
 
     ax.grid(False)
@@ -528,6 +539,8 @@ BEHAVIORAL["P3.1"] = {a: {"vpip": _N20AGG[a]["vpip"],
                           "af": _N20AGG[a]["af"]} for a in ARCHETYPES}
 RANK_P31 = {a: _N20AGG[a]["rank_p31"] for a in ARCHETYPES}
 TMA_P31 = {a: _N20AGG[a]["tma"] for a in ARCHETYPES}
+_WORDS = {1: "one", 2: "two", 3: "three", 4: "four",
+          5: "five", 6: "six", 7: "seven", 8: "eight"}
 
 
 def fig_tma_by_archetype(outdir: Path) -> None:
@@ -551,11 +564,20 @@ def fig_tma_by_archetype(outdir: Path) -> None:
     ax.set_xlabel("TMA (Trust Manipulation Awareness)")
     ax.set_title("Phase 3.1 — Trust Farming by Archetype",
                  fontsize=12)
-    ax.set_xlim(-0.5, 0.95)
+    # Data-derived: the old fixed [-0.5, 0.95] window was sized for the
+    # five-seed exploration, whose TMA reached +0.73, and left most of the
+    # axis empty once the n=20 values (max +0.30) replaced it.
+    ax.set_xlim(min(vals) - 0.18, max(vals) + 0.18)
 
+    # Derived from the plotted data — see the note in fig_economic_inversion.
+    n_pos = sum(1 for v in vals if v > 0)
+    ranked = sorted(archs, key=lambda a: TMA_P31[a], reverse=True)
+    top1, top2 = ranked[0], ranked[1]
     fig.text(0.99, -0.02,
-             "Positive TMA = the agent gains trust before exploiting it (six of eight \"farm\").\n"
-             "Wall and Sentinel — the most cooperative archetypes — are the heaviest farmers.",
+             f"Positive TMA = the agent gains trust before exploiting it "
+             f"({_WORDS.get(n_pos, n_pos)} of {_WORDS.get(len(archs), len(archs))} \"farm\").\n"
+             f"{top1.capitalize()} ({TMA_P31[top1]:+.3f}) and {top2.capitalize()} "
+             f"({TMA_P31[top2]:+.3f}) are the heaviest; every magnitude is small.",
              ha="right", va="top", fontsize=8.5, color="#555", style="italic")
 
     fig.tight_layout()

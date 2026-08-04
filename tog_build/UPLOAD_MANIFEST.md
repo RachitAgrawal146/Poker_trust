@@ -18,5 +18,7 @@
 | Previously Published (Statement / Files) | Skip (no prior versions) |
 | Cover letter / Comments | **AUTHOR-SUPPLIED — pending.** Not generated (not the assistant's to write) |
 
+**Abstract field:** the manuscript abstract is 288 words. If the ScholarOne abstract box rejects it (IEEE guidance is ~250), paste the 246-word equivalent in `tog_build/abstract_scholarone.txt` instead — same content, nothing added.
+
 **Post-upload checklist:** After portal upload, compare the portal-rendered proof
 against `tog_anonymous_FINAL.pdf`: page count (10), Index Terms line, ±0.073 in IV-A.
