@@ -1001,7 +1001,12 @@ variability arising from sampling at temperature 1.0.
 
 \subsection{Phase 3.1: reasoning scaffolding attenuates the trap}
 
-Phase 3.1, in its canonical twenty-seed form, generates $\rtp = +0.062 \pm 0.378$, with ten of the twenty seeds producing a positive per-seed correlation. The directional shift from Phase 3 ($\Delta\rtp = +0.572$) is larger than that of any previous phase, and at $n = 20$ seeds the 95\% bootstrap interval, $[-0.10, +0.22]$, is about a third narrower than the corresponding five-seed bootstrap interval and centered on zero: it excludes negative correlations of the magnitude reported in every earlier phase while remaining consistent with either full neutralization or a small residual effect of either sign. Individual seeds remain uninformative in isolation---given $n = 8$ archetype pairs per seed, the Fisher-$z$ interval for a per-seed $\rtp = +0.06$ spans roughly $[-0.67, +0.73]$---so the claim rests on the ensemble, not on any single seed. All statistics and exhibits in this subsection derive from this twenty-seed temperature-0 dataset, with one exception: the boxed illustrative hand is drawn from the original five-seed exploration, whose hand-level transcripts remain the source of the story hands.
+Phase 3.1, in its canonical twenty-seed form, generates $\rtp = +0.062 \pm 0.378$, with ten of the twenty seeds producing a positive per-seed correlation. The directional shift from Phase 3 ($\Delta\rtp = +0.572$) is larger than that of any previous phase, and at $n = 20$ seeds the 95\% bootstrap interval, $[-0.10, +0.22]$, is about a third narrower than the corresponding five-seed bootstrap interval and centered on zero: it excludes negative correlations of the magnitude reported in every earlier phase while remaining consistent with either full neutralization or a small residual effect of either sign. Individual seeds remain uninformative in isolation---given $n = 8$ archetype pairs per seed, the Fisher-$z$ interval for a per-seed $\rtp = +0.06$ spans roughly $[-0.67, +0.73]$---so the claim rests on the ensemble, not on any single seed. A temperature-matched
+comparison isolates the scaffold effect from the sampling change:
+at temperature 1.0 and five seeds, Phase 3 gives $\rtp = -0.510$ and
+Phase 3.1 gives $-0.094$ ($\Delta\rtp = +0.416$), so the attenuation
+is present before temperature is pinned and is not an artifact of it;
+the temperature-0 twenty-seed run reproduces it at higher power. All statistics and exhibits in this subsection derive from this twenty-seed temperature-0 dataset, with one exception: the boxed illustrative hand is drawn from the original five-seed exploration, whose hand-level transcripts remain the source of the story hands.
 
 \begin{figure}[tb]
   \centering
@@ -1074,6 +1079,29 @@ Phase 2, or Phase 3 dataset; Phase 3.1 \arch{Wall}, augmented with
 chain-of-thought, per-opponent memory, and adaptive strategy
 notes, does.}
 \end{tcolorbox}
+
+
+\subsection{A first scaffold ablation: removing chain-of-thought}
+
+Phase 3.1 deploys three scaffolds jointly, so the attenuation cannot
+be attributed to any one of them without separating them. We report
+one leave-one-out contrast, chosen because it maps directly onto the
+paper's central claim: the \emph{no-CoT} arm removes chain-of-thought
+reasoning while retaining both information scaffolds (per-opponent
+memory and adaptive notes), at the same five seeds, 150 hands and
+temperature 0 as the canonical run. It yields $\rtp = -0.217 \pm
+0.418$ ($n = 5$; 95\% bootstrap CI $[-0.54, +0.11]$)---roughly
+midway between the full-scaffold $+0.062$ and the no-scaffold Phase 3
+value of $-0.510$. Removing the reasoning scaffold while leaving the
+information scaffolds intact therefore restores a substantial part of
+the trap, which is what the reasoning-not-optimization reading
+predicts. At $n = 5$ the interval is wide and overlaps both
+neighbours, so we read this as directional support rather than a
+decisive decomposition. The complementary \emph{no-memory} and
+\emph{no-notes} arms were attempted in the same batch but lost to an
+API quota exhaustion mid-run; their seeds are excluded rather than
+reported, because the failures fell in the closing hands that set the
+final stacks. A complete three-arm ablation remains outstanding.
 
 % =============================================================================
 \section{Discussion}
@@ -1346,10 +1374,7 @@ post hoc and are unadjusted for multiple comparisons. The 150-hand $n = 20$ repl
 (Anthropic Haiku 4.5); a multi-model replication (Gemini Flash,
 GPT-4o-mini, or a comparable alternative) is needed to
 demonstrate that the attenuation is not model-specific. Finally,
-the Phase 3.1 three-scaffold deployment (chain-of-thought,
-memory, adaptive notes) is currently joint; a clean main-text
-ablation isolating each component's contribution is the second-
-most-important missing experiment.
+the Phase 3.1 three-scaffold deployment (chain-of-thought, memory, adaptive notes) is only partially separated: we report the no-CoT arm, but the no-memory and no-notes arms were lost to an API quota exhaustion and remain outstanding, so the relative contribution of the two information scaffolds is untested.
 
 \textit{Design-choice gaps.} Several of our methodological
 choices are load-bearing in ways that future work should
@@ -1390,9 +1415,7 @@ parameters at once and does not cleanly isolate the bounds.
 
 Three follow-up experiments are the most important next steps.
 \textit{First}, the $n = 20$ Phase 3.1 replication at the 150-hand horizon has now been run and is the dataset reported here; extending it to 500 hands per seed (matching Phase 3) remains the highest-leverage single experiment, as it would remove the hand-count asymmetry from the final rung; estimated cost ${\sim}\$230$ in API spend.
-\textit{Second}, a clean ablation of the three Phase 3.1 scaffolds
-(chain-of-thought, per-opponent memory, adaptive notes) is required
-to support the claim that all three are necessary.
+\textit{Second}, completing the scaffold ablation is required before claiming all three components are necessary: the no-CoT arm reported here restores roughly half the trap, but the no-memory and no-notes arms remain to be run.
 \textit{Third}, a temperature-pinned re-run of Phase 3 at $T = 0.0$ would resolve the open reproducibility caveat (Phase 3.1 is already temperature-pinned).
 Beyond these three, a multi-LLM replication, a no-limit Hold'em
 extension, and an experimental varying of inter-archetype distance

@@ -43,6 +43,7 @@
 % Supplementary numbering
 \renewcommand{\thetable}{S\arabic{table}}
 \renewcommand{\thefigure}{S\arabic{figure}}
+\renewcommand{\thesection}{S\arabic{section}}
 
 \title{Supplementary Material for ``Trust Dynamics in Multi-Agent
   Strategic Interaction: A Simulation Study of Bayesian Reputation
@@ -51,6 +52,46 @@
 
 \begin{document}
 \maketitle
+
+\section{Mathematical preliminaries}
+Two quantitative tools recur in every part of the analysis, and we
+state them here so the main text can use them without further
+build-up.
+
+Pearson correlation coefficient is the first one. Given $n$ paired
+observations $(x_i, y_i)$ with sample means $\bar{x}$ and
+$\bar{y}$, it is defined as
+\begin{equation}
+  r = \frac{\sum_{i=1}^{n}(x_i-\bar{x})(y_i-\bar{y})}
+           {\sqrt{\sum_{i=1}^{n}(x_i-\bar{x})^2}\;
+            \sqrt{\sum_{i=1}^{n}(y_i-\bar{y})^2}}.
+  \label{eq:pearson}
+\end{equation}
+$r$ ranges from $-1$ (perfectly anti-correlated) through $0$ (no
+linear relationship) to $+1$ (perfectly correlated); the sign
+indicates the direction of the relationship and the magnitude its
+strength. We use $r$ between an archetype's mean trust score and
+its final stack to measure how reputation maps to economic
+outcome---a value we call $r_{tp}$.
+
+Bayesian updating is the second. Given a prior belief $P(t)$ that
+the opponent is of type $t$, and a likelihood $P(a\mid t)$ that a
+type-$t$ opponent would have taken the action $a$ we just
+observed, Bayes' rule gives the posterior belief
+\begin{equation}
+  P(t\mid a) = \frac{P(a\mid t)\,P(t)}
+                    {\sum_{t'} P(a\mid t')\,P(t')}.
+  \label{eq:bayes}
+\end{equation}
+Each agent maintains a categorical posterior distribution over the
+8 archetypes for each other player at the table. They update their
+beliefs with Eq.~\ref{eq:bayes} on every action they observe. The
+belief-updating mechanism used in this study---including the noise
+floor and hand-forgetting---is developed in the main text, as is the
+honesty score $h(t)$ that converts a posterior into a scalar trust
+score.
+
+\section{Additional tables, figures, and hand transcripts}
 
 \begin{table*}[t]
 \centering
@@ -158,6 +199,100 @@ Phase 2, or Phase 3 dataset; Phase 3.1 \arch{Wall}, augmented with
 chain-of-thought, per-opponent memory, and adaptive strategy
 notes, does.}
 \end{tcolorbox}
+
+\begin{table*}[!ht]
+\centering
+\caption{\textbf{Per-archetype policy bounds.}
+$P(\text{bet}|S)$, $P(\text{bet}|W)$ are the probabilities of
+betting with a strong or weak hand on a given street (preflop
+unless noted); $P(\text{fold}|W)$ is the probability of folding a
+weak hand to an opponent's bet. Static archetypes live at a fixed
+point inside the bound box. Under Phase 2's bounded hill-climber
+the agent may drift within the box; under Phase 2$^{*}$'s
+unbounded variant the box is replaced by $[0, 1]$ on every
+dimension. Adaptive archetypes additionally read live state
+(opponent posterior or grievance ledger) and are described by the
+rule that produces the policy rather than by fixed bounds.}
+\label{tab:bounds-comprehensive}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabularx}{\textwidth}{@{}l >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X c >{\raggedright\arraybackslash}X@{}}
+\toprule
+Archetype & $P(\text{bet}|S)$ & $P(\text{bet}|W)$ & $P(\text{fold}|W)$ & $h$ & Adaptation rule \\
+\midrule
+\arch{Oracle}    & $[0.65, 0.85]$ & $[0.15, 0.35]$ & $[0.45, 0.65]$ & 0.67 & None --- fixed mixed strategy \\
+\arch{Sentinel}  & $[0.90, 1.00]$ & $[0.00, 0.10]$ & $[0.80, 0.95]$ & 0.92 & None --- tight value-bettor \\
+\arch{Firestorm} & $[0.85, 1.00]$ & $[0.45, 0.65]$ & $[0.00, 0.20]$ & 0.38 & None --- bets everything \\
+\arch{Wall}      & $[0.95, 1.00]$ & $[0.00, 0.05]$ & $[0.00, 0.05]$ & 0.96 & None --- calls all, folds none \\
+\arch{Phantom}   & $[0.30, 0.50]$ & $[0.60, 0.80]$ pre, $[0.05, 0.20]$ post & $[0.70, 0.90]$ post-flop after preflop bluff & 0.48 & Static but street-conditional \\
+\arch{Predator}  & TAG default; exploit profile vs.\ target & $0.05$ default; $0.55$ vs.\ classified target & $0.65$ default; $0.30$ vs.\ classified target & 0.79 & Activates exploit profile when posterior on opponent $>0.60$ \\
+\arch{Mirror}    & $0.5\cdot\text{self}+0.5\cdot\text{target}$ & same blend & same blend & 0.91 & Re-targets at each hand to highest-VPIP opponent \\
+\arch{Judge}     & $[0.88, 0.98]$ coop; $[0.95, 1.00]$ retal. & $[0.02, 0.10]$ coop; $[0.30, 0.45]$ retal. & $[0.78, 0.92]$ coop; $[0.30, 0.50]$ retal. & 0.92 & Switches to retaliation after 5+ confirmed bluffs by an opponent \\
+\bottomrule
+\end{tabularx}
+\end{table*}
+
+\begin{table}[ht]
+\centering
+\small
+\begin{tabular}{lrl}
+\hline
+Archetype & TMA & Direction \\
+\hline
+judge & +0.304 & farming \\
+predator & +0.280 & farming \\
+oracle & +0.273 & farming \\
+phantom & +0.261 & farming \\
+mirror & +0.200 & farming \\
+wall & +0.190 & farming \\
+sentinel & +0.138 & farming \\
+firestorm & -0.157 & no awareness \\
+\hline
+\end{tabular}
+\caption{Trust Manipulation Awareness (TMA) per archetype in Phase 3.1 (twenty-seed temperature-0 replication). Positive TMA = the agent gains trust before exploiting it. Seven of eight archetypes show weakly positive TMA (maximum +0.30); for honest archetypes the signal reflects correlated trust and legitimate value-betting rather than deception.}
+\label{tab:tma}
+\end{table}
+
+\begin{figure}[tb]
+  \centering
+  \includegraphics[width=\linewidth]{10_param_drift_unbounded_aggressive.png}
+  \caption{\textbf{Per-archetype preflop bluff-rate drift under
+  aggressive unbounded hill-climbing.} Each panel is one archetype
+  and each translucent line is one of the five seeds. Every
+  archetype's bluff rate wanders substantially over the run, yet the
+  panels do not converge on a common profile (the corresponding mean
+  $L_1$ parameter drift is $3.4$).}
+  \label{fig:param-drift}
+\end{figure}
+
+\begin{figure}[tb]
+  \centering
+  \includegraphics[width=\linewidth]{07_phase2_bounded_vs_unbounded_aggressive.png}
+  \caption{\textbf{Bounded versus unbounded hill-climbing per
+  seed.} The left of each pair of bars is $r_{tp}$ for bounded
+  Phase 2 hill-climbing; the right is $r_{tp}$ for aggressive
+  Phase 2$^{*}$ hill-climbing, for each of the five canonical
+  seeds. When the bounding constraints are relaxed and the
+  optimiser's step size is increased fivefold, $r_{tp}$ increases by
+  only $+0.028$ on average, and across seeds the variance in $r_{tp}$
+  nearly triples.}
+  \label{fig:p2-bounded-vs-unbounded}
+\end{figure}
+
+\begin{figure}[tb]
+  \centering
+  \includegraphics[width=\linewidth]{14_nash_convergence_compare.png}
+  \caption{\textbf{The 8-agent population becomes dispersed in
+  parameter space.} Averaged pairwise $L_1$ distance between all
+  eight agents in a 36-dimensional parameter space over
+  $10{,}000$ hands of unbounded hill-climbing. (\textbf{Left})
+  With weak HC ($\delta = 0.03$), agents barely move.
+  (\textbf{Right}) Aggressive HC ($\delta = 0.15$) spreads the
+  population out on every seed. A ratio of final-to-initial
+  cluster spread $>1$ implies the agents become more dispersed at
+  end-of-run than at the start.}
+  \label{fig:nash}
+\end{figure}
 
 \section*{Broader Impact Statement}
 This research examines ways in which an observation-based reputation system creates incentives for an agent to exploit its predictability with respect to cooperative behavior. Therefore, the mechanisms identified in this work can be used to develop a theoretical basis for discovering, modeling, or strategically leveraging trust in reputation systems. In particular, both the Trust Manipulation Awareness (TMA) metric and the concept of ``trust farming'' can be viewed as a conceptual approach for maximizing the use of trust instead of detecting it.

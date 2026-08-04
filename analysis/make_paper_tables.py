@@ -242,8 +242,10 @@ def table_behavioral_shift(data_dir: Path, tex_dir: Path) -> None:
     _write_latex_table(
         tex_dir / "behavioral_shift_p1_p31.tex",
         caption="Phase 1 (frozen rules) vs. Phase 3.1 (LLM + reasoning) "
-                "behavioral fingerprints (Phase 3.1 columns from the original "
-                "five-seed exploration). VPIP = voluntarily put in pot; "
+                "behavioral fingerprints. Phase 1 columns are the five "
+                "canonical seeds at 10\\,000 hands; Phase 3.1 columns are the "
+                "twenty-seed temperature-0 replication at 150 hands per seed. "
+                "VPIP = voluntarily put in pot; "
                 "PFR = preflop raise rate; AF = aggression factor "
                 "((bets+raises)/calls).",
         label="behavioral-shift",
