@@ -448,7 +448,7 @@ def fig_trust_vs_stack(outdir: Path) -> None:
     fig, axes = plt.subplots(1, 2, figsize=(11.0, 4.8), sharey=False)
 
     p3_path = _REPO_ROOT / "paper_resources" / "data" / "phase3_stats.json"
-    p31_path = _REPO_ROOT / "paper_resources" / "data" / "phase31_stats.json"
+    p31_path = _REPO_ROOT / "paper_resources" / "data" / "phase31_n20_stats.json"
     if not p3_path.exists() or not p31_path.exists():
         print(f"  skipping fig 5: {p3_path} or {p31_path} missing")
         plt.close(fig)
@@ -460,12 +460,9 @@ def fig_trust_vs_stack(outdir: Path) -> None:
     for ax, data, title, color in [
         (axes[0], p3_data, "Phase 3 (LLM personalities) — r = -0.510",
          "#E67E22"),
-        # This scatter plots the per-seat data of the ORIGINAL five-seed
-        # Phase 3.1 run (phase31_stats.json) — no per-seat extraction exists
-        # yet for the twenty-seed replication — so the title must describe
-        # that run, not carry the n=20 headline r.
         (axes[1], p31_data,
-         "Phase 3.1 (LLM + reasoning, original five-seed run) — r = -0.094",
+         "Phase 3.1 (LLM + reasoning, n=20, T=0) — r = "
+         f"{np.mean(R_BY_PHASE['Phase 3.1' + chr(10) + 'LLM + reasoning']):+.3f}",
          "#1B9E77"),
     ]:
         # Pool every seat across every seed
@@ -512,6 +509,25 @@ TMA_P31 = {
     "mirror":    -0.277,
     "firestorm": -0.313,
 }
+
+
+# ---------------------------------------------------------------------------
+# n=20 override: the three dicts above hold the retired five-seed values.
+# The canonical Phase 3.1 exhibits now derive from the twenty-seed
+# temperature-0 replication, extracted by analysis/recompute_p31_n20.py
+# into phase31_n20_stats.json. Overriding here (rather than deleting the
+# dicts) keeps the old values greppable for provenance while guaranteeing
+# every figure renders the canonical dataset.
+# ---------------------------------------------------------------------------
+import json as _json
+_N20 = _json.load(open(_REPO_ROOT / "paper_resources" / "data"
+                       / "phase31_n20_stats.json"))
+_N20AGG = _N20["aggregates"]
+BEHAVIORAL["P3.1"] = {a: {"vpip": _N20AGG[a]["vpip"],
+                          "pfr": _N20AGG[a]["pfr"],
+                          "af": _N20AGG[a]["af"]} for a in ARCHETYPES}
+RANK_P31 = {a: _N20AGG[a]["rank_p31"] for a in ARCHETYPES}
+TMA_P31 = {a: _N20AGG[a]["tma"] for a in ARCHETYPES}
 
 
 def fig_tma_by_archetype(outdir: Path) -> None:

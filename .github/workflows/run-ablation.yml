@@ -1,0 +1,162 @@
+# Phase 3.1 scaffold ablation — the experiment the paper cites but has
+# never run. Three leave-one-out arms x five seeds x 150 hands, at
+# temperature 0, against the same engine and seeds as the canonical
+# Phase 3.1 replication, so the arms are directly comparable to its
+# full-scaffold result (r_tp = +0.062, n=20).
+#
+# Push-triggered rather than workflow_dispatch because the session
+# driving this repo cannot reach the dispatch API (its integration token
+# lacks actions:write). Pushing this file to the `run-ablation` branch is
+# the authorization gesture; the cost is stated below and in the job
+# summary. Estimated spend: ~$43.85 (~30,900 calls). The no-cot arm
+# answers in the 16-token Phase 3 format and so runs at the cheaper,
+# faster rate than the two CoT arms.
+name: Run ablation
+
+on:
+  push:
+    branches: [run-ablation]
+
+permissions:
+  contents: write
+
+env:
+  MODEL: claude-haiku-4-5-20251001
+  HANDS: "150"
+
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      # Same rationale as the replication workflow: a present-but-invalid
+      # key would otherwise fail in all fifteen jobs at once, several
+      # minutes in, looking like a code fault.
+      - name: Verify the API key with one minimal call
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          pip install --quiet anthropic
+          python3 - <<'PY'
+          import sys, anthropic
+          try:
+              r = anthropic.Anthropic().messages.create(
+                  model="${{ env.MODEL }}", max_tokens=4,
+                  messages=[{"role": "user", "content": "Reply with OK"}])
+              print("API key valid:", r.content[0].text.strip())
+          except Exception as e:
+              print(f"::error::API preflight failed — {type(e).__name__}: {e}")
+              sys.exit(1)
+          PY
+      - name: Cost notice
+        run: |
+          {
+            echo "### Phase 3.1 scaffold ablation"
+            echo ""
+            echo "| | |"
+            echo "|---|---|"
+            echo "| Arms | no-cot, no-memory, no-notes |"
+            echo "| Seeds per arm | 5 (42, 137, 256, 512, 1024) |"
+            echo "| Hands per seed | 150 |"
+            echo "| Jobs | 15 |"
+            echo "| Estimated cost | ~\$43.85 |"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  run:
+    needs: preflight
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    strategy:
+      fail-fast: false     # one bad seed must not kill the other fourteen
+      max-parallel: 10     # below the free-tier ceiling; see experiments.yml
+      matrix:
+        arm: [no-cot, no-memory, no-notes]
+        seed: [42, 137, 256, 512, 1024]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: pip install --quiet numpy treys anthropic
+      - name: Run ${{ matrix.arm }} / seed ${{ matrix.seed }}
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          mkdir -p out
+          python3 phase3/run_phase31_replication.py \
+            --db "out/runs_seed_${{ matrix.seed }}.sqlite" \
+            --hands "$HANDS" \
+            --seeds "${{ matrix.seed }}" \
+            --arm "${{ matrix.arm }}" \
+            --model "$MODEL" \
+            --yes
+      - uses: actions/upload-artifact@v4
+        with:
+          name: abl-${{ matrix.arm }}-${{ matrix.seed }}
+          path: out/*.sqlite
+          retention-days: 30
+
+  aggregate:
+    needs: [preflight, run]
+    if: always() && !cancelled()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main          # land results on main, not this trigger branch
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: pip install --quiet numpy treys matplotlib
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          pattern: abl-*
+      - name: Recompute r per arm
+        run: |
+          set -euo pipefail
+          for ARM in no-cot no-memory no-notes; do
+            # Each arm gets its own phase key with ladder=false, so no
+            # published phase is overwritten and the headline four-tier
+            # figure is untouched.
+            python3 phase3/run_phase31_replication.py --emit-r-json \
+              --db-glob "artifacts/abl-${ARM}-*/*.sqlite" \
+              --hands "$HANDS" \
+              --phase-key "Phase 3.1 ablation (${ARM})" || \
+              echo "::warning::arm ${ARM} produced no complete seeds"
+          done
+          python3 analysis/bootstrap_ci.py | tee ci_report.txt
+          python3 analysis/bootstrap_ci.py --csv \
+            > paper_resources/data/r_bootstrap_ci.csv
+          rm -f paper_resources/data/r_by_phase.json.bak
+      - name: Publish to job summary
+        run: |
+          { echo '### Ablation results'; echo '```';
+            cat ci_report.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: all-databases-ablation
+          path: artifacts/**/*.sqlite
+          retention-days: 90
+      - name: Commit
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A paper_resources || true
+          if git diff --cached --quiet; then
+            echo "No changes to commit."; exit 0
+          fi
+          git commit -m "experiment: Phase 3.1 scaffold ablation results
+
+          Three leave-one-out arms (no-cot, no-memory, no-notes), five seeds
+          each at 150 hands, temperature 0. Each arm written to its own
+          phase key with ladder=false; the canonical four-tier ladder is
+          unchanged."
+          for i in 1 2 3 4; do
+            git push origin HEAD:main && break || sleep $((2**i))
+          done
