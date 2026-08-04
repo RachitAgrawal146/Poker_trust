@@ -154,16 +154,17 @@ def fig_four_tier_ladder(outdir: Path) -> None:
 
     ax.set_xticks(range(len(PHASE_ORDER)))
     ax.set_xticklabels(PHASE_ORDER, fontsize=10)
-    ax.set_ylabel("Trust-profit Pearson r\n(mean across 5 seeds)", fontsize=11)
+    ax.set_ylabel("Trust-profit Pearson r\n(mean across seeds)", fontsize=11)
     ax.set_title("Trust-Profit r Across Four Agent Architectures",
                  fontsize=12)
     ax.set_ylim(-1.05, 0.40)
 
+    _n31 = len(R_BY_PHASE[PHASE_ORDER[-1]])
     fig.text(0.99, -0.02,
              "Error bars: 95% percentile bootstrap CI on the mean "
-             "(10,000 resamples, n=5 seeds).\n"
-             "Phase 3.1 CI contains zero AND moderate negative correlations; "
-             "n=20 replication needed.",
+             f"(10,000 resamples; n=5 seeds, n={_n31} for Phase 3.1).\n"
+             "The Phase 3.1 interval is centered on zero and excludes every "
+             "earlier phase's correlation.",
              ha="right", va="top", fontsize=8.5, color="#555", style="italic")
 
     fig.tight_layout()
@@ -223,9 +224,12 @@ def fig_five_tier_ladder(outdir: Path) -> None:
                  fontsize=12)
     ax.set_ylim(-1.05, 0.45)
 
+    _n31b = len(R_BY_PHASE[PHASE_ORDER[-1]])
     fig.text(0.99, -0.02,
-             "Error bars: 95% percentile bootstrap CI on the mean (10,000 resamples, n=5 seeds).\n"
-             "Phase 3.1 CI [-0.32, +0.20] contains zero AND moderate negative correlations.",
+             "Error bars: 95% percentile bootstrap CI on the mean "
+             f"(10,000 resamples; n=5 seeds, n={_n31b} for Phase 3.1).\n"
+             "The Phase 3.1 interval is centered on zero and excludes every "
+             "earlier phase's correlation.",
              ha="right", va="top", fontsize=8.5, color="#555", style="italic")
     fig.tight_layout()
     _save(fig, outdir, "01b_five_tier_ladder_with_unbounded.png")
@@ -456,7 +460,12 @@ def fig_trust_vs_stack(outdir: Path) -> None:
     for ax, data, title, color in [
         (axes[0], p3_data, "Phase 3 (LLM personalities) — r = -0.510",
          "#E67E22"),
-        (axes[1], p31_data, "Phase 3.1 (LLM + reasoning) — r = -0.094",
+        # This scatter plots the per-seat data of the ORIGINAL five-seed
+        # Phase 3.1 run (phase31_stats.json) — no per-seat extraction exists
+        # yet for the twenty-seed replication — so the title must describe
+        # that run, not carry the n=20 headline r.
+        (axes[1], p31_data,
+         "Phase 3.1 (LLM + reasoning, original five-seed run) — r = -0.094",
          "#1B9E77"),
     ]:
         # Pool every seat across every seed

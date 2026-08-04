@@ -124,17 +124,22 @@ def table_headline_ladder(data_dir: Path, tex_dir: Path) -> None:
     # LaTeX
     _write_latex_table(
         tex_dir / "headline_ladder.tex",
+        # n and the P1->P3.1 delta are computed from the data rather than
+        # hardcoded, so a re-run at a different seed count cannot leave the
+        # caption contradicting its own table.
         caption="Per-seed Pearson r between mean trust score (final hand) and "
                 "final stack across the four agent architectures. Phase 3.1 "
                 "(LLM agents with chain-of-thought, opponent memory, and "
                 "adaptive strategy notes) breaks the trap: the mean r is "
-                "statistically indistinguishable from zero at $n=5$.",
+                "statistically indistinguishable from zero at "
+                f"$n={len(R_BY_PHASE[phase_keys[-1]])}$.",
         label="ladder",
         column_spec="lrrrr",
         header=["Seed", "P1", "P2", "P3", "P3.1"],
         rows=rows,
-        footnote=(r"P1 $\to$ P3.1: $\Delta r = +0.658$, larger than all "
-                  r"intermediate steps combined."),
+        footnote=(rf"P1 $\to$ P3.1: $\Delta r = "
+                  rf"{np.mean(R_BY_PHASE[phase_keys[-1]]) - np.mean(R_BY_PHASE[phase_keys[0]]):+.3f}$, "
+                  r"larger than all intermediate steps combined."),
     )
 
 
@@ -179,8 +184,9 @@ def table_per_archetype_p31(data_dir: Path, tex_dir: Path) -> None:
 
     _write_latex_table(
         tex_dir / "per_archetype_p31.tex",
-        caption="Phase 3.1 economic outcomes by archetype (mean across 5 seeds, "
-                "150 hands each). Ranks are derived from final-stack ordering. "
+        caption="Phase 3.1 economic outcomes by archetype (original five-seed "
+                "exploration, 150 hands each; headline correlations derive from "
+                "the twenty-seed replication). Ranks are derived from final-stack ordering. "
                 "Wall, the most-trusted archetype, climbs from rank 8 (Phase 3) "
                 "to rank 1 (Phase 3.1), with zero rebuys.",
         label="archetype-p31",
@@ -214,7 +220,8 @@ def table_behavioral_shift(data_dir: Path, tex_dir: Path) -> None:
     _write_latex_table(
         tex_dir / "behavioral_shift_p1_p31.tex",
         caption="Phase 1 (frozen rules) vs. Phase 3.1 (LLM + reasoning) "
-                "behavioral fingerprints. VPIP = voluntarily put in pot; "
+                "behavioral fingerprints (Phase 3.1 columns from the original "
+                "five-seed exploration). VPIP = voluntarily put in pot; "
                 "PFR = preflop raise rate; AF = aggression factor "
                 "((bets+raises)/calls).",
         label="behavioral-shift",
@@ -253,7 +260,8 @@ def table_tma(data_dir: Path, tex_dir: Path) -> None:
         # most honest archetypes as evidence of deception. For Wall and
         # Sentinel the signal reflects trust and legitimate value-betting
         # rising together, not manipulation. Do not drop it.
-        caption="Trust Manipulation Awareness (TMA) per archetype in Phase 3.1. "
+        caption="Trust Manipulation Awareness (TMA) per archetype in Phase 3.1 "
+                "(original five-seed exploration). "
                 "Positive TMA = the agent gains trust before exploiting it. "
                 "Six of eight archetypes farm; Wall and Sentinel show the "
                 "strongest signals, but for these two honest archetypes the "
