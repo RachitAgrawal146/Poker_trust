@@ -18,13 +18,22 @@ archetype agents play Limit Texas Hold'em against each other while every
 agent maintains a Bayesian posterior over what archetype every other
 agent is.
 
-**Status as of 2026-05-01:** all four phases complete. Headline result
-is the four-tier ladder of trust-profit r values:
+**Status as of 2026-10-13:** all four phases complete; the manuscript
+built from `tog_submission/` was submitted and is frozen at tag
+`tog-r0-submitted` (commit `3e87700`). The ladder of trust-profit r
+values in that version (mean of per-seed r, from
+`paper_resources/data/r_by_phase.json`, the single source of truth):
 
-  Phase 1 (frozen rule-based)              r = -0.752
-  Phase 2 (bounded hill-climbing)          r = -0.637
-  Phase 3 (LLM personality role-play)      r = -0.510
-  Phase 3.1 (LLM + CoT + memory + adaptive) r = -0.094 (trap broken)
+  Phase 1 (frozen rule-based)               r = -0.752  (5 seeds x 10 000 hands)
+  Phase 2 (bounded hill-climbing)           r = -0.637  (5 seeds x 10 000 hands)
+  Phase 3 (LLM personality role-play)       r = -0.510  (5 seeds x 500 hands)
+  Phase 3.1 (LLM + CoT + memory + adaptive) r = +0.062  (20 seeds x 150 hands,
+                                                         temperature 0)
+
+The older Phase 3.1 figure r = -0.094 came from a five-seed
+temperature-1.0 run (`runs_phase31_long.sqlite`) that is **not** in this
+repository; treat it as superseded. `research_data/MANIFEST.md` says
+where every dataset lives.
 
 Detailed reports in `phase1/phase1_report.md`,
 `phase2/adaptive/phase2_report.md`, and `phase3/phase3_report.md`
@@ -37,6 +46,33 @@ notes — live in `paper_resources/`. See `paper_resources/README.md`.
 
 All 12 Phase 1 stages are complete. The canonical Phase 1 dataset is produced
 by `run_sim.py` with 5 seeds × 10 000 hands at Stage 6.
+
+## Revision mode (2026-10)
+
+These rules override the conventions below wherever they conflict.
+
+* **Working branch is `revision/r1`**, created from
+  `claude/repo-papers-review-chz55c` at `3e87700`. This overrides rule 6
+  (`main`). Do not open or merge a pull request into `main`, and do not
+  push to `claude/repo-papers-review-chz55c`, until the revision is
+  ready to publish.
+* **Rule 7's "canonical abstract verbatim" instruction is retired.**
+  Abstracts and all other manuscript text are no longer regenerated
+  from this repository.
+* **`tog_submission/` and `tog_build/` are frozen** at tag
+  `tog-r0-submitted`. Do not edit them; new manuscript work happens
+  elsewhere.
+* **Never edit** `archetype_params.py`, `preflop_lookup.py`,
+  `phase1/test_cases.py`, or the Stage 5 trust flow in
+  `agents/base_agent.py`. New behaviour goes in new modules and
+  subclasses behind flags whose default reproduces the published
+  behaviour bit for bit.
+* **Code that produced published data is never changed
+  retroactively.** If a document and the code disagree, the document
+  changes, or a new flagged variant is added and run.
+* Experiment and archive workflows are triggered by pushes to
+  dedicated `run/*` branches and store databases in GitHub Releases
+  (Actions artifacts expire after 90 days).
 
 ## Non-negotiable conventions
 
