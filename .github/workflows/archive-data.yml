@@ -1,0 +1,220 @@
+# Archive the R0 language-model databases into GitHub Release `data-r0`.
+#
+# The n=20 Phase 3.1 replication and the scaffold-ablation databases
+# existed only as Actions artifacts with 90-day retention (expiring about
+# 1 and 2 Nov 2026). Releases do not expire. The session container
+# cannot download artifacts or call workflow_dispatch, so this runs on
+# a push to its own branch and commits only small JSON check files back.
+#
+# Idempotent: if `data-r0` already holds both archives, the archive job
+# skips creation and only the verify job does work. A second push is
+# therefore an independent "download and open from the Release" test.
+#
+# Also creates the annotated tag `tog-r0-submitted` on 3e87700 if it is
+# missing (the session's git proxy refuses tag pushes).
+name: Archive R0 data
+
+on:
+  push:
+    branches: [run/archive-data]
+
+permissions:
+  contents: write
+  actions: read      # cross-run artifact download
+
+env:
+  R0_COMMIT: 3e87700d440f0e9b59b298c30e158da6788a2437
+  RELEASE: data-r0
+  P31_RUN: "30788234686"
+  ABL_RUN: "30874382486"
+  GH_TOKEN: ${{ github.token }}
+
+jobs:
+  archive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Ensure tag tog-r0-submitted
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git ls-remote --exit-code --tags origin refs/tags/tog-r0-submitted; then
+            echo "tag exists"
+          else
+            git tag -a tog-r0-submitted "$R0_COMMIT" \
+              -m "R0: sources as submitted (tog_submission/ at 3e87700)"
+            git push origin refs/tags/tog-r0-submitted
+          fi
+
+      - name: Does the release already hold the archives?
+        id: state
+        run: |
+          assets=$(gh release view "$RELEASE" --json assets --jq '.assets[].name' 2>/dev/null || true)
+          echo "$assets"
+          if echo "$assets" | grep -qx phase31_n20_r0.tar.gz && \
+             echo "$assets" | grep -qx ablation_r0.tar.gz; then
+            echo "create=no" >> "$GITHUB_OUTPUT"
+          else
+            echo "create=yes" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Download the n=20 Phase 3.1 databases
+        if: steps.state.outputs.create == 'yes'
+        uses: actions/download-artifact@v4
+        with:
+          name: all-databases-phase31-n20
+          run-id: ${{ env.P31_RUN }}
+          github-token: ${{ github.token }}
+          path: stage/phase31_n20
+
+      - name: Download the ablation databases
+        if: steps.state.outputs.create == 'yes'
+        uses: actions/download-artifact@v4
+        with:
+          name: all-databases-ablation
+          run-id: ${{ env.ABL_RUN }}
+          github-token: ${{ github.token }}
+          path: stage/ablation
+
+      - name: Check the downloaded databases
+        if: steps.state.outputs.create == 'yes'
+        run: |
+          find stage -type f | sort
+          python3 research_data/tools/check_dbs.py stage/phase31_n20 \
+            --expect-count 20 --expect-hands 150 \
+            --out checks/phase31_n20_source.json
+          python3 research_data/tools/check_dbs.py stage/ablation \
+            --out checks/ablation_source.json
+
+      - name: Write READMEs, build archives and checksums
+        if: steps.state.outputs.create == 'yes'
+        run: |
+          cat > stage/phase31_n20/README.md <<MD
+          # Phase 3.1 n=20 replication databases (R0)
+
+          Source: Actions artifact \`all-databases-phase31-n20\` of workflow run
+          ${P31_RUN} ("Paper experiments", workflow_dispatch on main at
+          92e1b64, experiment phase31-n20, 3 Aug 2026). Files are archived
+          unchanged, in the artifact's folder layout.
+
+          * Model: claude-haiku-4-5-20251001, temperature 0 (Anthropic path of
+            phase3/llm_chat_agent.py); arm \`full\` (CoT + memory + notes)
+          * 150 hands per seed, one seed per database, 20 seeds:
+            42 137 256 512 1024 12666 13927 14942 19277 29004
+            41939 42908 58556 69218 70875 72385 73280 77153 86890 99769
+          * Driver: phase3/run_phase31_replication.py
+          * Aggregates derived from these files:
+            paper_resources/data/phase31_n20_stats.json and the
+            "Phase 3.1 (LLM + reasoning)" entry of
+            paper_resources/data/r_by_phase.json
+          * Per-file SHA-256, integrity check and row counts:
+            phase31_n20_source.json (Release asset)
+          MD
+          cat > stage/ablation/README.md <<MD
+          # Phase 3.1 scaffold-ablation databases (R0)
+
+          Source: Actions artifact \`all-databases-ablation\` of workflow run
+          ${ABL_RUN} ("Run ablation", push to run-ablation at 28f3fd1,
+          4 Aug 2026). Files are archived unchanged, in the artifact's
+          folder layout. Model claude-haiku-4-5-20251001, temperature 0,
+          150 hands per seed, seeds 42 137 256 512 1024. Driver:
+          phase3/run_phase31_replication.py --arm <arm>.
+
+          The run ran out of API credit part-way through; the API returned
+          errors from 04:33:58Z on 4 Aug 2026 (details in commit 0b43ea5).
+
+          | Arm | Status |
+          |---|---|
+          | no-cot (abl-no-cot-*) | Clean. All 5 seeds finished 03:53-03:55Z, before the API errors began. Source of the "Phase 3.1 ablation (no-cot)" entry of paper_resources/data/r_by_phase.json. |
+          | no-memory (abl-no-memory-*) | **Contaminated. Do not analyse.** The 3 seeds present finished 04:34-04:35Z, after the API errors began, so their final hands are affected. Kept for provenance only. |
+          | no-notes | No databases. All 5 seeds stopped at the failure-rate guard. |
+
+          Per-file SHA-256, integrity check and row counts:
+          ablation_source.json (Release asset).
+          MD
+          echo "Ablation folders present:"; ls stage/ablation
+          mkdir -p dist
+          tar -C stage -czf dist/phase31_n20_r0.tar.gz phase31_n20
+          tar -C stage -czf dist/ablation_r0.tar.gz ablation
+          cp checks/phase31_n20_source.json checks/ablation_source.json dist/
+          (cd dist && sha256sum *.tar.gz *.json > SHA256SUMS && cat SHA256SUMS)
+
+      - name: Create release and upload
+        if: steps.state.outputs.create == 'yes'
+        run: |
+          if ! gh release view "$RELEASE" > /dev/null 2>&1; then
+            gh release create "$RELEASE" --target "$R0_COMMIT" \
+              --title "data-r0: Phase 3.1 language-model databases" \
+              --notes "Raw SQLite databases of the Phase 3.1 n=20 replication (workflow run ${P31_RUN}) and the Phase 3.1 scaffold ablation (workflow run ${ABL_RUN}), copied unchanged from their Actions artifacts, which expire after 90 days. Each archive contains a README with the protocol. SHA256SUMS covers every asset; the *_source.json files list per-database checksums, integrity checks and row counts. The no-memory ablation seeds are contaminated by API errors and must not be analysed. See research_data/MANIFEST.md."
+          fi
+          gh release upload "$RELEASE" dist/* --clobber
+
+      - name: Commit source checks back to this branch
+        if: steps.state.outputs.create == 'yes'
+        run: |
+          mkdir -p research_data/checks
+          cp checks/*.json research_data/checks/
+          cp dist/SHA256SUMS research_data/checks/data-r0.SHA256SUMS
+          git add research_data/checks
+          git commit -q -m "archive: data-r0 source checks (runs ${P31_RUN}, ${ABL_RUN})" || exit 0
+          for i in 1 2 3 4; do
+            git pull -q --rebase origin "$GITHUB_REF_NAME" && \
+            git push -q origin "HEAD:$GITHUB_REF_NAME" && break || sleep $((2**i))
+          done
+
+  verify:
+    needs: archive
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download from the release, verify checksums, open every database
+        run: |
+          mkdir -p fetched && cd fetched
+          gh release download "$RELEASE" --repo "$GITHUB_REPOSITORY"
+          ls -la
+          sha256sum -c SHA256SUMS
+          tar -xzf phase31_n20_r0.tar.gz
+          tar -xzf ablation_r0.tar.gz
+          cd ..
+          python3 research_data/tools/check_dbs.py fetched/phase31_n20 \
+            --expect-count 20 --expect-hands 150 \
+            --out verify/phase31_n20_release.json
+          python3 research_data/tools/check_dbs.py fetched/ablation \
+            --out verify/ablation_release.json
+          python3 - <<'PY'
+          import json, sys
+          bad = []
+          for k in ("phase31_n20", "ablation"):
+              rel = json.load(open(f"verify/{k}_release.json"))
+              src = json.load(open(f"fetched/{k}_source.json"))
+              a = {f["path"]: f["sha256"] for f in rel["files"]}
+              b = {f["path"]: f["sha256"] for f in src["files"]}
+              print(k, "files", len(a), "match source:", a == b,
+                    "all_ok:", rel["all_ok"])
+              if a != b or not rel["all_ok"]:
+                  bad.append(k)
+          sys.exit(1 if bad else 0)
+          PY
+
+      - name: Commit verification result back to this branch
+        if: always()
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          mkdir -p research_data/checks
+          cp verify/*.json research_data/checks/ 2>/dev/null || true
+          printf '{"run_id": %s, "run_attempt": %s, "head_sha": "%s", "verify_outcome": "%s"}\n' \
+            "$GITHUB_RUN_ID" "$GITHUB_RUN_ATTEMPT" "$GITHUB_SHA" "${{ job.status }}" \
+            > "research_data/checks/verify_run_${GITHUB_RUN_ID}.json"
+          git add research_data/checks
+          git commit -q -m "archive: data-r0 release verification (run ${GITHUB_RUN_ID})" || exit 0
+          for i in 1 2 3 4; do
+            git pull -q --rebase origin "$GITHUB_REF_NAME" && \
+            git push -q origin "HEAD:$GITHUB_REF_NAME" && break || sleep $((2**i))
+          done
