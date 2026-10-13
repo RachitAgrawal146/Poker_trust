@@ -1,0 +1,207 @@
+{
+ "root": "stage/ablation",
+ "n_files": 8,
+ "files": [
+  {
+   "path": "abl-no-cot-1024/runs_seed_1024.sqlite",
+   "bytes": 720896,
+   "sha256": "2bf101836ad68f921583e3e278abaedd9ea119fc1217b37d39b54c5af29fbd4a",
+   "integrity": "ok",
+   "runs": [
+    {
+     "run_id": 1,
+     "seed": 1024,
+     "num_hands": 150,
+     "num_seats": 8,
+     "started_at": "2026-08-04T03:19:14.339794+00:00",
+     "label": "phase31-repl-memory+notes",
+     "git_sha": "28f3fd16640595961f38117bbec3064ff02b2987"
+    }
+   ],
+   "n_hands": 150,
+   "n_actions": 2671,
+   "n_showdowns": 299,
+   "n_trust_snapshots": 8400,
+   "n_agent_stats": 8,
+   "hands_per_run": {
+    "1": 150
+   }
+  },
+  {
+   "path": "abl-no-cot-137/runs_seed_137.sqlite",
+   "bytes": 716800,
+   "sha256": "4db53a5b0e02ce8b7ad36d165a322f6c0a838f957a3cea816fcaea35ca8d2770",
+   "integrity": "ok",
+   "runs": [
+    {
+     "run_id": 1,
+     "seed": 137,
+     "num_hands": 150,
+     "num_seats": 8,
+     "started_at": "2026-08-04T03:19:13.939258+00:00",
+     "label": "phase31-repl-memory+notes",
+     "git_sha": "28f3fd16640595961f38117bbec3064ff02b2987"
+    }
+   ],
+   "n_hands": 150,
+   "n_actions": 2602,
+   "n_showdowns": 274,
+   "n_trust_snapshots": 8400,
+   "n_agent_stats": 8,
+   "hands_per_run": {
+    "1": 150
+   }
+  },
+  {
+   "path": "abl-no-cot-256/runs_seed_256.sqlite",
+   "bytes": 729088,
+   "sha256": "13b8062e775fc0117582da9724149535f35c8f31b380984a5148b4d76df16775",
+   "integrity": "ok",
+   "runs": [
+    {
+     "run_id": 1,
+     "seed": 256,
+     "num_hands": 150,
+     "num_seats": 8,
+     "started_at": "2026-08-04T03:19:14.981438+00:00",
+     "label": "phase31-repl-memory+notes",
+     "git_sha": "28f3fd16640595961f38117bbec3064ff02b2987"
+    }
+   ],
+   "n_hands": 150,
+   "n_actions": 2651,
+   "n_showdowns": 285,
+   "n_trust_snapshots": 8400,
+   "n_agent_stats": 8,
+   "hands_per_run": {
+    "1": 150
+   }
+  },
+  {
+   "path": "abl-no-cot-42/runs_seed_42.sqlite",
+   "bytes": 729088,
+   "sha256": "083d6b605be8c21a5314645c37925d8d2e2ac2b3c277ccf63a9db31c5c8ee72c",
+   "integrity": "ok",
+   "runs": [
+    {
+     "run_id": 1,
+     "seed": 42,
+     "num_hands": 150,
+     "num_seats": 8,
+     "started_at": "2026-08-04T03:19:13.335994+00:00",
+     "label": "phase31-repl-memory+notes",
+     "git_sha": "28f3fd16640595961f38117bbec3064ff02b2987"
+    }
+   ],
+   "n_hands": 150,
+   "n_actions": 2672,
+   "n_showdowns": 261,
+   "n_trust_snapshots": 8400,
+   "n_agent_stats": 8,
+   "hands_per_run": {
+    "1": 150
+   }
+  },
+  {
+   "path": "abl-no-cot-512/runs_seed_512.sqlite",
+   "bytes": 712704,
+   "sha256": "678fa653b157002066135151e6a2887d21d02098b2ce67a4813c54967baf3dfa",
+   "integrity": "ok",
+   "runs": [
+    {
+     "run_id": 1,
+     "seed": 512,
+     "num_hands": 150,
+     "num_seats": 8,
+     "started_at": "2026-08-04T03:19:12.727496+00:00",
+     "label": "phase31-repl-memory+notes",
+     "git_sha": "28f3fd16640595961f38117bbec3064ff02b2987"
+    }
+   ],
+   "n_hands": 150,
+   "n_actions": 2447,
+   "n_showdowns": 205,
+   "n_trust_snapshots": 8400,
+   "n_agent_stats": 8,
+   "hands_per_run": {
+    "1": 150
+   }
+  },
+  {
+   "path": "abl-no-memory-1024/runs_seed_1024.sqlite",
+   "bytes": 720896,
+   "sha256": "a0b88e0d85dc584a9a5c0739c0a01c538baf37c9aabebcfbf2c1018fb5cbfd47",
+   "integrity": "ok",
+   "runs": [
+    {
+     "run_id": 1,
+     "seed": 1024,
+     "num_hands": 150,
+     "num_seats": 8,
+     "started_at": "2026-08-04T03:19:24.594141+00:00",
+     "label": "phase31-repl-cot+notes",
+     "git_sha": "28f3fd16640595961f38117bbec3064ff02b2987"
+    }
+   ],
+   "n_hands": 150,
+   "n_actions": 2384,
+   "n_showdowns": 141,
+   "n_trust_snapshots": 8400,
+   "n_agent_stats": 8,
+   "hands_per_run": {
+    "1": 150
+   }
+  },
+  {
+   "path": "abl-no-memory-256/runs_seed_256.sqlite",
+   "bytes": 729088,
+   "sha256": "2300afccf9518bef56e1e5393dd042e8c5de7b34badcb28277dd02570565ff22",
+   "integrity": "ok",
+   "runs": [
+    {
+     "run_id": 1,
+     "seed": 256,
+     "num_hands": 150,
+     "num_seats": 8,
+     "started_at": "2026-08-04T03:19:12.443602+00:00",
+     "label": "phase31-repl-cot+notes",
+     "git_sha": "28f3fd16640595961f38117bbec3064ff02b2987"
+    }
+   ],
+   "n_hands": 150,
+   "n_actions": 2460,
+   "n_showdowns": 156,
+   "n_trust_snapshots": 8400,
+   "n_agent_stats": 8,
+   "hands_per_run": {
+    "1": 150
+   }
+  },
+  {
+   "path": "abl-no-memory-512/runs_seed_512.sqlite",
+   "bytes": 716800,
+   "sha256": "e69629bfde34f1e9df4201103d56afbe59387fec8fd75d8133cdcc991423d0f5",
+   "integrity": "ok",
+   "runs": [
+    {
+     "run_id": 1,
+     "seed": 512,
+     "num_hands": 150,
+     "num_seats": 8,
+     "started_at": "2026-08-04T03:19:15.608558+00:00",
+     "label": "phase31-repl-cot+notes",
+     "git_sha": "28f3fd16640595961f38117bbec3064ff02b2987"
+    }
+   ],
+   "n_hands": 150,
+   "n_actions": 2405,
+   "n_showdowns": 176,
+   "n_trust_snapshots": 8400,
+   "n_agent_stats": 8,
+   "hands_per_run": {
+    "1": 150
+   }
+  }
+ ],
+ "all_ok": true
+}
