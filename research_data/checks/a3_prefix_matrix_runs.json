@@ -1,0 +1,485 @@
+{
+ "jobs": [
+  {
+   "file": "phase1_seed1024.sqlite",
+   "integrity": "ok",
+   "runs": [
+    {
+     "run_id": 1,
+     "seed": 1024,
+     "num_hands": 10000,
+     "label": "a3pre-phase1",
+     "git_sha": "7ab199629957bbb652fb075c1fe086c297ec45fc"
+    }
+   ],
+   "hands": 10000,
+   "seconds": 1853,
+   "hands_per_second": 5.4,
+   "chip_conservation": [
+    {
+     "run_id": 1,
+     "total_stack": 12200,
+     "expected": 12200,
+     "ok": true
+    }
+   ]
+  },
+  {
+   "file": "phase1_seed137.sqlite",
+   "integrity": "ok",
+   "runs": [
+    {
+     "run_id": 1,
+     "seed": 137,
+     "num_hands": 10000,
+     "label": "a3pre-phase1",
+     "git_sha": "7ab199629957bbb652fb075c1fe086c297ec45fc"
+    }
+   ],
+   "hands": 10000,
+   "seconds": 1985,
+   "hands_per_second": 5.04,
+   "chip_conservation": [
+    {
+     "run_id": 1,
+     "total_stack": 13400,
+     "expected": 13400,
+     "ok": true
+    }
+   ]
+  },
+  {
+   "file": "phase1_seed256.sqlite",
+   "integrity": "ok",
+   "runs": [
+    {
+     "run_id": 1,
+     "seed": 256,
+     "num_hands": 10000,
+     "label": "a3pre-phase1",
+     "git_sha": "7ab199629957bbb652fb075c1fe086c297ec45fc"
+    }
+   ],
+   "hands": 10000,
+   "seconds": 1947,
+   "hands_per_second": 5.14,
+   "chip_conservation": [
+    {
+     "run_id": 1,
+     "total_stack": 13600,
+     "expected": 13600,
+     "ok": true
+    }
+   ]
+  },
+  {
+   "file": "phase1_seed42.sqlite",
+   "integrity": "ok",
+   "runs": [
+    {
+     "run_id": 1,
+     "seed": 42,
+     "num_hands": 10000,
+     "label": "a3pre-phase1",
+     "git_sha": "7ab199629957bbb652fb075c1fe086c297ec45fc"
+    }
+   ],
+   "hands": 10000,
+   "seconds": 1912,
+   "hands_per_second": 5.23,
+   "chip_conservation": [
+    {
+     "run_id": 1,
+     "total_stack": 13000,
+     "expected": 13000,
+     "ok": true
+    }
+   ]
+  },
+  {
+   "file": "phase1_seed512.sqlite",
+   "integrity": "ok",
+   "runs": [
+    {
+     "run_id": 1,
+     "seed": 512,
+     "num_hands": 10000,
+     "label": "a3pre-phase1",
+     "git_sha": "7ab199629957bbb652fb075c1fe086c297ec45fc"
+    }
+   ],
+   "hands": 10000,
+   "seconds": 987,
+   "hands_per_second": 10.13,
+   "chip_conservation": [
+    {
+     "run_id": 1,
+     "total_stack": 14400,
+     "expected": 14400,
+     "ok": true
+    }
+   ]
+  },
+  {
+   "file": "phase2_bounded_seed1024.sqlite",
+   "integrity": "ok",
+   "runs": [
+    {
+     "run_id": 1,
+     "seed": 1024,
+     "num_hands": 10000,
+     "label": "a3pre-phase2-bounded",
+     "git_sha": "7ab199629957bbb652fb075c1fe086c297ec45fc"
+    }
+   ],
+   "hands": 10000,
+   "seconds": 967,
+   "hands_per_second": 10.34,
+   "chip_conservation": [
+    {
+     "run_id": 1,
+     "total_stack": 13200,
+     "expected": 13200,
+     "ok": true
+    }
+   ]
+  },
+  {
+   "file": "phase2_bounded_seed137.sqlite",
+   "integrity": "ok",
+   "runs": [
+    {
+     "run_id": 1,
+     "seed": 137,
+     "num_hands": 10000,
+     "label": "a3pre-phase2-bounded",
+     "git_sha": "7ab199629957bbb652fb075c1fe086c297ec45fc"
+    }
+   ],
+   "hands": 10000,
+   "seconds": 917,
+   "hands_per_second": 10.91,
+   "chip_conservation": [
+    {
+     "run_id": 1,
+     "total_stack": 13800,
+     "expected": 13800,
+     "ok": true
+    }
+   ]
+  },
+  {
+   "file": "phase2_bounded_seed256.sqlite",
+   "integrity": "ok",
+   "runs": [
+    {
+     "run_id": 1,
+     "seed": 256,
+     "num_hands": 10000,
+     "label": "a3pre-phase2-bounded",
+     "git_sha": "7ab199629957bbb652fb075c1fe086c297ec45fc"
+    }
+   ],
+   "hands": 10000,
+   "seconds": 1383,
+   "hands_per_second": 7.23,
+   "chip_conservation": [
+    {
+     "run_id": 1,
+     "total_stack": 13200,
+     "expected": 13200,
+     "ok": true
+    }
+   ]
+  },
+  {
+   "file": "phase2_bounded_seed42.sqlite",
+   "integrity": "ok",
+   "runs": [
+    {
+     "run_id": 1,
+     "seed": 42,
+     "num_hands": 10000,
+     "label": "a3pre-phase2-bounded",
+     "git_sha": "7ab199629957bbb652fb075c1fe086c297ec45fc"
+    }
+   ],
+   "hands": 10000,
+   "seconds": 957,
+   "hands_per_second": 10.45,
+   "chip_conservation": [
+    {
+     "run_id": 1,
+     "total_stack": 11000,
+     "expected": 11000,
+     "ok": true
+    }
+   ]
+  },
+  {
+   "file": "phase2_bounded_seed512.sqlite",
+   "integrity": "ok",
+   "runs": [
+    {
+     "run_id": 1,
+     "seed": 512,
+     "num_hands": 10000,
+     "label": "a3pre-phase2-bounded",
+     "git_sha": "7ab199629957bbb652fb075c1fe086c297ec45fc"
+    }
+   ],
+   "hands": 10000,
+   "seconds": 961,
+   "hands_per_second": 10.41,
+   "chip_conservation": [
+    {
+     "run_id": 1,
+     "total_stack": 13400,
+     "expected": 13400,
+     "ok": true
+    }
+   ]
+  },
+  {
+   "file": "phase2_unb_aggr_seed1024.sqlite",
+   "integrity": "ok",
+   "runs": [
+    {
+     "run_id": 1,
+     "seed": 1024,
+     "num_hands": 10000,
+     "label": "a3pre-phase2-unbounded-aggressive",
+     "git_sha": "7ab199629957bbb652fb075c1fe086c297ec45fc"
+    }
+   ],
+   "hands": 10000,
+   "seconds": 1650,
+   "hands_per_second": 6.06,
+   "chip_conservation": [
+    {
+     "run_id": 1,
+     "total_stack": 11800,
+     "expected": 11800,
+     "ok": true
+    }
+   ]
+  },
+  {
+   "file": "phase2_unb_aggr_seed137.sqlite",
+   "integrity": "ok",
+   "runs": [
+    {
+     "run_id": 1,
+     "seed": 137,
+     "num_hands": 10000,
+     "label": "a3pre-phase2-unbounded-aggressive",
+     "git_sha": "7ab199629957bbb652fb075c1fe086c297ec45fc"
+    }
+   ],
+   "hands": 10000,
+   "seconds": 1142,
+   "hands_per_second": 8.76,
+   "chip_conservation": [
+    {
+     "run_id": 1,
+     "total_stack": 15000,
+     "expected": 15000,
+     "ok": true
+    }
+   ]
+  },
+  {
+   "file": "phase2_unb_aggr_seed256.sqlite",
+   "integrity": "ok",
+   "runs": [
+    {
+     "run_id": 1,
+     "seed": 256,
+     "num_hands": 10000,
+     "label": "a3pre-phase2-unbounded-aggressive",
+     "git_sha": "7ab199629957bbb652fb075c1fe086c297ec45fc"
+    }
+   ],
+   "hands": 10000,
+   "seconds": 1863,
+   "hands_per_second": 5.37,
+   "chip_conservation": [
+    {
+     "run_id": 1,
+     "total_stack": 11000,
+     "expected": 11000,
+     "ok": true
+    }
+   ]
+  },
+  {
+   "file": "phase2_unb_aggr_seed42.sqlite",
+   "integrity": "ok",
+   "runs": [
+    {
+     "run_id": 1,
+     "seed": 42,
+     "num_hands": 10000,
+     "label": "a3pre-phase2-unbounded-aggressive",
+     "git_sha": "7ab199629957bbb652fb075c1fe086c297ec45fc"
+    }
+   ],
+   "hands": 10000,
+   "seconds": 1787,
+   "hands_per_second": 5.6,
+   "chip_conservation": [
+    {
+     "run_id": 1,
+     "total_stack": 13200,
+     "expected": 13200,
+     "ok": true
+    }
+   ]
+  },
+  {
+   "file": "phase2_unb_aggr_seed512.sqlite",
+   "integrity": "ok",
+   "runs": [
+    {
+     "run_id": 1,
+     "seed": 512,
+     "num_hands": 10000,
+     "label": "a3pre-phase2-unbounded-aggressive",
+     "git_sha": "7ab199629957bbb652fb075c1fe086c297ec45fc"
+    }
+   ],
+   "hands": 10000,
+   "seconds": 1629,
+   "hands_per_second": 6.14,
+   "chip_conservation": [
+    {
+     "run_id": 1,
+     "total_stack": 10400,
+     "expected": 10400,
+     "ok": true
+    }
+   ]
+  },
+  {
+   "file": "phase2_unb_weak_seed1024.sqlite",
+   "integrity": "ok",
+   "runs": [
+    {
+     "run_id": 1,
+     "seed": 1024,
+     "num_hands": 10000,
+     "label": "a3pre-phase2-unbounded-weak",
+     "git_sha": "7ab199629957bbb652fb075c1fe086c297ec45fc"
+    }
+   ],
+   "hands": 10000,
+   "seconds": 1800,
+   "hands_per_second": 5.56,
+   "chip_conservation": [
+    {
+     "run_id": 1,
+     "total_stack": 13600,
+     "expected": 13600,
+     "ok": true
+    }
+   ]
+  },
+  {
+   "file": "phase2_unb_weak_seed137.sqlite",
+   "integrity": "ok",
+   "runs": [
+    {
+     "run_id": 1,
+     "seed": 137,
+     "num_hands": 10000,
+     "label": "a3pre-phase2-unbounded-weak",
+     "git_sha": "7ab199629957bbb652fb075c1fe086c297ec45fc"
+    }
+   ],
+   "hands": 10000,
+   "seconds": 1882,
+   "hands_per_second": 5.31,
+   "chip_conservation": [
+    {
+     "run_id": 1,
+     "total_stack": 12400,
+     "expected": 12400,
+     "ok": true
+    }
+   ]
+  },
+  {
+   "file": "phase2_unb_weak_seed256.sqlite",
+   "integrity": "ok",
+   "runs": [
+    {
+     "run_id": 1,
+     "seed": 256,
+     "num_hands": 10000,
+     "label": "a3pre-phase2-unbounded-weak",
+     "git_sha": "7ab199629957bbb652fb075c1fe086c297ec45fc"
+    }
+   ],
+   "hands": 10000,
+   "seconds": 908,
+   "hands_per_second": 11.01,
+   "chip_conservation": [
+    {
+     "run_id": 1,
+     "total_stack": 13000,
+     "expected": 13000,
+     "ok": true
+    }
+   ]
+  },
+  {
+   "file": "phase2_unb_weak_seed42.sqlite",
+   "integrity": "ok",
+   "runs": [
+    {
+     "run_id": 1,
+     "seed": 42,
+     "num_hands": 10000,
+     "label": "a3pre-phase2-unbounded-weak",
+     "git_sha": "7ab199629957bbb652fb075c1fe086c297ec45fc"
+    }
+   ],
+   "hands": 10000,
+   "seconds": 1378,
+   "hands_per_second": 7.26,
+   "chip_conservation": [
+    {
+     "run_id": 1,
+     "total_stack": 11200,
+     "expected": 11200,
+     "ok": true
+    }
+   ]
+  },
+  {
+   "file": "phase2_unb_weak_seed512.sqlite",
+   "integrity": "ok",
+   "runs": [
+    {
+     "run_id": 1,
+     "seed": 512,
+     "num_hands": 10000,
+     "label": "a3pre-phase2-unbounded-weak",
+     "git_sha": "7ab199629957bbb652fb075c1fe086c297ec45fc"
+    }
+   ],
+   "hands": 10000,
+   "seconds": 872,
+   "hands_per_second": 11.47,
+   "chip_conservation": [
+    {
+     "run_id": 1,
+     "total_stack": 13400,
+     "expected": 13400,
+     "ok": true
+    }
+   ]
+  }
+ ],
+ "n_jobs": 20
+}

@@ -1,0 +1,631 @@
+{
+ "rows": [
+  {
+   "dataset": "phase1",
+   "seed": 1024,
+   "run_id": 1,
+   "git_sha": "7ab199629957bbb652fb075c1fe086c297ec45fc",
+   "r_regenerated": -0.776229,
+   "published_key": "Phase 1 (frozen rules)",
+   "r_published": -0.776,
+   "match_3dp": true,
+   "abs_diff": 0.000229,
+   "mean_trust": [
+    0.822557,
+    0.629557,
+    0.476387,
+    0.962,
+    0.719795,
+    0.810439,
+    0.866873,
+    0.835946
+   ],
+   "final_stack": [
+    950,
+    1545,
+    6265,
+    151,
+    82,
+    188,
+    1141,
+    1878
+   ]
+  },
+  {
+   "dataset": "phase1",
+   "seed": 137,
+   "run_id": 1,
+   "git_sha": "7ab199629957bbb652fb075c1fe086c297ec45fc",
+   "r_regenerated": -0.607543,
+   "published_key": "Phase 1 (frozen rules)",
+   "r_published": -0.608,
+   "match_3dp": true,
+   "abs_diff": 0.000457,
+   "mean_trust": [
+    0.754188,
+    0.84658,
+    0.396082,
+    0.962,
+    0.509133,
+    0.736173,
+    0.741276,
+    0.879723
+   ],
+   "final_stack": [
+    1200,
+    1961,
+    5919,
+    57,
+    166,
+    572,
+    2626,
+    899
+   ]
+  },
+  {
+   "dataset": "phase1",
+   "seed": 256,
+   "run_id": 1,
+   "git_sha": "7ab199629957bbb652fb075c1fe086c297ec45fc",
+   "r_regenerated": -0.791999,
+   "published_key": "Phase 1 (frozen rules)",
+   "r_published": -0.792,
+   "match_3dp": true,
+   "abs_diff": 1e-06,
+   "mean_trust": [
+    0.767273,
+    0.843876,
+    0.473302,
+    0.962,
+    0.675021,
+    0.795733,
+    0.856744,
+    0.795728
+   ],
+   "final_stack": [
+    2632,
+    1265,
+    6780,
+    42,
+    181,
+    172,
+    1408,
+    1120
+   ]
+  },
+  {
+   "dataset": "phase1",
+   "seed": 42,
+   "run_id": 1,
+   "git_sha": "7ab199629957bbb652fb075c1fe086c297ec45fc",
+   "r_regenerated": -0.774238,
+   "published_key": "Phase 1 (frozen rules)",
+   "r_published": -0.774,
+   "match_3dp": true,
+   "abs_diff": 0.000238,
+   "mean_trust": [
+    0.673693,
+    0.789548,
+    0.571421,
+    0.961999,
+    0.716843,
+    0.832592,
+    0.832943,
+    0.824982
+   ],
+   "final_stack": [
+    2007,
+    1191,
+    7030,
+    133,
+    195,
+    89,
+    1285,
+    1070
+   ]
+  },
+  {
+   "dataset": "phase1",
+   "seed": 512,
+   "run_id": 1,
+   "git_sha": "7ab199629957bbb652fb075c1fe086c297ec45fc",
+   "r_regenerated": -0.811788,
+   "published_key": "Phase 1 (frozen rules)",
+   "r_published": -0.812,
+   "match_3dp": true,
+   "abs_diff": 0.000212,
+   "mean_trust": [
+    0.617406,
+    0.754582,
+    0.375141,
+    0.962,
+    0.623552,
+    0.81133,
+    0.83456,
+    0.822277
+   ],
+   "final_stack": [
+    1802,
+    1713,
+    8380,
+    131,
+    51,
+    661,
+    416,
+    1246
+   ]
+  },
+  {
+   "dataset": "phase2_bounded",
+   "seed": 1024,
+   "run_id": 1,
+   "git_sha": "7ab199629957bbb652fb075c1fe086c297ec45fc",
+   "r_regenerated": -0.564437,
+   "published_key": "Phase 2 (bounded HC)",
+   "r_published": -0.564,
+   "match_3dp": true,
+   "abs_diff": 0.000437,
+   "mean_trust": [
+    0.800335,
+    0.81317,
+    0.562185,
+    0.962,
+    0.57123,
+    0.887636,
+    0.775734,
+    0.844014
+   ],
+   "final_stack": [
+    1601,
+    1526,
+    7108,
+    72,
+    112,
+    1079,
+    984,
+    718
+   ]
+  },
+  {
+   "dataset": "phase2_bounded",
+   "seed": 137,
+   "run_id": 1,
+   "git_sha": "7ab199629957bbb652fb075c1fe086c297ec45fc",
+   "r_regenerated": -0.423738,
+   "published_key": "Phase 2 (bounded HC)",
+   "r_published": -0.424,
+   "match_3dp": true,
+   "abs_diff": 0.000262,
+   "mean_trust": [
+    0.800447,
+    0.723757,
+    0.651614,
+    0.962,
+    0.702417,
+    0.667408,
+    0.864709,
+    0.806656
+   ],
+   "final_stack": [
+    959,
+    219,
+    9957,
+    108,
+    115,
+    166,
+    897,
+    1379
+   ]
+  },
+  {
+   "dataset": "phase2_bounded",
+   "seed": 256,
+   "run_id": 1,
+   "git_sha": "7ab199629957bbb652fb075c1fe086c297ec45fc",
+   "r_regenerated": -0.719007,
+   "published_key": "Phase 2 (bounded HC)",
+   "r_published": -0.719,
+   "match_3dp": true,
+   "abs_diff": 7e-06,
+   "mean_trust": [
+    0.676582,
+    0.883171,
+    0.442294,
+    0.962,
+    0.604457,
+    0.723236,
+    0.812622,
+    0.85969
+   ],
+   "final_stack": [
+    1517,
+    1211,
+    8181,
+    136,
+    206,
+    420,
+    663,
+    866
+   ]
+  },
+  {
+   "dataset": "phase2_bounded",
+   "seed": 42,
+   "run_id": 1,
+   "git_sha": "7ab199629957bbb652fb075c1fe086c297ec45fc",
+   "r_regenerated": -0.759461,
+   "published_key": "Phase 2 (bounded HC)",
+   "r_published": -0.759,
+   "match_3dp": true,
+   "abs_diff": 0.000461,
+   "mean_trust": [
+    0.570972,
+    0.714563,
+    0.412821,
+    0.962,
+    0.690005,
+    0.83823,
+    0.827083,
+    0.817379
+   ],
+   "final_stack": [
+    920,
+    609,
+    7020,
+    41,
+    74,
+    516,
+    299,
+    1521
+   ]
+  },
+  {
+   "dataset": "phase2_bounded",
+   "seed": 512,
+   "run_id": 1,
+   "git_sha": "7ab199629957bbb652fb075c1fe086c297ec45fc",
+   "r_regenerated": -0.716729,
+   "published_key": "Phase 2 (bounded HC)",
+   "r_published": -0.717,
+   "match_3dp": true,
+   "abs_diff": 0.000271,
+   "mean_trust": [
+    0.833076,
+    0.671962,
+    0.376201,
+    0.962,
+    0.520137,
+    0.83904,
+    0.838115,
+    0.856574
+   ],
+   "final_stack": [
+    1697,
+    1605,
+    7499,
+    63,
+    227,
+    1588,
+    560,
+    161
+   ]
+  },
+  {
+   "dataset": "phase2_unb_aggr",
+   "seed": 1024,
+   "run_id": 1,
+   "git_sha": "7ab199629957bbb652fb075c1fe086c297ec45fc",
+   "r_regenerated": -0.759123,
+   "published_key": "Phase 2* (unbounded HC, aggr.)",
+   "r_published": -0.759,
+   "match_3dp": true,
+   "abs_diff": 0.000123,
+   "mean_trust": [
+    0.695522,
+    0.83504,
+    0.542277,
+    0.962,
+    0.675653,
+    0.793817,
+    0.85381,
+    0.879269
+   ],
+   "final_stack": [
+    2738,
+    590,
+    5886,
+    257,
+    46,
+    590,
+    938,
+    755
+   ]
+  },
+  {
+   "dataset": "phase2_unb_aggr",
+   "seed": 137,
+   "run_id": 1,
+   "git_sha": "7ab199629957bbb652fb075c1fe086c297ec45fc",
+   "r_regenerated": -0.700379,
+   "published_key": "Phase 2* (unbounded HC, aggr.)",
+   "r_published": -0.7,
+   "match_3dp": true,
+   "abs_diff": 0.000379,
+   "mean_trust": [
+    0.796518,
+    0.784091,
+    0.375056,
+    0.962,
+    0.504667,
+    0.774093,
+    0.85782,
+    0.82692
+   ],
+   "final_stack": [
+    659,
+    1899,
+    9168,
+    299,
+    145,
+    458,
+    942,
+    1430
+   ]
+  },
+  {
+   "dataset": "phase2_unb_aggr",
+   "seed": 256,
+   "run_id": 1,
+   "git_sha": "7ab199629957bbb652fb075c1fe086c297ec45fc",
+   "r_regenerated": -0.343708,
+   "published_key": "Phase 2* (unbounded HC, aggr.)",
+   "r_published": -0.344,
+   "match_3dp": true,
+   "abs_diff": 0.000292,
+   "mean_trust": [
+    0.863664,
+    0.814079,
+    0.37781,
+    0.960464,
+    0.694677,
+    0.805416,
+    0.820956,
+    0.743838
+   ],
+   "final_stack": [
+    1665,
+    2247,
+    2058,
+    149,
+    214,
+    1919,
+    263,
+    2485
+   ]
+  },
+  {
+   "dataset": "phase2_unb_aggr",
+   "seed": 42,
+   "run_id": 1,
+   "git_sha": "7ab199629957bbb652fb075c1fe086c297ec45fc",
+   "r_regenerated": -0.353675,
+   "published_key": "Phase 2* (unbounded HC, aggr.)",
+   "r_published": -0.354,
+   "match_3dp": true,
+   "abs_diff": 0.000325,
+   "mean_trust": [
+    0.715928,
+    0.878604,
+    0.63571,
+    0.961999,
+    0.692835,
+    0.560409,
+    0.860443,
+    0.788902
+   ],
+   "final_stack": [
+    795,
+    629,
+    10137,
+    139,
+    345,
+    33,
+    889,
+    233
+   ]
+  },
+  {
+   "dataset": "phase2_unb_aggr",
+   "seed": 512,
+   "run_id": 1,
+   "git_sha": "7ab199629957bbb652fb075c1fe086c297ec45fc",
+   "r_regenerated": -0.886619,
+   "published_key": "Phase 2* (unbounded HC, aggr.)",
+   "r_published": -0.887,
+   "match_3dp": true,
+   "abs_diff": 0.000381,
+   "mean_trust": [
+    0.811269,
+    0.768353,
+    0.400252,
+    0.962,
+    0.790876,
+    0.819718,
+    0.692477,
+    0.703333
+   ],
+   "final_stack": [
+    1846,
+    729,
+    5312,
+    49,
+    185,
+    56,
+    1592,
+    631
+   ]
+  },
+  {
+   "dataset": "phase2_unb_weak",
+   "seed": 1024,
+   "run_id": 1,
+   "git_sha": "7ab199629957bbb652fb075c1fe086c297ec45fc",
+   "r_regenerated": -0.77928,
+   "published_key": "Phase 2* (unbounded HC, weak)",
+   "r_published": -0.779,
+   "match_3dp": true,
+   "abs_diff": 0.00028,
+   "mean_trust": [
+    0.802305,
+    0.819936,
+    0.375002,
+    0.962,
+    0.581912,
+    0.769296,
+    0.720146,
+    0.837906
+   ],
+   "final_stack": [
+    1442,
+    1096,
+    9316,
+    267,
+    299,
+    282,
+    297,
+    601
+   ]
+  },
+  {
+   "dataset": "phase2_unb_weak",
+   "seed": 137,
+   "run_id": 1,
+   "git_sha": "7ab199629957bbb652fb075c1fe086c297ec45fc",
+   "r_regenerated": -0.676367,
+   "published_key": "Phase 2* (unbounded HC, weak)",
+   "r_published": -0.676,
+   "match_3dp": true,
+   "abs_diff": 0.000367,
+   "mean_trust": [
+    0.736564,
+    0.847061,
+    0.376116,
+    0.962,
+    0.518942,
+    0.798693,
+    0.823153,
+    0.805234
+   ],
+   "final_stack": [
+    868,
+    1718,
+    6714,
+    268,
+    205,
+    518,
+    91,
+    2018
+   ]
+  },
+  {
+   "dataset": "phase2_unb_weak",
+   "seed": 256,
+   "run_id": 1,
+   "git_sha": "7ab199629957bbb652fb075c1fe086c297ec45fc",
+   "r_regenerated": -0.932179,
+   "published_key": "Phase 2* (unbounded HC, weak)",
+   "r_published": -0.932,
+   "match_3dp": true,
+   "abs_diff": 0.000179,
+   "mean_trust": [
+    0.782741,
+    0.865226,
+    0.379044,
+    0.961997,
+    0.77308,
+    0.799743,
+    0.850212,
+    0.763221
+   ],
+   "final_stack": [
+    1438,
+    1059,
+    8343,
+    152,
+    15,
+    562,
+    527,
+    904
+   ]
+  },
+  {
+   "dataset": "phase2_unb_weak",
+   "seed": 42,
+   "run_id": 1,
+   "git_sha": "7ab199629957bbb652fb075c1fe086c297ec45fc",
+   "r_regenerated": -0.790622,
+   "published_key": "Phase 2* (unbounded HC, weak)",
+   "r_published": -0.791,
+   "match_3dp": true,
+   "abs_diff": 0.000378,
+   "mean_trust": [
+    0.795485,
+    0.830655,
+    0.518364,
+    0.962,
+    0.712035,
+    0.846734,
+    0.74075,
+    0.831098
+   ],
+   "final_stack": [
+    592,
+    1634,
+    7432,
+    227,
+    234,
+    393,
+    205,
+    483
+   ]
+  },
+  {
+   "dataset": "phase2_unb_weak",
+   "seed": 512,
+   "run_id": 1,
+   "git_sha": "7ab199629957bbb652fb075c1fe086c297ec45fc",
+   "r_regenerated": -0.716729,
+   "published_key": "Phase 2* (unbounded HC, weak)",
+   "r_published": -0.717,
+   "match_3dp": true,
+   "abs_diff": 0.000271,
+   "mean_trust": [
+    0.833076,
+    0.671962,
+    0.376201,
+    0.962,
+    0.520137,
+    0.83904,
+    0.838115,
+    0.856574
+   ],
+   "final_stack": [
+    1697,
+    1605,
+    7499,
+    63,
+    227,
+    1588,
+    560,
+    161
+   ]
+  }
+ ],
+ "n_match_3dp": 20,
+ "n_rows": 20,
+ "versions": {
+  "python": "3.12.15",
+  "numpy": "2.5.4",
+  "treys": "0.1.8"
+ }
+}
