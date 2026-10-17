@@ -1,0 +1,58 @@
+{
+ "_comment": [
+  "Single mapping from code names to the names printed in tables and figures (runbook B1).",
+  "Code names never change. Every exhibit generator reads this file; nothing types a display name by hand.",
+  "Archetype terms follow each table in archetype_params.ARCHETYPE_AVERAGES:",
+  "  oracle br .33 vbr .875 -> mixes bluffs and value bets at a fixed 1:2 ratio (hand-set, not a solved strategy)",
+  "  sentinel br .083 vbr .90 -> tight-aggressive; firestorm br .625 cr .625 -> maniac;",
+  "  wall br .038 cr .725 -> calling station; phantom br .525 vbr .575 cr .225 -> weak-aggressive bluffer;",
+  "  predator -> exploitative; mirror -> mimic; judge -> grudger (Axelrod's term for permanent retaliation)."
+ ],
+ "archetype": {
+  "oracle":    {"long": "Balanced",          "short": "BAL"},
+  "sentinel":  {"long": "Tight-aggressive",  "short": "TAG"},
+  "firestorm": {"long": "Maniac",            "short": "MAN"},
+  "wall":      {"long": "Calling station",   "short": "CS"},
+  "phantom":   {"long": "Weak-aggressive",   "short": "WAG"},
+  "predator":  {"long": "Exploiter",         "short": "EXP"},
+  "mirror":    {"long": "Mimic",             "short": "MIM"},
+  "judge":     {"long": "Grudger",           "short": "GRD"}
+ },
+ "phase": {
+  "phase1":          "Fixed rules",
+  "phase2_bounded":  "Bounded hill-climbing",
+  "phase2_unb_weak": "Unbounded hill-climbing (small steps)",
+  "phase2_unb_aggr": "Unbounded hill-climbing (large steps)",
+  "phase3":          "Language model, role-play",
+  "phase31":         "Language model, role-play with reasoning, memory and notes",
+  "phase31_no_cot":  "Language model, memory and notes without reasoning"
+ },
+ "condition": {
+  "published":               "Published roster",
+  "no_read":                 "No reading",
+  "published_predator_off":  "Published roster, exploiter off",
+  "read_target_inferred":    "Read target (inferred)",
+  "read_target_true":        "Read target (true type)",
+  "read_all_inferred":       "Everyone reads (inferred)",
+  "read_all_true":           "Everyone reads (true type)",
+  "loose_matched":           "Matched loosening, no reading",
+  "shuffled":                "Reading a random seat",
+  "noise_005":               "5% random actions",
+  "noise_010":               "10% random actions",
+  "potodds_no_read":         "Pot-odds calling, no reading",
+  "sweep_no_read":           "Bluff-rate sweep, not read",
+  "sweep_read":              "Bluff-rate sweep, read",
+  "legacy_stack":            "200-chip stacks with rebuys",
+  "hill_bounded":            "Bounded hill-climbing",
+  "hill_unbounded":          "Unbounded hill-climbing"
+ },
+ "metric": {
+  "walkover":        "pot won without showdown",
+  "honesty":         "non-bluff rate",
+  "win_rate":        "win rate",
+  "net_chips":       "net chips",
+  "showdown_net":    "showdown winnings",
+  "non_showdown_net":"non-showdown winnings",
+  "trust":           "trust"
+ }
+}
