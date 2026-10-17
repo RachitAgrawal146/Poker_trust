@@ -1,0 +1,13 @@
+{
+ "_comment": "A3 diagnosis: the same four datasets as a3_matrix.json, run with the code at 7ab1996, the commit before 57cca9a (22 May 2026: side-pot accounting and agents/mirror.py). A local rerun of phase1 seed 1024 at 7ab1996 gave r = -0.776, equal to the published value; current code gives -0.205. This matrix tests whether every published rule-based r comes from the pre-57cca9a engine.",
+ "release": "data-r0",
+ "asset_prefix": "a3pre_",
+ "seeds": [42, 137, 256, 512, 1024],
+ "include": [
+  {"dataset": "phase1", "cmd": "bash revision_experiments/at_commit.sh 7ab199629957bbb652fb075c1fe086c297ec45fc python3 phase1/run_sim.py --stage 6 --hands 10000 --label a3pre-phase1"},
+  {"dataset": "phase2_bounded", "cmd": "bash revision_experiments/at_commit.sh 7ab199629957bbb652fb075c1fe086c297ec45fc python3 phase2/adaptive/run_adaptive.py --hands 10000 --label a3pre-phase2-bounded --trajectories out/traj_bounded.json --optlog out/optlog_bounded.json"},
+  {"dataset": "phase2_unb_weak", "cmd": "bash revision_experiments/at_commit.sh 7ab199629957bbb652fb075c1fe086c297ec45fc python3 phase2/adaptive/run_adaptive.py --hands 10000 --unbounded --label a3pre-phase2-unbounded-weak --trajectories out/traj_unb_weak.json --optlog out/optlog_unb_weak.json"},
+  {"dataset": "phase2_unb_aggr", "cmd": "bash revision_experiments/at_commit.sh 7ab199629957bbb652fb075c1fe086c297ec45fc python3 phase2/adaptive/run_adaptive.py --hands 10000 --unbounded --delta 0.15 --eval-window 50 --decay-rate 0.998 --label a3pre-phase2-unbounded-aggressive --trajectories out/traj_unb_aggr.json --optlog out/optlog_unb_aggr.json"}
+ ],
+ "post": "python3 revision_experiments/a3_compare_r.py dbs --out research_data/checks/a3pre_compare_r.json"
+}
