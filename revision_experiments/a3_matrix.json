@@ -1,0 +1,13 @@
+{
+ "_comment": "A3: regenerate the R0 rule-based datasets with full logging, one job per (dataset, seed). Settings from phase2/README.md and paper_resources/notes/phase2_unbounded_writeup*.md. The aggressive run uses --delta 0.15 --eval-window 50 --decay-rate 0.998; the README's --hc-delta/--hc-eval-window flags do not exist in run_adaptive.py.",
+ "release": "data-r0",
+ "asset_prefix": "a3_",
+ "seeds": [42, 137, 256, 512, 1024],
+ "include": [
+  {"dataset": "phase1", "cmd": "python3 phase1/run_sim.py --stage 6 --hands 10000 --label a3-phase1"},
+  {"dataset": "phase2_bounded", "cmd": "python3 phase2/adaptive/run_adaptive.py --hands 10000 --label a3-phase2-bounded --trajectories out/traj_bounded.json --optlog out/optlog_bounded.json"},
+  {"dataset": "phase2_unb_weak", "cmd": "python3 phase2/adaptive/run_adaptive.py --hands 10000 --unbounded --label a3-phase2-unbounded-weak --trajectories out/traj_unb_weak.json --optlog out/optlog_unb_weak.json"},
+  {"dataset": "phase2_unb_aggr", "cmd": "python3 phase2/adaptive/run_adaptive.py --hands 10000 --unbounded --delta 0.15 --eval-window 50 --decay-rate 0.998 --label a3-phase2-unbounded-aggressive --trajectories out/traj_unb_aggr.json --optlog out/optlog_unb_aggr.json"}
+ ],
+ "post": "python3 revision_experiments/a3_compare_r.py dbs --out research_data/checks/a3_compare_r.json"
+}

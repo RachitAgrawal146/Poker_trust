@@ -1,0 +1,84 @@
+name: Rule-based runs
+# Triggered by a push to run/rule-based. The matrix file is named in
+# revision_experiments/RUN_MATRIX:
+#   {"include": [{dataset, cmd}], "seeds": [...], "release": tag,
+#    "asset_prefix": str, "post": analysis command run on dbs/}
+# One job per (dataset, seed). Release uploads never overwrite an existing
+# asset: a name clash fails the job instead.
+on:
+  push:
+    branches: [run/rule-based]
+permissions:
+  contents: write
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.m.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: m
+        run: python3 revision_experiments/plan_matrix.py "$(cat revision_experiments/RUN_MATRIX)" >> "$GITHUB_OUTPUT"
+  run:
+    needs: plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    strategy:
+      fail-fast: false
+      max-parallel: 20
+      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - run: pip install --quiet numpy treys
+      - name: Run ${{ matrix.dataset }} seed ${{ matrix.seed }}
+        env:
+          NAME: ${{ matrix.dataset }}_seed${{ matrix.seed }}
+        run: |
+          mkdir -p out
+          START=$(date +%s)
+          ${{ matrix.cmd }} --seeds ${{ matrix.seed }} --db out/$NAME.sqlite
+          END=$(date +%s)
+          python3 revision_experiments/db_summary.py out/$NAME.sqlite $((END-START)) > out/timing_$NAME.json
+          cat out/timing_$NAME.json
+          gzip -9 out/$NAME.sqlite
+      - uses: actions/upload-artifact@v4
+        with:
+          name: db-${{ matrix.dataset }}-${{ matrix.seed }}
+          path: out/
+          retention-days: 7
+  collect:
+    needs: run
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - run: pip install --quiet numpy treys
+      - uses: actions/download-artifact@v4
+        with: { path: art, pattern: 'db-*', merge-multiple: true }
+      - name: Upload databases to the Release (no overwrite)
+        env: { GH_TOKEN: '${{ github.token }}' }
+        run: |
+          F=$(cat revision_experiments/RUN_MATRIX)
+          TAG=$(python3 -c "import json,sys;print(json.load(open(sys.argv[1]))['release'])" "$F")
+          PREFIX=$(python3 -c "import json,sys;print(json.load(open(sys.argv[1]))['asset_prefix'])" "$F")
+          mkdir -p dbs up
+          for f in art/*.sqlite.gz; do b=$(basename "$f"); cp "$f" "up/${PREFIX}$b"; gunzip -c "$f" > "dbs/${b%.gz}"; done
+          (cd up && sha256sum *.sqlite.gz > "${PREFIX}SHA256SUMS")
+          gh release upload "$TAG" up/*
+      - name: Analyse and commit outputs
+        run: |
+          F=$(cat revision_experiments/RUN_MATRIX)
+          STEM=$(basename "$F" .json)
+          mkdir -p research_data/checks
+          python3 revision_experiments/collect_timing.py art "research_data/checks/${STEM}_runs.json"
+          POST=$(python3 -c "import json,sys;print(json.load(open(sys.argv[1])).get('post',''))" "$F")
+          if [ -n "$POST" ]; then $POST; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add research_data/checks
+          git commit -m "runs: outputs of ${STEM} (run ${{ github.run_id }})" || echo "nothing to commit"
+          git push origin HEAD:run/rule-based
