@@ -1,0 +1,487 @@
+{
+ "label": "a3pre_phase2_unb_weak",
+ "n_runs": 5,
+ "summary": {
+  "pearson_stack": {
+   "n": 5,
+   "mean": -0.7790352922961281,
+   "sd_pop": 0.08718981725456615,
+   "ci95_t": [
+    -0.9000741629658933,
+    -0.657996421626363
+   ],
+   "n_positive": 0
+  },
+  "pearson_net": {
+   "n": 5,
+   "mean": -0.6510691280319496,
+   "sd_pop": 0.15556685384199137,
+   "ci95_t": [
+    -0.8670305429722583,
+    -0.43510771309164087
+   ],
+   "n_positive": 0
+  },
+  "spearman_stack": {
+   "n": 5,
+   "mean": -0.4095238095238097,
+   "sd_pop": 0.1589363739836061,
+   "ci95_t": [
+    -0.6301628683161442,
+    -0.18888475073147518
+   ],
+   "n_positive": 0
+  },
+  "spearman_net": {
+   "n": 5,
+   "mean": -0.4428571428571429,
+   "sd_pop": 0.1401327520910682,
+   "ci95_t": [
+    -0.637392589667714,
+    -0.2483216960465718
+   ],
+   "n_positive": 0
+  }
+ },
+ "per_run": [
+  {
+   "file": "a3pre_phase2_unb_weak_seed1024.sqlite",
+   "run_id": 1,
+   "seed": 1024,
+   "archetypes": [
+    "oracle",
+    "sentinel",
+    "firestorm",
+    "wall",
+    "phantom",
+    "predator",
+    "mirror",
+    "judge"
+   ],
+   "trust": [
+    0.802305051226195,
+    0.819936393366573,
+    0.3750017864076501,
+    0.9619999999692023,
+    0.5819116001371526,
+    0.7692957723356619,
+    0.7201461297626045,
+    0.8379061062595603
+   ],
+   "final_stack": [
+    1442,
+    1096,
+    9316,
+    267,
+    299,
+    282,
+    297,
+    601
+   ],
+   "net_chips": [
+    842,
+    896,
+    9116,
+    -6933,
+    -4101,
+    -118,
+    -103,
+    401
+   ],
+   "pearson_stack": -0.7792800570422955,
+   "pearson_net": -0.6939057204997351,
+   "spearman_stack": -0.3571428571428572,
+   "spearman_net": -0.261904761904762
+  },
+  {
+   "file": "a3pre_phase2_unb_weak_seed137.sqlite",
+   "run_id": 1,
+   "seed": 137,
+   "archetypes": [
+    "oracle",
+    "sentinel",
+    "firestorm",
+    "wall",
+    "phantom",
+    "predator",
+    "mirror",
+    "judge"
+   ],
+   "trust": [
+    0.7365638208549711,
+    0.847060889958677,
+    0.37611616040889506,
+    0.9619999999973874,
+    0.5189420602267728,
+    0.7986925055341249,
+    0.8231527713024616,
+    0.8052342963647225
+   ],
+   "final_stack": [
+    868,
+    1718,
+    6714,
+    268,
+    205,
+    518,
+    91,
+    2018
+   ],
+   "net_chips": [
+    68,
+    1518,
+    6514,
+    -5132,
+    -4795,
+    118,
+    -109,
+    1818
+   ],
+   "pearson_stack": -0.6763665385821842,
+   "pearson_net": -0.4344903433519527,
+   "spearman_stack": -0.28571428571428575,
+   "spearman_net": -0.3571428571428572
+  },
+  {
+   "file": "a3pre_phase2_unb_weak_seed256.sqlite",
+   "run_id": 1,
+   "seed": 256,
+   "archetypes": [
+    "oracle",
+    "sentinel",
+    "firestorm",
+    "wall",
+    "phantom",
+    "predator",
+    "mirror",
+    "judge"
+   ],
+   "trust": [
+    0.7827409572935747,
+    0.865225897473631,
+    0.37904436017804943,
+    0.9619969877045733,
+    0.7730803714313553,
+    0.7997433905138674,
+    0.8502117970065735,
+    0.7632209345002884
+   ],
+   "final_stack": [
+    1438,
+    1059,
+    8343,
+    152,
+    15,
+    562,
+    527,
+    904
+   ],
+   "net_chips": [
+    1238,
+    459,
+    8143,
+    -6448,
+    -4185,
+    -38,
+    327,
+    504
+   ],
+   "pearson_stack": -0.9321789910083251,
+   "pearson_net": -0.8488270339731359,
+   "spearman_stack": -0.4047619047619048,
+   "spearman_net": -0.6190476190476191
+  },
+  {
+   "file": "a3pre_phase2_unb_weak_seed42.sqlite",
+   "run_id": 1,
+   "seed": 42,
+   "archetypes": [
+    "oracle",
+    "sentinel",
+    "firestorm",
+    "wall",
+    "phantom",
+    "predator",
+    "mirror",
+    "judge"
+   ],
+   "trust": [
+    0.7954849908371513,
+    0.8306552106114543,
+    0.5183635233006934,
+    0.9619999992607197,
+    0.7120354838913819,
+    0.8467335257870048,
+    0.7407497980139229,
+    0.8310980127521131
+   ],
+   "final_stack": [
+    592,
+    1634,
+    7432,
+    227,
+    234,
+    393,
+    205,
+    483
+   ],
+   "net_chips": [
+    392,
+    1434,
+    7032,
+    -5373,
+    -3166,
+    -207,
+    -395,
+    283
+   ],
+   "pearson_stack": -0.7906223678237257,
+   "pearson_net": -0.7672551084385315,
+   "spearman_stack": -0.28571428571428575,
+   "spearman_net": -0.38095238095238104
+  },
+  {
+   "file": "a3pre_phase2_unb_weak_seed512.sqlite",
+   "run_id": 1,
+   "seed": 512,
+   "archetypes": [
+    "oracle",
+    "sentinel",
+    "firestorm",
+    "wall",
+    "phantom",
+    "predator",
+    "mirror",
+    "judge"
+   ],
+   "trust": [
+    0.833075909832571,
+    0.6719619061662453,
+    0.3762014294305231,
+    0.9619997304523753,
+    0.5201369616289194,
+    0.8390402573253744,
+    0.8381153275464014,
+    0.8565737228918052
+   ],
+   "final_stack": [
+    1697,
+    1605,
+    7499,
+    63,
+    227,
+    1588,
+    560,
+    161
+   ],
+   "net_chips": [
+    1497,
+    1405,
+    7299,
+    -6337,
+    -4573,
+    1388,
+    -240,
+    -439
+   ],
+   "pearson_stack": -0.7167285070241103,
+   "pearson_net": -0.5108674338963928,
+   "spearman_stack": -0.7142857142857144,
+   "spearman_net": -0.5952380952380953
+  }
+ ],
+ "archetypes": {
+  "firestorm": {
+   "n_seeds": 5,
+   "hands": 50000,
+   "net_chips_total": 38104.0,
+   "net_chips_per_seed": 7620.8,
+   "win_rate_chips_per_100": 76.208,
+   "win_rate_bb_per_100": 38.104,
+   "showdown_net_chips_per_seed": -1745.4,
+   "non_showdown_net_chips_per_seed": 9366.2,
+   "showdowns_per_seed": 1408.2,
+   "per_hand_sd_chips": 9.577807372963814,
+   "seed_win_rates_chips_per_100": [
+    91.16,
+    65.14,
+    81.43,
+    70.32000000000001,
+    72.99
+   ],
+   "interval_method": "circular block bootstrap within seeds, block=min(100, hands//5)",
+   "ci95_boot_chips_per_100": [
+    67.85739999999998,
+    84.29019999999998
+   ]
+  },
+  "judge": {
+   "n_seeds": 5,
+   "hands": 50000,
+   "net_chips_total": 2567.0,
+   "net_chips_per_seed": 513.4,
+   "win_rate_chips_per_100": 5.1339999999999995,
+   "win_rate_bb_per_100": 2.5669999999999997,
+   "showdown_net_chips_per_seed": 2567.8,
+   "non_showdown_net_chips_per_seed": -2054.4,
+   "showdowns_per_seed": 441.4,
+   "per_hand_sd_chips": 5.680456337689781,
+   "seed_win_rates_chips_per_100": [
+    4.01,
+    18.18,
+    5.04,
+    2.83,
+    -4.390000000000001
+   ],
+   "interval_method": "circular block bootstrap within seeds, block=min(100, hands//5)",
+   "ci95_boot_chips_per_100": [
+    0.21365,
+    10.14805
+   ]
+  },
+  "mirror": {
+   "n_seeds": 5,
+   "hands": 50000,
+   "net_chips_total": -520.0,
+   "net_chips_per_seed": -104.0,
+   "win_rate_chips_per_100": -1.04,
+   "win_rate_bb_per_100": -0.52,
+   "showdown_net_chips_per_seed": 2462.8,
+   "non_showdown_net_chips_per_seed": -2566.8,
+   "showdowns_per_seed": 509.8,
+   "per_hand_sd_chips": 5.810315984522701,
+   "seed_win_rates_chips_per_100": [
+    -1.03,
+    -1.09,
+    3.27,
+    -3.95,
+    -2.4
+   ],
+   "interval_method": "circular block bootstrap within seeds, block=min(100, hands//5)",
+   "ci95_boot_chips_per_100": [
+    -5.99425,
+    3.96405
+   ]
+  },
+  "oracle": {
+   "n_seeds": 5,
+   "hands": 50000,
+   "net_chips_total": 4037.0,
+   "net_chips_per_seed": 807.4,
+   "win_rate_chips_per_100": 8.074,
+   "win_rate_bb_per_100": 4.037,
+   "showdown_net_chips_per_seed": 2566.2,
+   "non_showdown_net_chips_per_seed": -1758.8,
+   "showdowns_per_seed": 543.4,
+   "per_hand_sd_chips": 6.141877648765074,
+   "seed_win_rates_chips_per_100": [
+    8.42,
+    0.6799999999999999,
+    12.379999999999999,
+    3.92,
+    14.97
+   ],
+   "interval_method": "circular block bootstrap within seeds, block=min(100, hands//5)",
+   "ci95_boot_chips_per_100": [
+    3.2196999999999996,
+    13.556399999999998
+   ]
+  },
+  "phantom": {
+   "n_seeds": 5,
+   "hands": 50000,
+   "net_chips_total": -20820.0,
+   "net_chips_per_seed": -4164.0,
+   "win_rate_chips_per_100": -41.64,
+   "win_rate_bb_per_100": -20.82,
+   "showdown_net_chips_per_seed": 2604.4,
+   "non_showdown_net_chips_per_seed": -6768.4,
+   "showdowns_per_seed": 632.6,
+   "per_hand_sd_chips": 5.637174029600293,
+   "seed_win_rates_chips_per_100": [
+    -41.010000000000005,
+    -47.949999999999996,
+    -41.85,
+    -31.66,
+    -45.73
+   ],
+   "interval_method": "circular block bootstrap within seeds, block=min(100, hands//5)",
+   "ci95_boot_chips_per_100": [
+    -46.574,
+    -36.66185
+   ]
+  },
+  "predator": {
+   "n_seeds": 5,
+   "hands": 50000,
+   "net_chips_total": 1143.0,
+   "net_chips_per_seed": 228.6,
+   "win_rate_chips_per_100": 2.286,
+   "win_rate_bb_per_100": 1.143,
+   "showdown_net_chips_per_seed": 2877.6,
+   "non_showdown_net_chips_per_seed": -2649.0,
+   "showdowns_per_seed": 495.2,
+   "per_hand_sd_chips": 5.728659303920945,
+   "seed_win_rates_chips_per_100": [
+    -1.18,
+    1.18,
+    -0.38,
+    -2.07,
+    13.88
+   ],
+   "interval_method": "circular block bootstrap within seeds, block=min(100, hands//5)",
+   "ci95_boot_chips_per_100": [
+    -2.2383,
+    7.110799999999995
+   ]
+  },
+  "sentinel": {
+   "n_seeds": 5,
+   "hands": 50000,
+   "net_chips_total": 5712.0,
+   "net_chips_per_seed": 1142.4,
+   "win_rate_chips_per_100": 11.424,
+   "win_rate_bb_per_100": 5.712,
+   "showdown_net_chips_per_seed": 3331.2,
+   "non_showdown_net_chips_per_seed": -2188.8,
+   "showdowns_per_seed": 513.8,
+   "per_hand_sd_chips": 6.087415643965837,
+   "seed_win_rates_chips_per_100": [
+    8.959999999999999,
+    15.18,
+    4.590000000000001,
+    14.34,
+    14.05
+   ],
+   "interval_method": "circular block bootstrap within seeds, block=min(100, hands//5)",
+   "ci95_boot_chips_per_100": [
+    6.02165,
+    16.732249999999997
+   ]
+  },
+  "wall": {
+   "n_seeds": 5,
+   "hands": 50000,
+   "net_chips_total": -30223.0,
+   "net_chips_per_seed": -6044.6,
+   "win_rate_chips_per_100": -60.446,
+   "win_rate_bb_per_100": -30.223,
+   "showdown_net_chips_per_seed": 3664.4,
+   "non_showdown_net_chips_per_seed": -9709.0,
+   "showdowns_per_seed": 2264.0,
+   "per_hand_sd_chips": 8.42583219085213,
+   "seed_win_rates_chips_per_100": [
+    -69.33,
+    -51.32,
+    -64.48,
+    -53.73,
+    -63.370000000000005
+   ],
+   "interval_method": "circular block bootstrap within seeds, block=min(100, hands//5)",
+   "ci95_boot_chips_per_100": [
+    -67.5437,
+    -52.61340000000001
+   ]
+  }
+ }
+}
