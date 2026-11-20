@@ -32,6 +32,9 @@ Three things are added.
    a different, randomly chosen seat (``shuffled``, a placebo). ``target``
    restricts the rule to bets made by one archetype.
 
+   ``focal`` (see ``build_roster``) gives one archetype a different bluff
+   rate on every street, for the bluff-rate sweep.
+
 3. Two controls that involve no reading: ``loosen`` multiplies the same
    calling probabilities by a fixed factor per street and hand bucket,
    whoever bet; ``noise_p`` replaces a finished decision by a uniformly
@@ -258,10 +261,34 @@ _CLASSES = {
 }
 
 
+def _focal_class(base, br: float):
+    """``base`` with its bluff rate (bet probability with a Weak hand when no
+    bet is pending) set to ``br`` on every street. Everything else in its
+    table is unchanged."""
+
+    class Focal(base):
+        FOCAL_BR = float(br)
+
+        def get_params(self, betting_round, game_state):
+            params = dict(super().get_params(betting_round, game_state))
+            params["br"] = self.FOCAL_BR
+            return params
+
+    Focal.__name__ = f"{base.__name__}Br{int(round(br * 100)):02d}"
+    return Focal
+
+
 def build_roster(cfg: dict, seat_archetypes: List[str], seed: int):
-    """Return (agents, context) for one table."""
+    """Return (agents, context) for one table.
+
+    ``cfg["focal"] = {"archetype": A, "br": x}`` replaces archetype A by a
+    copy whose bluff rate is x on every street (the bluff-rate sweep).
+    """
     ctx = Context(cfg, seat_archetypes, seed)
-    classes = _CLASSES[cfg.get("roster", "no_read")]
+    classes = dict(_CLASSES[cfg.get("roster", "no_read")])
+    focal = cfg.get("focal")
+    if focal:
+        classes[focal["archetype"]] = _focal_class(classes[focal["archetype"]], focal["br"])
     agents = []
     for seat, arch in enumerate(seat_archetypes):
         agent = classes[arch](seat=seat)

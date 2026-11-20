@@ -18,6 +18,10 @@ same seat order and the same starting random state in both conditions).
 The primary contrast is the *cost of being read*: the win rate of archetype
 X when the others apply the response rule to X's bets only, minus X's win
 rate with all reading off. Holm adjustment covers the eight archetypes.
+
+The bluff-rate sweep gives one seat (the Oracle's) a bluff rate of 0, 0.15,
+0.33, 0.50 or 0.70 on every street and reports its win rate when nobody
+reads and when the others apply the response rule to its bets.
 """
 from __future__ import annotations
 
@@ -275,6 +279,40 @@ def main() -> int:
             mk = np.array([cost[x]["values"][k] for x in ARCH])
             per_seed_slopes.append(float(np.polyfit(h, mk, 1)[0]))
         primary["cost_vs_honesty"]["slope_per_seed"] = mean_ci(per_seed_slopes)
+
+    # bluff-rate sweep: the Oracle seat with its bluff rate set to x on every street
+    sweep = {}
+    oi = ARCH.index("oracle")
+    for br in (0.00, 0.15, 0.33, 0.50, 0.70):
+        tag = f"sweep_br{int(round(br * 100)):02d}"
+        off = "no_read" if br == 0.33 else tag + "_no_read"
+        on = "read_target_oracle_b10" if br == 0.33 else tag + "_read"
+        if off not in per or on not in per:
+            continue
+        common = [sd for sd in summaries[off]["seeds"] if sd in per[on]]
+        wr_off = [per[off][sd]["wr"][oi] for sd in common]
+        wr_on = [per[on][sd]["wr"][oi] for sd in common]
+        sweep[f"{br:.2f}"] = {
+            "bluff_rate": br, "condition_not_read": off, "condition_read": on,
+            "win_rate_not_read": mean_ci(wr_off), "win_rate_read": mean_ci(wr_on),
+            "cost_of_being_read": paired(wr_on, wr_off),
+            "trust_not_read": mean_ci([per[off][sd]["trust"][oi] for sd in common]),
+            "trust_read": mean_ci([per[on][sd]["trust"][oi] for sd in common]),
+            "nonshowdown_not_read": mean_ci([per[off][sd]["wr_nsd"][oi] for sd in common]),
+            "nonshowdown_read": mean_ci([per[on][sd]["wr_nsd"][oi] for sd in common]),
+            "showdown_not_read": mean_ci([per[off][sd]["wr_sd"][oi] for sd in common]),
+            "showdown_read": mean_ci([per[on][sd]["wr_sd"][oi] for sd in common]),
+            "fold_rate_medium_weak_vs_focal_not_read": summaries[off]["responses"]["fold_rate_medium_weak_by_bettor"]["oracle"],
+            "fold_rate_medium_weak_vs_focal_read": summaries[on]["responses"]["fold_rate_medium_weak_by_bettor"]["oracle"],
+        }
+    if len(sweep) >= 3:
+        xs = np.array([v["bluff_rate"] for v in sweep.values()])
+        n_seeds = min(v["win_rate_not_read"]["n"] for v in sweep.values())
+        for key in ("win_rate_not_read", "win_rate_read"):
+            slopes = [float(np.polyfit(xs, [v[key]["values"][k] for v in sweep.values()], 1)[0])
+                      for k in range(n_seeds)]
+            primary[f"sweep_slope_{key}_per_unit_bluff_rate"] = mean_ci(slopes)
+    primary["bluff_rate_sweep"] = sweep
 
     json.dump({"unit": "big blinds (2 chips) per 100 hands", "burn_in_hands_for_trust": BURN_IN,
                "conditions": summaries, "contrasts_vs_no_read": contrasts, "primary": primary},

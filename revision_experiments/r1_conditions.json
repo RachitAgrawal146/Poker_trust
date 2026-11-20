@@ -8,7 +8,9 @@
   "  loosen   fixed factor on the same calling probabilities, by street and bucket (no reading)",
   "  noise_p  probability that a decision is replaced by a random legal action",
   "  legacy   200-chip stacks with rebuys and the fixed seat order of the earlier runs",
-  "loose_matched_b10 factors: mean response-rule factor realised by read_all_b10 in the pilot (seeds 9001, 9002; 2,500 hands each; 18,309 eligible decisions), by street and bucket."
+  "loose_matched_b10 factors: mean response-rule factor realised by read_all_b10 in the pilot (seeds 9001, 9002; 2,500 hands each; 18,309 eligible decisions), by street and bucket.",
+  "  focal    {archetype, br}: that archetype's bluff rate (bet probability with a Weak hand, no bet pending) is set to br on every street",
+  "sweep_brXX_*: the Oracle seat with bluff rate XX; _no_read = nobody reads, _read = the others apply the rule to the focal seat only. At br 0.33 these are no_read and read_target_oracle_b10."
  ],
  "conditions": {
   "published": {
@@ -130,6 +132,74 @@
   "noise_010": {
    "roster": "no_read",
    "noise_p": 0.1
+  },
+  "sweep_br00_no_read": {
+   "roster": "no_read",
+   "focal": {
+    "archetype": "oracle",
+    "br": 0.0
+   }
+  },
+  "sweep_br00_read": {
+   "roster": "no_read",
+   "focal": {
+    "archetype": "oracle",
+    "br": 0.0
+   },
+   "beta": 1.0,
+   "source": "posterior",
+   "target": "oracle"
+  },
+  "sweep_br15_no_read": {
+   "roster": "no_read",
+   "focal": {
+    "archetype": "oracle",
+    "br": 0.15
+   }
+  },
+  "sweep_br15_read": {
+   "roster": "no_read",
+   "focal": {
+    "archetype": "oracle",
+    "br": 0.15
+   },
+   "beta": 1.0,
+   "source": "posterior",
+   "target": "oracle"
+  },
+  "sweep_br50_no_read": {
+   "roster": "no_read",
+   "focal": {
+    "archetype": "oracle",
+    "br": 0.5
+   }
+  },
+  "sweep_br50_read": {
+   "roster": "no_read",
+   "focal": {
+    "archetype": "oracle",
+    "br": 0.5
+   },
+   "beta": 1.0,
+   "source": "posterior",
+   "target": "oracle"
+  },
+  "sweep_br70_no_read": {
+   "roster": "no_read",
+   "focal": {
+    "archetype": "oracle",
+    "br": 0.7
+   }
+  },
+  "sweep_br70_read": {
+   "roster": "no_read",
+   "focal": {
+    "archetype": "oracle",
+    "br": 0.7
+   },
+   "beta": 1.0,
+   "source": "posterior",
+   "target": "oracle"
   }
  }
 }

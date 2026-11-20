@@ -42,6 +42,7 @@ Rule-based agents only. Three layers.
 | `shuffled_b10` | Rule uses the trust score of a random other seat, redrawn each hand | Placebo: effects that need no correct attribution |
 | `loose_matched_b10` | No reading; the same calling probabilities are multiplied by the mean factor that `read_all_b10` realised, by street and bucket | Rules out "the table simply calls more or less" |
 | `noise_005`, `noise_010` | `no_read`, each decision replaced by a random legal action with probability 0.05 or 0.10 | Does noise alone weaken the trust-outcome association |
+| `sweep_brXX_no_read`, `sweep_brXX_read` (XX = 00, 15, 50, 70) | The Oracle seat's bluff rate (bet probability with a Weak hand when no bet is pending) is set to XX on every street; the rest of its table is unchanged. Nobody reads, or the others apply the rule at `beta = 1` to that seat's bets only. At 0.33 these are `no_read` and `read_target_oracle_b10` | Profit against own bluff rate with everything else held fixed, read and not read |
 | `published_legacy`, `no_read_legacy` | The first two under the earlier protocol: 200-chip stacks with rebuys, fixed seat order | Continuity with the earlier runs; size of the protocol change |
 
 Protocol for all other conditions: 100,000-chip stacks, so no seat can go
@@ -57,7 +58,7 @@ and 9002 (2,500 hands each), which are not among the seeds below.
 20 seeds: 42, 137, 256, 512, 1024, 12666, 13927, 14942, 19277, 29004, 41939,
 42908, 58556, 69218, 70875, 72385, 73280, 77153, 86890, 99769 (the list frozen
 in `phase3/run_phase31_replication.py`). 10,000 hands per seed, 200,000 hands
-per condition, 20 conditions. No interim looks. A seed is rerun only after a
+per condition, 28 conditions. No interim looks. A seed is rerun only after a
 technical failure, and that is logged in `research_data/r1/`.
 
 ## Outcomes and statistics
@@ -78,6 +79,11 @@ technical failure, and that is logged in `research_data/r1/`.
   archetypes, with a t-interval over seeds. A negative slope means the
   archetypes that bluff least lose most from being read; a positive slope
   means the archetypes that bluff most lose most.
+* **Bluff-rate sweep:** the focal seat's win rate at each of the five bluff
+  rates, not read and read; the paired difference (its cost of being read) at
+  each; and the slope of win rate on bluff rate fitted per seed, in each of
+  the two settings. This holds every other feature of the player fixed, which
+  the comparison across eight archetypes cannot.
 * **Secondary:** per-condition Pearson and Spearman r between trust and win
   rate over the eight archetypes, per seed, summarised across seeds; win
   rates under `read_all` at the three strengths; each control against
@@ -94,6 +100,9 @@ technical failure, and that is logged in `research_data/r1/`.
 | `no_read` shows the same negative trust-outcome association as `published` | The earlier association is playing style, not reputation |
 | Cost of being read is larger for low-bluff archetypes (negative slope) | Being legible penalises the players who bluff least: the transparency paradox holds in this testbed |
 | Cost of being read is larger for high-bluff archetypes (positive slope) | Reputation protects the players who bluff least; the paradox does not hold here |
+| In the sweep, win rate rises with bluff rate when nobody reads | Bluffing pays against opponents who do not respond: the gap is style |
+| In the sweep, the cost of being read grows with bluff rate | Being read penalises bluffing, not honesty |
+| In the sweep, the cost of being read is largest at low bluff rates | Being read penalises honesty |
 | `shuffled_b10` reproduces the changes of `read_all_b10` | The changes do not depend on reading the right player |
 | `loose_matched_b10` reproduces them | The changes are a general shift in calling frequency |
 | `read_true_b10` differs from `read_all_b10` | Inference error in the posterior matters |
