@@ -1,0 +1,66 @@
+{
+ "label": "smoke",
+ "hands": 200,
+ "conditions": {
+  "no_read": {
+   "seeds_found": [
+    42,
+    137
+   ],
+   "seeds_missing": [],
+   "hands_ok": true,
+   "git_sha": [
+    "16b71a9e727b6dd3540bd3fb8b532f36a0114b46"
+   ],
+   "hands_per_second": [
+    9.9,
+    9.39
+   ]
+  },
+  "read_all_b10": {
+   "seeds_found": [
+    42,
+    137
+   ],
+   "seeds_missing": [],
+   "hands_ok": true,
+   "git_sha": [
+    "16b71a9e727b6dd3540bd3fb8b532f36a0114b46"
+   ],
+   "hands_per_second": [
+    6.13,
+    5.38
+   ]
+  },
+  "loose_matched_b10": {
+   "seeds_found": [
+    42,
+    137
+   ],
+   "seeds_missing": [],
+   "hands_ok": true,
+   "git_sha": [
+    "16b71a9e727b6dd3540bd3fb8b532f36a0114b46"
+   ],
+   "hands_per_second": [
+    4.96,
+    5.04
+   ]
+  },
+  "published_legacy": {
+   "seeds_found": [
+    42,
+    137
+   ],
+   "seeds_missing": [],
+   "hands_ok": true,
+   "git_sha": [
+    "16b71a9e727b6dd3540bd3fb8b532f36a0114b46"
+   ],
+   "hands_per_second": [
+    10.99,
+    9.95
+   ]
+  }
+ }
+}
