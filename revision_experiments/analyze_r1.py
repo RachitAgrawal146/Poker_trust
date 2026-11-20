@@ -261,6 +261,30 @@ def main() -> int:
             d["honesty"] = HONESTY[arch]
             cost[arch] = d
     primary = {"cost_of_being_read": cost}
+    # post hoc: the same contrast with the target's true non-bluff rate (exact reading)
+    exact = {}
+    for ai, arch in enumerate(ARCH):
+        cond = f"read_target_{arch}_true_b10"
+        if cond in contrasts:
+            d = dict(contrasts[cond]["delta_wr"][arch])
+            d["mean_change_of_the_other_seven"] = float(np.mean(
+                [contrasts[cond]["delta_wr"][o]["mean"] for o in ARCH if o != arch]))
+            d["honesty"] = HONESTY[arch]
+            inferred = f"read_target_{arch}_b10"
+            if inferred in per:
+                common = [sd for sd in summaries[cond]["seeds"] if sd in per[inferred]]
+                d["exact_minus_inferred"] = paired([per[cond][sd]["wr"][ai] for sd in common],
+                                                   [per[inferred][sd]["wr"][ai] for sd in common])
+            exact[arch] = d
+    if exact:
+        if len(exact) == len(ARCH):
+            for x, adj in zip(ARCH, holm([exact[x]["p"] for x in ARCH])):
+                exact[x]["p_holm"] = adj
+            h_ = np.array([HONESTY[x] for x in ARCH])
+            n_ = min(exact[x]["n"] for x in ARCH)
+            slopes = [float(np.polyfit(h_, [exact[x]["values"][k] for x in ARCH], 1)[0]) for k in range(n_)]
+            primary["exact_cost_vs_honesty_slope_per_seed"] = mean_ci(slopes)
+        primary["cost_of_being_read_exact_posthoc"] = exact
     if len(cost) == len(ARCH):
         p = [cost[x]["p"] for x in ARCH]
         for x, adj in zip(ARCH, holm(p)):

@@ -10,7 +10,8 @@
   "  legacy   200-chip stacks with rebuys and the fixed seat order of the earlier runs",
   "loose_matched_b10 factors: mean response-rule factor realised by read_all_b10 in the pilot (seeds 9001, 9002; 2,500 hands each; 18,309 eligible decisions), by street and bucket.",
   "  focal    {archetype, br}: that archetype's bluff rate (bet probability with a Weak hand, no bet pending) is set to br on every street",
-  "sweep_brXX_*: the Oracle seat with bluff rate XX; _no_read = nobody reads, _read = the others apply the rule to the focal seat only. At br 0.33 these are no_read and read_target_oracle_b10."
+  "sweep_brXX_*: the Oracle seat with bluff rate XX; _no_read = nobody reads, _read = the others apply the rule to the focal seat only. At br 0.33 these are no_read and read_target_oracle_b10.",
+  "read_target_X_true_b10: added after the main runs were analysed (see the addendum in R1_PLAN.md). The rule applied to bets by X only, with X's true non-bluff rate in place of the posterior."
  ],
  "conditions": {
   "published": {
@@ -200,6 +201,54 @@
    "beta": 1.0,
    "source": "posterior",
    "target": "oracle"
+  },
+  "read_target_oracle_true_b10": {
+   "roster": "no_read",
+   "beta": 1.0,
+   "source": "true",
+   "target": "oracle"
+  },
+  "read_target_sentinel_true_b10": {
+   "roster": "no_read",
+   "beta": 1.0,
+   "source": "true",
+   "target": "sentinel"
+  },
+  "read_target_firestorm_true_b10": {
+   "roster": "no_read",
+   "beta": 1.0,
+   "source": "true",
+   "target": "firestorm"
+  },
+  "read_target_wall_true_b10": {
+   "roster": "no_read",
+   "beta": 1.0,
+   "source": "true",
+   "target": "wall"
+  },
+  "read_target_phantom_true_b10": {
+   "roster": "no_read",
+   "beta": 1.0,
+   "source": "true",
+   "target": "phantom"
+  },
+  "read_target_predator_true_b10": {
+   "roster": "no_read",
+   "beta": 1.0,
+   "source": "true",
+   "target": "predator"
+  },
+  "read_target_mirror_true_b10": {
+   "roster": "no_read",
+   "beta": 1.0,
+   "source": "true",
+   "target": "mirror"
+  },
+  "read_target_judge_true_b10": {
+   "roster": "no_read",
+   "beta": 1.0,
+   "source": "true",
+   "target": "judge"
   }
  }
 }

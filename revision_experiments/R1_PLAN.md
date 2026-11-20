@@ -116,3 +116,22 @@ technical failure, and that is logged in `research_data/r1/`.
   and the controls describe this rule.
 * Eight archetypes with hand-set tables; hand buckets from equity against one
   random hand.
+
+## Addendum, 20 November 2026: one set of conditions added after the main runs
+
+The 28 conditions above were run and analysed as planned (run 44740915042,
+ledgers in `research_data/r1/full/`). One question arose from the results
+and was not anticipated: the posterior gives the tight archetypes a trust
+score near 0.80 where their true non-bluff rate is 0.92, so the response to
+their bets under `read_target_X_b10` is milder than exact knowledge of their
+type would produce. To measure the cost of being read when the reading is
+exact, eight conditions are added:
+
+| Condition | Definition |
+|---|---|
+| `read_target_X_true_b10` (8) | `no_read` plus the rule at `beta = 1`, applied only to bets by archetype X, using X's true non-bluff rate in place of the posterior |
+
+Same seeds, hands, protocol, outcome and statistics as above. These
+conditions were chosen after seeing the main results. They are reported as
+a post hoc addition, separately from the pre-specified cost of being read,
+and nothing in the pre-specified analysis is changed by them.
