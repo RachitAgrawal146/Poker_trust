@@ -1,0 +1,70 @@
+name: R1 rule-based conditions
+# Triggered by a push to run/r1 that changes revision_experiments/r1_plan.json:
+#   {"label": str, "conditions": [...], "seeds": [...], "hands": int, "seeds_per_job": int}
+# One job per (condition, chunk of seeds). Each job writes one small JSON
+# ledger per seed. The collect job gathers them into
+# research_data/r1/<label>/<condition>.json and commits them to run/r1.
+on:
+  push:
+    branches: [run/r1]
+    paths: ['revision_experiments/r1_plan.json']
+permissions:
+  contents: write
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.m.outputs.matrix }}
+      label: ${{ steps.m.outputs.label }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: m
+        run: python3 revision_experiments/plan_r1.py revision_experiments/r1_plan.json >> "$GITHUB_OUTPUT"
+  run:
+    needs: plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    strategy:
+      fail-fast: false
+      max-parallel: 20
+      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - run: pip install --quiet numpy treys
+      - name: Run ${{ matrix.condition }} seeds ${{ matrix.seeds }}
+        run: |
+          nproc
+          python3 revision_experiments/run_r1.py --condition "${{ matrix.condition }}" \
+            --seeds "${{ matrix.seeds }}" --hands ${{ matrix.hands }} \
+            --procs ${{ matrix.procs }} --out out
+      - uses: actions/upload-artifact@v4
+        with:
+          name: r1-${{ matrix.condition }}-${{ matrix.chunk }}
+          path: out/
+          retention-days: 30
+  collect:
+    needs: [plan, run]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - run: pip install --quiet numpy scipy
+      - uses: actions/download-artifact@v4
+        with: { path: art, pattern: 'r1-*', merge-multiple: true }
+      - name: Gather, summarise and commit
+        env:
+          LABEL: ${{ needs.plan.outputs.label }}
+        run: |
+          mkdir -p "research_data/r1/$LABEL"
+          python3 revision_experiments/collect_r1.py art "research_data/r1/$LABEL" revision_experiments/r1_plan.json
+          python3 revision_experiments/analyze_r1.py "research_data/r1/$LABEL" --out "research_data/r1/$LABEL/summary.json" || echo "analysis failed; raw ledgers are committed"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add research_data/r1
+          git commit -m "runs: R1 ledgers for $LABEL (run ${{ github.run_id }})" || echo "nothing to commit"
+          git pull --rebase origin run/r1
+          git push origin HEAD:run/r1

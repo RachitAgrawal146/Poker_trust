@@ -1,0 +1,135 @@
+{
+ "_comment": [
+  "R1 rule-based conditions, read by run_r1.py. Keys per condition:",
+  "  roster   published | no_read",
+  "  beta     strength of the response rule (0 = off)",
+  "  source   posterior | true | shuffled (where the trust score comes from)",
+  "  target   apply the rule only to bets made by this archetype",
+  "  loosen   fixed factor on the same calling probabilities, by street and bucket (no reading)",
+  "  noise_p  probability that a decision is replaced by a random legal action",
+  "  legacy   200-chip stacks with rebuys and the fixed seat order of the earlier runs",
+  "loose_matched_b10 factors: mean response-rule factor realised by read_all_b10 in the pilot (seeds 9001, 9002; 2,500 hands each; 18,309 eligible decisions), by street and bucket."
+ ],
+ "conditions": {
+  "published": {
+   "roster": "published"
+  },
+  "no_read": {
+   "roster": "no_read"
+  },
+  "published_legacy": {
+   "roster": "published",
+   "legacy": true
+  },
+  "no_read_legacy": {
+   "roster": "no_read",
+   "legacy": true
+  },
+  "read_all_b05": {
+   "roster": "no_read",
+   "beta": 0.5,
+   "source": "posterior"
+  },
+  "read_all_b10": {
+   "roster": "no_read",
+   "beta": 1.0,
+   "source": "posterior"
+  },
+  "read_all_b20": {
+   "roster": "no_read",
+   "beta": 2.0,
+   "source": "posterior"
+  },
+  "read_true_b10": {
+   "roster": "no_read",
+   "beta": 1.0,
+   "source": "true"
+  },
+  "shuffled_b10": {
+   "roster": "no_read",
+   "beta": 1.0,
+   "source": "shuffled"
+  },
+  "loose_matched_b10": {
+   "roster": "no_read",
+   "loosen": {
+    "preflop": {
+     "Strong": 1.0,
+     "Medium": 1.363,
+     "Weak": 1.2874
+    },
+    "flop": {
+     "Strong": 1.0,
+     "Medium": 1.4366,
+     "Weak": 1.4715
+    },
+    "turn": {
+     "Strong": 1.0,
+     "Medium": 1.5495,
+     "Weak": 1.5743
+    },
+    "river": {
+     "Strong": 1.0,
+     "Medium": 1.5848,
+     "Weak": 1.655
+    }
+   }
+  },
+  "read_target_oracle_b10": {
+   "roster": "no_read",
+   "beta": 1.0,
+   "source": "posterior",
+   "target": "oracle"
+  },
+  "read_target_sentinel_b10": {
+   "roster": "no_read",
+   "beta": 1.0,
+   "source": "posterior",
+   "target": "sentinel"
+  },
+  "read_target_firestorm_b10": {
+   "roster": "no_read",
+   "beta": 1.0,
+   "source": "posterior",
+   "target": "firestorm"
+  },
+  "read_target_wall_b10": {
+   "roster": "no_read",
+   "beta": 1.0,
+   "source": "posterior",
+   "target": "wall"
+  },
+  "read_target_phantom_b10": {
+   "roster": "no_read",
+   "beta": 1.0,
+   "source": "posterior",
+   "target": "phantom"
+  },
+  "read_target_predator_b10": {
+   "roster": "no_read",
+   "beta": 1.0,
+   "source": "posterior",
+   "target": "predator"
+  },
+  "read_target_mirror_b10": {
+   "roster": "no_read",
+   "beta": 1.0,
+   "source": "posterior",
+   "target": "mirror"
+  },
+  "read_target_judge_b10": {
+   "roster": "no_read",
+   "beta": 1.0,
+   "source": "posterior",
+   "target": "judge"
+  },
+  "noise_005": {
+   "roster": "no_read",
+   "noise_p": 0.05
+  },
+  "noise_010": {
+   "roster": "no_read",
+   "noise_p": 0.1
+  }
+ }
+}

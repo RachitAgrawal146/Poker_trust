@@ -1,0 +1,15 @@
+{
+ "label": "smoke",
+ "conditions": [
+  "no_read",
+  "read_all_b10",
+  "loose_matched_b10",
+  "published_legacy"
+ ],
+ "seeds": [
+  42,
+  137
+ ],
+ "hands": 200,
+ "seeds_per_job": 2
+}
