@@ -27,7 +27,7 @@ and the actual paper-writing pass:
   setup and headline numbers, the metrics framework, the two
   &quot;money quote&quot; hands, real-world parallels, and a
   cheat-sheet of numbers to memorize.
-- `paper_resources/notes/ARPIT_MEETING_FAQ.md` &mdash; 32 anticipated
+- `paper_resources/notes/MEETING_FAQ.md` &mdash; 32 anticipated
   mentor questions with prepared answers, grouped by topic (headline
   finding, statistical rigor, Nash falsification, methodology, trap
   mechanism, limitations, future work) plus quick-recall flashcards.
@@ -166,7 +166,7 @@ Two follow-up items closed here.
 
 ## [Phase 2* unbounded sub-experiment] &mdash; 2026-05-04
 
-Tests Arpit's "do economically-motivated agents converge to a
+Tests the mentor's "do economically-motivated agents converge to a
 Nash-equilibrium profile if given full parameter freedom?" hypothesis.
 
 - `phase2/adaptive/bounds.py::make_unbounded_bounds()` &mdash; helper

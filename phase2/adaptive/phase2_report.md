@@ -1,6 +1,6 @@
 # Phase 2 (Adaptive) Report — Bounded Online Optimization Weakens But Cannot Escape the Trust Trap
 
-**Author:** Rachit Agrawal | Polygence Research Project | 2025–2026
+**Author:** Anonymous | 2025–2026
 **Branch:** `claude/poker-trust-phase-2-C1yUP` (phase2-adaptive lineage)
 **Canonical run config:** 5 seeds × 10 000 hands, `eval_window = 200`,
 `delta = 0.03 → 0.005`, decay 0.995. Lean run (3 × 5000) executed first as a

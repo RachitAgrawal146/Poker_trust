@@ -1,6 +1,6 @@
 # Paper Resources
 
-Materials for writing the Polygence research paper. The skeleton LaTeX
+Materials for writing the research paper. The skeleton LaTeX
 manuscript is in [`manuscript/main.tex`](manuscript/main.tex) — every
 section, figure, table, and boxed hand-example placed, captions
 drafted, `% PROSE:` markers showing what to write. The prose itself is
@@ -55,7 +55,7 @@ in the preamble if you organize them differently. Then:
 3. Read [`notes/PROJECT_ORIENTATION.md`](notes/PROJECT_ORIENTATION.md)
    first — it's a ground-up explanation of every component the paper
    discusses.
-4. Keep [`notes/ARPIT_MEETING_FAQ.md`](notes/ARPIT_MEETING_FAQ.md)
+4. Keep [`notes/MEETING_FAQ.md`](notes/MEETING_FAQ.md)
    open during writing for the anticipated questions and prepared
    answers.
 5. When you cite something, add the entry to `references.bib` and
@@ -86,7 +86,7 @@ Phase 2 unbounded sub-experiment:
 | `10_param_drift_unbounded.png` | Preflop bluff-rate drift (weak HC — agents barely move) |
 | `10_param_drift_unbounded_aggressive.png` | Aggressive HC — 11× more drift |
 
-Nash convergence test (per Arpit's 2026-04-30 question):
+Nash convergence test (per the mentor's 2026-04-30 question):
 
 | File | Use for |
 |---|---|
@@ -111,7 +111,7 @@ Drop-in `tabular` blocks for `\input{}` in Overleaf:
 ## Data (13 CSVs)
 
 Every figure and table traces back to one of these CSVs. Open in
-Excel / Python / a Polygence reviewer's spreadsheet if asked for raw
+Excel / Python / a reviewer's spreadsheet if asked for raw
 numbers.
 
 | File | Backs |
@@ -166,10 +166,10 @@ Each note covers one self-contained topic.
 | `unbounded_archetype_drift.md` | L1 distance to canonical archetype: agents stay closest to themselves on every seed |
 | `societal_implications.md` | Real-world parallels (eBay, AI alignment, HFT) — extends §7.2 |
 | `future_work_expanded.md` | Detailed Phase 4 roadmap (n=20 replication, multi-LLM, no-limit) — extends §7.3 |
-| `mentor_walkthrough.md` | 30-min script for the next Arpit meeting (6 beats × 5 min) |
+| `mentor_walkthrough.md` | 30-min script for the next the mentor meeting (6 beats × 5 min) |
 | `methods_disclosures.md` | Methods-section checklist (LLM temperature disclosure, CI derivation, engine side-pot change) |
 | `PROJECT_ORIENTATION.md` | **Read first.** Ground-up explanation of the whole project (assume zero memory): research question, 8 archetypes, Bayesian trust model, the four phases, metrics, money-quote hands, real-world parallels, cheat-sheet numbers |
-| `ARPIT_MEETING_FAQ.md` | Anticipated mentor questions with prepared answers. Quick-recall flashcards at the bottom |
+| `MEETING_FAQ.md` | Anticipated mentor questions with prepared answers. Quick-recall flashcards at the bottom |
 
 ## Suggested paper outline (where to use each asset)
 

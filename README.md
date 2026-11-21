@@ -49,7 +49,7 @@ over cooperation, or is the trap dynamic dependent on agent capability?**
 Every phase reuses the **same game engine**, **same trust posterior**, and
 **same metrics framework**. Only the agent's `decide_action` changes.
 
-The Polygence research paper is built from
+The research paper is built from
 [`paper_resources/manuscript/main.tex`](paper_resources/manuscript/main.tex)
 (compiled `main.pdf`, editable `main.docx`); supporting
 materials — figures, LaTeX tables, CSV data, story-hand transcripts, and
@@ -152,7 +152,7 @@ python analysis/bootstrap_ci.py              # Mean-r CIs + per-seed Fisher-z
 ## Project Layout
 
 ```
-Poker_trust/
+repository/
 │
 ├── phase1/                   # ── PHASE 1: RULE-BASED ─────────────────────────
 │   ├── README.md             # Phase 1 quick reference

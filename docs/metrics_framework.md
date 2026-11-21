@@ -1,6 +1,6 @@
 # Metrics Framework: Quantifying Trust Dynamics and Agent Complexity
 
-**Rachit Agrawal | Polygence Research Project**
+**Anonymous**
 **Updated April 25, 2026 — includes computed results from 5,000-hand simulation**
 
 ---
@@ -9,7 +9,7 @@
 
 > To investigate whether observation-based trust systems inherently reward exploitation over cooperation, and whether this dynamic is a structural property of repeated strategic interaction or an artifact of agent design.
 
-Arpit's follow-up: How do we *quantify* this? And how do we measure what it means to "improve" from mathematical models → ML → LLM agents?
+the mentor's follow-up: How do we *quantify* this? And how do we measure what it means to "improve" from mathematical models → ML → LLM agents?
 
 This document defines concrete, computable metrics for both questions — and presents actual computed values from Phase 1.
 

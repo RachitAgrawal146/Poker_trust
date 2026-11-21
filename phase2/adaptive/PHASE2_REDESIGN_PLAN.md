@@ -1,6 +1,6 @@
 # Phase 2 Redesign — Plan & Status
 
-**Audience:** Arpit
+**Audience:** the mentor
 **Branch:** `phase2-adaptive`
 **Status:** stages 1–4 implemented, canonical run (3 seeds × 5000 hands) executed, comparison + writeup pending
 

@@ -40,7 +40,7 @@ Detailed reports in `phase1/phase1_report.md`,
 (the latter covers both the Phase 3 baseline and the Phase 3.1
 reasoning-scaffolding follow-up). Cross-phase scorecards in
 `reports/phase31_long_scorecard.txt` (the most recent / most complete).
-The Polygence paper itself is written externally (Overleaf); supporting
+The paper itself is written externally (Overleaf); supporting
 materials — figures, LaTeX tables, CSV data, story hands, and topical
 notes — live in `paper_resources/`. See `paper_resources/README.md`.
 
@@ -109,7 +109,7 @@ These rules override the conventions below wherever they conflict.
    when hooks have already rejected the previous attempt.
 
 6. **The working branch is `main`** on `origin`
-   (`rachitagrawal146/poker_trust`). All historical development
+   (`<owner>/<repository>`). All historical development
    branches (`claude/poker-trust-simulation-6h3xR`, the four stage
    sub-branches, `claude/dazzling-sagan-dQ7ZF`,
    `claude/focused-thompson-1gTAE`, `claude/stoic-mccarthy-3tnxav`)
@@ -122,7 +122,7 @@ These rules override the conventions below wherever they conflict.
    Submission-ready variants live at the repo root: `arxiv_build/`
    (verified arXiv source bundle + tarball), `tmlr_submission/` +
    `tmlr_build/` (anonymized TMLR source, PDF, and port reports),
-   and `jei_submission/` (JEI-formatted docx + compliance reports).
+   and one further formatted variant.
    `tog_submission/` + `tog_build/` (IEEE Transactions on Games
    double-anonymous port, 10-page gate) were added 2026-07-19.
    Treat all of these as frozen deliverables — regenerate via the scripts

@@ -1,6 +1,6 @@
 # Phase 3 Report — LLM Agents (Baseline + Reasoning Scaffolding)
 
-**Author:** Rachit Agrawal | Polygence Research Project | 2025–2026
+**Author:** Anonymous | 2025–2026
 **Branch:** `main`
 **Two sub-phases reported here:**
 

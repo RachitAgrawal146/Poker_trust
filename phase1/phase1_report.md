@@ -1,6 +1,6 @@
 # Phase 1 Complete Report: Multi-Agent Trust Dynamics in 8-Player Limit Hold'em
 
-**Author:** Rachit Agrawal | Polygence Research Project | 2025–2026
+**Author:** Anonymous | 2025–2026
 **Dataset:** v3 — 500,000 hands across 20 seeds (25,000 hands/seed)
 **Codebase:** 9,569 lines of Python + 1,927-line HTML visualizer
 
@@ -816,8 +816,8 @@ The spec's headline prediction — that the Mirror's reflected aggression trigge
 ### 12.1 Setup
 
 ```bash
-git clone https://github.com/RachitAgrawal146/Poker_trust.git
-cd Poker_trust
+git clone <repository URL>
+cd <repository>
 pip install -r requirements.txt   # treys + numpy
 ```
 

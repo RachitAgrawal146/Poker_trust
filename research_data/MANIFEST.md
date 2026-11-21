@@ -25,7 +25,7 @@ All three LFS objects were confirmed to resolve on the LFS server on
 Release `data-r0` (tag on `3e87700`), created by
 `.github/workflows/archive-data.yml`. Files were copied unchanged from
 Actions artifacts that expire after 90 days. Download with
-`curl -sSfL -O https://github.com/RachitAgrawal146/Poker_trust/releases/download/data-r0/<asset>`.
+`curl -sSfL -O <repository URL>/releases/download/data-r0/<asset>`.
 
 | Asset | Contents | Protocol | SHA-256 |
 |---|---|---|---|
