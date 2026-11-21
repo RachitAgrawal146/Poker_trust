@@ -98,6 +98,14 @@ for c, t in (("published", "PB"), ("read_all_b10", "RA"), ("loose_matched_b10", 
              ("noise_010", "NzT"), ("read_true_b10", "RT")):
     m, se, lo, hi = rdiff(c, "no_read")
     M("Rdiff" + t, sg(m, 3)); M("Rdiff" + t + "Lo", sg(lo, 3)); M("Rdiff" + t + "Hi", sg(hi, 3))
+# the earlier statistic (trust of the final hand), which the analysis plan reports for continuity
+def rfinal(c):
+    return np.array(C[c]["association"]["pearson_final_trust_winrate"]["values"])
+for c, t in (("no_read", "NR"), ("published", "PB")):
+    m, se, lo, hi = tci(rfinal(c))
+    M(t + "RFinal", sg(m, 2)); M(t + "RFinalLo", sg(lo, 2)); M(t + "RFinalHi", sg(hi, 2))
+m, se, lo, hi = tci(rfinal("published") - rfinal("no_read"))
+M("RdiffPBFinal", sg(m, 2)); M("RdiffPBFinalLo", sg(lo, 2)); M("RdiffPBFinalHi", sg(hi, 2))
 m, se, lo, hi = rdiff("read_all_b10", "loose_matched_b10")
 M("RdiffRAvsLM", sg(m, 3)); M("RdiffRAvsLMLo", sg(lo, 3)); M("RdiffRAvsLMHi", sg(hi, 3))
 

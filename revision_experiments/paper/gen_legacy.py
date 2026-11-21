@@ -1,5 +1,5 @@
 """Macros and tables for the datasets of the first submission, re-analysed
-under win rate. Source: Poker_trust research_data/checks/b2/*.json (written by
+under win rate. Source: research_data/checks/b2/*.json in the code repository (written by
 analysis/metric_change.py from the released databases).
   python3 gen_legacy.py REPO PAPER/generated
 """
