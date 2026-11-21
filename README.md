@@ -27,6 +27,9 @@
 > Firestorm = maniac, Wall = calling station, Phantom = bluffer, Predator =
 > exploiter, Mirror = mimic, Judge = grudger; "honesty" = non-bluff rate. The
 > outcome is win rate in big blinds per 100 hands.
+>
+> This review copy omits manuscript bundles prepared for other venues, the
+> title page, and working notes, so a few paths named below are absent.
 
 Multi-agent Bayesian trust dynamics in 8-player Limit Texas Hold'em. Eight
 archetype agents play hundreds of thousands of hands while every agent
