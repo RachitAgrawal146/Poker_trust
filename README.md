@@ -1,5 +1,33 @@
 # Poker Trust Simulation
 
+> **Revision R1 (November 2026).** The study was revised and its conclusions
+> changed. The trust-profit association reported below is reproduced, but it
+> is fully present when no agent can act on what it has inferred, so it
+> reflects playing style and not the use of reputation. The interpretation of
+> that association as a "trap", the claim about language-model reasoning and
+> the claim about numerical optimisation are withdrawn. Everything below this
+> note describes the earlier version and is kept for the record, with its
+> original names (Phase 1 to 3.1; Oracle, Sentinel, Firestorm, Wall, Phantom,
+> Predator, Mirror, Judge) and its original outcome (final stack).
+>
+> | Revision material | Where |
+> |---|---|
+> | Analysis plan, committed before the runs | `revision_experiments/R1_PLAN.md` |
+> | Conditions (36) | `revision_experiments/r1_conditions.json` |
+> | Agents, response rule and controls | `revision_experiments/r1_agents.py` |
+> | Runner, analysis, tests | `revision_experiments/run_r1.py`, `analyze_r1.py`, `test_r1.py` |
+> | Per-seed ledgers and summary (20 seeds x 10,000 hands per condition) | `research_data/r1/full/` |
+> | Scripts that write every number, table and figure of the revised paper | `revision_experiments/paper/` |
+> | Earlier datasets re-analysed under win rate | `research_data/checks/b2/` |
+>
+> Run one condition:
+> `python3 revision_experiments/run_r1.py --condition no_read --seeds 42 --hands 10000 --out out/`
+>
+> Names in the revised paper: Oracle = balanced, Sentinel = tight-aggressive,
+> Firestorm = maniac, Wall = calling station, Phantom = bluffer, Predator =
+> exploiter, Mirror = mimic, Judge = grudger; "honesty" = non-bluff rate. The
+> outcome is win rate in big blinds per 100 hands.
+
 Multi-agent Bayesian trust dynamics in 8-player Limit Texas Hold'em. Eight
 archetype agents play hundreds of thousands of hands while every agent
 maintains a live posterior over what *kind* of player everyone else is.
